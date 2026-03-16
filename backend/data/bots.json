@@ -1,0 +1,128 @@
+[
+  {
+    "characterID": "bot_gareth_warrior",
+    "characterName": "Gareth",
+    "level": 3,
+    "stats": {
+      "conviction": 80,
+      "endurance": 110,
+      "ambition": 60,
+      "harmony": 50
+    },
+    "skills": [
+      {
+        "skillID": "basic_attack",
+        "learned": true,
+        "usageCount": 25,
+        "skillXP": 400,
+        "skillLevel": 3,
+        "lastUsed": null
+      },
+      {
+        "skillID": "block",
+        "learned": true,
+        "usageCount": 15,
+        "skillXP": 200,
+        "skillLevel": 2,
+        "lastUsed": null
+      }
+    ],
+    "consumables": {
+      "health_potion_minor": 2,
+      "escape_rope": 1
+    },
+    "equipment": {
+      "mainHand": "sword_iron_tier0",
+      "offHand": null,
+      "chest": null,
+      "head": null,
+      "hands": null,
+      "legs": null,
+      "feet": null
+    }
+  },
+  {
+    "characterID": "bot_elara_mage",
+    "characterName": "Elara",
+    "level": 3,
+    "stats": {
+      "conviction": 100,
+      "endurance": 55,
+      "ambition": 75,
+      "harmony": 85
+    },
+    "skills": [
+      {
+        "skillID": "produce_flame",
+        "learned": true,
+        "usageCount": 30,
+        "skillXP": 450,
+        "skillLevel": 3,
+        "lastUsed": null
+      },
+      {
+        "skillID": "first_aid",
+        "learned": true,
+        "usageCount": 10,
+        "skillXP": 150,
+        "skillLevel": 2,
+        "lastUsed": null
+      }
+    ],
+    "consumables": {
+      "mana_potion_minor": 3,
+      "health_potion_minor": 1
+    },
+    "equipment": {
+      "mainHand": "tome_flame_tier1",
+      "offHand": null,
+      "chest": null,
+      "head": null,
+      "hands": null,
+      "legs": null,
+      "feet": null
+    }
+  },
+  {
+    "characterID": "bot_kess_rogue",
+    "characterName": "Kess",
+    "level": 2,
+    "stats": {
+      "conviction": 70,
+      "endurance": 65,
+      "ambition": 95,
+      "harmony": 60
+    },
+    "skills": [
+      {
+        "skillID": "basic_attack",
+        "learned": true,
+        "usageCount": 20,
+        "skillXP": 300,
+        "skillLevel": 2,
+        "lastUsed": null
+      },
+      {
+        "skillID": "dodge",
+        "learned": true,
+        "usageCount": 18,
+        "skillXP": 280,
+        "skillLevel": 2,
+        "lastUsed": null
+      }
+    ],
+    "consumables": {
+      "escape_rope": 2,
+      "health_potion_minor": 1
+    },
+    "equipment": {
+      "mainHand": "dagger_iron_tier0",
+      "offHand": null,
+      "chest": null,
+      "head": null,
+      "hands": null,
+      "legs": null,
+      "feet": null
+    }
+  }
+]

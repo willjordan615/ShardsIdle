@@ -1,0 +1,82 @@
+[
+  {
+    "id": "health_potion_minor",
+    "name": "Minor Health Potion",
+    "type": "consumable",
+    "rarity": "common",
+    "skillID": "use_health_potion_minor",
+    "description": "Restores a small amount of health.",
+    "stackable": true,
+    "maxStack": 10
+  },
+  {
+    "id": "health_potion",
+    "name": "Health Potion",
+    "type": "consumable",
+    "rarity": "uncommon",
+    "skillID": "use_health_potion",
+    "description": "Restores a moderate amount of health.",
+    "stackable": true,
+    "maxStack": 10
+  },
+  {
+    "id": "mana_potion_minor",
+    "name": "Minor Mana Potion",
+    "type": "consumable",
+    "rarity": "common",
+    "skillID": "use_mana_potion_minor",
+    "description": "Restores a small amount of mana.",
+    "stackable": true,
+    "maxStack": 10
+  },
+  {
+    "id": "mana_potion",
+    "name": "Mana Potion",
+    "type": "consumable",
+    "rarity": "uncommon",
+    "skillID": "use_mana_potion",
+    "description": "Restores a moderate amount of mana.",
+    "stackable": true,
+    "maxStack": 10
+  },
+  {
+    "id": "stamina_potion_minor",
+    "name": "Minor Stamina Potion",
+    "type": "consumable",
+    "rarity": "common",
+    "skillID": "use_stamina_potion_minor",
+    "description": "Restores a small amount of stamina.",
+    "stackable": true,
+    "maxStack": 10
+  },
+  {
+    "id": "escape_rope",
+    "name": "Escape Rope",
+    "type": "consumable",
+    "rarity": "common",
+    "skillID": "use_escape_rope",
+    "description": "Guarantees a successful retreat from combat.",
+    "stackable": true,
+    "maxStack": 5
+  },
+  {
+    "id": "smoke_bomb",
+    "name": "Smoke Bomb",
+    "type": "consumable",
+    "rarity": "uncommon",
+    "skillID": "use_smoke_bomb",
+    "description": "Guarantees a successful retreat and obscures enemy vision.",
+    "stackable": true,
+    "maxStack": 5
+  },
+  {
+    "id": "throwing_knife",
+    "name": "Throwing Knife",
+    "type": "consumable",
+    "rarity": "common",
+    "skillID": "throw_knife",
+    "description": "A quick ranged attack dealing moderate damage.",
+    "stackable": true,
+    "maxStack": 20
+  }
+]

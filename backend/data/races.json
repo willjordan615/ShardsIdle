@@ -1,0 +1,62 @@
+[
+  {
+    "id": "human",
+    "name": "Human",
+    "description": "Versatile and adaptable, humans have no particular strengths or weaknesses.",
+    "baseStats": {
+      "conviction": 75,
+      "endurance": 75,
+      "ambition": 75,
+      "harmony": 75
+    },
+    "startingSkills": ["slash"]
+  },
+  {
+    "id": "dwarf",
+    "name": "Dwarf",
+    "description": "Stalwart defenders with natural resistance, but less agile than other races.",
+    "baseStats": {
+      "conviction": 70,
+      "endurance": 120,
+      "ambition": 50,
+      "harmony": 80
+    },
+    "startingSkills": ["slash", "shield_bash"]
+  },
+  {
+    "id": "elf",
+    "name": "Elf",
+    "description": "Swift and graceful, elves excel at magic and precision strikes.",
+    "baseStats": {
+      "conviction": 100,
+      "endurance": 60,
+      "ambition": 80,
+      "harmony": 95
+    },
+    "startingSkills": ["arcane_bolt", "evasion"]
+  },
+  {
+    "id": "orc",
+    "name": "Orc",
+    "description": "Savage and powerful, orcs deal tremendous damage but lack finesse.",
+    "baseStats": {
+      "conviction": 110,
+      "endurance": 95,
+      "ambition": 70,
+      "harmony": 50
+    },
+    "startingSkills": ["cleave", "roar"]
+  },
+  {
+    "id": "halfling",
+    "name": "Halfling",
+    "description": "Small but cunning, halflings excel at avoiding danger.",
+    "baseStats": {
+      "conviction": 60,
+      "endurance": 70,
+      "ambition": 100,
+      "harmony": 85
+    },
+    "startingSkills": ["backstab", "dodge"]
+  }
+]

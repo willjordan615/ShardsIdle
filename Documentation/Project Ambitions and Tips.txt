@@ -1,0 +1,77 @@
+
+# File 2: `PROJECT_AMBITIONS_AND_TIPS.md`
+
+```markdown
+# Project Ambitions, Needs, and Collaboration Guide
+
+## 🚀 Current Project Status
+**Shards Idle** is currently in a functional Alpha state. The core loop (Create → Fight → Reward) is complete and stable.
+- ✅ **Combat Engine**: Fully operational with variance, pre-combat checks, multi-stage logic, and desperation AI.
+- ✅ **Progression**: Float-based XP system with category balancing is active.
+- ✅ **UI/UX**: Tooltips, inventory management, and character creation are working (with recent fixes for stuck tooltips).
+- ✅ **Data**: Static data loaded from JSON; dynamic data persisted in SQLite.
+
+## 🔮 Future Ambitions & Goals
+
+### 1. Combo Skill System (High Priority)
+- **Goal**: Implement a system where using skills in a specific sequence (e.g., *Shove* → *Aim* → *Power Shot*) triggers a unique, powerful "Combo Effect."
+- **Requirements**:
+  - Track "Last Used Skill" and "Combo Counter" in combat state.
+  - Define combo sequences in `skills.json` or a new `combos.json`.
+  - Modify `combatEngine.js` to detect sequences and apply bonus effects/damage.
+  - Reset combos on miss, wait, or specific interrupts.
+
+### 2. Advanced AI Behaviors
+- **Goal**: Move beyond simple resource desperation.
+- **Ideas**:
+  - **Target Priority**: AI focuses on low-HP targets or healers.
+  - **Synergy**: Enemy groups buff each other (e.g., Shaman buffs Warrior).
+  - **Phase Changes**: Bosses change tactics at 50% HP.
+
+### 3. Expanded Content
+- **Goals**:
+  - Add more races, skills, and items.
+  - Create complex branching dungeons (e.g., *Forest Dungeon* with secret paths).
+  - Introduce elemental reactions (e.g., *Oil* + *Fire* = Explosion).
+
+### 4. Multiplayer/Co-op (Long Term)
+- **Goal**: Allow real players to join parties instead of just bots/imports.
+- **Challenges**: State synchronization, turn timing, lobby management.
+
+## 🛠 Immediate Needs & Technical Debt
+
+1.  **Combo Logic Implementation**: The architecture needs to be designed and coded for the Combo Skill system.
+2.  **Balance Tuning**: With variance active, damage numbers need tuning to ensure fights aren't too RNG-dependent.
+3.  **UI Polish**:
+    - Add visual indicators for active combos.
+    - Improve feedback for Pre-Combat successes/failures.
+    - Add sound effects (optional).
+4.  **Testing**: Rigorous testing of edge cases in combat (e.g., dying during pre-combat, empty inventory).
+
+## 🤖 Tips for Working with Me (The Developer)
+
+### Communication Style
+- **Be Direct & Technical**: I prefer concise, code-focused answers. Avoid fluff.
+- **Context is King**: Always reference specific files (e.g., "In `combatEngine.js` line 400...") when suggesting changes.
+- **Iterative Approach**: I like to implement small, testable chunks. Don't try to rewrite the whole engine at once.
+
+### Coding Preferences
+- **Vanilla JS**: Do not suggest React, Vue, or jQuery. Stick to ES6+ modules.
+- **Async/Await**: Use `async/await` for all DB and API calls. Avoid callback hell.
+- **Safety First**: Always add checks for `null`/`undefined` (e.g., `if (!character) return;`).
+- **Logging**: When adding new features, include `console.log('[FEATURE] ...')` statements so I can debug easily.
+- **No Breaking Changes**: When refactoring, ensure existing save files (characters) remain compatible. If a schema change is needed, provide a migration script.
+
+### How to Help Me Best
+1.  **Analyze Before Coding**: When I ask for a feature, first outline the logic flow (e.g., "Step 1: Track last skill. Step 2: Check combo table...").
+2.  **Provide Full Files**: When merging changes, output the *entire* corrected file content so I can copy-paste safely without missing context.
+3.  **Anticipate Bugs**: If a change might affect tooltips, save states, or combat loops, explicitly warn me and provide the fix for those side effects immediately.
+4.  **Respect the Architecture**: Keep logic separated (e.g., don't put combat math in the UI layer).
+
+## 📝 Known Quirks
+- **Tooltips**: They are fragile. Any DOM re-render requires an explicit `destroyGearTooltip()` call.
+- **Combat Playback**: The frontend plays back combat asynchronously. Do not `await` the playback function in the start routine, or the UI will freeze until the fight ends.
+- **Data Loading**: `window.gameData` must be fully populated before any combat or character creation occurs.
+
+---
+*Last Updated: Current Session*

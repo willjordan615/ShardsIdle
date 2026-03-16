@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPG Data Editor</title>
+    <!-- Link to the external CSS file -->
+    <link rel="stylesheet" href="css/admin-editor.css">
+</head>
+<body>
+
+<div id="notification">Saved Successfully!</div>
+
+<!-- MODAL: ADD ENEMY TO STAGE -->
+<div id="enemyModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal('enemyModal')">&times;</span>
+        <h3>Add Enemy to Stage</h3>
+        <input type="hidden" id="modal-stage-idx">
+        
+        <label>Select Enemy Type</label>
+        <select id="modal-enemy-select"></select>
+        
+        <div class="form-row" style="margin-top:15px;">
+            <div>
+                <label>Level</label>
+                <input type="number" id="modal-enemy-level" value="1">
+            </div>
+            <div>
+                <label>Min Count</label>
+                <input type="number" id="modal-enemy-min" value="1">
+            </div>
+            <div>
+                <label>Max Count</label>
+                <input type="number" id="modal-enemy-max" value="1">
+            </div>
+        </div>
+        
+        <button class="btn btn-success" style="width:100%; margin-top:20px;" onclick="confirmAddEnemy()">Add Enemy</button>
+    </div>
+</div>
+
+<!-- MODAL: ADD/EDIT OPPORTUNITY -->
+<div id="oppModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal('oppModal')">&times;</span>
+        <h3>Add Pre-Combat Opportunity</h3>
+        <input type="hidden" id="modal-opp-stage-idx">
+        <input type="hidden" id="modal-opp-idx"> <!-- For editing -->
+        
+        <label>Opportunity Name</label>
+        <input type="text" id="modal-opp-name" placeholder="e.g., Serpentine Approach">
+        
+        <label>Required Skill</label>
+        <select id="modal-opp-skill"></select>
+        
+        <div class="form-row" style="margin-top:15px;">
+            <div>
+                <label>Primary Stat</label>
+                <select id="modal-opp-stat">
+                    <option value="ambition">Ambition</option>
+                    <option value="endurance">Endurance</option>
+                    <option value="conviction">Conviction</option>
+                    <option value="harmony">Harmony</option>
+                </select>
+            </div>
+            <div>
+                <label>Difficulty Threshold</label>
+                <input type="number" id="modal-opp-thresh" value="40">
+            </div>
+        </div>
+
+        <hr style="border-color:var(--gold-dim); margin: 15px 0;">
+        <h4>Effects</h4>
+        
+        <label>Success Narrative</label>
+        <textarea id="modal-opp-success-narr" rows="2">Success!</textarea>
+        <label>Success Effect Type</label>
+        <select id="modal-opp-success-type">
+            <option value="narrative_only">Narrative Only</option>
+            <option value="remove_enemy">Remove Enemy</option>
+            <option value="apply_status">Apply Status</option>
+        </select>
+
+        <label style="margin-top:10px;">Failure Narrative</label>
+        <textarea id="modal-opp-fail-narr" rows="2">Failed!</textarea>
+        <label>Failure Effect Type</label>
+        <select id="modal-opp-fail-type">
+            <option value="apply_direct_damage">Direct Damage (%)</option>
+            <option value="apply_status">Apply Status</option>
+        </select>
+        <label>Failure Magnitude (0.2 = 20%)</label>
+        <input type="number" step="0.1" id="modal-opp-fail-mag" value="0.2">
+
+        <label style="margin-top:10px;">Fallback Narrative (No Skill)</label>
+        <textarea id="modal-opp-fb-narr" rows="2">No skill to help!</textarea>
+        <label>Fallback Effect Type</label>
+        <select id="modal-opp-fb-type">
+            <option value="apply_direct_damage">Direct Damage (%)</option>
+            <option value="apply_status">Apply Status</option>
+        </select>
+        <label>Fallback Magnitude (0.3 = 30%)</label>
+        <input type="number" step="0.1" id="modal-opp-fb-mag" value="0.3">
+
+        <button class="btn btn-success" style="width:100%; margin-top:20px;" onclick="confirmAddOpp()">Save Opportunity</button>
+    </div>
+</div>
+
+<div class="container">
+    <header style="text-align: center; margin-bottom: 30px;">
+        <h1>Game Data Editor</h1>
+        <p>Edit Challenges and Enemy Types directly</p>
+    </header>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('challenges')">Challenges</button>
+        <button class="tab-btn" onclick="switchTab('enemies')">Enemy Types</button>
+    </div>
+
+    <!-- CHALLENGES TAB -->
+    <div id="tab-challenges" class="tab-content active">
+        <div class="panel">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h2>Select Challenge</h2>
+                <button class="btn btn-primary" onclick="createNewChallenge()">+ New Challenge</button>
+            </div>
+            <select id="challenge-select" onchange="loadChallenge()" style="margin-top:10px;"></select>
+        </div>
+
+        <div id="challenge-editor" style="display:none;">
+            <div class="panel">
+                <h3>General Info</h3>
+                <div class="form-row">
+                    <div><label>ID (Unique)</label><input type="text" id="chal-id" readonly></div>
+                    <div><label>Name</label><input type="text" id="chal-name" oninput="updateChallengeField('name', this.value)"></div>
+                    <div><label>Difficulty</label><input type="number" id="chal-diff" oninput="updateChallengeField('difficulty', parseInt(this.value))"></div>
+                    <div><label>Rec. Level</label><input type="number" id="chal-level" oninput="updateChallengeField('recommendedLevel', parseInt(this.value))"></div>
+                </div>
+                <div class="form-row">
+                    <div style="grid-column: span 2;"><label>Description</label><input type="text" id="chal-desc" oninput="updateChallengeField('description', this.value)"></div>
+                </div>
+            </div>
+
+            <div id="stages-container"></div>
+            
+            <div class="panel" style="text-align: right; margin-top: 20px;">
+                <button class="btn btn-success" onclick="saveChallenges()">💾 Save All Challenges</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ENEMIES TAB -->
+    <div id="tab-enemies" class="tab-content">
+        <div class="panel">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h2>Select Enemy Type</h2>
+                <button class="btn btn-primary" onclick="createNewEnemy()">+ New Enemy</button>
+            </div>
+            <select id="enemy-select" onchange="loadEnemy()" style="margin-top:10px;"></select>
+        </div>
+
+        <div id="enemy-editor" style="display:none;">
+            <div class="panel">
+                <h3>General Info</h3>
+                <div class="form-row">
+                    <div><label>ID</label><input type="text" id="ene-id" readonly></div>
+                    <div><label>Name</label><input type="text" id="ene-name"></div>
+                </div>
+                <div class="form-row">
+                    <div style="grid-column: span 2;"><label>Description</label><input type="text" id="ene-desc"></div>
+                </div>
+                
+                <h3>Stats</h3>
+                <div class="form-row">
+                    <div><label>Conviction</label><input type="number" id="ene-stat-con"></div>
+                    <div><label>Endurance</label><input type="number" id="ene-stat-end"></div>
+                    <div><label>Ambition</label><input type="number" id="ene-stat-amb"></div>
+                    <div><label>Harmony</label><input type="number" id="ene-stat-har"></div>
+                    <div><label>Base Defense</label><input type="number" id="ene-def"></div>
+                    
+                    <!-- NEW: Skill Count Input triggers dynamic rows -->
+                    <div>
+                        <label>Skill Count</label>
+                        <input type="number" id="ene-skill-count" min="0" max="10" onchange="renderSkillRows()">
+                    </div>
+                </div>
+
+                <!-- NEW: Dynamic Skill Rows Container -->
+                <h3>Available Skills</h3>
+                <div id="ene-skill-rows" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin-bottom: 20px;">
+                    <!-- Dropdowns will be injected here by JS -->
+                </div>
+            </div>
+
+            <div class="panel" style="text-align: right;">
+                <button class="btn btn-success" onclick="saveEnemies()">💾 Save All Enemies</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Global State
+    let challengesData = [];
+    let enemiesData = [];
+    let skillsData = []; // New: Store skills for dropdowns
+    let currentChallengeIdx = -1;
+    let currentEnemyIdx = -1;
+
+    // --- Initialization ---
+    async function init() {
+        await loadData();
+        populateDropdowns();
+        setupEnemyListeners();
+    }
+
+    async function loadData() {
+        try {
+            const [cRes, eRes, sRes] = await Promise.all([
+                fetch('/api/admin/data/challenges'),
+                fetch('/api/admin/data/enemies'),
+                fetch('/api/data/skills') // Fetch skills for the dropdowns
+            ]);
+            challengesData = await cRes.json();
+            enemiesData = await eRes.json();
+            skillsData = await sRes.json(); // Store skills globally
+        } catch (err) {
+            showNotification('Failed to load data: ' + err.message, true);
+        }
+    }
+
+    function switchTab(tab) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById(`tab-${tab}`).classList.add('active');
+        event.target.classList.add('active');
+    }
+
+    function populateDropdowns() {
+        const cSelect = document.getElementById('challenge-select');
+        const eSelect = document.getElementById('enemy-select');
+        
+        cSelect.innerHTML = '<option value="">-- Select --</option>';
+        challengesData.forEach((c, i) => {
+            cSelect.innerHTML += `<option value="${i}">${c.name} (${c.id})</option>`;
+        });
+
+        eSelect.innerHTML = '<option value="">-- Select --</option>';
+        enemiesData.forEach((e, i) => {
+            eSelect.innerHTML += `<option value="${i}">${e.name} (${e.id})</option>`;
+        });
+    }
+
+    function showNotification(msg, isError = false) {
+        const el = document.getElementById('notification');
+        el.textContent = msg;
+        el.className = isError ? 'error show' : 'show';
+        setTimeout(() => el.className = '', 3000);
+    }
+
+    // --- Modal Logic ---
+    function openModal(id) {
+        document.getElementById(id).style.display = "block";
+    }
+    function closeModal(id) {
+        document.getElementById(id).style.display = "none";
+    }
+    window.onclick = function(event) {
+        if (event.target.className === 'modal') {
+            event.target.style.display = "none";
+        }
+    }
+
+    // --- Challenge Logic ---
+
+    function updateChallengeField(field, value) {
+        if(currentChallengeIdx === -1) return;
+        challengesData[currentChallengeIdx][field] = value;
+    }
+
+    function createNewChallenge() {
+        const id = prompt("Enter unique Challenge ID (e.g., challenge_my_quest):");
+        if (!id) return;
+        challengesData.push({
+            id: id, name: "New Challenge", description: "", difficulty: 1, recommendedLevel: 1,
+            minPartySize: 1, maxPartySize: 4, stages: [], rewards: { baseXP: 100, baseGold: 50, lootTable: [] }
+        });
+        populateDropdowns();
+        document.getElementById('challenge-select').value = challengesData.length - 1;
+        loadChallenge();
+    }
+
+    function loadChallenge() {
+        const idx = document.getElementById('challenge-select').value;
+        if (idx === "") { document.getElementById('challenge-editor').style.display = 'none'; return; }
+        
+        currentChallengeIdx = parseInt(idx);
+        const c = challengesData[currentChallengeIdx];
+        
+        document.getElementById('chal-id').value = c.id;
+        document.getElementById('chal-name').value = c.name;
+        document.getElementById('chal-diff').value = c.difficulty;
+        document.getElementById('chal-level').value = c.recommendedLevel;
+        document.getElementById('chal-desc').value = c.description;
+        
+        renderStages(c.stages);
+        document.getElementById('challenge-editor').style.display = 'block';
+    }
+
+    function renderStages(stages) {
+        const container = document.getElementById('stages-container');
+        container.innerHTML = '<h2>Stages</h2>';
+        
+        stages.forEach((stage, sIdx) => {
+            const div = document.createElement('div');
+            div.className = 'panel nested-section';
+            
+            let html = `
+                <div style="display:flex; justify-content:space-between;">
+                    <h3>Stage ${stage.stageId}: <input type="text" value="${stage.title}" onchange="updateStage(${sIdx}, 'title', this.value)" style="display:inline; width:200px;"></h3>
+                    <button class="btn btn-danger btn-sm" onclick="removeStage(${sIdx})">Remove Stage</button>
+                </div>
+                <div class="form-row">
+                    <div style="grid-column:span:2"><label>Description</label><input type="text" value="${stage.description}" onchange="updateStage(${sIdx}, 'description', this.value)"></div>
+                </div>
+                
+                <h4>Enemies</h4>
+                <ul class="item-list" id="stage-${sIdx}-enes"></ul>
+                <button class="btn btn-primary btn-sm" onclick="openEnemyModal(${sIdx})">+ Add Enemy</button>
+
+                <h4>Pre-Combat Opportunities</h4>
+                <ul class="item-list" id="stage-${sIdx}-opp"></ul>
+                <button class="btn btn-primary btn-sm" onclick="openOppModal(${sIdx})">+ Add Opportunity</button>
+
+                <h4>Branches (Optional)</h4>
+                <ul class="item-list" id="stage-${sIdx}-branch"></ul>
+                <button class="btn btn-primary btn-sm" onclick="addBranchToStage(${sIdx})">+ Add Branch</button>
+            `;
+            div.innerHTML = html;
+            container.appendChild(div);
+
+            // Render Enemies
+            const eneList = document.getElementById(`stage-${sIdx}-enes`);
+            (stage.enemies || []).forEach((e, eIdx) => {
+                const countStr = e.countRange ? `[${e.countRange[0]}, ${e.countRange[1]}]` : e.count;
+                eneList.innerHTML += `
+                    <li class="list-item">
+                        <span><strong>${e.enemyTypeID}</strong> (Lvl ${e.level}) Count: ${countStr}</span>
+                        <button class="btn btn-danger btn-sm" onclick="removeStageEnemy(${sIdx}, ${eIdx})">X</button>
+                    </li>`;
+            });
+
+            // Render Opportunities
+            const oppList = document.getElementById(`stage-${sIdx}-opp`);
+            (stage.preCombatOpportunities || []).forEach((o, oIdx) => {
+                oppList.innerHTML += `
+                    <li class="list-item">
+                        <span><strong>${o.name}</strong> (Req: ${o.requiredSkillID})</span>
+                        <div>
+                            <button class="btn btn-primary btn-sm" onclick="openOppModal(${sIdx}, ${oIdx})">Edit</button>
+                            <button class="btn btn-danger btn-sm" onclick="removeStageOpp(${sIdx}, ${oIdx})">X</button>
+                        </div>
+                    </li>`;
+            });
+
+            // Render Branches
+            const branchList = document.getElementById(`stage-${sIdx}-branch`);
+            (stage.stageBranches || []).forEach((b, bIdx) => {
+                const cond = b.condition ? `${b.condition.type}:${b.condition.value}` : 'None (Default)';
+                branchList.innerHTML += `
+                    <li class="list-item">
+                        <span>Go to Stage ${b.nextStageId} if [${cond}]</span>
+                        <button class="btn btn-danger btn-sm" onclick="removeStageBranch(${sIdx}, ${bIdx})">X</button>
+                    </li>`;
+            });
+        });
+
+        const addBtn = document.createElement('button');
+        addBtn.className = 'btn btn-primary';
+        addBtn.style.marginTop = '10px';
+        addBtn.textContent = '+ Add Stage';
+        addBtn.onclick = () => {
+            const newId = stages.length > 0 ? Math.max(...stages.map(s=>s.stageId)) + 1 : 1;
+            stages.push({ stageId: newId, title: "New Stage", description: "", enemies: [], preCombatOpportunities: [], stageBranches: [] });
+            renderStages(stages);
+        };
+        container.appendChild(addBtn);
+    }
+
+    function updateStage(sIdx, field, val) { 
+        if(currentChallengeIdx === -1) return;
+        challengesData[currentChallengeIdx].stages[sIdx][field] = val; 
+    }
+    
+    function removeStage(sIdx) {
+        if(confirm('Delete this stage?')) {
+            challengesData[currentChallengeIdx].stages.splice(sIdx, 1);
+            loadChallenge();
+        }
+    }
+
+    // --- Enemy Modal Logic ---
+    function openEnemyModal(sIdx) {
+        document.getElementById('modal-stage-idx').value = sIdx;
+        const select = document.getElementById('modal-enemy-select');
+        select.innerHTML = '';
+        enemiesData.forEach((e, i) => {
+            select.innerHTML += `<option value="${e.id}">${e.name} (${e.id})</option>`;
+        });
+        openModal('enemyModal');
+    }
+
+    function confirmAddEnemy() {
+        const sIdx = parseInt(document.getElementById('modal-stage-idx').value);
+        const typeId = document.getElementById('modal-enemy-select').value;
+        const level = parseInt(document.getElementById('modal-enemy-level').value);
+        const minC = parseInt(document.getElementById('modal-enemy-min').value);
+        const maxC = parseInt(document.getElementById('modal-enemy-max').value);
+        
+        const countRange = (minC === maxC) ? undefined : [minC, maxC];
+        const count = (minC === maxC) ? minC : undefined;
+
+        challengesData[currentChallengeIdx].stages[sIdx].enemies.push({
+            enemyTypeID: typeId, level: level, countRange, count
+        });
+        closeModal('enemyModal');
+        renderStages(challengesData[currentChallengeIdx].stages);
+    }
+
+    function removeStageEnemy(sIdx, eIdx) {
+        challengesData[currentChallengeIdx].stages[sIdx].enemies.splice(eIdx, 1);
+        renderStages(challengesData[currentChallengeIdx].stages);
+    }
+
+    // --- Opportunity Modal Logic ---
+    function openOppModal(sIdx, oIdx = null) {
+        document.getElementById('modal-opp-stage-idx').value = sIdx;
+        
+        // Populate Skills Dropdown
+        const skillSelect = document.getElementById('modal-opp-skill');
+        skillSelect.innerHTML = '';
+        skillsData.forEach(s => {
+            skillSelect.innerHTML += `<option value="${s.id}">${s.name} (${s.id})</option>`;
+        });
+
+        if (oIdx !== null) {
+            // Edit Mode
+            document.getElementById('modal-opp-idx').value = oIdx;
+            const opp = challengesData[currentChallengeIdx].stages[sIdx].preCombatOpportunities[oIdx];
+            
+            document.getElementById('modal-opp-name').value = opp.name;
+            skillSelect.value = opp.requiredSkillID;
+            document.getElementById('modal-opp-stat').value = opp.checkStat;
+            document.getElementById('modal-opp-thresh').value = opp.difficultyThreshold;
+            
+            document.getElementById('modal-opp-success-narr').value = opp.successEffect.narrative;
+            document.getElementById('modal-opp-success-type').value = opp.successEffect.type;
+            
+            document.getElementById('modal-opp-fail-narr').value = opp.failureEffect.narrative;
+            document.getElementById('modal-opp-fail-type').value = opp.failureEffect.type;
+            document.getElementById('modal-opp-fail-mag').value = opp.failureEffect.magnitude || 0.2;
+            
+            document.getElementById('modal-opp-fb-narr').value = opp.fallbackEffect.narrative;
+            document.getElementById('modal-opp-fb-type').value = opp.fallbackEffect.type;
+            document.getElementById('modal-opp-fb-mag').value = opp.fallbackEffect.magnitude || 0.3;
+        } else {
+            // New Mode
+            document.getElementById('modal-opp-idx').value = "";
+            document.getElementById('modal-opp-name').value = "";
+            document.getElementById('modal-opp-thresh').value = 40;
+            document.getElementById('modal-opp-success-narr').value = "Success!";
+            document.getElementById('modal-opp-fail-narr').value = "Failed!";
+            document.getElementById('modal-opp-fb-narr').value = "No skill!";
+        }
+        
+        openModal('oppModal');
+    }
+
+    function confirmAddOpp() {
+        const sIdx = parseInt(document.getElementById('modal-opp-stage-idx').value);
+        const oIdxVal = document.getElementById('modal-opp-idx').value;
+        const oIdx = oIdxVal === "" ? null : parseInt(oIdxVal);
+
+        const opp = {
+            id: oIdx !== null ? challengesData[currentChallengeIdx].stages[sIdx].preCombatOpportunities[oIdx].id : `opp_${Date.now()}`,
+            name: document.getElementById('modal-opp-name').value,
+            requiredSkillID: document.getElementById('modal-opp-skill').value,
+            checkStat: document.getElementById('modal-opp-stat').value,
+            secondaryStat: "endurance",
+            difficultyThreshold: parseInt(document.getElementById('modal-opp-thresh').value),
+            successEffect: { 
+                type: document.getElementById('modal-opp-success-type').value, 
+                magnitude: 0, 
+                narrative: document.getElementById('modal-opp-success-narr').value 
+            },
+            failureEffect: { 
+                type: document.getElementById('modal-opp-fail-type').value, 
+                magnitude: parseFloat(document.getElementById('modal-opp-fail-mag').value), 
+                statScale: "maxHP",
+                narrative: document.getElementById('modal-opp-fail-narr').value 
+            },
+            fallbackEffect: { 
+                type: document.getElementById('modal-opp-fb-type').value, 
+                magnitude: parseFloat(document.getElementById('modal-opp-fb-mag').value), 
+                statScale: "maxHP",
+                narrative: document.getElementById('modal-opp-fb-narr').value 
+            }
+        };
+
+        if (oIdx !== null) {
+            challengesData[currentChallengeIdx].stages[sIdx].preCombatOpportunities[oIdx] = opp;
+        } else {
+            if(!challengesData[currentChallengeIdx].stages[sIdx].preCombatOpportunities) 
+                challengesData[currentChallengeIdx].stages[sIdx].preCombatOpportunities = [];
+            challengesData[currentChallengeIdx].stages[sIdx].preCombatOpportunities.push(opp);
+        }
+        
+        closeModal('oppModal');
+        renderStages(challengesData[currentChallengeIdx].stages);
+    }
+
+    function removeStageOpp(sIdx, oIdx) {
+        challengesData[currentChallengeIdx].stages[sIdx].preCombatOpportunities.splice(oIdx, 1);
+        renderStages(challengesData[currentChallengeIdx].stages);
+    }
+
+    function addBranchToStage(sIdx) {
+        const hasCond = confirm("Does this branch have a condition? (Cancel for default fallback)");
+        let condition = null;
+        if(hasCond) {
+            const type = prompt("Condition Type (has_skill):", "has_skill");
+            const val = prompt("Condition Value (skill_id):");
+            condition = { type, value: val };
+        }
+        const nextId = parseInt(prompt("Next Stage ID:"));
+        const desc = prompt("Override Description (optional):", "");
+
+        const branch = {
+            branchId: `branch_${Date.now()}`,
+            condition, nextStageId: nextId,
+            overrideDescription: desc || undefined
+        };
+
+        if(!challengesData[currentChallengeIdx].stages[sIdx].stageBranches)
+            challengesData[currentChallengeIdx].stages[sIdx].stageBranches = [];
+        
+        challengesData[currentChallengeIdx].stages[sIdx].stageBranches.push(branch);
+        renderStages(challengesData[currentChallengeIdx].stages);
+    }
+
+    function removeStageBranch(sIdx, bIdx) {
+        challengesData[currentChallengeIdx].stages[sIdx].stageBranches.splice(bIdx, 1);
+        renderStages(challengesData[currentChallengeIdx].stages);
+    }
+
+    async function saveChallenges() {
+        try {
+            const res = await fetch('/api/admin/data/challenges', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(challengesData)
+            });
+            if(res.ok) showNotification('Challenges Saved!');
+            else throw new Error('Save failed');
+        } catch(e) { showNotification(e.message, true); }
+    }
+
+    // --- Enemy Logic ---
+
+    // Helper: Render the dynamic skill dropdowns
+    function renderSkillRows() {
+        const countInput = document.getElementById('ene-skill-count');
+        const count = parseInt(countInput.value) || 0;
+        const container = document.getElementById('ene-skill-rows');
+        const currentEnemyIdx = parseInt(document.getElementById('enemy-select').value);
+        
+        // Get currently selected skills if editing existing enemy
+        let currentSkills = [];
+        if (!isNaN(currentEnemyIdx) && enemiesData[currentEnemyIdx]) {
+            currentSkills = enemiesData[currentEnemyIdx].availableSkills || [];
+        }
+
+        container.innerHTML = '';
+
+        for (let i = 0; i < count; i++) {
+            const wrapper = document.createElement('div');
+            wrapper.style.position = 'relative';
+            
+            const label = document.createElement('label');
+            label.textContent = `Skill Slot ${i + 1}`;
+            label.style.fontSize = '0.7rem';
+            
+            const select = document.createElement('select');
+            select.className = 'dynamic-skill-select';
+            select.dataset.index = i;
+            
+            // Add empty option
+            const defaultOpt = document.createElement('option');
+            defaultOpt.value = "";
+            defaultOpt.text = "-- Select Skill --";
+            select.appendChild(defaultOpt);
+
+            // Populate with all available skills
+            skillsData.forEach(skill => {
+                const opt = document.createElement('option');
+                opt.value = skill.id;
+                opt.text = `${skill.name} (${skill.id})`;
+                select.appendChild(opt);
+            });
+
+            // Set value if editing existing enemy
+            if (currentSkills[i]) {
+                select.value = currentSkills[i];
+            }
+
+            wrapper.appendChild(label);
+            wrapper.appendChild(select);
+            container.appendChild(wrapper);
+        }
+    }
+
+    function createNewEnemy() {
+        const id = prompt("Enter unique Enemy ID (e.g., my_custom_goblin):");
+        if(!id) return;
+        enemiesData.push({
+            id: id, name: "New Enemy", description: "",
+            stats: { conviction: 10, endurance: 10, ambition: 10, harmony: 10 },
+            baseDefense: 0, availableSkills: [], skillSelectionCount: 1, equipment: {}
+        });
+        populateDropdowns();
+        document.getElementById('enemy-select').value = enemiesData.length - 1;
+        loadEnemy();
+    }
+
+    function loadEnemy() {
+        const idx = document.getElementById('enemy-select').value;
+        if(idx === "") { 
+            document.getElementById('enemy-editor').style.display = 'none'; 
+            return; 
+        }
+        
+        currentEnemyIdx = parseInt(idx);
+        const e = enemiesData[currentEnemyIdx];
+        
+        document.getElementById('ene-id').value = e.id;
+        document.getElementById('ene-name').value = e.name;
+        document.getElementById('ene-desc').value = e.description;
+        document.getElementById('ene-stat-con').value = e.stats.conviction;
+        document.getElementById('ene-stat-end').value = e.stats.endurance;
+        document.getElementById('ene-stat-amb').value = e.stats.ambition;
+        document.getElementById('ene-stat-har').value = e.stats.harmony;
+        document.getElementById('ene-def').value = e.baseDefense;
+        document.getElementById('ene-skill-count').value = e.skillSelectionCount; // Or availableSkills.length
+        
+        // Trigger the rendering of skill rows
+        renderSkillRows();
+
+        document.getElementById('enemy-editor').style.display = 'block';
+    }
+
+    // Setup Listeners for standard fields
+    function setupEnemyListeners() {
+        ['ene-name', 'ene-desc'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.addEventListener('input', (e) => {
+                if(currentEnemyIdx === -1) return;
+                const key = id.replace('ene-', '');
+                enemiesData[currentEnemyIdx][key] = e.target.value;
+            });
+        });
+
+        ['ene-stat-con', 'ene-stat-end', 'ene-stat-amb', 'ene-stat-har'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.addEventListener('input', (e) => {
+                if(currentEnemyIdx === -1) return;
+                const key = id.replace('ene-stat-', '');
+                const map = { 'con': 'conviction', 'end': 'endurance', 'amb': 'ambition', 'har': 'harmony' };
+                enemiesData[currentEnemyIdx].stats[map[key]] = parseInt(e.target.value) || 0;
+            });
+        });
+
+        document.getElementById('ene-def').addEventListener('input', (e) => {
+            if(currentEnemyIdx === -1) return;
+            enemiesData[currentEnemyIdx].baseDefense = parseInt(e.target.value) || 0;
+        });
+        
+        // Note: skill-count now uses onchange="renderSkillRows()" in HTML, 
+        // but we also update the data model here:
+        document.getElementById('ene-skill-count').addEventListener('change', (e) => {
+             if(currentEnemyIdx === -1) return;
+             enemiesData[currentEnemyIdx].skillSelectionCount = parseInt(e.target.value) || 1;
+        });
+    }
+
+    async function saveEnemies() {
+        if(currentEnemyIdx === -1) return;
+
+        // 1. Gather skills from the dynamic dropdowns
+        const skillSelects = document.querySelectorAll('.dynamic-skill-select');
+        const selectedSkills = [];
+        skillSelects.forEach(select => {
+            if (select.value) {
+                selectedSkills.push(select.value);
+            }
+        });
+
+        // 2. Update the data model
+        enemiesData[currentEnemyIdx].availableSkills = selectedSkills;
+        // Ensure skillSelectionCount matches the number of slots if you want them linked
+        enemiesData[currentEnemyIdx].skillSelectionCount = selectedSkills.length; 
+
+        try {
+            const res = await fetch('/api/admin/data/enemies', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(enemiesData)
+            });
+            if(res.ok) showNotification('Enemies Saved!');
+            else throw new Error('Save failed');
+        } catch(e) { showNotification(e.message, true); }
+    }
+
+    // Start
+    init();
+</script>
+
+</body>
+</html>

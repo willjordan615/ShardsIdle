@@ -1,0 +1,362 @@
+/* admin-editor.css */
+
+/* =========================================
+   THEME VARIABLES
+   Easy to tweak for future dark/light modes
+   ========================================= */
+:root {
+    --bg-dark: #0a0e27;
+    --bg-panel: rgba(15, 52, 96, 0.95);
+    --gold: #d4af37;
+    --gold-dim: #8b7355;
+    --text-main: #e0e0e0;
+    --danger: #d4484a;
+    --success: #4cd964;
+    --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* =========================================
+   GLOBAL RESET & BODY
+   ========================================= */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-main);
+    background: linear-gradient(135deg, var(--bg-dark) 0%, #16213e 100%);
+    color: var(--text-main);
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+    line-height: 1.5;
+}
+
+h1, h2, h3, h4 {
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 0;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* =========================================
+   TABS SYSTEM
+   ========================================= */
+.tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--gold-dim);
+    padding-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.tab-btn {
+    background: transparent;
+    border: 1px solid var(--gold-dim);
+    color: var(--gold-dim);
+    padding: 10px 20px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}
+
+.tab-btn:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+}
+
+.tab-btn.active {
+    background: var(--gold);
+    color: var(--bg-dark);
+    border-color: var(--gold);
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease-in;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================================
+   PANELS & LAYOUT
+   ========================================= */
+.panel {
+    background: var(--bg-panel);
+    border: 1px solid var(--gold);
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.nested-section {
+    border: 1px dashed var(--gold-dim);
+    padding: 15px;
+    margin-top: 15px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+
+/* =========================================
+   FORMS & INPUTS
+   ========================================= */
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    color: var(--gold-dim);
+    font-size: 0.8rem;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+input, select, textarea {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--gold-dim);
+    color: var(--text-main);
+    padding: 10px;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    transition: border-color 0.2s;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: var(--gold);
+    outline: none;
+    box-shadow: 0 0 5px rgba(212, 175, 55, 0.3);
+}
+
+textarea {
+    resize: vertical;
+    min-height: 60px;
+}
+
+/* =========================================
+   BUTTONS
+   ========================================= */
+.btn {
+    padding: 10px 18px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+.btn-primary {
+    background: var(--gold);
+    color: var(--bg-dark);
+}
+
+.btn-primary:hover {
+    background: #ffd700;
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+}
+
+.btn-danger {
+    background: var(--danger);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #ff6b6b;
+}
+
+.btn-success {
+    background: var(--success);
+    color: var(--bg-dark);
+}
+
+.btn-success:hover {
+    background: #69f0ae;
+}
+
+.btn-sm {
+    padding: 5px 10px;
+    font-size: 0.75rem;
+}
+
+/* =========================================
+   LISTS (Enemies, Opportunities)
+   ========================================= */
+.item-list {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+}
+
+.list-item {
+    background: rgba(0, 0, 0, 0.3);
+    border-left: 3px solid var(--gold-dim);
+    padding: 12px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 0 4px 4px 0;
+    transition: background 0.2s;
+}
+
+.list-item:hover {
+    background: rgba(0, 0, 0, 0.5);
+    border-left-color: var(--gold);
+}
+
+/* =========================================
+   NOTIFICATIONS
+   ========================================= */
+#notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    background: var(--success);
+    color: var(--bg-dark);
+    font-weight: bold;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    transform: translateX(200%);
+    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    z-index: 3000;
+}
+
+#notification.error {
+    background: var(--danger);
+    color: white;
+}
+
+#notification.show {
+    transform: translateX(0);
+}
+
+/* =========================================
+   MODALS (Fixed Scrolling & Centering)
+   ========================================= */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(2px);
+    
+    /* CRITICAL FIX FOR SCROLLING */
+    overflow-y: auto; 
+    padding: 20px 0; /* Allows content to breathe at top/bottom while scrolling */
+}
+
+.modal-content {
+    background-color: var(--bg-panel);
+    border: 2px solid var(--gold);
+    /* Changed from 10% to 5% auto for better centering on small screens */
+    margin: 5% auto; 
+    padding: 25px;
+    width: 90%;
+    max-width: 650px;
+    border-radius: 8px;
+    position: relative;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.close-modal {
+    color: var(--gold-dim);
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 20px;
+    transition: color 0.2s;
+}
+
+.close-modal:hover {
+    color: var(--gold);
+    text-decoration: none;
+}
+
+/* Modal Form Specifics */
+.modal-content h3 {
+    margin-top: 0;
+    border-bottom: 1px solid var(--gold-dim);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.modal-content hr {
+    border: 0;
+    border-top: 1px solid var(--gold-dim);
+    margin: 20px 0;
+}
+
+/* =========================================
+   RESPONSIVE DESIGN
+   ========================================= */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .list-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .list-item div {
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .modal-content {
+        margin: 10% auto;
+        width: 95%;
+        padding: 15px;
+    }
+}

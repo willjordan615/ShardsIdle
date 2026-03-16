@@ -1,0 +1,156 @@
+[
+  {
+    "id": "goblin_scout",
+    "name": "Goblin Scout",
+    "description": "Quick and nimble goblin skirmisher",
+    "stats": {
+      "conviction": 30,
+      "endurance": 25,
+      "ambition": 40,
+      "harmony": 10
+    },
+    "baseDefense": 5,
+    "availableSkills": ["basic_attack", "footwork", "shove", "misdirect"],
+    "skillSelectionCount": 2,
+    "equipment": {
+      "mainHand": "goblin_dagger",
+      "offHand": null,
+      "head": null,
+      "chest": null,
+      "accessory1": null,
+      "accessory2": null
+    }
+  },
+  {
+    "id": "goblin_archer",
+    "name": "Goblin Archer",
+    "description": "Goblin marksman with precision aim",
+    "stats": {
+      "conviction": 35,
+      "endurance": 20,
+      "ambition": 50,
+      "harmony": 5
+    },
+    "baseDefense": 0,
+    "availableSkills": ["basic_attack", "aim", "footwork", "shove"],
+    "skillSelectionCount": 2,
+    "equipment": {
+      "mainHand": "goblin_bow",
+      "offHand": null,
+      "head": null,
+      "chest": null,
+      "accessory1": null,
+      "accessory2": null
+    }
+  },
+  {
+    "id": "spider_small",
+    "name": "Giant Spider",
+    "description": "Venomous spider with web attack",
+    "stats": {
+      "conviction": 35,
+      "endurance": 40,
+      "ambition": 25,
+      "harmony": 10
+    },
+    "baseDefense": 5,
+    "availableSkills": ["basic_attack", "block", "sense"],
+    "skillSelectionCount": 2,
+    "equipment": {
+      "mainHand": "fangs_tiny",
+      "offHand": null,
+      "head": null,
+      "chest": null,
+      "accessory1": null,
+      "accessory2": null
+    }
+  },
+  {
+    "id": "spider_large",
+    "name": "Large Spider",
+    "description": "Ancient spider of fearsome size",
+    "stats": {
+      "conviction": 50,
+      "endurance": 60,
+      "ambition": 30,
+      "harmony": 15
+    },
+    "baseDefense": 10,
+    "availableSkills": ["basic_attack", "block", "shove", "sense"],
+    "skillSelectionCount": 2,
+    "equipment": {
+      "mainHand": "fangs_small",
+      "offHand": null,
+      "head": null,
+      "chest": null,
+      "accessory1": null,
+      "accessory2": null
+    }
+  },
+  {
+    "id": "orc_warrior",
+    "name": "Orc Warrior",
+    "description": "Mighty orc with brutal strength",
+    "stats": {
+      "conviction": 70,
+      "endurance": 80,
+      "ambition": 50,
+      "harmony": 20
+    },
+    "baseDefense": 8,
+    "availableSkills": ["basic_attack", "shove", "block", "misdirect"],
+    "skillSelectionCount": 2,
+    "equipment": {
+      "mainHand": "fangs_small",
+      "offHand": null,
+      "head": null,
+      "chest": null,
+      "accessory1": null,
+      "accessory2": null
+    }
+  },
+  {
+    "id": "orc_shaman",
+    "name": "Orc Shaman",
+    "description": "Orc spellcaster and healer",
+    "stats": {
+      "conviction": 60,
+      "endurance": 50,
+      "ambition": 40,
+      "harmony": 70
+    },
+    "baseDefense": 3,
+    "availableSkills": ["produce_flame", "first_aid", "rest", "shout"],
+    "skillSelectionCount": 2,
+    "equipment": {
+      "mainHand": "fangs_small",
+      "offHand": null,
+      "head": null,
+      "chest": null,
+      "accessory1": null,
+      "accessory2": null
+    }
+  },
+  {
+    "id": "dragon_ancient",
+    "name": "Ancient Red Dragon",
+    "description": "Legendary dragon of immense power",
+    "stats": {
+      "conviction": 150,
+      "endurance": 180,
+      "ambition": 100,
+      "harmony": 50
+    },
+    "baseDefense": 25,
+    "availableSkills": ["basic_attack", "shove", "block", "produce_flame", "shout", "sense"],
+    "skillSelectionCount": 2,
+    "equipment": {
+      "mainHand": "fangs_small",
+      "offHand": null,
+      "head": null,
+      "chest": null,
+      "accessory1": null,
+      "accessory2": null
+    }
+  }
+]

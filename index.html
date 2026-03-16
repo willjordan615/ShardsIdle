@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shards Idle</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/admin-panel.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Shards Idle</h1>
+            <p class="subtitle">An Asynchronous Group-Based PvE RPG</p>
+        </header>
+
+        <!-- ROSTER SCREEN -->
+        <div id="roster" class="screen active">
+            <div class="nav-buttons">
+                <button onclick="showScreen('create')">Create Character</button>
+            </div>
+            <h2>Your Characters</h2>
+            <div id="rosterContainer" class="grid-4"></div>
+        </div>
+
+        <!-- CHARACTER CREATION SCREEN -->
+        <div id="create" class="screen">
+            <div class="nav-buttons">
+                <button onclick="showScreen('roster')" class="secondary">Back to Roster</button>
+            </div>
+            <h2>Create New Character</h2>
+            <div id="creationMessages"></div>
+            
+            <div class="grid-2">
+                <div>
+                    <div class="section">
+                        <h3>Character Details</h3>
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input type="text" id="characterName" placeholder="Enter character name">
+                        </div>
+                        <h3 style="margin-top: 2rem;">Choose Race</h3>
+                        <div id="raceSelect"></div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="section">
+                        <h3>Choose Starting Weapon</h3>
+                        <div id="weaponSelect"></div>
+                    </div>
+
+                    <div class="section">
+                        <h3>Starting Skills</h3>
+                        <div id="skillSelect"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Base Statistics</h3>
+                <p style="color: #8b7355; margin-bottom: 1rem; font-size: 0.9rem;">These are your starting stats based on your chosen race.</p>
+                <div class="stat-block">
+                    <div class="stat-item">
+                        <div class="stat-label">Conviction</div>
+                        <div class="stat-value" id="statConviction">—</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Endurance</div>
+                        <div class="stat-value" id="statEndurance">—</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Ambition</div>
+                        <div class="stat-value" id="statAmbition">—</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Harmony</div>
+                        <div class="stat-value" id="statHarmony">—</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section" id="statAllocationSection" style="display: none;">
+                <h3>Allocate 25 Attribute Points</h3>
+                <p style="color: #8b7355; margin-bottom: 1.5rem; font-size: 0.9rem;">Distribute your 25 points among the four attributes to customize your character.</p>
+                <div id="statAllocationContainer"></div>
+            </div>
+
+            <div style="text-align: center; margin-top: 2rem;">
+                <button onclick="createCharacter()">Create Character</button>
+                <button onclick="showScreen('roster')" class="secondary" style="margin-left: 1rem;">Cancel</button>
+            </div>
+        </div>
+
+        <!-- CHARACTER DETAIL SCREEN -->
+        <div id="detail" class="screen">
+            <div class="nav-buttons">
+                <button onclick="showScreen('roster')" class="secondary">← Back to Roster</button>
+                <button onclick="selectCharacterForChallenge(currentState.detailCharacterId)">Select Challenge</button>
+            </div>
+
+            <h2 id="detailName">Character Name</h2>
+            <p id="detailRace" style="color: #8b7355; margin-bottom: 2rem;">Race</p>
+
+            <div class="grid-2">
+                <div>
+                    <div class="section derived-stats-section">
+                        <div class="derived-grid">
+                            <div class="derived-item">
+                                <span class="derived-label">HP</span>
+                                <span id="detailHP" class="derived-value">0</span>
+                            </div>
+                            <div class="derived-item">
+                                <span class="derived-label">Mana</span>
+                                <span id="detailMana" class="derived-value">0</span>
+                            </div>
+                            <div class="derived-item">
+                                <span class="derived-label">Stamina</span>
+                                <span id="detailStamina" class="derived-value">0</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section">
+                        <h3>Statistics</h3>
+                        <div class="stat-block">
+                            <div class="stat-item">
+                                <div class="stat-label">Conviction</div>
+                                <div class="stat-value" id="detailConviction">—</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">Endurance</div>
+                                <div class="stat-value" id="detailEndurance">—</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">Ambition</div>
+                                <div class="stat-value" id="detailAmbition">—</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">Harmony</div>
+                                <div class="stat-value" id="detailHarmony">—</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section" style="margin-top: 2rem;">
+                        <h3>Progression</h3>
+                        <div style="margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span style="color: #8b7355; font-size: 0.75rem; text-transform: uppercase;">Level</span>
+                                <span style="color: #d4af37; font-weight: bold;" id="detailLevel">1</span>
+                            </div>
+                            <div class="health-bar">
+                                <div class="health-bar-fill" id="xpBar" style="width: 0%"></div>
+                                <div class="health-bar-text" id="xpText">0/1000</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section" id="inventory-section" style="margin-top: 1rem;">
+                        <h3>INVENTORY</h3>
+                        <div id="inventoryDisplay" class="inventory-grid"></div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="section">
+                        <h3>Equipped Gear</h3>
+                        <div id="equippedDisplay"></div>
+                        <button onclick="showEquipmentSwap()" style="width: 100%; margin-top: 1rem;">Manage Equipment</button>
+                    </div>
+
+                    <div class="section" style="margin-top: 2rem;">
+                        <h3>Consumable Belt</h3>
+                        <div id="consumableBeltDisplay"></div>
+                        <button onclick="showConsumableManagement()" style="width: 100%; margin-top: 1rem;">Manage Consumables</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Skills</h3>
+                <div class="grid-3" id="skillDisplay"></div>
+            </div>
+
+            <div style="text-align: center; margin-top: 2rem;">
+                <button onclick="deleteCharacter(currentState.detailCharacterId)" class="danger">Delete Character</button>
+                <!-- ADDED: Share Character Button -->
+                <button onclick="openShareModal(currentState.detailCharacterId)" class="secondary" style="margin-left: 1rem;">📤 Share Character</button>
+            </div>
+        </div>
+
+        <!-- EQUIPMENT SWAP MODAL -->
+        <div id="equipmentSwapModal">
+            <div>
+                <h2 style="margin-bottom: 1.5rem;">Manage Equipment</h2>
+                <button onclick="closeEquipmentSwap()" class="secondary" style="margin-bottom: 1rem;">Close</button>
+                
+                <div class="grid-2">
+                    <div>
+                        <h3>Currently Equipped</h3>
+                        <div id="equippedList"></div>
+                    </div>
+                    <div>
+                        <h3>Inventory</h3>
+                        <div id="inventoryList"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONSUMABLE MANAGEMENT MODAL -->
+        <div id="consumableModal">
+            <div>
+                <h2 style="margin-bottom: 1.5rem;">Manage Consumables</h2>
+                <button onclick="closeConsumableManagement()" class="secondary" style="margin-bottom: 1rem;">Close</button>
+                
+                <div class="grid-2">
+                    <div>
+                        <h3>Available Consumables</h3>
+                        <div id="availableConsumablesList"></div>
+                    </div>
+                    <div>
+                        <h3>Belt (4 slots)</h3>
+                        <div id="beltList"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CHALLENGE SELECTION SCREEN -->
+        <div id="challenge" class="screen">
+            <div class="nav-buttons">
+                <button onclick="showScreen('detail')" class="secondary">← Back to Character</button>
+            </div>
+            <h2>Select Challenge</h2>
+            <div id="challengeContainer" class="grid-3"></div>
+        </div>
+
+        <!-- PARTY FORMATION SCREEN -->
+        <div id="party" class="screen">
+            <div class="nav-buttons">
+                <button onclick="showScreen('challenge')" class="secondary">← Back to Challenges</button>
+            </div>
+
+            <h2 id="partyChallengeName">Challenge Name</h2>
+            <p id="partyChallengeMeta" style="color: #8b7355; margin-bottom: 2rem;"></p>
+
+            <div class="grid-2">
+                <div>
+                    <div class="section">
+                        <h3>Your Party</h3>
+                        <div id="partyDisplay"></div>
+                        <button onclick="confirmPartyAndStart()" style="width: 100%; margin-top: 1.5rem;">Begin Challenge</button>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="section">
+                        <h3>Available Companions</h3>
+                        <!-- ADDED: Tab Navigation -->
+                        <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; border-bottom: 1px solid #8b7355; padding-bottom: 0.5rem;">
+                            <button onclick="showCompanionTab('bots')" id="tab-bots" style="background: rgba(45, 80, 22, 0.5);">🤖 Bot Companions</button>
+                            <button onclick="showCompanionTab('public')" id="tab-public" class="secondary">🌐 Public Characters</button>
+                        </div>
+                        
+                        <!-- Bot Companions -->
+                        <div id="botsDisplay"></div>
+                        
+                        <!-- ADDED: Public Characters Tab -->
+                        <div id="publicCompanionsDisplay" style="display: none;">
+                            <div class="grid-3" style="margin-bottom: 1rem;">
+                                <select id="publicLevelFilter" onchange="loadPublicCompanions()">
+                                    <option value="">Any Level</option>
+                                    <option value="1">Level 1+</option>
+                                    <option value="5">Level 5+</option>
+                                    <option value="10">Level 10+</option>
+                                </select>
+                                <select id="publicSortFilter" onchange="loadPublicCompanions()">
+                                    <option value="imports">Sort: Most Imported</option>
+                                    <option value="wins">Sort: Wins</option>
+                                    <option value="combats">Sort: Total Combats</option>
+                                    <option value="winrate">Sort: Win Rate</option>
+                                </select>
+                                <input type="text" id="publicSearchFilter" placeholder="Search..." oninput="loadPublicCompanions()">
+                            </div>
+                            <div id="publicCompanionsList" class="grid-3">
+                                <div class="card" style="text-align: center; color: #8b7355; grid-column: 1 / -1;">
+                                    Loading public characters...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- COMBAT LOG SCREEN -->
+        <div id="combatlog" class="screen">
+            <div class="nav-buttons">
+                <button onclick="showScreen('roster')" class="secondary">← Back to Roster</button>
+            </div>
+
+            <h2>Combat Log</h2>
+            
+            <div class="combatants-display">
+                <div class="combatant-group">
+                    <h3>Party</h3>
+                    <div id="partyStatus"></div>
+                </div>
+                <div class="combatant-group">
+                    <h3>Enemies</h3>
+                    <div id="enemyStatus"></div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Battle Log</h3>
+                <div class="combat-log" id="combatLogDisplay"></div>
+            </div>
+
+            <div id="combatResult" style="margin-top: 2rem;"></div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- ADDED: BROWSE PUBLIC CHARACTERS SCREEN     -->
+        <!-- ========================================== -->
+        <div id="browse" class="screen">
+            <div class="nav-buttons">
+                <button onclick="showScreen('party')" class="secondary">← Back to Party Formation</button>
+            </div>
+            <h2>Browse Public Characters</h2>
+            
+            <div class="section">
+                <div class="grid-3">
+                    <select id="browseLevelFilter" onchange="loadBrowseCharacters()">
+                        <option value="">Any Level</option>
+                        <option value="1">Level 1+</option>
+                        <option value="5">Level 5+</option>
+                        <option value="10">Level 10+</option>
+                    </select>
+                    <select id="browseSortFilter" onchange="loadBrowseCharacters()">
+                        <option value="level">Sort: Level</option>
+                        <option value="combats">Sort: Total Combats</option>
+                        <option value="wins">Sort: Wins</option>
+                        <option value="damage">Sort: Damage Dealt</option>
+                        <option value="imports">Sort: Most Imported</option>
+                        <option value="winrate">Sort: Win Rate</option>
+                    </select>
+                    <input type="text" id="browseSearchFilter" placeholder="Search by name..." oninput="loadBrowseCharacters()">
+                </div>
+            </div>
+            
+            <div id="browseResults" class="grid-3" style="margin-top: 1rem;"></div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- ADDED: SHARE CHARACTER MODAL               -->
+        <!-- ========================================== -->
+        <div id="shareModal">
+            <div>
+                <h2 style="margin-bottom: 1.5rem;">Share Character</h2>
+                <button onclick="closeModal('shareModal')" class="secondary" style="margin-bottom: 1rem; float: right;">×</button>
+                
+                <p class="subtitle">Generate a share code to let other players import this character.</p>
+                
+                <div class="form-group">
+                    <label>Build Name (optional):</label>
+                    <input type="text" id="shareBuildName" placeholder="e.g., Tank Build">
+                </div>
+                
+                <div class="form-group">
+                    <label>Build Description (optional):</label>
+                    <textarea id="shareBuildDescription" placeholder="Describe your build..." style="min-height: 80px; width: 100%;"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="shareIsPublic" checked> Make publicly browsable
+                    </label>
+                </div>
+                
+                <div id="shareCodeDisplay" style="display: none; background: rgba(10, 14, 39, 0.6); border: 1px solid #4cd964; border-radius: 6px; padding: 1rem; margin: 1rem 0;">
+                    <p class="subtitle">Your Share Code:</p>
+                    <div class="grid-2" style="align-items: center;">
+                        <code id="shareCodeValue" style="font-size: 1.5rem; color: #4cd964; letter-spacing: 2px;">PLAYERA-9C86</code>
+                        <button onclick="copyShareCode()" class="secondary">Copy</button>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 1rem;">
+                    <button onclick="closeModal('shareModal')" class="secondary">Cancel</button>
+                    <button onclick="exportCharacter()" id="shareExportBtn">Generate Share Code</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- ADDED: IMPORT CHARACTER MODAL              -->
+        <!-- ========================================== -->
+        <div id="importModal">
+            <div>
+                <h2 style="margin-bottom: 1.5rem;">Import Character</h2>
+                <button onclick="closeModal('importModal')" class="secondary" style="margin-bottom: 1rem; float: right;">×</button>
+                
+                <div class="form-group">
+                    <label>Enter Share Code:</label>
+                    <input type="text" id="importShareCode" placeholder="e.g., PLAYERA-9C86" style="font-size: 1.25rem; text-align: center; letter-spacing: 2px;">
+                </div>
+                
+                <div id="importPreview" style="display: none; background: rgba(10, 14, 39, 0.6); border-radius: 6px; padding: 1rem; margin: 1rem 0;"></div>
+                
+                <div id="importWarning" style="display: none; background: rgba(212, 72, 74, 0.2); border-left: 3px solid #d4484a; border-radius: 4px; padding: 0.75rem; margin: 1rem 0;">
+                    <p class="subtitle" style="color: #d4484a; margin: 0;">
+                        ⚠️ Imported characters cannot be re-exported. They are linked references to the original.
+                    </p>
+                </div>
+                
+                <div style="margin-top: 1rem;">
+                    <button onclick="closeModal('importModal')" class="secondary">Cancel</button>
+                    <button onclick="confirmImport()" id="importConfirmBtn" disabled>Import to Party</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- ADMIN PANEL (Hidden - Tilde + Password)    -->
+        <!-- ========================================== -->
+        <div id="adminPanel">
+            <div class="admin-panel-container">
+                <div class="admin-header">
+                    <h2>🔧 Admin Panel</h2>
+                    <button onclick="closeAdminPanel()" class="admin-close-btn">Close</button>
+                </div>
+                <div class="admin-search">
+                    <input type="text" class="admin-search-input" placeholder="Search items..." id="adminSearchInput">
+                    <button class="admin-btn-create" onclick="openAdminEditor()">+ Create Item</button>
+                </div>
+                <div class="admin-items-list" id="adminItemsList"></div>
+                <div class="admin-footer">
+                    Admin Panel v1.0 | Shards Idle
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODULAR JAVASCRIPT LOADING -->
+    <script src="js/game-data.js"></script>
+    <script src="js/ui-helpers.js"></script>
+    <script src="js/character-management.js"></script>
+    <script src="js/stat-tooltip.js"></script>
+    <script src="js/gear-tooltip.js"></script>
+    <script src="js/inventory-system.js"></script>
+    <script src="js/combat-system.js"></script>
+    <script src="js/combat-log.js"></script>
+    <script src="js/admin-panel.js"></script>
+    <!-- ADDED: Browse System for Share/Import functionality -->
+    <script src="js/browse-system.js"></script>
+
+    <!-- APP INITIALIZATION -->
+    <script>
+        (async function() {
+            const success = await initializeGame();
+            if (success) {
+                initCharacterCreation();
+                await renderRoster();
+            }
+        })();
+    </script>
+    
+</body>
+</html>
