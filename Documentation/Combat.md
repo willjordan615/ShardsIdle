@@ -1,178 +1,195 @@
-# Combat System Documentation (combat.md)
+# Combat System Documentation
 
-Project: Shards Idle  
-Status: Functional Alpha  
-Core Files: backend/combatEngine.js, js/combat-system.js, js/combat-log.js  
+Project: Shards Idle
+Status: Alpha 1.1 (Stable)
+Core Files: `backend/combatEngine.js`, `backend/routes/combat.js`, `js/combat-system.js`, `js/combat-log.js`
+Last Updated: March 17, 2026
+
 ---
 
-## 1\. System Overview
+## 1. System Overview
 
-The combat system is an asynchronous, turn-based engine that simulates multi-stage PvE encounters. It separates logic (Backend) from presentation (Frontend). The backend calculates the entire battle state instantly and returns a log of events, which the frontend plays back visually to the user.
+The combat system is an asynchronous, turn-based engine that simulates multi-stage PvE encounters. Logic and presentation are fully separated. The backend calculates the entire battle instantly and returns a structured result object. The frontend plays it back visually, turn by turn.
 
 ### Key Architectural Principles
-
-* Stateless Simulation: The server does not maintain active combat sessions in memory; it processes a request, simulates the fight, saves the result, and returns the log.  
-* Deterministic Variance: While RNG is used for hits/crits/variance, the seed is derived from the turn state to ensure consistency during replay if needed.  
-* Modular Logic: Damage calculation, AI decision-making, and status effects are handled in distinct functions within combatEngine.js.
+- **Stateless Simulation**: The server holds no active combat sessions. It receives a request, simulates the fight, saves the result, and returns the log.
+- **Deterministic Variance**: RNG is used for hits/crits/variance, but the result is fully computed server-side before playback begins.
+- **Modular Logic**: Damage calculation, AI decision-making, and status effects are handled in distinct functions within `combatEngine.js`.
+- **Fire-and-Forget Playback**: `displayCombatLog()` is called without `await` in `startCombat()`. This is intentional — awaiting it would freeze the UI for the entire duration of combat playback.
 
 ---
 
-## 2\. Core Components
+## 2. Core Components
 
 ### A. Combat Engine (backend/combatEngine.js)
 
-The heart of the simulation. It orchestrates the loop, manages turns, and resolves actions.
+The heart of the simulation. Orchestrates the turn loop, manages stages, and resolves all actions.
 
-#### 1\. Initialization & Setup
+#### Initialization & Setup
+- **Import Hydration**: If a party member has `isImported: true` or is missing `stats`, the engine fetches the original character from the database and merges their full stats before simulation begins.
+- **Stat Aggregation**: Combines Base Race Stats + Allocated Attribute Points + Equipment Bonuses + Skill Passives.
+- **Weapon Variance Profiling**: Scans `items.json` at startup. Keywords map to variance ranges:
+  - `"dagger"` → `[0.7, 1.4]` (High volatility)
+  - `"mace"` → `[0.9, 1.1]` (Consistent)
+  - `"sword"` → `[0.8, 1.2]` (Balanced)
+  - `"scepter"` → `[0.85, 1.25]`
 
-* Party Validation: Verifies character data, equipment, and skill lists.  
-* Stage Loading: Loads the specific challenge stage configuration (enemies, terrain, pre-combat checks).  
-* Stat Aggregation: Calculates final stats (HP, Stamina, Mana, Speed) by combining:  
-  * Base Race Stats  
-  * Allocated Attribute Points (Conviction, Endurance, Ambition, Harmony)  
-  * Equipment Bonuses  
-  * Skill Passive Buffs
-
-#### 2\. The Turn Loop
-
+#### The Turn Loop
 The engine runs a while loop until Victory or Defeat conditions are met.
 
-1. Initiative Sort: Entities (Players \+ Enemies) are sorted by Speed stat. Ties are broken randomly.  
-2. Action Selection:  
-   * Players: Uses a priority queue based on defined AI behavior (e.g., "Heal if HP \< 30%", else "Attack Lowest HP"). Note: In the current alpha, player actions are auto-simulated based on this logic.  
-   * Enemies: Uses the Desperation AI (see Section 3).  
-3. Execution:  
-   * Check resource costs (Stamina/Mana).  
-   * Apply accuracy checks.  
-   * Calculate Damage/Healing (see Section 4).  
-   * Apply Status Effects.  
-4. Post-Turn Cleanup: Remove expired buffs/debuffs, regenerate resources.  
-5. Log Generation: Every action is pushed to a combatLog array with timestamps and metadata.
+1. **Initiative Sort**: All entities (players + enemies) sorted by Speed. Ties broken randomly.
+2. **Action Selection**:
+   - **Players**: Priority queue AI (e.g., "Heal if HP < 30%", else "Attack Lowest HP").
+   - **Enemies**: Standard rotation → Desperation AI below 30% HP → `NO_RESOURCES` fallback pool when stamina/mana exhausted.
+3. **Execution**:
+   - Resource cost check (Stamina/Mana)
+   - Accuracy check
+   - Damage/Healing calculation with variance applied
+   - Status effect application
+4. **Post-Turn Cleanup**: Expire buffs/debuffs, regenerate resources.
+5. **Log Generation**: Every action pushed to the current segment's `turns` array with full metadata including delay timing for frontend playback.
 
-#### 3\. Multi-Stage Logic
+#### Multi-Stage Logic
+- Battles flow through sequential stages defined in `challenges.json`.
+- Survivors retain current HP/Resources between stages.
+- **Branching**: At stage end, `stageBranches` is checked. If a condition is met (e.g., `has_skill: climb`), the engine jumps to a specific `nextStageId` instead of the default next stage.
+- Each completed stage produces a segment in the response with its own `turns`, `participantsSnapshot`, `introText`, `summaryText`, and `status`.
 
-* Battles can consist of multiple sequential stages.  
-* Upon clearing a stage, surviving entities retain their current HP/Resources (unless specified otherwise).  
-* The engine automatically loads the next stage configuration and resumes the loop.  
-* Branching: If a stage has branching paths (based on pre-combat results), the engine selects the correct next stage ID.
-
-### B. Combat System (js/combat-system.js)
-
-The frontend controller responsible for setup and initiation.
-
-* Party Formation: Allows users to select their main character and fill slots with bots or imported "Companion" codes.  
-* Challenge Selection: Interfaces with window.gameData to list available dungeons.  
-* Pre-Combat Phase:  
-  * Detects skills tagged for pre-combat (e.g., Footwork, Serpentine Approach).  
-  * Prompts the user (or auto-resolves based on settings) to attempt skill checks.  
-  * Modifies the initial combat state (e.g., removes an enemy, applies a buff) before sending the request to the backend.  
-* Request Handling: Sends the full party state and challenge ID to the /api/combat/start endpoint.
-
-### C. Combat Log (js/combat-log.js)
-
-The visual playback and reward processor.
-
-* Asynchronous Playback:  
-  * Receives the combatLog array from the server.  
-  * Iterates through events using setTimeout or requestAnimationFrame to animate turns one by one.  
-  * Updates DOM elements (health bars, floating text, action descriptions) in real-time.  
-* Reward Calculation (applyCombatRewards):  
-  * Triggered immediately after simulation ends (before or during playback).  
-  * XP Distribution:  
-    * Scans the log for skill usage.  
-    * Applies Category Balancing:  
-      * DAMAGE\_SINGLE: 0.5 XP per hit (prevents spam-leveling).  
-      * UTILITY / HEALING: 50.0 XP per use.  
-    * Updates character skill levels using Float-Based XP (e.g., Level 2.45).  
-  * Loot & Gold: Adds rewards to the character profile.  
-* Defeat Handling:  
-  * Detects Victory: false.  
-  * Prevents null-reference errors when calculating rewards for dead characters.  
-  * Displays "Defeated" screen with options to retry or return to hub.
-
----
-
-## 3\. Specialized Mechanics
-
-### Dynamic Weapon Variance
-
-Implemented in combatEngine.js damage calculation.
-
-* Profile Mapping: At startup, items.json is scanned. Keywords map to variance ranges:  
-  * "dagger" → \[0.7, 1.4\] (High volatility)  
-  * "mace" → \[0.9, 1.1\] (Consistent)  
-  * "sword" → \[0.8, 1.2\] (Balanced)  
-* Application: Final Damage \= (Base Skill Dmg \+ Weapon Dmg) \* Random(VarianceRange).  
-* Impact: Creates distinct "feel" for weapons without needing unique code for every item.
-
-### Desperation AI
-
+#### Desperation AI
 Enemy behavior shifts dynamically based on HP thresholds.
+- **Normal State** (>30% HP): Standard rotation — basic attack → cooldown skill.
+- **Desperate State** (<30% HP): Ignores resource conservation, prioritizes high-damage abilities, may target lowest-HP players.
+- **No Resources State**: Draws from a global `NO_RESOURCES` skill pool (e.g., Last Stand). Self-targeting skills are applied to the enemy itself; damage skills target the lowest-HP player.
 
-* Normal State: Uses standard rotation (Basic Attack \-\> Cooldown Skill).  
-* Desperate State (\<30% HP):  
-  * Ignores resource conservation.  
-  * Prioritizes high-damage, high-cooldown abilities.  
-  * May target low-HP players specifically (Glass Cannon strategy).
+### B. Safety Net Logic (backend/routes/combat.js)
 
-### Pre-Combat Opportunities
+Manages the idle auto-restart loop.
 
-Before the main loop starts, the engine checks for specific skills in the party.
+- **On victory**: Updates `lastSuccessfulChallengeId` on the character via direct SQL `UPDATE`.
+- **On defeat**: Reads `lastSuccessfulChallengeId` from the character record and returns it as `nextChallengeId` in the response.
+- **Default fallback**: `challenge_goblin_camp` if no successful challenge is recorded.
+- The frontend's `startCountdown()` reads `nextChallengeId` from the response, updates `window.currentState.selectedChallenge`, and calls `startCombat()` when the timer expires.
 
-* Logic: SuccessChance \= PrimaryStat \+ (SecondaryStat \* 0.5).  
-* Outcomes:  
-  * Success: Narrative bonus (e.g., "You bypassed the trap"), enemy removal, or starting buff.  
-  * Failure: Direct damage or debuff applied to the party.  
-  * Fallback: If the skill is missing entirely, a hardcoded penalty is applied (e.g., "You walked into the trap blindly").
+### C. Pre-Combat Opportunities
 
-### Status Effect Engine (StatusEngine.js)
+Triggered before specific stages, configured per-stage in `challenges.json`.
 
-* Handles DoT (Damage over Time), HoT (Heal over Time), Stuns, and Silences.  
-* Processes at the start of each entity's turn.  
-* Supports stacking limits and duration tracking.
+- **Logic**: `SuccessChance = PrimaryStat + (SecondaryStat * 0.5)` vs `difficultyThreshold`
+- **Outcomes**:
+  - **Success**: Narrative bonus (e.g., bypass trap), enemy removal, or starting buff.
+  - **Failure**: Direct damage (% of maxHP) or status debuff applied to party.
+  - **Fallback**: Harder penalty if the required skill is absent entirely.
+- Pre-combat results appear as `type: "pre_combat_skill"` or `type: "pre_combat_fallback"` turns in the segment log.
+
+### D. Combat System Frontend (js/combat-system.js)
+
+Frontend controller for setup and initiation.
+
+- Owns and initializes `window.currentState` (the only place it should ever be declared).
+- Handles challenge selection, party formation, bot/companion selection.
+- Builds `partySnapshots` — includes `stats`, `skills`, `consumables`, and `equipment` for all party members including imported companions.
+- Sends `POST /api/combat/start` with `{ partySnapshots, challengeID, challenges }`.
+- On response: calls `showScreen('combatlog')` then `displayCombatLog(combatResult)` without `await`.
+
+### E. Combat Log Frontend (js/combat-log.js)
+
+Visual playback and reward processor.
+
+#### Playback
+- Iterates through `combatData.segments` in order.
+- Per segment: shows intro narrative (4s pause) → renders enemies for this stage → plays each turn with per-turn delay → shows stage summary.
+- `hpMaxes` is updated from `segment.participantsSnapshot` at the start of each stage so HP bar percentages are calculated against the correct max for newly spawned enemies.
+- Health bar updates trigger on any turn with a defined `targetHPAfter`, including heals.
+
+#### Result Modal
+After all segments complete:
+- Populates `#combatResultModal` with loot, XP, and skill progress.
+- Victory: 3s countdown, then auto-restarts same challenge.
+- Defeat: 5s countdown, then restarts from safety net challenge.
+- Retreat: 2s delay, then `returnToHub()`.
+
+#### Reward Calculation (applyCombatRewards)
+- Skips imported characters (`charId.startsWith('import_')`) and bots (matched against `window.gameData.bots`).
+- Applies character XP and handles level-ups.
+- Applies skill XP with category balancing:
+  - `DAMAGE_SINGLE`: 2 XP/use (anti-spam)
+  - All others: 50 XP/use
+  - Scaled by `Math.log(skillLevel + 2)` for diminishing returns
+  - Pre-combat failures get 0.5x multiplier
+- Applies loot to first player character's inventory.
+- Calls `renderRoster()` and `showCharacterDetail()` to refresh UI.
 
 ---
 
-## 4\. Data Flow Diagram
+## 3. Known Quirks & Safety Checks
 
-mermaid  
-Code  
-Preview  
----
-
-## 5\. Known Quirks & Safety Checks
+### HP Bars Across Stages
+The initial `hpMaxes` map is populated from `combatData.participants.enemies` which reflects only the final state. When entering each new stage, `segment.participantsSnapshot.enemies` must be used to update `hpMaxes` for newly spawned enemies, or bar percentages will be wrong.
 
 ### Tooltip Management
-
-* Issue: Dynamic DOM updates during combat playback can cause tooltips to stick or crash.  
-* Fix: destroyGearTooltip() is explicitly called before opening modals or updating inventory views mid-combat (if applicable).
+Dynamic DOM updates during combat playback can cause gear tooltips to orphan on screen. `destroyGearTooltip()` must be called both before and after any operation that replaces gear card DOM elements (equip, unequip, modal close).
 
 ### Async Playback
+`displayCombatLog()` is an `async` function but must not be `await`ed by its caller. The `await sleep()` calls inside work correctly — they pause the playback loop — but the outer caller continues immediately, which is the desired behavior for keeping the UI responsive.
 
-* Rule: The frontend playback function must not block the main thread.  
-* Implementation: Uses non-blocking timers. The await keyword is avoided in the render loop to keep the UI responsive.
+### Bot & Import Safety
+Bots and imported characters exist in `window.gameData.bots` and the `character_imports` table respectively, not in the main characters table. Attempting to `getCharacter()` on their IDs will 404. Both `applyCombatRewards` skips them explicitly.
 
-### Null Safety
-
-* Check: All damage/healing functions verify target \!== null and target.hp \> 0 before execution.  
-* Edge Case: Handles scenarios where a character dies during a pre-combat phase or via DoT before their turn initiates.
-
-### Data Integrity
-
-* Schema Compatibility: Combat logs store skill IDs, not names, to ensure old logs remain valid if skill names change.  
-* Float Precision: XP is stored as floats in SQLite; rounding only occurs for display purposes.
+### XSS Protection
+Public companion cards in party formation are built via DOM methods with `data-*` attributes, not inline `onclick` strings. All user-supplied strings (character names, race names) are passed through `escapeHtml()` before insertion into innerHTML.
 
 ---
 
-## 6\. Future Expansion Points (Hooks)
+## 4. Data Flow Diagram
 
-The current codebase includes commented placeholders for:
-
-1. Combo System: Logic hooks exist to track lastUsedSkillId. Ready for sequence detection implementation.  
-2. Elemental Reactions: Damage types are tagged (Fire, Oil, etc.) but reaction logic is currently stubbed.  
-3. Target Priority AI: Current AI is basic; structure allows for swapping in complex targeting algorithms (e.g., "Focus Healer").
+```
+User clicks "Begin Challenge"
+        │
+        ▼
+confirmPartyAndStart() → startCombat()
+        │
+        ▼
+POST /api/combat/start
+{ partySnapshots, challengeID, challenges }
+        │
+        ▼
+Backend: combatEngine.js
+  ├── Hydrate imports from DB
+  ├── Aggregate stats
+  ├── Run turn loop (all stages)
+  ├── Update safety net (SQL)
+  └── Return result object
+        │
+        ▼
+Frontend receives response
+        │
+        ├── showScreen('combatlog')
+        └── displayCombatLog(result)  ← fire-and-forget
+                │
+                ▼
+        Stage 1 playback (turns + delays)
+                │
+                ▼
+        Stage 2 playback (turns + delays)
+                │
+                ▼
+        Result Modal shown
+        (loot, XP, countdown)
+                │
+                ▼
+        applyCombatRewards()
+        startCountdown() → startCombat()
+```
 
 ---
 
-Generated based on README.md, Project Ambitions and Tips.txt, and current codebase analysis.
+## 5. Future Expansion Points
 
+1. **Combo System**: `lastUsedSkillId` tracking hook exists in `combatEngine.js`. Sequence detection and combo recipe lookup against a `combos.json` is the next step.
+2. **Elemental Reactions**: Damage types are tagged (Fire, Oil, etc.) throughout the engine. Reaction logic (e.g., Oil + Fire = Explosion) is stubbed but not implemented.
+3. **Advanced Target Priority AI**: Current AI targets lowest HP. Structure allows swapping in complex algorithms (focus healers, focus buffers, random).
+4. **Boss Phase Changes**: Desperation AI threshold exists. Phase-specific skill loadout swapping at defined HP thresholds is a natural extension.
+
+---
+
+*Combat System Documentation — Shards Idle Alpha 1.1 — March 17, 2026*
