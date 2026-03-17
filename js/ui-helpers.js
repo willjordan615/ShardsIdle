@@ -149,3 +149,17 @@ function getDeviceId() {
     }
     return id;
 }
+
+/**
+ * Return to character detail screen after combat.
+ * Reloads the character so XP, loot, and stats are fresh.
+ */
+function returnToHub() {
+    const characterId = window.currentState?.detailCharacterId;
+    if (characterId && typeof showCharacterDetail === 'function') {
+        showCharacterDetail(characterId);
+    } else {
+        // Fallback to roster if no character is loaded
+        showScreen('roster');
+    }
+}

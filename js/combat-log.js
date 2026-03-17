@@ -123,6 +123,11 @@ async function displayCombatLog(combatData) {
 
                 // Update enemy panel for this stage
                 if (segment.participantsSnapshot && segment.participantsSnapshot.enemies.length > 0) {
+                    // Update hpMaxes for new enemies entering this stage
+                    segment.participantsSnapshot.enemies.forEach(e => {
+                        hpMaxes[e.enemyID]   = e.maxHP;
+                        hpCurrent[e.enemyID] = e.maxHP;
+                    });
                     renderEnemies(segment.participantsSnapshot.enemies);
                 }
 
@@ -403,11 +408,13 @@ function updateHealthBars(turn, hpMaxes, hpCurrent) {
         turn.result.targets.forEach(targetInfo => {
             updateSingleHealthBar(targetInfo.targetId, targetInfo.hpAfter, hpMaxes, hpCurrent, 'enemy');
         });
-    } else if (turn.result?.targetId && turn.result?.damageDealt > 0) {
+    } else if (turn.result?.targetId) {
         const targetId = turn.result.targetId;
         const newHP    = turn.result.targetHPAfter;
-        const updated  = updateSingleHealthBar(targetId, newHP, hpMaxes, hpCurrent, 'enemy');
-        if (!updated)  updateSingleHealthBar(targetId, newHP, hpMaxes, hpCurrent, 'party');
+        if (newHP !== undefined) {
+            const updated = updateSingleHealthBar(targetId, newHP, hpMaxes, hpCurrent, 'enemy');
+            if (!updated) updateSingleHealthBar(targetId, newHP, hpMaxes, hpCurrent, 'party');
+        }
     }
 }
 

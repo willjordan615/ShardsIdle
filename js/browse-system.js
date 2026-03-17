@@ -342,9 +342,7 @@ function openShareModal(characterId) {
         return;
     }
  
-    // Store the ID on the modal element so exportCharacter() can read it
-    // without needing window.currentState (which may not be on window if
-    // currentState is declared with let/const in game-data.js)
+
     const modal = document.getElementById('shareModal');
     if (modal) modal.dataset.characterId = characterId;
  
