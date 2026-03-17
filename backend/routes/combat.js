@@ -142,42 +142,72 @@ router.post('/start', async (req, res) => {
             const character = await db.getCharacter(targetId);
 
             if (character) {
-                // --- CRITICAL FIX: FORCE SKILL OVERWRITE ---
-                
-                // 1. Find the matching participant in the result (should be 'participant' itself)
-                // We trust the 'participant' object passed in the loop as it comes directly from the engine's final state
-                if (participant.skills && Array.isArray(participant.skills)) {
-                    const oldCount = character.skills ? character.skills.length : 0;
-                    const newCount = participant.skills.length;
-                    
-                    // Overwrite the skills array entirely with the engine's final state
-                    character.skills = participant.skills;
-                    
-                    console.log(`[SKILL SYNC] ${character.name}: Skills updated from ${oldCount} → ${newCount}`);
-                    
-                    // Debug: Check for Lunge specifically
-                    const hasLunge = character.skills.some(s => s.skillID === 'lunge');
-                    if (hasLunge) {
-                        const lunge = character.skills.find(s => s.skillID === 'lunge');
-                        console.log(`[SKILL SYNC] ✅ Lunge found! Level: ${lunge.skillLevel}, XP: ${lunge.skillXP}`);
-                    } else {
-                        console.log(`[SKILL SYNC] ❌ Lunge NOT found in updated skills list.`);
-                        console.log(`[SKILL SYNC] Available IDs:`, character.skills.map(s => s.skillID));
-                    }
-                } else {
-                    console.warn(`[SKILL SYNC] ⚠️ No skills array found in participant data for ${character.name}`);
-                }
-                // -------------------------------------------
-
-                // 2. Update aggregate stats (wins, losses, etc.)
-                combatEngine.updateCombatStats(character, result, challenge);
-
-                // 3. SAVE TO DATABASE
-                await db.saveCharacter(character);
-                console.log(`[DB SAVE] ✅ Successfully saved ${character.name} (Skills Count: ${character.skills.length})`);
-            } else {
-                console.warn(`[DB SAVE] ⚠️ Character ${targetId} not found. Skipping.`);
+            // --- PATCH START: SAFE SKILL MERGE LOGIC ---
+            
+            // 1. Create a map of incoming skills from the engine result for quick lookup
+            const incomingSkillsMap = new Map();
+            if (participant.skills && Array.isArray(participant.skills)) {
+                participant.skills.forEach(skill => {
+                    incomingSkillsMap.set(skill.skillID, skill);
+                });
             }
+
+            // 2. Prepare the final skills array
+            const finalSkills = [];
+            const processedSkillIDs = new Set();
+
+            // A. Iterate over EXISTING DB skills (Preserve history & XP for unused skills)
+            if (Array.isArray(character.skills)) {
+                for (const dbSkill of character.skills) {
+                    const incoming = incomingSkillsMap.get(dbSkill.skillID);
+                    
+                    if (incoming) {
+                        // Skill was used/discovered: Update XP, Level, UsageCount from result
+                        // We spread dbSkill first to keep any extra DB fields, then overwrite with incoming data
+                        finalSkills.push({ ...dbSkill, ...incoming });
+                        processedSkillIDs.add(dbSkill.skillID);
+                    } else {
+                        // Skill exists in DB but NOT in result (e.g., Lunge wasn't used this turn)
+                        // KEEP IT exactly as is to prevent deletion and XP loss
+                        finalSkills.push(dbSkill);
+                        processedSkillIDs.add(dbSkill.skillID);
+                    }
+                }
+            }
+
+            // B. Add NEW skills discovered this fight (Present in Result, Missing in DB)
+            if (participant.skills && Array.isArray(participant.skills)) {
+                for (const newSkill of participant.skills) {
+                    if (!processedSkillIDs.has(newSkill.skillID)) {
+                        // This is a newly discovered child skill
+                        console.log(`[SKILL SYNC] ✨ Persisting new discovery: ${newSkill.skillID}`);
+                        finalSkills.push(newSkill);
+                    }
+                }
+            }
+
+            // 3. Apply the merged array to the character object
+            character.skills = finalSkills;
+            // --- PATCH END ---
+
+            // Log newly discovered child skills (XP:0 here is correct — frontend awards XP after this save)
+            const newDiscoveries = finalSkills.filter(s => s.discovered && (s.skillLevel || 0) < 1);
+            if (newDiscoveries.length > 0) {
+                newDiscoveries.forEach(s => {
+                    console.log(`[SKILL SYNC] ✨ ${character.name} has discovered skill: ${s.skillID} (Lv.0, XP:0 — frontend will award discovery XP)`);
+                });
+            }
+            console.log(`[SKILL SYNC] ${character.name}: ${finalSkills.length} skills saved (${newDiscoveries.length} new discoveries this combat).`);
+
+            // 4. Update aggregate stats (wins, losses, etc.)
+            combatEngine.updateCombatStats(character, result, challenge);
+
+            // 5. SAVE TO DATABASE
+            await db.saveCharacter(character);
+            console.log(`[DB SAVE] ✅ Successfully saved ${character.name} (Skills Count: ${character.skills.length})`);
+        } else {
+            console.warn(`[DB SAVE] ⚠️ Character ${targetId} not found. Skipping.`);
+        }
         }
     }
 
@@ -235,4 +265,11 @@ router.get('/history/:characterID', async (req, res) => {
     }
 });
 
+// Allow admin saves to invalidate the singleton so next combat re-reads fresh JSON data.
+function resetCombatEngine() {
+    combatEngine = null;
+    console.log('[COMBAT] Engine cache invalidated — will reinitialize on next combat.');
+}
+
 module.exports = router;
+module.exports.resetCombatEngine = resetCombatEngine;

@@ -6,6 +6,19 @@ const fs = require('fs');
 const path = require('path');
 const router = express.Router();
 
+// Lazy reference to combat engine invalidation — avoids a circular require at module load.
+// items.json changes affect weapon variance profiles cached in the engine singleton.
+function invalidateCombatEngine() {
+    try {
+        const combatRoutes = require('./combat');
+        if (typeof combatRoutes.resetCombatEngine === 'function') {
+            combatRoutes.resetCombatEngine();
+        }
+    } catch (e) {
+        console.warn('[ADMIN] Could not reset combat engine cache:', e.message);
+    }
+}
+
 // Load game data
 let gameData = {};
 
@@ -74,6 +87,7 @@ router.put('/items/:id', (req, res) => {
     try {
         fs.writeFileSync(itemsPath, JSON.stringify(gameData.items, null, 2));
         console.log(`[ADMIN] Updated item: ${req.params.id}`);
+        invalidateCombatEngine();
         res.json({ 
             success: true, 
             message: 'Item updated',
@@ -117,6 +131,7 @@ router.post('/items', (req, res) => {
     try {
         fs.writeFileSync(itemsPath, JSON.stringify(gameData.items, null, 2));
         console.log(`[ADMIN] Created new item: ${newItem.id}`);
+        invalidateCombatEngine();
         res.json({ 
             success: true, 
             message: 'Item created',
@@ -153,6 +168,7 @@ router.delete('/items/:id', (req, res) => {
     try {
         fs.writeFileSync(itemsPath, JSON.stringify(gameData.items, null, 2));
         console.log(`[ADMIN] Deleted item: ${req.params.id}`);
+        invalidateCombatEngine();
         res.json({ 
             success: true, 
             message: 'Item deleted',

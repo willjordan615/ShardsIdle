@@ -1,234 +1,276 @@
-// backend/routes/admin.js
-// Admin endpoints for in-game editing
+// js/admin-panel.js
+// In-game admin panel: item browser + editor. Triggered by ~ key + password.
+// Wrapped in an IIFE — no top-level declarations that conflict with game-data.js.
 
-const express = require('express');
-const fs = require('fs');
-const path = require('path');
-const router = express.Router();
+(function() {
+    'use strict';
 
-// Load game data
-let gameData = {};
+    let adminItems    = [];
+    let editingItemId = null;
+    let isUnlocked    = false;
+    const ADMIN_PASSWORD = 'admin123';
 
-function loadGameData() {
-    const dataPath = path.join(__dirname, '../data');
-    
-    try {
-        const itemsPath = path.join(dataPath, 'items.json');
-        if (fs.existsSync(itemsPath)) {
-            gameData.items = JSON.parse(fs.readFileSync(itemsPath, 'utf8'));
+    // ~ key triggers password prompt, then opens panel
+    document.addEventListener('keydown', function(e) {
+        if (e.key === '`' || e.key === '~') {
+            if (!isUnlocked) {
+                const pw = prompt('Admin password:');
+                if (pw === ADMIN_PASSWORD) { isUnlocked = true; openPanel(); }
+            } else {
+                openPanel();
+            }
         }
-    } catch (error) {
-        console.error('Error loading items:', error);
-        gameData.items = [];
+    });
+
+    // Called by index.html onclick="closeAdminPanel()"
+    window.closeAdminPanel = function() {
+        const p = document.getElementById('adminPanel');
+        if (p) p.style.display = 'none';
+    };
+
+    // Called by index.html onclick="openAdminEditor()" and from item rows
+    window.openAdminEditor = function(itemId) {
+        const item = itemId ? adminItems.find(i => i.id === itemId) : null;
+        renderEditor(item);
+    };
+
+    function openPanel() {
+        const p = document.getElementById('adminPanel');
+        if (p) p.style.display = 'block';
+        loadItems();
     }
 
-    try {
-        const skillsPath = path.join(dataPath, 'skills.json');
-        if (fs.existsSync(skillsPath)) {
-            gameData.skills = JSON.parse(fs.readFileSync(skillsPath, 'utf8'));
+    async function loadItems() {
+        try {
+            const res  = await fetch(BACKEND_URL + '/api/admin/items');
+            const data = await res.json();
+            adminItems = data.items || [];
+            renderList(adminItems);
+        } catch (err) {
+            console.error('[ADMIN] load failed:', err);
         }
-    } catch (error) {
-        console.error('Error loading skills:', error);
-        gameData.skills = [];
     }
 
-    try {
-        const consumablesPath = path.join(dataPath, 'consumables.json');
-        if (fs.existsSync(consumablesPath)) {
-            gameData.consumables = JSON.parse(fs.readFileSync(consumablesPath, 'utf8'));
+    // ── List view ─────────────────────────────────────────────────────────────
+    function renderList(items) {
+        const wrap = document.querySelector('#adminPanel .admin-panel-container');
+        if (!wrap) return;
+        wrap.innerHTML = `
+            <div class="admin-header">
+                <h2>🔧 Admin Panel</h2>
+                <button onclick="closeAdminPanel()" class="admin-close-btn">Close</button>
+            </div>
+            <div class="admin-search">
+                <input type="text" class="admin-search-input" placeholder="Search items..."
+                       id="adminSearchInput" oninput="adminFilterItems(this.value)">
+                <button class="admin-btn-create" onclick="openAdminEditor()">+ Create Item</button>
+            </div>
+            <div class="admin-items-list" id="adminItemsList"></div>
+            <div class="admin-footer">Admin Panel v1.0 | Shards Idle</div>
+        `;
+        fillList(items);
+    }
+
+    function fillList(items) {
+        const list = document.getElementById('adminItemsList');
+        if (!list) return;
+        list.innerHTML = '';
+        if (!items.length) {
+            list.innerHTML = '<div style="padding:20px;color:#888;text-align:center">No items found.</div>';
+            return;
         }
-    } catch (error) {
-        console.error('Error loading consumables:', error);
-        gameData.consumables = [];
-    }
-}
-
-// ─── SKILLS ENDPOINTS ────────────────────────────────────────────────────────
-
-router.get('/data/skills', (req, res) => {
-    if (!gameData.skills) loadGameData();
-    res.json(gameData.skills || []);
-});
-
-router.post('/data/skills', (req, res) => {
-    if (!gameData.skills) loadGameData();
-    const incoming = req.body;
-    if (!Array.isArray(incoming)) return res.status(400).json({ error: 'Expected array of skills' });
-    gameData.skills = incoming;
-    const filePath = path.join(__dirname, '../data/skills.json');
-    try {
-        fs.writeFileSync(filePath, JSON.stringify(gameData.skills, null, 2));
-        console.log('[ADMIN] Skills saved');
-        res.json({ success: true, count: gameData.skills.length });
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to save skills', details: error.message });
-    }
-});
-
-// ─── CONSUMABLES ENDPOINTS ───────────────────────────────────────────────────
-
-router.get('/data/consumables', (req, res) => {
-    if (!gameData.consumables) loadGameData();
-    res.json(gameData.consumables || []);
-});
-
-router.post('/data/consumables', (req, res) => {
-    if (!gameData.consumables) loadGameData();
-    const incoming = req.body;
-    if (!Array.isArray(incoming)) return res.status(400).json({ error: 'Expected array of consumables' });
-    gameData.consumables = incoming;
-    const filePath = path.join(__dirname, '../data/consumables.json');
-    try {
-        fs.writeFileSync(filePath, JSON.stringify(gameData.consumables, null, 2));
-        console.log('[ADMIN] Consumables saved');
-        res.json({ success: true, count: gameData.consumables.length });
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to save consumables', details: error.message });
-    }
-});
-
-/**
- * GET /api/admin/items
- * Get all items (for admin panel)
- */
-router.get('/items', (req, res) => {
-    if (!gameData.items) {
-        loadGameData();
-    }
-    res.json({ items: gameData.items });
-});
-
-/**
- * GET /api/admin/items/:id
- * Get a single item by ID
- */
-router.get('/items/:id', (req, res) => {
-    if (!gameData.items) {
-        loadGameData();
-    }
-    
-    const item = gameData.items.find(i => i.id === req.params.id);
-    if (!item) {
-        return res.status(404).json({ error: 'Item not found' });
-    }
-    
-    res.json({ item });
-});
-
-/**
- * PUT /api/admin/items/:id
- * Update an item
- */
-router.put('/items/:id', (req, res) => {
-    if (!gameData.items) {
-        loadGameData();
-    }
-    
-    const itemIndex = gameData.items.findIndex(i => i.id === req.params.id);
-    if (itemIndex === -1) {
-        return res.status(404).json({ error: 'Item not found' });
-    }
-    
-    // Update the item in memory
-    gameData.items[itemIndex] = { ...gameData.items[itemIndex], ...req.body };
-    
-    // Save to file
-    const itemsPath = path.join(__dirname, '../data/items.json');
-    try {
-        fs.writeFileSync(itemsPath, JSON.stringify(gameData.items, null, 2));
-        console.log(`[ADMIN] Updated item: ${req.params.id}`);
-        res.json({ 
-            success: true, 
-            message: 'Item updated',
-            item: gameData.items[itemIndex]
-        });
-    } catch (error) {
-        console.error('Error saving items:', error);
-        res.status(500).json({ 
-            error: 'Failed to save item',
-            details: error.message
+        items.forEach(item => {
+            const row = document.createElement('div');
+            row.className = 'admin-item-row';
+            row.innerHTML = `
+                <div class="admin-item-info">
+                    <div class="admin-item-name">${esc(item.name)} <span style="color:#666;font-size:.8em">[${esc(item.id)}]</span></div>
+                    <div class="admin-item-meta">${esc(item.type||'unknown')} · ${esc(item.rarity||'common')}</div>
+                </div>
+                <div class="admin-item-stats">
+                    ${item.dmg1 ? 'DMG: '+item.dmg1 : ''}
+                    ${item.armor ? ' ARM: '+item.armor : ''}
+                </div>`;
+            row.onclick = () => window.openAdminEditor(item.id);
+            list.appendChild(row);
         });
     }
-});
 
-/**
- * POST /api/admin/items
- * Create a new item
- */
-router.post('/items', (req, res) => {
-    if (!gameData.items) {
-        loadGameData();
-    }
-    
-    const newItem = req.body;
-    
-    // Validate required fields
-    if (!newItem.id || !newItem.name) {
-        return res.status(400).json({ error: 'Item must have id and name' });
-    }
-    
-    // Check for duplicates
-    if (gameData.items.some(i => i.id === newItem.id)) {
-        return res.status(400).json({ error: 'Item with this ID already exists' });
-    }
-    
-    // Add to items array
-    gameData.items.push(newItem);
-    
-    // Save to file
-    const itemsPath = path.join(__dirname, '../data/items.json');
-    try {
-        fs.writeFileSync(itemsPath, JSON.stringify(gameData.items, null, 2));
-        console.log(`[ADMIN] Created new item: ${newItem.id}`);
-        res.json({ 
-            success: true, 
-            message: 'Item created',
-            item: newItem
-        });
-    } catch (error) {
-        console.error('Error saving items:', error);
-        res.status(500).json({ 
-            error: 'Failed to create item',
-            details: error.message
-        });
-    }
-});
+    window.adminFilterItems = function(q) {
+        const lq = q.toLowerCase();
+        fillList(adminItems.filter(i =>
+            i.name.toLowerCase().includes(lq) ||
+            i.id.toLowerCase().includes(lq) ||
+            (i.type||'').toLowerCase().includes(lq)
+        ));
+    };
 
-/**
- * DELETE /api/admin/items/:id
- * Delete an item
- */
-router.delete('/items/:id', (req, res) => {
-    if (!gameData.items) {
-        loadGameData();
-    }
-    
-    const itemIndex = gameData.items.findIndex(i => i.id === req.params.id);
-    if (itemIndex === -1) {
-        return res.status(404).json({ error: 'Item not found' });
-    }
-    
-    const deletedItem = gameData.items[itemIndex];
-    gameData.items.splice(itemIndex, 1);
-    
-    // Save to file
-    const itemsPath = path.join(__dirname, '../data/items.json');
-    try {
-        fs.writeFileSync(itemsPath, JSON.stringify(gameData.items, null, 2));
-        console.log(`[ADMIN] Deleted item: ${req.params.id}`);
-        res.json({ 
-            success: true, 
-            message: 'Item deleted',
-            item: deletedItem
-        });
-    } catch (error) {
-        console.error('Error saving items:', error);
-        res.status(500).json({ 
-            error: 'Failed to delete item',
-            details: error.message
-        });
-    }
-});
+    // ── Editor view ───────────────────────────────────────────────────────────
+    function renderEditor(item) {
+        const isNew = !item;
+        editingItemId = item ? item.id : null;
+        const wrap = document.querySelector('#adminPanel .admin-panel-container');
+        if (!wrap) return;
 
-module.exports = router;
-module.exports.loadGameData = loadGameData;
+        const sb = item?.statBonuses || {};
+        const v  = (k, fb='') => esc(String(item?.[k] ?? fb));
+
+        wrap.innerHTML = `
+            <div class="admin-header">
+                <button onclick="adminBackToList()" class="admin-back-btn">← Back</button>
+                <h2>${isNew ? '➕ New Item' : '✏️ ' + esc(item.name)}</h2>
+                <button onclick="closeAdminPanel()" class="admin-close-btn">Close</button>
+            </div>
+            <div class="admin-editor">
+
+                <div class="admin-editor-section">
+                    <h3>Identity</h3>
+                    <div class="admin-field"><label>ID</label>
+                        <input type="text" id="ae_id" value="${v('id')}" ${isNew?'':'readonly style="opacity:.5"'}></div>
+                    <div class="admin-field"><label>Name</label>
+                        <input type="text" id="ae_name" value="${v('name')}"></div>
+                    <div class="admin-field"><label>Type</label>
+                        <input type="text" id="ae_type" value="${v('type')}"></div>
+                    <div class="admin-field"><label>Rarity</label>
+                        <input type="text" id="ae_rarity" value="${v('rarity','common')}"></div>
+                    <div class="admin-field"><label>Slot</label>
+                        <input type="text" id="ae_slot_id1" value="${v('slot_id1')}"></div>
+                    <div class="admin-field"><label>Description</label>
+                        <textarea id="ae_description">${v('description')}</textarea></div>
+                </div>
+
+                <div class="admin-editor-section">
+                    <h3>Damage</h3>
+                    <div class="admin-stats-grid">
+                        <div class="admin-field"><label>DMG 1</label><input type="number" id="ae_dmg1" value="${v('dmg1',0)}"></div>
+                        <div class="admin-field"><label>Type 1</label><input type="text" id="ae_dmg_type_1" value="${v('dmg_type_1')}"></div>
+                        <div class="admin-field"><label>DMG 2</label><input type="number" id="ae_dmg2" value="${v('dmg2',0)}"></div>
+                        <div class="admin-field"><label>Type 2</label><input type="text" id="ae_dmg_type_2" value="${v('dmg_type_2')}"></div>
+                    </div>
+                </div>
+
+                <div class="admin-editor-section">
+                    <h3>Defense &amp; Stats</h3>
+                    <div class="admin-stats-grid">
+                        <div class="admin-field"><label>Armor</label><input type="number" id="ae_armor" value="${v('armor',0)}"></div>
+                        <div class="admin-field"><label>Delay (1-3)</label><input type="number" id="ae_delay" value="${v('delay',2)}" min="1" max="3"></div>
+                    </div>
+                    <div style="margin-top:10px;color:#888;font-size:.85em">Stat Bonuses</div>
+                    <div class="admin-stats-grid" style="margin-top:6px">
+                        <div class="admin-field"><label>Conv.</label><input type="number" id="ae_sc" value="${sb.conviction||0}"></div>
+                        <div class="admin-field"><label>End.</label><input type="number" id="ae_se" value="${sb.endurance||0}"></div>
+                        <div class="admin-field"><label>Amb.</label><input type="number" id="ae_sa" value="${sb.ambition||0}"></div>
+                        <div class="admin-field"><label>Harm.</label><input type="number" id="ae_sh" value="${sb.harmony||0}"></div>
+                    </div>
+                </div>
+
+                <div class="admin-editor-section">
+                    <h3>On-Hit Procs</h3>
+                    <div class="admin-stats-grid">
+                        <div class="admin-field"><label>Skill 1</label><input type="text" id="ae_oh1id" value="${v('onhit_skillid_1')}"></div>
+                        <div class="admin-field"><label>Chance 1 %</label><input type="number" id="ae_oh1ch" value="${v('onhit_skillchance_1',0)}"></div>
+                        <div class="admin-field"><label>Skill 2</label><input type="text" id="ae_oh2id" value="${v('onhit_skillid_2')}"></div>
+                        <div class="admin-field"><label>Chance 2 %</label><input type="number" id="ae_oh2ch" value="${v('onhit_skillchance_2',0)}"></div>
+                    </div>
+                </div>
+
+                <div class="admin-actions">
+                    <button class="admin-btn-save" onclick="adminSaveItem(${isNew})">
+                        ${isNew ? '✅ Create' : '💾 Save'}
+                    </button>
+                    ${!isNew ? `<button class="admin-btn-cancel" style="background:#8b2222"
+                        onclick="adminDeleteItem('${editingItemId}')">🗑️ Delete</button>` : ''}
+                    <button class="admin-btn-cancel" onclick="adminBackToList()">Cancel</button>
+                </div>
+            </div>`;
+    }
+
+    window.adminBackToList = function() {
+        editingItemId = null;
+        renderList(adminItems);
+    };
+
+    // ── Save / Delete ─────────────────────────────────────────────────────────
+    window.adminSaveItem = async function(isNew) {
+        const id = document.getElementById('ae_id')?.value.trim();
+        if (!id) { alert('ID is required.'); return; }
+
+        const num = id => { const n = parseFloat(document.getElementById(id)?.value); return isNaN(n)||n===0 ? undefined : n; };
+        const str = id => { const s = document.getElementById(id)?.value.trim(); return s||undefined; };
+
+        const statBonuses = {
+            conviction: parseFloat(document.getElementById('ae_sc')?.value)||0,
+            endurance:  parseFloat(document.getElementById('ae_se')?.value)||0,
+            ambition:   parseFloat(document.getElementById('ae_sa')?.value)||0,
+            harmony:    parseFloat(document.getElementById('ae_sh')?.value)||0,
+        };
+
+        const payload = {
+            id,
+            name:               document.getElementById('ae_name')?.value.trim() || id,
+            type:               str('ae_type'),
+            rarity:             str('ae_rarity') || 'common',
+            description:        str('ae_description'),
+            slot_id1:           str('ae_slot_id1'),
+            dmg1:               num('ae_dmg1'),
+            dmg_type_1:         str('ae_dmg_type_1'),
+            dmg2:               num('ae_dmg2'),
+            dmg_type_2:         str('ae_dmg_type_2'),
+            armor:              num('ae_armor'),
+            delay:              num('ae_delay'),
+            onhit_skillid_1:    str('ae_oh1id'),
+            onhit_skillchance_1:num('ae_oh1ch'),
+            onhit_skillid_2:    str('ae_oh2id'),
+            onhit_skillchance_2:num('ae_oh2ch'),
+        };
+
+        // Only include statBonuses if at least one is non-zero
+        if (Object.values(statBonuses).some(v => v !== 0)) payload.statBonuses = statBonuses;
+
+        // Strip undefined
+        Object.keys(payload).forEach(k => { if (payload[k] === undefined) delete payload[k]; });
+
+        try {
+            const method = isNew ? 'POST' : 'PUT';
+            const url    = isNew
+                ? BACKEND_URL + '/api/admin/items'
+                : BACKEND_URL + '/api/admin/items/' + editingItemId;
+
+            const res = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!res.ok) throw new Error(((await res.json()).error) || res.status);
+
+            if (typeof showSuccess === 'function') showSuccess(isNew ? `"${payload.name}" created!` : `"${payload.name}" saved!`);
+            await loadItems();
+            adminBackToList();
+        } catch (err) {
+            alert('Save failed: ' + err.message);
+            console.error('[ADMIN]', err);
+        }
+    };
+
+    window.adminDeleteItem = async function(itemId) {
+        if (!confirm('Delete "' + itemId + '"? This cannot be undone.')) return;
+        try {
+            const res = await fetch(BACKEND_URL + '/api/admin/items/' + itemId, { method: 'DELETE' });
+            if (!res.ok) throw new Error(((await res.json()).error) || res.status);
+            if (typeof showSuccess === 'function') showSuccess('"' + itemId + '" deleted.');
+            await loadItems();
+            adminBackToList();
+        } catch (err) {
+            alert('Delete failed: ' + err.message);
+            console.error('[ADMIN]', err);
+        }
+    };
+
+    // ── Utility ───────────────────────────────────────────────────────────────
+    function esc(s) {
+        return String(s)
+            .replace(/&/g,'&amp;').replace(/"/g,'&quot;')
+            .replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+})();

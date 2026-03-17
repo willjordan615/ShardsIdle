@@ -121,9 +121,10 @@ async function displayCombatLog(combatData) {
                 logDisplay.scrollTop = logDisplay.scrollHeight;
                 await sleep(4000);
 
-                // Update enemy panel for this stage
+        // Update enemy panel for this stage
+                // FIX #2: Always re-seed hpMaxes from the segment snapshot so stage 1
+                // enemies use their own maxHP, not the last stage's enemy pool.
                 if (segment.participantsSnapshot && segment.participantsSnapshot.enemies.length > 0) {
-                    // Update hpMaxes for new enemies entering this stage
                     segment.participantsSnapshot.enemies.forEach(e => {
                         hpMaxes[e.enemyID]   = e.maxHP;
                         hpCurrent[e.enemyID] = e.maxHP;
@@ -526,101 +527,193 @@ function updateResourceBars(resourceStates) {
 }
 
 // --- REWARD PROCESSOR ---
-
 async function applyCombatRewards(combatData) {
-    try {
-        const rewards = combatData.rewards;
-        if (!rewards) {
-            console.warn('[REWARDS] No rewards in combat data.');
-            return;
+try {
+    const rewards = combatData.rewards;
+    if (!rewards) {
+        console.warn('[REWARDS] No rewards in combat data.');
+        return;
+    }
+
+    const allTurns = combatData.segments
+        ? combatData.segments.flatMap(s => s.turns)
+        : (combatData.turns || []);
+
+    // Load skill definitions
+    let allSkills = [];
+    if (window.gameData?.skills) {
+        allSkills = window.gameData.skills; 
+    } else {
+        try {
+            const baseUrl = typeof BACKEND_URL !== 'undefined' ? BACKEND_URL : '';
+            const res = await fetch(`${baseUrl}/api/data/skills`);
+            if (res.ok) allSkills = await res.json();
+        } catch (e) {
+            console.error('[REWARDS] Failed to load skills:', e);
         }
+    }
 
-        const allTurns = combatData.segments
-            ? combatData.segments.flatMap(s => s.turns)
-            : (combatData.turns || []);
+    for (const participant of combatData.participants.playerCharacters) {
+        const charId = participant.characterID;
+        
+        // Skip imported characters and bots
+        if (charId.startsWith('import_')) continue;
+        if (window.gameData?.bots?.some(b => b.characterID === charId)) continue;
 
-        // Load skill definitions
-        let allSkills = [];
-        if (window.gameData?.skills) {
-            allSkills = window.gameData.skills;
-        } else {
-            try {
-                const baseUrl = typeof BACKEND_URL !== 'undefined' ? BACKEND_URL : '';
-                const res = await fetch(`${baseUrl}/api/data/skills`);
-                if (res.ok) allSkills = await res.json();
-            } catch (e) {
-                console.error('[REWARDS] Failed to load skills:', e);
+        const character = await getCharacter(charId);
+        if (!character) continue;
+
+        const oldLevel = character.level || 1;
+
+        // Apply character XP and level-ups
+        const xpGained = rewards.experienceGained?.[charId] || 0;
+        if (xpGained > 0) {
+            character.experience = (character.experience || 0) + xpGained;
+            character.lastModified = Date.now();
+            let xpThreshold = getXPToNextLevel(character.level);
+            while (character.experience >= xpThreshold) {
+                character.experience -= xpThreshold;
+                character.level++;
+                xpThreshold = getXPToNextLevel(character.level);
             }
         }
 
-        for (const participant of combatData.participants.playerCharacters) {
-            const charId = participant.characterID;
-            // Skip imported characters and bots (bots are in gameData.bots, not the DB)
-            if (charId.startsWith('import_')) continue;
-            if (window.gameData?.bots?.some(b => b.characterID === charId)) continue;
+        if (character.level > oldLevel) {
+            showSafeSuccess(`${character.name} leveled up to Level ${character.level}!`);
+        }
 
-            const character = await getCharacter(charId);
-            if (!character) continue;
+        // --- CRITICAL FIX: AGGRESSIVE DISCOVERY INJECTION ---
+        // We scan ALL turns for this character. If we see a isFirstDiscovery flag,
+        // we FORCE add the skill to the local character object immediately.
+        console.log(`[REWARDS] Scanning turns for discoveries for ${character.name}...`);
+        
+        allTurns.forEach(turn => {
+            // Match by ID first, then Name as fallback
+            const isMyTurn = (turn.actor === charId) || (turn.actorName === character.name);
+            
+            if (isMyTurn && turn.isFirstDiscovery && turn.action?.skillID) {
+                const exists = character.skills.some(s => s.skillID === turn.action.skillID);
+                if (!exists) {
+                    console.log(`[REWARDS] ⚡ FORCE INJECTING discovery: ${turn.action.skillID}`);
+                    character.skills.push({
+                        skillID: turn.action.skillID,
+                        skillLevel: 0,
+                        skillXP: 0,
+                        usageCount: 0,
+                        discovered: true,
+                        discoveredAt: Date.now()
+                    });
+                } else {
+                    console.log(`[REWARDS] ℹ️ Skill ${turn.action.skillID} already exists locally.`);
+                }
+            }
+        });
+        // ------------------------------------------------------
 
-            const oldLevel = character.level || 1;
+        // Apply skill XP
+        allTurns.forEach(turn => {
+            // Match by ID first, then Name
+            const isMyTurn = (turn.actor === charId) || (turn.actorName === character.name);
+            if (!isMyTurn) return;
 
-            // Apply character XP and level-ups
-            const xpGained = rewards.experienceGained?.[charId] || 0;
-            if (xpGained > 0) {
-                character.experience   = (character.experience || 0) + xpGained;
-                character.lastModified = Date.now();
-                let xpThreshold = getXPToNextLevel(character.level);
-                while (character.experience >= xpThreshold) {
-                    character.experience -= xpThreshold;
-                    character.level++;
-                    xpThreshold = getXPToNextLevel(character.level);
+            const isRegularSkill   = turn.action?.type === 'skill';
+            const isPreCombatSkill = turn.action?.type === 'pre_combat_skill' || turn.action?.type === 'pre_combat_fallback';
+            
+            if (!isRegularSkill && !isPreCombatSkill) return;
+
+            const skillID = turn.action.skillID;
+            if (!skillID) return;
+
+            // Find the skill in the character's owned list (now includes injected discoveries)
+            const skillRef = character.skills.find(s => s.skillID === skillID);
+            
+            if (!skillRef) {
+                // Only warn if it's NOT a discovery turn (discoveries should be injected now)
+                if (!turn.isFirstDiscovery) {
+                    console.warn(`[XP] Skill ${skillID} not found for ${character.name}. Skipping.`);
+                }
+                return;
+            }
+
+            let xpToAward = 0;
+            const skillDef = allSkills.find(s => s.id === skillID);
+            
+            // --- LOGIC BRANCH A: DISCOVERY PHASE (Level 0) ---
+            if (skillRef.skillLevel < 1) {
+                if (turn.isChildSkillProc) {
+                    // Flat 20 XP per proc toward the 120 XP unlock threshold (~6 procs)
+                    xpToAward = 20.0;
+                } else {
+                    // Skill is Level 0 but NOT procced. No XP.
+                    return; 
+                }
+            } 
+            // --- LOGIC BRANCH B: MASTERY PHASE (Level >= 1) ---
+            else {
+                // Standard XP for intentional use
+                const multiplier = (!turn.result?.success && isPreCombatSkill) ? 0.5 : 1.0;
+                
+                let baseSkillXP = 50.0;
+                if (skillDef?.category?.includes('DAMAGE_SINGLE')) { 
+                    baseSkillXP = 2.0; 
+                }
+
+                xpToAward = (baseSkillXP * multiplier) / Math.log(skillRef.skillLevel + 2);
+                
+                if (turn.isDesperation) {
+                    xpToAward = 0; 
                 }
             }
 
-            if (character.level > oldLevel) {
-                showSafeSuccess(`${character.name} leveled up to Level ${character.level}!`);
-            }
-
-            // Apply skill XP
-            allTurns.forEach(turn => {
-                if (turn.actor !== charId && turn.actorName !== character.name) return;
-
-                const isRegularSkill   = turn.action?.type === 'skill';
-                const isPreCombatSkill = turn.action?.type === 'pre_combat_skill' || turn.action?.type === 'pre_combat_fallback';
-                if (!isRegularSkill && !isPreCombatSkill) return;
-
-                const skillID  = turn.action.skillID;
-                if (!skillID) return;
-
-                const skillRef = character.skills.find(s => s.skillID === skillID);
-                if (!skillRef) return;
-
-                const skillDef    = allSkills.find(s => s.id === skillID);
-                let baseSkillXP   = 50.0;
-                if (skillDef?.category?.includes('DAMAGE_SINGLE')) baseSkillXP = 2;
-
-                const multiplier  = (!turn.result?.success && isPreCombatSkill) ? 0.5 : 1.0;
-                const rawGain     = (baseSkillXP * multiplier) / Math.log(skillRef.skillLevel + 2);
-                const skillXPGain = Math.max(0.01, rawGain);
-
-                skillRef.skillXP    = (skillRef.skillXP || 0) + skillXPGain;
+            if (xpToAward > 0) {
+                skillRef.skillXP = (skillRef.skillXP || 0) + xpToAward;
                 skillRef.usageCount = (skillRef.usageCount || 0) + 1;
 
-                const threshold = 100 * skillRef.skillLevel * 1.2;
+                // Level 0 → 1: flat 120 XP discovery threshold.
+                // Level 1+: standard formula (100 * level * 1.2).
+                const threshold = skillRef.skillLevel < 1
+                    ? 120
+                    : 100 * skillRef.skillLevel * 1.2;
+
                 if (skillRef.skillXP >= threshold) {
                     skillRef.skillXP -= threshold;
                     skillRef.skillLevel++;
                     showSafeSuccess(`${turn.action.name || skillID} leveled up to ${skillRef.skillLevel}!`);
+                    console.log(`[XP] 🎉 ${skillID} reached Level ${skillRef.skillLevel}!`);
+                } else if (skillRef.skillLevel < 1) {
+                    console.log(`[XP] ✨ ${skillID} discovery XP: ${skillRef.skillXP.toFixed(0)} / ${threshold} (+${xpToAward})`);
                 }
-            });
+            }
+        });
 
-            await saveCharacterToServer(character);
+        await saveCharacterToServer(character);
+
+        // --- PATCH: SYNC STATE FOR NEXT COMBAT ---
+        if (window.currentState && window.currentState.currentParty) {
+            const partyIndex = window.currentState.currentParty.findIndex(
+                m => m.characterID === charId || m.id === charId
+            );
+            
+            if (partyIndex !== -1) {
+                window.currentState.currentParty[partyIndex].skills = character.skills;
+                window.currentState.currentParty[partyIndex].experience = character.experience;
+                window.currentState.currentParty[partyIndex].level = character.level;
+                console.log(`[STATE SYNC] Updated currentState for ${character.name} (Skills: ${character.skills.length})`);
+            }
         }
+        // --- END PATCH ---
+    }
 
-        // Apply loot to first non-imported player character
-        if (rewards.lootDropped && rewards.lootDropped.length > 0) {
-            const firstCharId = combatData.participants.playerCharacters[0]?.characterID;
-            const character   = await getCharacter(firstCharId);
+    // Apply Loot
+    if (rewards.lootDropped && rewards.lootDropped.length > 0) {
+        const firstParticipant = combatData.participants.playerCharacters.find(
+            p => !p.characterID.startsWith('import_') && !window.gameData?.bots?.some(b => b.characterID === p.characterID)
+        );
+
+        if (firstParticipant) {
+            const firstCharId = firstParticipant.characterID;
+            const character = await getCharacter(firstCharId);
+            
             if (character) {
                 if (!character.inventory) character.inventory = [];
                 rewards.lootDropped.forEach(loot => {
@@ -628,20 +721,30 @@ async function applyCombatRewards(combatData) {
                 });
                 showSafeSuccess(`Loot obtained: ${rewards.lootDropped.map(l => l.itemID).join(', ')}`);
                 await saveCharacterToServer(character);
+
+                if (window.currentState && window.currentState.currentParty) {
+                    const partyIndex = window.currentState.currentParty.findIndex(
+                        m => m.characterID === firstCharId || m.id === firstCharId
+                    );
+                    if (partyIndex !== -1) {
+                        window.currentState.currentParty[partyIndex].inventory = character.inventory;
+                        console.log(`[STATE SYNC] Updated inventory in currentState for ${character.name}`);
+                    }
+                }
             }
         }
-
-        // Refresh roster and character detail
-        if (typeof renderRoster === 'function') await renderRoster();
-        if (window.currentState?.detailCharacterId && typeof showCharacterDetail === 'function') {
-            await showCharacterDetail(window.currentState.detailCharacterId);
-        }
-
-        const totalXP = Object.values(rewards.experienceGained || {}).reduce((a, b) => a + b, 0);
-        console.log(`[REWARDS] Total XP awarded: ${totalXP}`);
-
-    } catch (error) {
-        console.error('[REWARDS] Failed to apply rewards:', error);
-        showSafeError('Failed to apply rewards: ' + error.message);
     }
+
+    if (typeof renderRoster === 'function') await renderRoster();
+    if (window.currentState?.detailCharacterId && typeof showCharacterDetail === 'function') {
+        await showCharacterDetail(window.currentState.detailCharacterId);
+    }
+
+    const totalXP = Object.values(rewards.experienceGained || {}).reduce((a, b) => a + b, 0);
+    console.log(`[REWARDS] Total XP awarded: ${totalXP}`);
+
+} catch (error) {
+    console.error('[REWARDS] Failed to apply rewards:', error);
+    showSafeError('Failed to apply rewards: ' + error.message);
+}
 }

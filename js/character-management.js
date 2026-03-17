@@ -799,29 +799,294 @@ function renderEquippedGear(character) {
 }
 
 /**
- * Render character skills with tooltips
+ * Render character skills with TWO DROPDOWNS/SLOTS for active equipment.
+ * Assumes: character.skills[0] and [1] are the equipped slots.
+ * Items at index 2+ are owned but unequipped.
  */
-function renderCharacterSkills(character) {
+async function renderCharacterSkills(character) {
     const container = document.getElementById('skillDisplay');
     if (!container) return;
     
     container.innerHTML = '';
     
-    character.skills.forEach(skillRef => {
-        const skill = getSkill(skillRef.skillID);
-        if (!skill || skill.category.includes('CONSUMABLE')) return;
+    // Ensure we have an array
+    if (!character.skills) character.skills = [];
+
+    const TOTAL_SLOTS = 2;
+    
+    // Render the 2 Equipment Slots
+    for (let i = 0; i < TOTAL_SLOTS; i++) {
+        const slotIndex = i;
+        // Get the skill currently in this slot (if any)
+        const skillRecord = character.skills[slotIndex] || null;
         
         const card = document.createElement('div');
         card.className = 'card';
-        card.innerHTML = `
-            <div class="card-title">${skill.name}</div>
-            <div class="card-description">Level ${skillRef.skillLevel}</div>
-            <div class="card-description" style="margin-top: 0.5rem;">XP: ${skillRef.skillXP}</div>
-        `;
+        card.style.cssText = 'flex:1; margin:5px; min-width:140px; border: 1px solid #d4af37; background: rgba(20,30,50,0.8); position:relative; display:flex; flex-direction:column; justify-content:space-between;';
         
-        addSkillTooltip(card, skill, 500);
+        if (skillRecord) {
+            const skillDef = window.gameData.skills.find(s => s.id === skillRecord.skillID);
+            
+            if (skillDef) {
+                // Content
+                const contentDiv = document.createElement('div');
+                contentDiv.innerHTML = `
+                    <div class="card-title" style="color:#ffd700;">${skillDef.name}</div>
+                    <div class="card-description">Level ${skillRecord.skillLevel || 1}</div>
+                    <div class="card-description" style="margin-top: 0.5rem; font-size:0.8em; color:#aaa;">XP: ${skillRecord.skillXP ? skillRecord.skillXP.toFixed(2) : '0'}</div>
+                `;
+                card.appendChild(contentDiv);
+                
+                // Add Tooltip
+                addSkillTooltip(card, skillDef, 500);
+
+                // Swap Button
+                const btn = document.createElement('button');
+                btn.textContent = '🔄 Change Skill';
+                btn.style.cssText = 'margin-top:10px; width:100%; padding:5px; background:#2a4a6a; color:#fff; border:1px solid #4a6a8a; cursor:pointer;';
+                btn.onclick = () => openSkillSwapModal(character, slotIndex);
+                card.appendChild(btn);
+            } else {
+                // Corrupt data
+                card.innerHTML = `<div class="card-title" style="color:red;">Unknown Skill</div><div class="card-description">ID: ${skillRecord.skillID}</div>`;
+            }
+        } else {
+            // Empty Slot
+            card.innerHTML = `
+                <div class="card-title" style="color:#666;">Empty Slot ${slotIndex + 1}</div>
+                <div class="card-description">No skill equipped</div>
+                <button id="swap-btn-${slotIndex}" style="margin-top:10px; width:100%; padding:5px; background:#2a4a6a; color:#fff; border:1px solid #4a6a8a; cursor:pointer;">
+                    ⚡ Equip Skill
+                </button>
+            `;
+            const btn = card.querySelector(`#swap-btn-${slotIndex}`);
+            if (btn) btn.onclick = () => openSkillSwapModal(character, slotIndex);
+        }
+        
         container.appendChild(card);
+    }
+
+    // --- DISCOVERED SKILLS (level 0 — not yet equippable) ---
+    // Skills that have been discovered via child skill proc but haven't reached level 1 yet.
+    // They live at index 2+ in character.skills. Show XP progress toward the 120 unlock threshold.
+    const discoveredLocked = character.skills.slice(2).filter(
+        rec => rec.discovered && (rec.skillLevel || 0) < 1
+    );
+
+    if (discoveredLocked.length > 0) {
+        const section = document.createElement('div');
+        section.style.cssText = 'width:100%; margin-top:14px;';
+
+        const heading = document.createElement('div');
+        heading.style.cssText = 'color:#d4af37; font-size:0.8em; letter-spacing:1px; margin-bottom:6px; text-transform:uppercase;';
+        heading.textContent = '\u{1F52E} Discovered (Unlocking...)';
+        section.appendChild(heading);
+
+        const UNLOCK_THRESHOLD = 120;
+
+        discoveredLocked.forEach(rec => {
+            const skillDef = window.gameData?.skills?.find(s => s.id === rec.skillID);
+            const name = skillDef?.name || rec.skillID;
+            const xp   = rec.skillXP || 0;
+            const pct  = Math.min(100, Math.floor((xp / UNLOCK_THRESHOLD) * 100));
+
+            const row = document.createElement('div');
+            row.style.cssText = 'background:rgba(212,175,55,0.07); border:1px solid rgba(212,175,55,0.3); border-radius:6px; padding:8px 10px; margin-bottom:6px;';
+            row.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                    <span style="color:#d4af37; font-weight:bold; font-size:0.9em;">${name}</span>
+                    <span style="color:#aaa; font-size:0.75em;">${xp.toFixed(0)} / ${UNLOCK_THRESHOLD} XP</span>
+                </div>
+                <div style="background:#0f0f1e; border-radius:3px; height:6px; overflow:hidden;">
+                    <div style="background:linear-gradient(90deg,#d4af37,#ffe066); width:${pct}%; height:100%; transition:width 0.3s;"></div>
+                </div>
+                <div style="color:#888; font-size:0.72em; margin-top:3px;">
+                    ${skillDef?.description || 'Discovered in combat — keep fighting to unlock.'}
+                </div>
+            `;
+            section.appendChild(row);
+        });
+
+        container.appendChild(section);
+    }
+}
+
+/**
+ * Opens a modal to swap a skill in the specified slot index (0 or 1).
+ */
+async function openSkillSwapModal(character, slotIndex) {
+    let modal = document.getElementById('skillSwapModal');
+    
+    // Create modal if it doesn't exist
+    if (!modal) {
+        createSkillSwapModalHTML();
+        modal = document.getElementById('skillSwapModal');
+    }
+
+    const modalTitle = document.getElementById('skillSwapTitle');
+    const modalList = document.getElementById('skillSwapList');
+    
+    if (!modalTitle || !modalList) return;
+
+    modalTitle.textContent = `Select Skill for Slot ${slotIndex + 1}`;
+    modalList.innerHTML = '<div style="text-align:center; color:#aaa;">Loading skills...</div>';
+    modal.style.display = 'flex';
+
+    // Identify the skill in the OTHER slot to prevent duplicates
+    const otherSlotIndex = slotIndex === 0 ? 1 : 0;
+    const otherSlotSkillID = character.skills[otherSlotIndex]?.skillID;
+    const currentSlotSkillID = character.skills[slotIndex]?.skillID;
+
+    // Filter Equippable Skills
+    const equippableSkills = window.gameData.skills.filter(s => {
+        if (s.category && s.category.includes('CONSUMABLE')) return false;
+        
+        const isStarter = s.isStarterSkill === true;
+        const ownedRecord = character.skills.find(rec => rec.skillID === s.id);
+        const isOwnedAndUnlocked = ownedRecord && (ownedRecord.skillLevel || 0) >= 1;
+        
+        if (!isStarter && !isOwnedAndUnlocked) return false;
+        if (s.id === otherSlotSkillID) return false; // Prevent duplicate in other slot
+        if (s.id === currentSlotSkillID) return false; // Prevent selecting current
+        
+        return true;
     });
+
+    modalList.innerHTML = '';
+    if (equippableSkills.length === 0) {
+        modalList.innerHTML = '<div style="text-align:center; color:#666; padding:20px;">No other skills available.<br><small>Discover new skills by combining parents in combat!</small></div>';
+    } else {
+        equippableSkills.forEach(skill => {
+            const ownedRec = character.skills.find(r => r.skillID === skill.id);
+            const levelText = ownedRec ? `Lv.${ownedRec.skillLevel}` : 'Starter';
+            const xpText = ownedRec ? `(XP: ${ownedRec.skillXP.toFixed(1)})` : '';
+
+            const item = document.createElement('div');
+            item.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:12px; border-bottom:1px solid #333; cursor:pointer; transition:background 0.2s;';
+            item.onmouseover = function() { this.style.background = '#2a4a6a'; };
+            item.onmouseout = function() { this.style.background = 'transparent'; };
+            
+            item.innerHTML = `
+                <div>
+                    <div style="font-weight:bold; color:#ffd700;">${skill.name}</div>
+                    <div style="font-size:0.85em; color:#aaa;">${skill.category} | ${levelText} ${xpText}</div>
+                </div>
+                <div style="color:#4cd964; font-weight:bold; font-size:0.9em;">Equip ➜</div>
+            `;
+
+            item.onclick = async () => {
+                await confirmSkillSwap(character, slotIndex, skill.id);
+            };
+
+            modalList.appendChild(item);
+        });
+    }
+}
+
+/**
+ * Handles the logic of swapping the skill and saving to server.
+ */
+async function confirmSkillSwap(character, slotIndex, newSkillID) {
+    const modal = document.getElementById('skillSwapModal');
+    if (modal) modal.style.display = 'none';
+
+    const oldSkillRecord = character.skills[slotIndex];
+    
+    // 1. Find the record for the NEW skill in the full array
+    let newSkillRecordIndex = character.skills.findIndex(s => s.skillID === newSkillID);
+    let newSkillRecord = null;
+
+    if (newSkillRecordIndex === -1) {
+        // New starter skill not yet in array
+        newSkillRecord = {
+            skillID: newSkillID,
+            skillLevel: 1,
+            skillXP: 0,
+            usageCount: 0,
+            learned: true
+        };
+    } else {
+        // Grab the existing record
+        newSkillRecord = character.skills[newSkillRecordIndex];
+        
+        // ⚠️ CRITICAL FIX: If the new skill is currently sitting in the "unequipped" pool (index 2+),
+        // we must remove it from there first so we don't duplicate it when we place it in the slot.
+        if (newSkillRecordIndex !== slotIndex) {
+             // We will handle the removal after we secure the old skill, 
+             // to avoid index shifting issues.
+        }
+    }
+
+    // 2. Secure the OLD skill (the one being kicked out of the slot)
+    // We only keep it if it's not the same as the new skill (swapping A for A does nothing)
+    let skillToUnequip = null;
+    if (oldSkillRecord && oldSkillRecord.skillID !== newSkillID) {
+        skillToUnequip = oldSkillRecord;
+    }
+
+    // 3. Rebuild the Skills Array Cleanly
+    // FIX: previous code always pushed newSkill first, so swapping slot 1 silently
+    // placed the new skill into slot 0 and the other skill into slot 1.
+    // We now respect slotIndex when ordering the first two entries.
+
+    const otherSlotIndex  = slotIndex === 0 ? 1 : 0;
+    const otherSlotID     = character.skills[otherSlotIndex]?.skillID;
+    const otherSkillRecord = character.skills.find(s => s.skillID === otherSlotID);
+
+    // Skills beyond index 1 that are not being moved into a slot
+    const unequippedSkills = character.skills.filter((s, idx) => {
+        if (idx === 0 || idx === 1) return false;      // skip equipped pair
+        if (s.skillID === newSkillID) return false;    // being promoted to a slot
+        if (s.skillID === otherSlotID) return false;   // safety
+        return true;
+    });
+
+    // If the kicked-out skill is not already in the pool, add it
+    if (skillToUnequip && !unequippedSkills.some(s => s.skillID === skillToUnequip.skillID)) {
+        unequippedSkills.push(skillToUnequip);
+    }
+
+    // Build [slot0, slot1, ...rest] in the correct order
+    const finalSkills = [];
+    if (slotIndex === 0) {
+        finalSkills.push(newSkillRecord);
+        if (otherSkillRecord) finalSkills.push(otherSkillRecord);
+    } else {
+        if (otherSkillRecord) finalSkills.push(otherSkillRecord);
+        finalSkills.push(newSkillRecord);
+    }
+    finalSkills.push(...unequippedSkills);
+
+    // 4. Apply and Save
+    character.skills = finalSkills;
+
+    try {
+        await saveCharacterToServer(character);
+        if (typeof showSafeSuccess === 'function') {
+            showSafeSuccess(`Equipped ${window.gameData.skills.find(s=>s.id===newSkillID).name}!`);
+        }
+        await renderCharacterSkills(character);
+    } catch (err) {
+        if (typeof showSafeError === 'function') showSafeError('Failed to save skills: ' + err.message);
+        console.error(err);
+    }
+}
+
+/**
+ * Helper to create modal HTML if it doesn't exist in index.html
+ */
+function createSkillSwapModalHTML() {
+    const modal = document.createElement('div');
+    modal.id = 'skillSwapModal';
+    modal.style.cssText = 'display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:2000; justify-content:center; align-items:center;';
+    modal.innerHTML = `
+        <div style="background:#1a1a2e; border:2px solid #d4af37; padding:20px; width:90%; max-width:500px; max-height:80vh; overflow-y:auto; border-radius:8px; position:relative; box-shadow:0 0 20px rgba(0,0,0,0.5);">
+            <h3 id="skillSwapTitle" style="color:#ffd700; margin-top:0; border-bottom:1px solid #333; padding-bottom:10px;">Select Skill</h3>
+            <div id="skillSwapList" style="margin-bottom:20px; max-height:60vh; overflow-y:auto;"></div>
+            <button onclick="document.getElementById('skillSwapModal').style.display='none'" style="width:100%; padding:12px; background:#4a2a2a; color:#fff; border:none; border-radius:4px; cursor:pointer; font-weight:bold;">Cancel</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
 }
 
 /**
@@ -1092,57 +1357,9 @@ function addEquippedGearTooltip(element, item, delay = 500) {
     });
 }
 
-/**
- * Add stat tooltip behavior
- */
-function addStatTooltip(element, statName, delay = 400) {
-    const statDescriptions = {
-        conviction: 'Increases hit chance, critical strike chance, and damage scaling',
-        endurance: 'Increases maximum HP, Stamina, and damage mitigation',
-        ambition: 'Improves initiative, retreat success chance, and certain skill effects',
-        harmony: 'Boosts maximum Mana, healing power, and group synergy effects'
-    };
-    
-    let tooltip = null;
-    let tooltipTimeout = null;
-    
-    element.addEventListener('mouseenter', (e) => {
-        tooltipTimeout = setTimeout(() => {
-            tooltip = document.createElement('div');
-            tooltip.style.cssText = `
-                position: fixed; 
-                background: #16213e; 
-                border: 1px solid #4a9eff; 
-                border-radius: 4px; 
-                padding: 0.5rem; 
-                max-width: 250px; 
-                z-index: 10000; 
-                color: #aaa; 
-                font-family: 'Courier New', monospace; 
-                font-size: 0.8rem; 
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
-                pointer-events: none;
-            `;
-            tooltip.textContent = statDescriptions[statName] || statName;
-            document.body.appendChild(tooltip);
-            positionTooltip(tooltip, e);
-        }, delay);
-    });
-    
-    element.addEventListener('mousemove', (e) => {
-        if (tooltip) {
-            positionTooltip(tooltip, e);
-        }
-    });
-    
-    element.addEventListener('mouseleave', () => {
-        if (tooltipTimeout) clearTimeout(tooltipTimeout);
-        if (tooltip) {
-            tooltip.remove();
-            tooltip = null;
-        }
-    });
-}
+// addStatTooltip is defined in stat-tooltip.js (richer version with createStatTooltip).
+// The duplicate that used to live here has been removed to prevent the weaker inline
+// version from shadowing the correct one during the window between script loads.
 
 /**
  * Check if a character is imported (linked reference)

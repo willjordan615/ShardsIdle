@@ -343,19 +343,22 @@ class CombatEngine {
     // Handle Stages with Branching Logic
     const allStages = challenge.stages || [];
     let stageIndex = 0;
+    // FIX #3: When a branch fires we record the target index so stageIndex++ lands correctly.
+    let forcedNextStageIndex = null;
 
     while (stageIndex < allStages.length) {
       let stage = allStages[stageIndex];
+      forcedNextStageIndex = null;
 
       // --- BRANCHING LOGIC ---
       if (stage.stageBranches && stage.stageBranches.length > 0) {
         console.log(`[BRANCH] Evaluating branches for Stage ${stage.stageId}: ${stage.title}`);
-        let nextStageId = null;
+        let resolvedNextStageId = null;
 
         for (const branch of stage.stageBranches) {
           if (!branch.condition) {
-            // Default fallback branch (no condition)
-            nextStageId = branch.nextStageId;
+            // Default fallback branch — keep as candidate but keep scanning for a condition match
+            resolvedNextStageId = branch.nextStageId;
             if (branch.overrideDescription) stage.description = branch.overrideDescription;
             continue; 
           }
@@ -369,21 +372,22 @@ class CombatEngine {
           }
           
           if (conditionMet) {
-            nextStageId = branch.nextStageId;
+            resolvedNextStageId = branch.nextStageId;
             if (branch.overrideDescription) stage.description = branch.overrideDescription;
-            console.log(`[BRANCH] Condition met (${branch.condition.type}: ${branch.condition.value}). Jumping to Stage ${nextStageId}`);
+            console.log(`[BRANCH] Condition met (${branch.condition.type}: ${branch.condition.value}). Jumping to Stage ${resolvedNextStageId}`);
             break;
           }
         }
 
-        if (nextStageId) {
-          // Find the target stage object
-          const targetStage = allStages.find(s => s.stageId === nextStageId);
-          if (targetStage) {
-            stage = targetStage; // Swap the current stage to the branched one
-            // Skip the original sequential increment later
+        if (resolvedNextStageId !== null) {
+          const targetIdx = allStages.findIndex(s => s.stageId === resolvedNextStageId);
+          if (targetIdx !== -1) {
+            stage = allStages[targetIdx];
+            // FIX: record target so stageIndex++ below advances PAST the branched stage
+            forcedNextStageIndex = targetIdx;
+            console.log(`[BRANCH] Resolved to stage index ${targetIdx} (stageId: ${stage.stageId})`);
           } else {
-            console.error(`[BRANCH] Target stage ${nextStageId} not found!`);
+            console.error(`[BRANCH] Target stage ${resolvedNextStageId} not found!`);
           }
         }
       }
@@ -454,6 +458,12 @@ class CombatEngine {
             turn.action = action;
             turn.roll = turnResult.roll;
             turn.result = turnResult.result;
+            // FIX #1: Hoist child skill proc flags from action → turn so frontend can detect them
+            if (action.isChildSkillProc) {
+              turn.isChildSkillProc = true;
+              turn.isFirstDiscovery = action.isFirstDiscovery || false;
+              turn.replacedSkillID  = action.replacedSkillID  || null;
+            }
             
             if (action.type === 'retreat' && turnResult.result.success) {
               return this._buildRetreatResult(combatID, playerCharacters, enemies, stageTurns, globalTurnCount, combatant.id);
@@ -504,7 +514,33 @@ class CombatEngine {
           if (statusResults.healed > 0) {
             combatant.currentHP = Math.min(combatant.maxHP, combatant.currentHP + statusResults.healed);
           }
+
+          // FIX: Apply stat boosts/reductions — previously computed but discarded.
+          // Transient per-turn deltas only; reversed after tick so they don't compound.
+          const hasDeltas = Object.keys(statusResults.statBoosts).length > 0
+                         || Object.keys(statusResults.statReductions).length > 0;
+          const appliedDeltas = {};
+          if (hasDeltas) {
+            for (const [stat, boost] of Object.entries(statusResults.statBoosts)) {
+              const delta = Math.floor((combatant.stats[stat] || 0) * boost);
+              combatant.stats[stat] = (combatant.stats[stat] || 0) + delta;
+              appliedDeltas[stat] = (appliedDeltas[stat] || 0) + delta;
+            }
+            for (const [stat, reduction] of Object.entries(statusResults.statReductions)) {
+              const delta = Math.floor((combatant.stats[stat] || 0) * reduction);
+              combatant.stats[stat] = Math.max(0, (combatant.stats[stat] || 0) - delta);
+              appliedDeltas[stat] = (appliedDeltas[stat] || 0) - delta;
+            }
+          }
+
           this.statusEngine.updateStatusDurations(combatant);
+
+          // Reverse transient deltas so they don't bleed into the next turn
+          if (hasDeltas) {
+            for (const [stat, delta] of Object.entries(appliedDeltas)) {
+              combatant.stats[stat] = (combatant.stats[stat] || 0) - delta;
+            }
+          }
         });
 
         if (stageTurns.length > 0) {
@@ -543,7 +579,13 @@ class CombatEngine {
         break;
       }
 
-      stageIndex++;
+      // FIX #3: If a branch fired, jump to targetIdx+1 so we continue AFTER the branched stage.
+      // Otherwise advance sequentially.
+      if (forcedNextStageIndex !== null) {
+        stageIndex = forcedNextStageIndex + 1;
+      } else {
+        stageIndex++;
+      }
     }
 
     const allStagesWon = segments.every(s => s.status === 'victory');
@@ -573,49 +615,6 @@ class CombatEngine {
       rewards,
       shouldPersist: true
     };
-  }
-
-  _generateStageSummary(stage, players, enemies, won, startHP, endHP) {
-    if (!won) {
-        const survivors = players.filter(p => !p.defeated);
-        const killer = enemies.find(e => !e.defeated && e.currentHP > 0);
-        return `${players[0].name} was overwhelmed in "${stage.title}". ${survivors.length === 0 ? 'The party was wiped out.' : `${survivors.length} survivor(s) fled.`} ${killer ? `Last stood by ${killer.name}.` : ''}`;
-    }
-    const hpStatus = players.map(p => {
-        const start = startHP.find(h => h.id === p.id)?.hp || p.maxHP;
-        const end = endHP.find(h => h.id === p.id)?.hp || 0;
-        const pct = Math.floor((end / p.maxHP) * 100);
-        return pct < 30 ? `${p.name} (Critical ${pct}%)` : `${p.name} (${pct}%)`;
-    }).join(', ');
-    const enemyList = enemies.map(e => `${e.name} (Lvl ${e.level})`).join(', ');
-    return `${players[0].name} cleared "${stage.title}", defeating ${enemyList}. Party Status: ${hpStatus}.`;
-  }
-
-  _buildRetreatResult(combatID, players, enemies, turns, turnCount, retreatedBy) {
-    return {
-        combatID, result: 'retreated', totalTurns: turnCount,
-        segments: [{ stageId: 'retreat', title: 'Retreat', introText: 'Fleeing...', turns, summaryText: 'Successfully retreated.', status: 'retreat' }],
-        turns, participants: { playerCharacters: [], enemies: [] }, rewards: null, shouldPersist: false
-    };
-  }
-
-  calculateRewards(players, challenge) {
-     const rewards = { experienceGained: {}, lootDropped: [] };
-     const baseXP = challenge?.rewards?.baseXP || 100;
-     const lootTable = challenge?.rewards?.lootTable || [];
-
-     players.forEach(player => {
-        const xpReward = Math.floor(baseXP * (1 + (player.stats?.harmony || 0) / 250));
-        rewards.experienceGained[player.id] = xpReward;
-     });
-
-     lootTable.forEach(lootItem => {
-        const dropChance = (lootItem.dropChance || 0.3) * (1 + (players[0]?.stats?.ambition || 0) / 500);
-        if (Math.random() <= dropChance) {
-            rewards.lootDropped.push({ characterID: players[0].id, itemID: lootItem.itemID, itemName: lootItem.itemID, rarity: lootItem.rarity });
-        }
-     });
-     return rewards;
   }
 
   // Helper: Generate Narrative Summary
@@ -916,7 +915,6 @@ class CombatEngine {
   /**
    * After the AI selects a skill, check whether a child skill should proc
    * and replace it. Returns the action to execute (may be unchanged).
-   * Also handles decrementing consumable qty if a consumable-parent proc fires.
    */
   checkChildSkillProc(character, selectedAction, players, enemies) {
     if (!selectedAction || selectedAction.type !== 'skill') return selectedAction;
@@ -928,7 +926,6 @@ class CombatEngine {
     const availablePool    = this.getAugmentedSkillPool(character);
 
     // Find child skills whose both parents are in the available pool
-    // and whose category matches what the AI would have used this turn
     const eligibleChildSkills = this.skills.filter(s => {
         if (!s.isChildSkill) return false;
         if (!s.parentSkills || s.parentSkills.length !== 2) return false;
@@ -938,12 +935,18 @@ class CombatEngine {
 
     if (eligibleChildSkills.length === 0) return selectedAction;
 
-    // Shuffle so no child skill is systematically blocked by another
     const shuffled = eligibleChildSkills.sort(() => Math.random() - 0.5);
 
     for (const childSkill of shuffled) {
         const procChance = childSkill.procChance || 0.05;
         if (Math.random() >= procChance) continue;
+
+        // --- CRITICAL FIX: Prevent "Lunge replacing Lunge" ---
+        // If the selected action is ALREADY this child skill, do not re-proc.
+        if (selectedAction.skillID === childSkill.id) {
+            return selectedAction; 
+        }
+        // -------------------------------------------------------
 
         // Proc fires — resolve target
         const aliveEnemies = enemies.filter(e => !e.defeated);
@@ -956,7 +959,7 @@ class CombatEngine {
             target = aliveEnemies.reduce((min, e) => e.currentHP < min.currentHP ? e : min).id;
         }
 
-        // If a consumable was a parent, decrement its qty
+        // Consumable logic (unchanged)
         childSkill.parentSkills.forEach(parentSkillId => {
             const consumables = character.consumables || {};
             Object.entries(consumables).forEach(([consumableId, qty]) => {
@@ -987,20 +990,12 @@ class CombatEngine {
             console.log(`[CHILD PROC] ✨ ${character.name} discovered: ${childSkill.name}!`);
         }
 
-        // Award child skill XP — dedicated rate independent of category
-        const CHILD_XP_PER_PROC  = 20;
-        const LEVEL_1_THRESHOLD  = 120;
-        const skillRecord = character.skills.find(s => s.skillID === childSkill.id);
-        if (skillRecord) {
-            skillRecord.skillXP    = (skillRecord.skillXP || 0) + CHILD_XP_PER_PROC;
-            skillRecord.usageCount = (skillRecord.usageCount || 0) + 1;
-            if (skillRecord.skillLevel === 0 && skillRecord.skillXP >= LEVEL_1_THRESHOLD) {
-                skillRecord.skillLevel = 1;
-                skillRecord.skillXP   -= LEVEL_1_THRESHOLD;
-                console.log(`[CHILD PROC] 🔓 ${character.name} unlocked: ${childSkill.name}!`);
-            }
-        }
-
+        // --- REMOVED: XP Award Logic ---
+        // We NO LONGER award XP here. 
+        // The Frontend (combat-log.js) will detect isChildSkillProc and award XP 
+        // based on the strict rules (Discovery XP only if Level 0).
+        // This prevents double-dipping and the "Echo Loop".
+        
         console.log(`[CHILD PROC] ${character.name} → ${childSkill.name} (replaced ${selectedSkillDef.name})`);
 
         return {
@@ -1013,7 +1008,7 @@ class CombatEngine {
         };
     }
 
-    return selectedAction; // no proc fired
+    return selectedAction;
   }
 
   triggerWeaponProcs(actor, target, skillLevel) {

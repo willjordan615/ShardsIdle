@@ -9,6 +9,7 @@ const { router: dataRoutes, loadGameData } = require('./routes/data');
 const characterRoutes = require('./routes/character');
 const adminRoutes = require('./routes/admin');
 const characterSnapshotsRoutes = require('./routes/character-snapshots');
+const { resetCombatEngine } = combatRoutes;
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -66,8 +67,8 @@ app.post('/api/admin/data/challenges', (req, res) => {
         fs.writeFileSync(filePath, JSON.stringify(newData, null, 2), 'utf8');
         console.log('[EDITOR] ✅ Challenges saved successfully.');
         
-        // Optional: Reload game data if your server caches it
         if (typeof loadGameData === 'function') loadGameData();
+        if (typeof resetCombatEngine === 'function') resetCombatEngine();
         
         res.json({ success: true, message: 'Challenges saved!' });
     } catch (error) {
@@ -101,8 +102,8 @@ app.post('/api/admin/data/enemies', (req, res) => {
         fs.writeFileSync(filePath, JSON.stringify(newData, null, 2), 'utf8');
         console.log('[EDITOR] ✅ Enemy Types saved successfully.');
 
-        // Optional: Reload game data
         if (typeof loadGameData === 'function') loadGameData();
+        if (typeof resetCombatEngine === 'function') resetCombatEngine();
 
         res.json({ success: true, message: 'Enemy Types saved!' });
     } catch (error) {

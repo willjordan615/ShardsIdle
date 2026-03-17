@@ -176,10 +176,13 @@
                 </div>
             </div>
 
-            <div class="section">
-                <h3>Skills</h3>
-                <div class="grid-3" id="skillDisplay"></div>
-            </div>
+<!-- Inside the Character Details Screen -->
+<div class="section-title">Skills</div>
+<div id="skillDisplay" style="display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;">
+    <!-- Skills rendered here by JS -->
+</div>
+<!-- NEW: Container for the Confirm Button -->
+<div id="skillActionContainer" style="margin-bottom: 1rem; min-height: 40px;"></div>
 
             <div style="text-align: center; margin-top: 2rem;">
                 <button onclick="deleteCharacter(currentState.detailCharacterId)" class="danger">Delete Character</button>

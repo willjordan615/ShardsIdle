@@ -94,13 +94,13 @@
             },
             "failureEffect": {
               "type": "apply_status",
-              "status": "slowed",
+              "status": "slow",
               "duration": 2,
               "narrative": "The fire sputters. You get stuck in the sticky residue."
             },
             "fallbackEffect": {
               "type": "apply_status",
-              "status": "slowed",
+              "status": "slow",
               "duration": 2,
               "narrative": "Lacking fire magic, you struggle through the webs manually, becoming slowed."
             }

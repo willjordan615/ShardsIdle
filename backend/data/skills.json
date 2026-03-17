@@ -1998,8 +1998,8 @@
     ]
   },
   {
-    "id": "desperate_lunge",
-    "name": "Desperate Lunge",
+    "id": "desperate_attack",
+    "name": "Desperate Attack",
     "category": "NO_RESOURCES",
     "description": "A reckless, exhausting attack made when all other options are spent. Leaves you vulnerable.",
     "basePower": 0.4,
@@ -2022,7 +2022,7 @@
         "targets": "single_enemy",
         "scalesBy": "basePower",
         "damageType": "physical",
-        "magnitude": 0.4
+        "magnitude": 0.8
       },
       {
         "type": "apply_debuff",

@@ -73,7 +73,9 @@ router.post('/export', async (req, res) => {
             build_description: buildDescription || null,
             is_public: isPublic ? 1 : 0,
             import_count: 0,
-            last_shared_at: new Date().toISOString()
+            last_shared_at: new Date().toISOString(),
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
         };
 
         // Insert snapshot into database
@@ -200,6 +202,12 @@ router.get('/import/:shareCode', async (req, res) => {
                 ownerUserId: snapshot.owner_user_id,
                 level: snapshot.level,
                 race: snapshot.race,
+                // Include full data so party formation shows correct HP preview.
+                // Backend combat.js re-hydrates from DB before simulation.
+                stats:       originalCharacter?.stats        || JSON.parse(snapshot.stats      || '{}'),
+                skills:      originalCharacter?.skills       || JSON.parse(snapshot.skills     || '[]'),
+                equipment:   originalCharacter?.equipment    || JSON.parse(snapshot.equipment  || '{}'),
+                consumables: originalCharacter?.consumables  || {},
                 shareCode: shareCode,
                 importedAt: new Date().toISOString(),
                 canReExport: false,
