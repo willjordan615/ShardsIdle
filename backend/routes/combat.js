@@ -14,11 +14,11 @@ function initializeCombatEngine() {
     if (!combatEngine) {
         try {
             const dataDir = path.join(__dirname, '../data');
-            const skills    = JSON.parse(fs.readFileSync(path.join(dataDir, 'skills.json'),      'utf8'));
-            const enemyTypes = JSON.parse(fs.readFileSync(path.join(dataDir, 'enemy-types.json'), 'utf8'));
-            const races     = JSON.parse(fs.readFileSync(path.join(dataDir, 'races.json'),        'utf8'));
-            const gear      = JSON.parse(fs.readFileSync(path.join(dataDir, 'items.json'),        'utf8'));
-            const statuses  = JSON.parse(fs.readFileSync(path.join(dataDir, 'statuses.json'),     'utf8'));
+            const skills     = JSON.parse(fs.readFileSync(path.join(dataDir, 'skills.json'),        'utf8'));
+            const enemyTypes = JSON.parse(fs.readFileSync(path.join(dataDir, 'enemy-types.json'),  'utf8'));
+            const races      = JSON.parse(fs.readFileSync(path.join(dataDir, 'races.json'),         'utf8'));
+            const gear       = JSON.parse(fs.readFileSync(path.join(dataDir, 'items.json'),         'utf8'));
+            const statuses   = JSON.parse(fs.readFileSync(path.join(dataDir, 'statuses.json'),      'utf8'));
 
             const statusEngine = new StatusEngine(statuses);
             combatEngine = new CombatEngine(skills, enemyTypes, races, gear, statusEngine);

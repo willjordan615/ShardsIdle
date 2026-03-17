@@ -325,8 +325,11 @@ class CombatEngine {
         maxStamina: this.calculateMaxStamina(stats, level, true),
         currentStamina: this.calculateMaxStamina(stats, level, true),
         skills,
-        consumables: snapshot.consumables || [],
+        consumables: snapshot.consumables || {},
         equipment: snapshot.equipment || [],
+        // Augmented skill pool: equipped skills + active consumable belt skills.
+        // Consumable belt skills are available as long as quantity > 0.
+        // This is recalculated each turn via getAugmentedSkillPool().
         defeated: false,
         index: idx,
         statusEffects: []
@@ -688,7 +691,8 @@ class CombatEngine {
     if (character.currentHP <= character.maxHP * 0.3) {
         const healSkill = this.getAvailableSkillByCategory(character, 'HEALING');
         if (healSkill) {
-            return { type: 'skill', skillID: healSkill.id, target: character.id };
+            const action = { type: 'skill', skillID: healSkill.id, target: character.id };
+            return this.checkChildSkillProc(character, action, players, enemies);
         }
     }
 
@@ -697,7 +701,8 @@ class CombatEngine {
     if (lowHPAlly) {
         const healSkill = this.getAvailableSkillByCategory(character, 'HEALING');
         if (healSkill) {
-            return { type: 'skill', skillID: healSkill.id, target: lowHPAlly.id };
+            const action = { type: 'skill', skillID: healSkill.id, target: lowHPAlly.id };
+            return this.checkChildSkillProc(character, action, players, enemies);
         }
     }
 
@@ -705,7 +710,8 @@ class CombatEngine {
     if (aliveEnemies.length >= 3) {
         const aoeSkill = this.getAvailableSkillByCategory(character, 'DAMAGE_AOE');
         if (aoeSkill) {
-            return { type: 'skill', skillID: aoeSkill.id, target: null };
+            const action = { type: 'skill', skillID: aoeSkill.id, target: null };
+            return this.checkChildSkillProc(character, action, players, enemies);
         }
     }
 
@@ -715,7 +721,8 @@ class CombatEngine {
     );
     if (damageSkill) {
         const lowestHPEnemy = aliveEnemies.reduce((min, e) => e.currentHP < min.currentHP ? e : min);
-        return { type: 'skill', skillID: damageSkill.id, target: lowestHPEnemy.id };
+        const action = { type: 'skill', skillID: damageSkill.id, target: lowestHPEnemy.id };
+        return this.checkChildSkillProc(character, action, players, enemies);
     }
 
     // Priority 5: Any damage skill
@@ -724,7 +731,8 @@ class CombatEngine {
     );
     if (anyDamage) {
         const lowestHPEnemy = aliveEnemies.reduce((min, e) => e.currentHP < min.currentHP ? e : min);
-        return { type: 'skill', skillID: anyDamage.id, target: lowestHPEnemy.id };
+        const action = { type: 'skill', skillID: anyDamage.id, target: lowestHPEnemy.id };
+        return this.checkChildSkillProc(character, action, players, enemies);
     }
 
     // NEW LOGIC: NO RESOURCES FALLBACK
@@ -864,6 +872,139 @@ class CombatEngine {
         .map(s => this.skills.find(skill => skill.id === s.skillID))
         .filter(s => s && predicate(s))
         .sort((a, b) => (b.basePower || 0) - (a.basePower || 0))[0];
+  }
+
+  /**
+   * Build the full set of skill IDs available to a character this turn.
+   * Includes equipped skills + consumable belt skills (while qty > 0).
+   * Consumable items live in this.gear — identified by skillID or effect_skillid field.
+   */
+  getAugmentedSkillPool(character) {
+    const pool = new Set();
+
+    // Equipped skill slots
+    if (character.skills) {
+        character.skills.forEach(s => pool.add(s.skillID));
+    }
+
+    // Consumable belt — add the skill linked to each consumable with qty > 0
+    const consumables = character.consumables || {};
+    if (typeof consumables === 'object' && !Array.isArray(consumables)) {
+        Object.entries(consumables).forEach(([consumableId, qty]) => {
+            if (qty > 0) {
+                const itemDef = this.gear.find(g => g.id === consumableId);
+                if (itemDef) {
+                    const skillId = itemDef.skillID || itemDef.effect_skillid;
+                    if (skillId) pool.add(skillId);
+                }
+            }
+        });
+    }
+
+    return pool;
+  }
+
+  /**
+   * After the AI selects a skill, check whether a child skill should proc
+   * and replace it. Returns the action to execute (may be unchanged).
+   * Also handles decrementing consumable qty if a consumable-parent proc fires.
+   */
+  checkChildSkillProc(character, selectedAction, players, enemies) {
+    if (!selectedAction || selectedAction.type !== 'skill') return selectedAction;
+
+    const selectedSkillDef = this.skills.find(s => s.id === selectedAction.skillID);
+    if (!selectedSkillDef) return selectedAction;
+
+    const selectedCategory = selectedSkillDef.category;
+    const availablePool    = this.getAugmentedSkillPool(character);
+
+    // Find child skills whose both parents are in the available pool
+    // and whose category matches what the AI would have used this turn
+    const eligibleChildSkills = this.skills.filter(s => {
+        if (!s.isChildSkill) return false;
+        if (!s.parentSkills || s.parentSkills.length !== 2) return false;
+        if (s.category !== selectedCategory) return false;
+        return s.parentSkills.every(parentId => availablePool.has(parentId));
+    });
+
+    if (eligibleChildSkills.length === 0) return selectedAction;
+
+    // Shuffle so no child skill is systematically blocked by another
+    const shuffled = eligibleChildSkills.sort(() => Math.random() - 0.5);
+
+    for (const childSkill of shuffled) {
+        const procChance = childSkill.procChance || 0.05;
+        if (Math.random() >= procChance) continue;
+
+        // Proc fires — resolve target
+        const aliveEnemies = enemies.filter(e => !e.defeated);
+        let target = selectedAction.target;
+
+        if (childSkill.category === 'HEALING' || childSkill.category === 'RESTORATION') {
+            const lowHPAlly = players.find(p => !p.defeated && p.currentHP < p.maxHP);
+            target = lowHPAlly ? lowHPAlly.id : character.id;
+        } else if (!target && aliveEnemies.length > 0) {
+            target = aliveEnemies.reduce((min, e) => e.currentHP < min.currentHP ? e : min).id;
+        }
+
+        // If a consumable was a parent, decrement its qty
+        childSkill.parentSkills.forEach(parentSkillId => {
+            const consumables = character.consumables || {};
+            Object.entries(consumables).forEach(([consumableId, qty]) => {
+                if (qty <= 0) return;
+                const itemDef = this.gear.find(g => g.id === consumableId);
+                const itemSkillId = itemDef?.skillID || itemDef?.effect_skillid;
+                if (itemSkillId === parentSkillId) {
+                    consumables[consumableId]--;
+                    console.log(`[CHILD PROC] Consumed ${consumableId} (${consumables[consumableId]} remaining)`);
+                }
+            });
+        });
+
+        // First discovery — add skill record to character
+        const alreadyKnown = character.skills && character.skills.some(s => s.skillID === childSkill.id);
+        const isFirstDiscovery = !alreadyKnown;
+
+        if (isFirstDiscovery) {
+            if (!character.skills) character.skills = [];
+            character.skills.push({
+                skillID:      childSkill.id,
+                skillLevel:   0,
+                skillXP:      0,
+                usageCount:   0,
+                discovered:   true,
+                discoveredAt: Date.now()
+            });
+            console.log(`[CHILD PROC] ✨ ${character.name} discovered: ${childSkill.name}!`);
+        }
+
+        // Award child skill XP — dedicated rate independent of category
+        const CHILD_XP_PER_PROC  = 20;
+        const LEVEL_1_THRESHOLD  = 120;
+        const skillRecord = character.skills.find(s => s.skillID === childSkill.id);
+        if (skillRecord) {
+            skillRecord.skillXP    = (skillRecord.skillXP || 0) + CHILD_XP_PER_PROC;
+            skillRecord.usageCount = (skillRecord.usageCount || 0) + 1;
+            if (skillRecord.skillLevel === 0 && skillRecord.skillXP >= LEVEL_1_THRESHOLD) {
+                skillRecord.skillLevel = 1;
+                skillRecord.skillXP   -= LEVEL_1_THRESHOLD;
+                console.log(`[CHILD PROC] 🔓 ${character.name} unlocked: ${childSkill.name}!`);
+            }
+        }
+
+        console.log(`[CHILD PROC] ${character.name} → ${childSkill.name} (replaced ${selectedSkillDef.name})`);
+
+        return {
+            type:             'skill',
+            skillID:          childSkill.id,
+            target,
+            isChildSkillProc: true,
+            isFirstDiscovery,
+            replacedSkillID:  selectedAction.skillID
+        };
+    }
+
+    return selectedAction; // no proc fired
   }
 
   triggerWeaponProcs(actor, target, skillLevel) {

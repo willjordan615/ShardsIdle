@@ -30,7 +30,6 @@
       }
     ]
   },
-
   {
     "id": "apply_poison_weapon",
     "name": "Apply Poison",
@@ -1999,196 +1998,733 @@
     ]
   },
   {
-  "id": "desperate_lunge",
-  "name": "Desperate Lunge",
-  "category": "NO_RESOURCES",
-  "description": "A reckless, exhausting attack made when all other options are spent. Leaves you vulnerable.",
-  "basePower": 0.4,
-  "costType": "none",
-  "costAmount": 0,
-  "requiredLevel": 1,
-  "scalingFactors": {
-    "conviction": 0.6,
-    "endurance": 0.4
-  },
-  "baseHitChance": 0.75,
-  "critChance": 0.05,
-  "delay": 2000,
-  "hitCount": {
-    "fixed": 1
-  },
-  "effects": [
-    {
-      "type": "damage",
-      "targets": "single_enemy",
-      "scalesBy": "basePower",
-      "damageType": "physical",
-      "magnitude": 0.4
+    "id": "desperate_lunge",
+    "name": "Desperate Lunge",
+    "category": "NO_RESOURCES",
+    "description": "A reckless, exhausting attack made when all other options are spent. Leaves you vulnerable.",
+    "basePower": 0.4,
+    "costType": "none",
+    "costAmount": 0,
+    "requiredLevel": 1,
+    "scalingFactors": {
+      "conviction": 0.6,
+      "endurance": 0.4
     },
-    {
-      "type": "apply_debuff",
-      "targets": "self",
-      "debuff": "weaken",
-      "chance": 1.0,
-      "duration": 2,
-      "magnitude": 1
-    }
-  ]
-},
-{
-  "id": "catch_breath",
-  "name": "Catch Breath",
-  "category": "NO_RESOURCES",
-  "description": "Sacrifice a turn to desperately recover stamina, but leave your defenses cracked.",
-  "basePower": 0.0,
-  "costType": "none",
-  "costAmount": 0,
-  "requiredLevel": 1,
-  "scalingFactors": {
-    "endurance": 1.0
-  },
-  "baseHitChance": 1.0,
-  "critChance": 0.0,
-  "delay": 1500,
-  "hitCount": {
-    "fixed": 1
-  },
-  "effects": [
-    {
-      "type": "restore_resource",
-      "targets": "self",
-      "resource": "stamina",
-      "scalesBy": "endurance",
-      "magnitude": 0.3
+    "baseHitChance": 0.75,
+    "critChance": 0.05,
+    "delay": 2000,
+    "hitCount": {
+      "fixed": 1
     },
-    {
-      "type": "apply_debuff",
-      "targets": "self",
-      "debuff": "endurance_crack",
-      "chance": 1.0,
-      "duration": 2,
-      "magnitude": 1
-    }
-  ]
-},
-{
-  "id": "mental_fog",
-  "name": "Mental Fog",
-  "category": "NO_RESOURCES",
-  "description": "Mana depletion causes severe confusion and disorientation. You stumble blindly.",
-  "basePower": 0.0,
-  "costType": "none",
-  "costAmount": 0,
-  "requiredLevel": 1,
-  "scalingFactors": {
-    "harmony": 0.5,
-    "conviction": 0.5
+    "effects": [
+      {
+        "type": "damage",
+        "targets": "single_enemy",
+        "scalesBy": "basePower",
+        "damageType": "physical",
+        "magnitude": 0.4
+      },
+      {
+        "type": "apply_debuff",
+        "targets": "self",
+        "debuff": "weaken",
+        "chance": 1.0,
+        "duration": 2,
+        "magnitude": 1
+      }
+    ]
   },
-  "baseHitChance": 1.0,
-  "critChance": 0.0,
-  "delay": 1000,
-  "hitCount": {
-    "fixed": 1
-  },
-  "effects": [
-    {
-      "type": "apply_debuff",
-      "targets": "self",
-      "debuff": "confused",
-      "chance": 1.0,
-      "duration": 2,
-      "magnitude": 1
+  {
+    "id": "catch_breath",
+    "name": "Catch Breath",
+    "category": "NO_RESOURCES",
+    "description": "Sacrifice a turn to desperately recover stamina, but leave your defenses cracked.",
+    "basePower": 0.0,
+    "costType": "none",
+    "costAmount": 0,
+    "requiredLevel": 1,
+    "scalingFactors": {
+      "endurance": 1.0
     },
-    {
-      "type": "apply_debuff",
-      "targets": "self",
-      "debuff": "dazed",
-      "chance": 1.0,
-      "duration": 2,
-      "magnitude": 1
-    }
-  ]
-},
-{
-  "id": "wild_flail",
-  "name": "Wild Flail",
-  "category": "NO_RESOURCES",
-  "description": "Swing wildly with no technique. High variance, low accuracy, but might hit hard.",
-  "basePower": 0.6,
-  "costType": "none",
-  "costAmount": 0,
-  "requiredLevel": 1,
-  "scalingFactors": {
-    "ambition": 0.8,
-    "conviction": 0.2
-  },
-  "baseHitChance": 0.50,
-  "critChance": 0.30,
-  "delay": 1400,
-  "hitCount": {
-    "min": 1,
-    "max": 3
-  },
-  "effects": [
-    {
-      "type": "damage",
-      "targets": "single_enemy",
-      "scalesBy": "basePower",
-      "damageType": "physical",
-      "magnitude": 0.6
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "delay": 1500,
+    "hitCount": {
+      "fixed": 1
     },
-    {
-      "type": "apply_debuff",
-      "targets": "self",
-      "debuff": "ambition_falter",
-      "chance": 0.5,
-      "duration": 1,
-      "magnitude": 1
-    }
-  ]
-},
-{
-  "id": "last_stand",
-  "name": "Last Stand",
-  "category": "NO_RESOURCES",
-  "description": "Draw upon remaining life force to generate energy. Restores resources but damages and curses you.",
-  "basePower": 0.0,
-  "costType": "none",
-  "costAmount": 0,
-  "requiredLevel": 1,
-  "scalingFactors": {
-    "endurance": 0.8,
-    "harmony": 0.2
+    "effects": [
+      {
+        "type": "restore_resource",
+        "targets": "self",
+        "resource": "stamina",
+        "scalesBy": "endurance",
+        "magnitude": 0.3
+      },
+      {
+        "type": "apply_debuff",
+        "targets": "self",
+        "debuff": "endurance_crack",
+        "chance": 1.0,
+        "duration": 2,
+        "magnitude": 1
+      }
+    ]
   },
-  "baseHitChance": 1.0,
-  "critChance": 0.0,
-  "delay": 1200,
-  "hitCount": {
-    "fixed": 1
+  {
+    "id": "mental_fog",
+    "name": "Mental Fog",
+    "category": "NO_RESOURCES",
+    "description": "Mana depletion causes severe confusion and disorientation. You stumble blindly.",
+    "basePower": 0.0,
+    "costType": "none",
+    "costAmount": 0,
+    "requiredLevel": 1,
+    "scalingFactors": {
+      "harmony": 0.5,
+      "conviction": 0.5
+    },
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "delay": 1000,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_debuff",
+        "targets": "self",
+        "debuff": "confused",
+        "chance": 1.0,
+        "duration": 2,
+        "magnitude": 1
+      },
+      {
+        "type": "apply_debuff",
+        "targets": "self",
+        "debuff": "dazed",
+        "chance": 1.0,
+        "duration": 2,
+        "magnitude": 1
+      }
+    ]
   },
-  "effects": [
-    {
-      "type": "restore_resource",
-      "targets": "self",
-      "resource": "stamina",
-      "scalesBy": "endurance",
-      "magnitude": 0.2
+  {
+    "id": "wild_flail",
+    "name": "Wild Flail",
+    "category": "NO_RESOURCES",
+    "description": "Swing wildly with no technique. High variance, low accuracy, but might hit hard.",
+    "basePower": 0.6,
+    "costType": "none",
+    "costAmount": 0,
+    "requiredLevel": 1,
+    "scalingFactors": {
+      "ambition": 0.8,
+      "conviction": 0.2
     },
-    {
-      "type": "restore_resource",
-      "targets": "self",
-      "resource": "mana",
-      "scalesBy": "harmony",
-      "magnitude": 0.2
+    "baseHitChance": 0.5,
+    "critChance": 0.3,
+    "delay": 1400,
+    "hitCount": {
+      "min": 1,
+      "max": 3
     },
-    {
-      "type": "apply_debuff",
-      "targets": "self",
-      "debuff": "cursed",
-      "chance": 1.0,
-      "duration": 3,
-      "magnitude": 1
-    }
-  ]
-}
+    "effects": [
+      {
+        "type": "damage",
+        "targets": "single_enemy",
+        "scalesBy": "basePower",
+        "damageType": "physical",
+        "magnitude": 0.6
+      },
+      {
+        "type": "apply_debuff",
+        "targets": "self",
+        "debuff": "ambition_falter",
+        "chance": 0.5,
+        "duration": 1,
+        "magnitude": 1
+      }
+    ]
+  },
+  {
+    "id": "last_stand",
+    "name": "Last Stand",
+    "category": "NO_RESOURCES",
+    "description": "Draw upon remaining life force to generate energy. Restores resources but damages and curses you.",
+    "basePower": 0.0,
+    "costType": "none",
+    "costAmount": 0,
+    "requiredLevel": 1,
+    "scalingFactors": {
+      "endurance": 0.8,
+      "harmony": 0.2
+    },
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "delay": 1200,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "restore_resource",
+        "targets": "self",
+        "resource": "stamina",
+        "scalesBy": "endurance",
+        "magnitude": 0.2
+      },
+      {
+        "type": "restore_resource",
+        "targets": "self",
+        "resource": "mana",
+        "scalesBy": "harmony",
+        "magnitude": 0.2
+      },
+      {
+        "type": "apply_debuff",
+        "targets": "self",
+        "debuff": "cursed",
+        "chance": 1.0,
+        "duration": 3,
+        "magnitude": 1
+      }
+    ]
+  },
+  {
+    "id": "lunge",
+    "name": "Lunge",
+    "category": "DAMAGE_SINGLE",
+    "description": "Commit forward with explosive force, closing distance in an instant.",
+    "isChildSkill": true,
+    "isStarterSkill": false,
+    "parentSkills": [
+      "basic_attack",
+      "footwork"
+    ],
+    "procChance": 0.05,
+    "basePower": 1.4,
+    "costType": "stamina",
+    "costAmount": 10,
+    "requiredLevel": 1,
+    "scalingFactors": {
+      "conviction": 0.6,
+      "ambition": 0.4
+    },
+    "baseHitChance": 0.88,
+    "critChance": 0.12,
+    "delay": 850,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "targets": "single_enemy",
+        "scalesBy": "basePower",
+        "damageType": "physical",
+        "magnitude": 1.4
+      },
+      {
+        "type": "apply_debuff",
+        "targets": "single_enemy",
+        "debuff": "knockback",
+        "duration": 1
+      }
+    ]
+  },
+  {
+    "id": "haymaker",
+    "name": "Haymaker",
+    "category": "DAMAGE_SINGLE",
+    "description": "A wild overhand swing. High risk, brutal impact.",
+    "isChildSkill": true,
+    "isStarterSkill": false,
+    "parentSkills": [
+      "basic_attack",
+      "shove"
+    ],
+    "procChance": 0.05,
+    "basePower": 1.6,
+    "costType": "stamina",
+    "costAmount": 12,
+    "requiredLevel": 1,
+    "scalingFactors": {
+      "conviction": 0.8,
+      "ambition": 0.2
+    },
+    "baseHitChance": 0.78,
+    "critChance": 0.2,
+    "delay": 1100,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "targets": "single_enemy",
+        "scalesBy": "basePower",
+        "damageType": "physical",
+        "magnitude": 1.6
+      },
+      {
+        "type": "apply_debuff",
+        "targets": "single_enemy",
+        "debuff": "knockback",
+        "duration": 1
+      }
+    ]
+  },
+  {
+    "id": "weak_point",
+    "name": "Weak Point",
+    "category": "DAMAGE_SINGLE",
+    "description": "Study and exploit a gap in the target's guard.",
+    "isChildSkill": true,
+    "isStarterSkill": false,
+    "parentSkills": [
+      "aim",
+      "sense"
+    ],
+    "procChance": 0.05,
+    "basePower": 1.3,
+    "costType": "stamina",
+    "costAmount": 9,
+    "requiredLevel": 1,
+    "scalingFactors": {
+      "conviction": 0.3,
+      "ambition": 0.7
+    },
+    "baseHitChance": 0.95,
+    "critChance": 0.25,
+    "delay": 1000,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "targets": "single_enemy",
+        "scalesBy": "basePower",
+        "damageType": "physical",
+        "magnitude": 1.3,
+        "ignoreArmor": 0.6
+      }
+    ]
+  },
+  {
+    "id": "skirmish",
+    "name": "Skirmish",
+    "category": "DAMAGE_SINGLE",
+    "description": "Strike and reposition in one fluid motion.",
+    "isChildSkill": true,
+    "isStarterSkill": false,
+    "parentSkills": [
+      "aim",
+      "footwork"
+    ],
+    "procChance": 0.05,
+    "basePower": 1.1,
+    "costType": "stamina",
+    "costAmount": 9,
+    "requiredLevel": 1,
+    "scalingFactors": {
+      "conviction": 0.4,
+      "ambition": 0.6
+    },
+    "baseHitChance": 0.92,
+    "critChance": 0.1,
+    "delay": 800,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "targets": "single_enemy",
+        "scalesBy": "basePower",
+        "damageType": "physical",
+        "magnitude": 1.1,
+        "ignoreArmor": 0.2
+      },
+      {
+        "type": "apply_buff",
+        "targets": "self",
+        "buff": "evasion_boost",
+        "magnitude": 0.2,
+        "duration": 1
+      }
+    ]
+  },
+  {
+    "id": "thunderclap",
+    "name": "Thunderclap",
+    "category": "DAMAGE_MAGIC",
+    "description": "A concussive electric burst that rattles bone and mind.",
+    "isChildSkill": true,
+    "isStarterSkill": false,
+    "parentSkills": [
+      "shock",
+      "shove"
+    ],
+    "procChance": 0.05,
+    "basePower": 1.2,
+    "costType": "mana",
+    "costAmount": 15,
+    "requiredLevel": 1,
+    "scalingFactors": {
+      "conviction": 0.5,
+      "ambition": 0.5
+    },
+    "baseHitChance": 0.88,
+    "critChance": 0.1,
+    "delay": 1000,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "targets": "single_enemy",
+        "scalesBy": "basePower",
+        "damageType": "electric",
+        "magnitude": 1.2
+      },
+      {
+        "type": "apply_debuff",
+        "targets": "single_enemy",
+        "debuff": "stun",
+        "chance": 0.35,
+        "duration": 1
+      },
+      {
+        "type": "apply_debuff",
+        "targets": "single_enemy",
+        "debuff": "knockback",
+        "duration": 1
+      }
+    ]
+  },
+  {
+    "id": "frost_slide",
+    "name": "Frost Slide",
+    "category": "DAMAGE_MAGIC",
+    "description": "Ride a lance of ice across the ground into the target.",
+    "isChildSkill": true,
+    "isStarterSkill": false,
+    "parentSkills": [
+      "chill",
+      "footwork"
+    ],
+    "procChance": 0.05,
+    "basePower": 1.2,
+    "costType": "mana",
+    "costAmount": 14,
+    "requiredLevel": 1,
+    "scalingFactors": {
+      "conviction": 0.5,
+      "ambition": 0.5
+    },
+    "baseHitChance": 0.9,
+    "critChance": 0.08,
+    "delay": 900,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "targets": "single_enemy",
+        "scalesBy": "basePower",
+        "damageType": "cold",
+        "magnitude": 1.2
+      },
+      {
+        "type": "apply_debuff",
+        "targets": "single_enemy",
+        "debuff": "slow",
+        "magnitude": 0.6,
+        "duration": 3
+      }
+    ]
+  },
+  {
+    "id": "scorched_shot",
+    "name": "Scorched Shot",
+    "category": "DAMAGE_MAGIC",
+    "description": "A precise strike that leaves the wound burning.",
+    "isChildSkill": true,
+    "isStarterSkill": false,
+    "parentSkills": [
+      "produce_flame",
+      "aim"
+    ],
+    "procChance": 0.05,
+    "basePower": 1.2,
+    "costType": "mana",
+    "costAmount": 14,
+    "requiredLevel": 1,
+    "scalingFactors": {
+      "conviction": 0.4,
+      "ambition": 0.6
+    },
+    "baseHitChance": 0.9,
+    "critChance": 0.15,
+    "delay": 1000,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "targets": "single_enemy",
+        "scalesBy": "basePower",
+        "damageType": "fire",
+        "magnitude": 1.2,
+        "ignoreArmor": 0.2
+      },
+      {
+        "type": "apply_debuff",
+        "targets": "single_enemy",
+        "debuff": "burn",
+        "chance": 0.5,
+        "duration": 3
+      }
+    ]
+  },
+  {
+    "id": "sleet",
+    "name": "Sleet",
+    "category": "DAMAGE_MAGIC",
+    "description": "Electrified ice shards that slow and shock simultaneously.",
+    "isChildSkill": true,
+    "isStarterSkill": false,
+    "parentSkills": [
+      "shock",
+      "chill"
+    ],
+    "procChance": 0.05,
+    "basePower": 1.1,
+    "costType": "mana",
+    "costAmount": 16,
+    "requiredLevel": 1,
+    "scalingFactors": {
+      "conviction": 0.5,
+      "ambition": 0.5
+    },
+    "baseHitChance": 0.88,
+    "critChance": 0.08,
+    "delay": 1100,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "targets": "single_enemy",
+        "scalesBy": "basePower",
+        "damageType": "cold",
+        "magnitude": 0.7
+      },
+      {
+        "type": "damage",
+        "targets": "single_enemy",
+        "scalesBy": "basePower",
+        "damageType": "electric",
+        "magnitude": 0.6
+      },
+      {
+        "type": "apply_debuff",
+        "targets": "single_enemy",
+        "debuff": "slow",
+        "magnitude": 0.4,
+        "duration": 2
+      },
+      {
+        "type": "apply_debuff",
+        "targets": "single_enemy",
+        "debuff": "stun",
+        "chance": 0.1,
+        "duration": 1
+      }
+    ]
+  },
+  {
+    "id": "singe",
+    "name": "Singe",
+    "category": "DAMAGE_SINGLE",
+    "description": "A melee strike charged with heat. The wound smolders.",
+    "isChildSkill": true,
+    "isStarterSkill": false,
+    "parentSkills": [
+      "produce_flame",
+      "basic_attack"
+    ],
+    "procChance": 0.05,
+    "basePower": 1.2,
+    "costType": "stamina",
+    "costAmount": 10,
+    "requiredLevel": 1,
+    "scalingFactors": {
+      "conviction": 0.5,
+      "ambition": 0.5
+    },
+    "baseHitChance": 0.92,
+    "critChance": 0.08,
+    "delay": 950,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "targets": "single_enemy",
+        "scalesBy": "basePower",
+        "damageType": "physical",
+        "magnitude": 0.9
+      },
+      {
+        "type": "damage",
+        "targets": "single_enemy",
+        "scalesBy": "basePower",
+        "damageType": "fire",
+        "magnitude": 0.4
+      },
+      {
+        "type": "apply_debuff",
+        "targets": "single_enemy",
+        "debuff": "burn",
+        "chance": 0.4,
+        "duration": 2
+      }
+    ]
+  },
+  {
+    "id": "frostbite",
+    "name": "Frostbite",
+    "category": "DAMAGE_SINGLE",
+    "description": "A chilling strike that seeps cold into the target's limbs.",
+    "isChildSkill": true,
+    "isStarterSkill": false,
+    "parentSkills": [
+      "chill",
+      "basic_attack"
+    ],
+    "procChance": 0.05,
+    "basePower": 1.1,
+    "costType": "stamina",
+    "costAmount": 10,
+    "requiredLevel": 1,
+    "scalingFactors": {
+      "conviction": 0.5,
+      "ambition": 0.5
+    },
+    "baseHitChance": 0.92,
+    "critChance": 0.08,
+    "delay": 1000,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "targets": "single_enemy",
+        "scalesBy": "basePower",
+        "damageType": "physical",
+        "magnitude": 0.8
+      },
+      {
+        "type": "damage",
+        "targets": "single_enemy",
+        "scalesBy": "basePower",
+        "damageType": "cold",
+        "magnitude": 0.4
+      },
+      {
+        "type": "apply_debuff",
+        "targets": "single_enemy",
+        "debuff": "slow",
+        "magnitude": 0.5,
+        "duration": 2
+      }
+    ]
+  },
+  {
+    "id": "warcry",
+    "name": "Warcry",
+    "category": "BUFF",
+    "description": "A rallying cry that sharpens the fighting spirit of all allies.",
+    "isChildSkill": true,
+    "isStarterSkill": false,
+    "parentSkills": [
+      "shout",
+      "focus"
+    ],
+    "procChance": 0.05,
+    "basePower": 0.0,
+    "costType": "stamina",
+    "costAmount": 10,
+    "requiredLevel": 1,
+    "scalingFactors": {
+      "conviction": 0.4,
+      "harmony": 0.6
+    },
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "delay": 900,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "targets": "all_allies",
+        "buff": "attack_boost",
+        "scalesBy": "conviction",
+        "magnitude": 0.5,
+        "duration": 4
+      },
+      {
+        "type": "apply_buff",
+        "targets": "all_allies",
+        "buff": "speed_boost",
+        "magnitude": 0.2,
+        "duration": 4
+      }
+    ]
+  },
+  {
+    "id": "mend",
+    "name": "Mend",
+    "category": "HEALING",
+    "description": "A focused treatment that draws on both skill and reagent to close wounds properly.",
+    "isChildSkill": true,
+    "isStarterSkill": false,
+    "parentSkills": [
+      "first_aid",
+      "use_health_potion_minor"
+    ],
+    "procChance": 0.05,
+    "basePower": 0.9,
+    "costType": "stamina",
+    "costAmount": 8,
+    "requiredLevel": 1,
+    "scalingFactors": {
+      "harmony": 0.8,
+      "conviction": 0.2
+    },
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "delay": 1100,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "heal",
+        "targets": "single_ally",
+        "scalesBy": "basePower",
+        "magnitude": 0.9
+      }
+    ]
+  }
 ]

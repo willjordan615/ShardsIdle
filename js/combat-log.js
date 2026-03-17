@@ -205,6 +205,46 @@ async function displayCombatLog(combatData) {
             }
         }
 
+        // Populate discoveries — scan all turns for child skill procs
+        const allTurns = combatData.segments
+            ? combatData.segments.flatMap(s => s.turns)
+            : (combatData.turns || []);
+
+        const discoveries = [];
+        const seen = new Set();
+        allTurns.forEach(turn => {
+            if (turn.isChildSkillProc && turn.action?.skillID && !seen.has(turn.action.skillID)) {
+                seen.add(turn.action.skillID);
+                const skillDef = window.gameData?.skills?.find(s => s.id === turn.action.skillID);
+                discoveries.push({
+                    name: skillDef?.name || turn.action.skillID,
+                    isFirst: turn.isFirstDiscovery
+                });
+            }
+        });
+
+        // Add discoveries section to modal if any procs fired
+        const modalContent = document.querySelector('#combatResultModal > div');
+        const existingDisc = document.getElementById('discoveriesSection');
+        if (existingDisc) existingDisc.remove();
+
+        if (discoveries.length > 0 && modalContent) {
+            const discSection = document.createElement('div');
+            discSection.id = 'discoveriesSection';
+            discSection.style.cssText = 'margin-bottom:1rem;background:rgba(212,175,55,0.08);border:1px solid #d4af37;border-radius:8px;padding:1rem;';
+            discSection.innerHTML = `
+                <div style="color:#d4af37;font-weight:bold;margin-bottom:0.5rem;">🔮 Skill Discoveries</div>
+                ${discoveries.map(d =>
+                    d.isFirst
+                        ? `<div style="color:#4cd964;">✨ ${d.name} — First discovered!</div>`
+                        : `<div style="color:#d4af37;">⚡ ${d.name} — XP gained toward unlock</div>`
+                ).join('')}
+            `;
+            // Insert before the XP section
+            if (charXPListEl) charXPListEl.parentElement.before(discSection);
+            else modalContent.prepend(discSection);
+        }
+
         // Populate character XP
         if (charXPListEl) {
             const totalCharXP = Object.values(rewards.experienceGained || {}).reduce((a, b) => a + b, 0);
@@ -345,6 +385,25 @@ function renderTurn(turn, logDisplay, hpMaxes, hpCurrent) {
         turnEl.innerHTML = `
             <div class="turn-header">${icon} ${turn.actorName} uses ${actionName}</div>
             <div class="turn-message">${turn.result?.message}</div>
+        `;
+        logDisplay.appendChild(turnEl);
+        logDisplay.scrollTop = logDisplay.scrollHeight;
+        return;
+    }
+
+    // Child skill discovery proc
+    if (turn.isChildSkillProc) {
+        turnEl.classList.add('narrative-turn');
+        turnEl.style.border = '1px solid #d4af37';
+        turnEl.style.background = 'rgba(212,175,55,0.08)';
+        const skillDef = window.gameData?.skills?.find(s => s.id === turn.action?.skillID);
+        const skillName = skillDef?.name || turn.action?.skillID || 'Unknown Skill';
+        const discoveryHeader = turn.isFirstDiscovery
+            ? `✨ An unknown technique fires — <strong>${skillName}</strong> discovered!`
+            : `⚡ <strong>${skillName}</strong> (Lv.0 — gaining XP)`;
+        turnEl.innerHTML = `
+            <div class="turn-header" style="color:#d4af37;">${discoveryHeader}</div>
+            <div class="turn-message">${turn.result?.message || skillName + ' fires!'}</div>
         `;
         logDisplay.appendChild(turnEl);
         logDisplay.scrollTop = logDisplay.scrollHeight;

@@ -14837,7 +14837,8 @@
     "onhit_skillchance_3": null,
     "extra_cost": null,
     "description": "A vial of pale green liquid that restores minor health.",
-    "tier": 0
+    "tier": 0,
+    "skillID": "use_health_potion_minor"
   },
   {
     "id": "consumable_potion_health_major",
@@ -14877,7 +14878,8 @@
     "onhit_skillchance_3": null,
     "extra_cost": null,
     "description": "A vial of crimson liquid that restores significant health.",
-    "tier": 2
+    "tier": 2,
+    "skillID": "use_health_potion"
   },
   {
     "id": "consumable_potion_mana_minor",
@@ -14917,7 +14919,8 @@
     "onhit_skillchance_3": null,
     "extra_cost": null,
     "description": "A vial of blue liquid that restores minor mana.",
-    "tier": 0
+    "tier": 0,
+    "skillID": "use_mana_potion_minor"
   },
   {
     "id": "consumable_potion_mana_major",
@@ -14957,7 +14960,8 @@
     "onhit_skillchance_3": null,
     "extra_cost": null,
     "description": "A vial of deep violet liquid that restores significant mana.",
-    "tier": 2
+    "tier": 2,
+    "skillID": "use_mana_potion"
   },
   {
     "id": "consumable_potion_stamina_minor",
@@ -14997,7 +15001,8 @@
     "onhit_skillchance_3": null,
     "extra_cost": null,
     "description": "A vial of amber liquid that restores minor stamina.",
-    "tier": 0
+    "tier": 0,
+    "skillID": "use_stamina_potion_minor"
   },
   {
     "id": "consumable_potion_strength_buff",
@@ -15037,7 +15042,8 @@
     "onhit_skillchance_3": null,
     "extra_cost": null,
     "description": "A bubbling crimson potion that grants temporary strength.",
-    "tier": 1
+    "tier": 1,
+    "skillID": "buff_strength"
   },
   {
     "id": "consumable_potion_defense_buff",
@@ -15077,7 +15083,8 @@
     "onhit_skillchance_3": null,
     "extra_cost": null,
     "description": "A shimmering silver potion that grants temporary defense.",
-    "tier": 1
+    "tier": 1,
+    "skillID": "buff_defense"
   },
   {
     "id": "consumable_potion_speed_buff",
@@ -15117,7 +15124,8 @@
     "onhit_skillchance_3": null,
     "extra_cost": null,
     "description": "A clear liquid that grants temporary movement speed.",
-    "tier": 1
+    "tier": 1,
+    "skillID": "buff_speed"
   },
   {
     "id": "consumable_scroll_fireball",
@@ -15157,7 +15165,8 @@
     "onhit_skillchance_3": null,
     "extra_cost": null,
     "description": "A parchment inscribed with fire magic runes.",
-    "tier": 1
+    "tier": 1,
+    "skillID": "skill_fireball"
   },
   {
     "id": "consumable_scroll_lightning",
@@ -15197,7 +15206,8 @@
     "onhit_skillchance_3": null,
     "extra_cost": null,
     "description": "A crackling scroll that releases electric energy.",
-    "tier": 2
+    "tier": 2,
+    "skillID": "skill_lightning"
   },
   {
     "id": "consumable_scroll_teleport",
@@ -15237,7 +15247,8 @@
     "onhit_skillchance_3": null,
     "extra_cost": null,
     "description": "A mystical scroll that bends space for instant travel.",
-    "tier": 3
+    "tier": 3,
+    "skillID": "skill_teleport"
   },
   {
     "id": "consumable_scroll_resurrection",
@@ -15277,7 +15288,8 @@
     "onhit_skillchance_3": null,
     "extra_cost": 100,
     "description": "A sacred scroll that returns the fallen to life.",
-    "tier": 5
+    "tier": 5,
+    "skillID": "skill_resurrect"
   },
   {
     "id": "consumable_bomb_fire",
@@ -15317,7 +15329,8 @@
     "onhit_skillchance_3": null,
     "extra_cost": null,
     "description": "An explosive device that ignites everything nearby.",
-    "tier": 2
+    "tier": 2,
+    "skillID": "proc_burn_aoe"
   },
   {
     "id": "consumable_bomb_ice",
@@ -15357,7 +15370,8 @@
     "onhit_skillchance_3": null,
     "extra_cost": null,
     "description": "A crystalline bomb that freezes the battlefield.",
-    "tier": 2
+    "tier": 2,
+    "skillID": "proc_chill_aoe"
   },
   {
     "id": "consumable_bomb_smoke",
@@ -15397,7 +15411,8 @@
     "onhit_skillchance_3": null,
     "extra_cost": null,
     "description": "Creates a thick cloud for escaping combat.",
-    "tier": 1
+    "tier": 1,
+    "skillID": "proc_stealth"
   },
   {
     "id": "consumable_bomb_flash",
@@ -15437,7 +15452,8 @@
     "onhit_skillchance_3": null,
     "extra_cost": null,
     "description": "Blinds and disorients enemies with brilliant light.",
-    "tier": 2
+    "tier": 2,
+    "skillID": "proc_stun_aoe"
   },
   {
     "id": "consumable_poison_blade",
@@ -15477,7 +15493,8 @@
     "onhit_skillchance_3": null,
     "extra_cost": null,
     "description": "Coats weapons with deadly toxin for several strikes.",
-    "tier": 1
+    "tier": 1,
+    "skillID": "apply_poison_weapon"
   },
   {
     "id": "consumable_poison_paralytic",
@@ -15517,7 +15534,8 @@
     "onhit_skillchance_3": null,
     "extra_cost": null,
     "description": "Numbing agent that paralyzes struck enemies.",
-    "tier": 3
+    "tier": 3,
+    "skillID": "apply_stun_weapon"
   },
   {
     "id": "consumable_tool_lockpick",
@@ -15557,7 +15575,8 @@
     "onhit_skillchance_3": null,
     "extra_cost": null,
     "description": "Delicate tools for opening locked containers.",
-    "tier": 0
+    "tier": 0,
+    "skillID": "unlock_door"
   },
   {
     "id": "consumable_tool_rope",
@@ -15597,7 +15616,8 @@
     "onhit_skillchance_3": null,
     "extra_cost": null,
     "description": "Sturdy rope for scaling walls and cliffs.",
-    "tier": 0
+    "tier": 0,
+    "skillID": "climb_surface"
   },
   {
     "id": "consumable_tool_torch",
@@ -15637,7 +15657,8 @@
     "onhit_skillchance_3": null,
     "extra_cost": null,
     "description": "Magical torch that burns without fuel.",
-    "tier": 1
+    "tier": 1,
+    "skillID": "light_area"
   },
   {
     "id": "consumable_tool_map",
@@ -15677,7 +15698,8 @@
     "onhit_skillchance_3": null,
     "extra_cost": null,
     "description": "Automatically charts the surrounding dungeon.",
-    "tier": 1
+    "tier": 1,
+    "skillID": "reveal_area"
   },
   {
     "id": "consumable_food_ration",
@@ -15717,7 +15739,8 @@
     "onhit_skillchance_3": null,
     "extra_cost": null,
     "description": "Dried meat and hardtack for long journeys.",
-    "tier": 0
+    "tier": 0,
+    "skillID": "use_stamina_potion_minor"
   },
   {
     "id": "consumable_food_feast",
@@ -15757,7 +15780,8 @@
     "onhit_skillchance_3": null,
     "extra_cost": null,
     "description": "A lavish meal that temporarily boosts all attributes.",
-    "tier": 4
+    "tier": 4,
+    "skillID": "buff_all_stats"
   },
   {
     "id": "consumable_trap_caltrops",
@@ -15797,7 +15821,8 @@
     "onhit_skillchance_3": null,
     "extra_cost": null,
     "description": "Spiked balls that slow pursuing enemies.",
-    "tier": 1
+    "tier": 1,
+    "skillID": "deploy_caltrops"
   },
   {
     "id": "consumable_trap_bear",
@@ -15837,7 +15862,8 @@
     "onhit_skillchance_3": null,
     "extra_cost": null,
     "description": "Heavy trap that immobilizes large creatures.",
-    "tier": 2
+    "tier": 2,
+    "skillID": "deploy_trap_stun"
   },
   {
     "id": "consumable_crystal_resurrection",
@@ -15877,7 +15903,8 @@
     "onhit_skillchance_3": null,
     "extra_cost": 200,
     "description": "Rare crystal that revives an entire fallen party.",
-    "tier": 6
+    "tier": 6,
+    "skillID": "skill_resurrect_party"
   },
   {
     "id": "consumable_crystal_teleport",
@@ -15917,7 +15944,8 @@
     "onhit_skillchance_3": null,
     "extra_cost": null,
     "description": "Shatters to return the party to safety instantly.",
-    "tier": 3
+    "tier": 3,
+    "skillID": "skill_teleport_safe"
   },
   {
     "id": "consumable_tome_knowledge",
@@ -15957,7 +15985,8 @@
     "onhit_skillchance_3": null,
     "extra_cost": 150,
     "description": "Ancient text that grants permanent skill knowledge.",
-    "tier": 5
+    "tier": 5,
+    "skillID": "grant_skill_point"
   },
   {
     "id": "consumable_charm_luck",
@@ -15997,7 +16026,8 @@
     "onhit_skillchance_3": null,
     "extra_cost": null,
     "description": "Increases item drop rates for the next encounter.",
-    "tier": 2
+    "tier": 2,
+    "skillID": "buff_loot_rate"
   },
   {
     "id": "fangs_tiny",
@@ -16196,5 +16226,349 @@
     "extra_cost": null,
     "description": "A crude bow.",
     "tier": -1
+  },
+  {
+    "id": "health_potion_minor",
+    "name": "Minor Health Potion",
+    "type": "potion",
+    "slot_id1": "consumable",
+    "slot_id2": null,
+    "dmg_type_1": null,
+    "dmg1": null,
+    "dmg_type_2": null,
+    "dmg2": null,
+    "dmg_type_3": null,
+    "dmg3": null,
+    "dmg_type_4": null,
+    "dmg4": null,
+    "delay": null,
+    "armor": null,
+    "phys_ev": null,
+    "mag_ev": null,
+    "hp": null,
+    "mana": null,
+    "stam": null,
+    "con": null,
+    "end": null,
+    "amb": null,
+    "har": null,
+    "skillID": "use_health_potion_minor",
+    "effect_skillid": "use_health_potion_minor",
+    "effect_ct": 1,
+    "consumable": true,
+    "stackable": true,
+    "unique": false,
+    "onhit_skillid_1": null,
+    "onhit_skillchance_1": null,
+    "onhit_skillid_2": null,
+    "onhit_skillchance_2": null,
+    "onhit_skillid_3": null,
+    "onhit_skillchance_3": null,
+    "extra_cost": null,
+    "description": "Restores a small amount of health.",
+    "tier": 0,
+    "rarity": "common",
+    "maxStack": 10
+  },
+  {
+    "id": "health_potion",
+    "name": "Health Potion",
+    "type": "potion",
+    "slot_id1": "consumable",
+    "slot_id2": null,
+    "dmg_type_1": null,
+    "dmg1": null,
+    "dmg_type_2": null,
+    "dmg2": null,
+    "dmg_type_3": null,
+    "dmg3": null,
+    "dmg_type_4": null,
+    "dmg4": null,
+    "delay": null,
+    "armor": null,
+    "phys_ev": null,
+    "mag_ev": null,
+    "hp": null,
+    "mana": null,
+    "stam": null,
+    "con": null,
+    "end": null,
+    "amb": null,
+    "har": null,
+    "skillID": "use_health_potion",
+    "effect_skillid": "use_health_potion",
+    "effect_ct": 1,
+    "consumable": true,
+    "stackable": true,
+    "unique": false,
+    "onhit_skillid_1": null,
+    "onhit_skillchance_1": null,
+    "onhit_skillid_2": null,
+    "onhit_skillchance_2": null,
+    "onhit_skillid_3": null,
+    "onhit_skillchance_3": null,
+    "extra_cost": null,
+    "description": "Restores a moderate amount of health.",
+    "tier": 0,
+    "rarity": "uncommon",
+    "maxStack": 10
+  },
+  {
+    "id": "mana_potion_minor",
+    "name": "Minor Mana Potion",
+    "type": "potion",
+    "slot_id1": "consumable",
+    "slot_id2": null,
+    "dmg_type_1": null,
+    "dmg1": null,
+    "dmg_type_2": null,
+    "dmg2": null,
+    "dmg_type_3": null,
+    "dmg3": null,
+    "dmg_type_4": null,
+    "dmg4": null,
+    "delay": null,
+    "armor": null,
+    "phys_ev": null,
+    "mag_ev": null,
+    "hp": null,
+    "mana": null,
+    "stam": null,
+    "con": null,
+    "end": null,
+    "amb": null,
+    "har": null,
+    "skillID": "use_mana_potion_minor",
+    "effect_skillid": "use_mana_potion_minor",
+    "effect_ct": 1,
+    "consumable": true,
+    "stackable": true,
+    "unique": false,
+    "onhit_skillid_1": null,
+    "onhit_skillchance_1": null,
+    "onhit_skillid_2": null,
+    "onhit_skillchance_2": null,
+    "onhit_skillid_3": null,
+    "onhit_skillchance_3": null,
+    "extra_cost": null,
+    "description": "Restores a small amount of mana.",
+    "tier": 0,
+    "rarity": "common",
+    "maxStack": 10
+  },
+  {
+    "id": "mana_potion",
+    "name": "Mana Potion",
+    "type": "potion",
+    "slot_id1": "consumable",
+    "slot_id2": null,
+    "dmg_type_1": null,
+    "dmg1": null,
+    "dmg_type_2": null,
+    "dmg2": null,
+    "dmg_type_3": null,
+    "dmg3": null,
+    "dmg_type_4": null,
+    "dmg4": null,
+    "delay": null,
+    "armor": null,
+    "phys_ev": null,
+    "mag_ev": null,
+    "hp": null,
+    "mana": null,
+    "stam": null,
+    "con": null,
+    "end": null,
+    "amb": null,
+    "har": null,
+    "skillID": "use_mana_potion",
+    "effect_skillid": "use_mana_potion",
+    "effect_ct": 1,
+    "consumable": true,
+    "stackable": true,
+    "unique": false,
+    "onhit_skillid_1": null,
+    "onhit_skillchance_1": null,
+    "onhit_skillid_2": null,
+    "onhit_skillchance_2": null,
+    "onhit_skillid_3": null,
+    "onhit_skillchance_3": null,
+    "extra_cost": null,
+    "description": "Restores a moderate amount of mana.",
+    "tier": 0,
+    "rarity": "uncommon",
+    "maxStack": 10
+  },
+  {
+    "id": "stamina_potion_minor",
+    "name": "Minor Stamina Potion",
+    "type": "potion",
+    "slot_id1": "consumable",
+    "slot_id2": null,
+    "dmg_type_1": null,
+    "dmg1": null,
+    "dmg_type_2": null,
+    "dmg2": null,
+    "dmg_type_3": null,
+    "dmg3": null,
+    "dmg_type_4": null,
+    "dmg4": null,
+    "delay": null,
+    "armor": null,
+    "phys_ev": null,
+    "mag_ev": null,
+    "hp": null,
+    "mana": null,
+    "stam": null,
+    "con": null,
+    "end": null,
+    "amb": null,
+    "har": null,
+    "skillID": "use_stamina_potion_minor",
+    "effect_skillid": "use_stamina_potion_minor",
+    "effect_ct": 1,
+    "consumable": true,
+    "stackable": true,
+    "unique": false,
+    "onhit_skillid_1": null,
+    "onhit_skillchance_1": null,
+    "onhit_skillid_2": null,
+    "onhit_skillchance_2": null,
+    "onhit_skillid_3": null,
+    "onhit_skillchance_3": null,
+    "extra_cost": null,
+    "description": "Restores a small amount of stamina.",
+    "tier": 0,
+    "rarity": "common",
+    "maxStack": 10
+  },
+  {
+    "id": "escape_rope",
+    "name": "Escape Rope",
+    "type": "tool",
+    "slot_id1": "consumable",
+    "slot_id2": null,
+    "dmg_type_1": null,
+    "dmg1": null,
+    "dmg_type_2": null,
+    "dmg2": null,
+    "dmg_type_3": null,
+    "dmg3": null,
+    "dmg_type_4": null,
+    "dmg4": null,
+    "delay": null,
+    "armor": null,
+    "phys_ev": null,
+    "mag_ev": null,
+    "hp": null,
+    "mana": null,
+    "stam": null,
+    "con": null,
+    "end": null,
+    "amb": null,
+    "har": null,
+    "skillID": "use_escape_rope",
+    "effect_skillid": "use_escape_rope",
+    "effect_ct": 1,
+    "consumable": true,
+    "stackable": true,
+    "unique": false,
+    "onhit_skillid_1": null,
+    "onhit_skillchance_1": null,
+    "onhit_skillid_2": null,
+    "onhit_skillchance_2": null,
+    "onhit_skillid_3": null,
+    "onhit_skillchance_3": null,
+    "extra_cost": null,
+    "description": "Guarantees a successful retreat from combat.",
+    "tier": 0,
+    "rarity": "common",
+    "maxStack": 5
+  },
+  {
+    "id": "smoke_bomb",
+    "name": "Smoke Bomb",
+    "type": "bomb",
+    "slot_id1": "consumable",
+    "slot_id2": null,
+    "dmg_type_1": null,
+    "dmg1": null,
+    "dmg_type_2": null,
+    "dmg2": null,
+    "dmg_type_3": null,
+    "dmg3": null,
+    "dmg_type_4": null,
+    "dmg4": null,
+    "delay": null,
+    "armor": null,
+    "phys_ev": null,
+    "mag_ev": null,
+    "hp": null,
+    "mana": null,
+    "stam": null,
+    "con": null,
+    "end": null,
+    "amb": null,
+    "har": null,
+    "skillID": "use_smoke_bomb",
+    "effect_skillid": "use_smoke_bomb",
+    "effect_ct": 1,
+    "consumable": true,
+    "stackable": true,
+    "unique": false,
+    "onhit_skillid_1": null,
+    "onhit_skillchance_1": null,
+    "onhit_skillid_2": null,
+    "onhit_skillchance_2": null,
+    "onhit_skillid_3": null,
+    "onhit_skillchance_3": null,
+    "extra_cost": null,
+    "description": "Guarantees a successful retreat and obscures enemy vision.",
+    "tier": 0,
+    "rarity": "uncommon",
+    "maxStack": 5
+  },
+  {
+    "id": "throwing_knife",
+    "name": "Throwing Knife",
+    "type": "dagger",
+    "slot_id1": "consumable",
+    "slot_id2": null,
+    "dmg_type_1": "physical",
+    "dmg1": 8,
+    "dmg_type_2": null,
+    "dmg2": null,
+    "dmg_type_3": null,
+    "dmg3": null,
+    "dmg_type_4": null,
+    "dmg4": null,
+    "delay": 600,
+    "armor": null,
+    "phys_ev": null,
+    "mag_ev": null,
+    "hp": null,
+    "mana": null,
+    "stam": null,
+    "con": null,
+    "end": null,
+    "amb": null,
+    "har": null,
+    "skillID": "throw_knife",
+    "effect_skillid": "throw_knife",
+    "effect_ct": 1,
+    "consumable": true,
+    "stackable": true,
+    "unique": false,
+    "onhit_skillid_1": null,
+    "onhit_skillchance_1": null,
+    "onhit_skillid_2": null,
+    "onhit_skillchance_2": null,
+    "onhit_skillid_3": null,
+    "onhit_skillchance_3": null,
+    "extra_cost": null,
+    "description": "A quick ranged attack dealing moderate damage.",
+    "tier": 0,
+    "rarity": "common",
+    "maxStack": 20
   }
 ]
