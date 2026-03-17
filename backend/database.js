@@ -75,7 +75,8 @@ function createTables() {
                     title TEXT,
                     lastActiveAt DATETIME,
                     createdAt INTEGER NOT NULL,
-                    lastModified INTEGER NOT NULL
+                    lastModified INTEGER NOT NULL,
+                    lastSuccessfulChallengeId TEXT DEFAULT NULL
                 )
             `, (err) => { if (err) reject(err); });
 
@@ -163,6 +164,19 @@ async function initializeCharacterSnapshotsTable() {
     await db.run('CREATE INDEX IF NOT EXISTS idx_character_level ON character_snapshots(level)');
     await db.run('CREATE INDEX IF NOT EXISTS idx_imports ON character_snapshots(import_count)');
     console.log('[DATABASE] character_snapshots table initialized');
+
+    // Migration: add lastSuccessfulChallengeId to existing databases that predate this column
+    await new Promise((resolve) => {
+        db.run(
+            `ALTER TABLE characters ADD COLUMN lastSuccessfulChallengeId TEXT DEFAULT NULL`,
+            (err) => {
+                if (err && !err.message.includes('duplicate column')) {
+                    console.warn('[DATABASE] Migration note:', err.message);
+                }
+                resolve(); // always resolve — column may already exist
+            }
+        );
+    });
 }
 
 function saveCombatLog(logData) {
@@ -288,8 +302,8 @@ function saveCharacter(character) {
                 ownerUserId, isPublic, shareCode, buildName, buildDescription,
                 importCount, lastSharedAt,
                 avatarId, avatarColor, avatarFrame, title, lastActiveAt,
-                createdAt, lastModified
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                createdAt, lastModified, lastSuccessfulChallengeId
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(id) DO UPDATE SET
                 name = ?, race = ?, level = ?, experience = ?,
                 conviction = ?, endurance = ?, ambition = ?, harmony = ?,
@@ -298,7 +312,7 @@ function saveCharacter(character) {
                 ownerUserId = ?, isPublic = ?, shareCode = ?, buildName = ?, buildDescription = ?,
                 importCount = ?, lastSharedAt = ?,
                 avatarId = ?, avatarColor = ?, avatarFrame = ?, title = ?, lastActiveAt = ?,
-                lastModified = ?`,
+                lastModified = ?, lastSuccessfulChallengeId = ?`,
             [
                 character.id, character.name, character.race, character.level, character.experience,
                 character.stats?.conviction || 0, character.stats?.endurance || 0,
@@ -317,6 +331,8 @@ function saveCharacter(character) {
                 character.avatarFrame || null, character.title || null,
                 character.lastActiveAt || Date.now(),
                 character.createdAt || Date.now(), Date.now(),
+                character.lastSuccessfulChallengeId || null,
+                // ON CONFLICT UPDATE values
                 character.name, character.race, character.level, character.experience,
                 character.stats?.conviction || 0, character.stats?.endurance || 0,
                 character.stats?.ambition || 0, character.stats?.harmony || 0,
@@ -333,7 +349,7 @@ function saveCharacter(character) {
                 character.avatarId || null, character.avatarColor || null,
                 character.avatarFrame || null, character.title || null,
                 character.lastActiveAt || Date.now(),
-                Date.now()
+                Date.now(), character.lastSuccessfulChallengeId || null
             ],
             function(err) {
                 if (err) reject(err);
@@ -380,7 +396,8 @@ function getCharacter(characterId) {
                     title: row.title,
                     createdAt: row.createdAt,
                     lastModified: row.lastModified,
-                    lastActiveAt: row.lastActiveAt
+                    lastActiveAt: row.lastActiveAt,
+                    lastSuccessfulChallengeId: row.lastSuccessfulChallengeId || null
                 });
             } else {
                 resolve(null);
@@ -426,7 +443,8 @@ function getAllCharacters() {
                     title: row.title,
                     createdAt: row.createdAt,
                     lastModified: row.lastModified,
-                    lastActiveAt: row.lastActiveAt
+                    lastActiveAt: row.lastActiveAt,
+                    lastSuccessfulChallengeId: row.lastSuccessfulChallengeId || null
                 })) : [];
                 resolve(characters);
             }

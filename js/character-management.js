@@ -520,7 +520,7 @@ async function createCharacter() {
     
     // ===== COMPLETE CHARACTER OBJECT WITH ALL SAVESTATE FIELDS =====
     const character = {
-        id: 'char_' + Date.now(),
+        id: 'char_' + crypto.randomUUID().replace(/-/g, '').slice(0, 16),
         name: name,
         race: currentState.selectedRace.id,
         stats: {
@@ -825,41 +825,35 @@ function renderCharacterSkills(character) {
 }
 
 /**
- * Render consumable belt
+ * Render consumable belt on character detail screen
  */
 function renderConsumableBelt(character) {
     const container = document.getElementById('consumableBeltDisplay');
     if (!container) return;
-    
+
     container.innerHTML = '';
     const consumableSlots = character.consumables || {};
-    let slotsFilled = 0;
-    
+
+    // Collect all filled belt entries in order
+    const filled = Object.entries(consumableSlots)
+        .filter(([, qty]) => qty > 0)
+        .map(([id, qty]) => ({ consumable: getConsumable(id), qty }))
+        .filter(entry => entry.consumable !== null && entry.consumable !== undefined);
+
     for (let i = 0; i < 4; i++) {
         const slot = document.createElement('div');
         slot.className = 'consumable-slot';
-        
-        let found = false;
-        for (let consumableId in consumableSlots) {
-            if (consumableSlots[consumableId] > 0 && slotsFilled === i) {
-                const consumable = getConsumable(consumableId);
-                if (consumable) {
-                    slot.classList.add('filled');
-                    slot.innerHTML = `
-                        <div class="consumable-name">${consumable.name}</div>
-                        <div class="consumable-quantity">Qty: ${consumableSlots[consumableId]}</div>
-                    `;
-                    slotsFilled++;
-                    found = true;
-                    break;
-                }
-            }
-        }
-        
-        if (!found) {
+
+        if (filled[i]) {
+            slot.classList.add('filled');
+            slot.innerHTML = `
+                <div class="consumable-name">${filled[i].consumable.name}</div>
+                <div class="consumable-quantity">Qty: ${filled[i].qty}</div>
+            `;
+        } else {
             slot.innerHTML = '<div style="color: #8b7355;">Empty Slot</div>';
         }
-        
+
         container.appendChild(slot);
     }
 }

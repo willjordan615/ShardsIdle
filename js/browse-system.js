@@ -238,8 +238,13 @@ async function confirmImport(shareCode) {
             canReExport: false
         };
         
-        // Add to current party (for combat formation)
+        // Add to current party if there's room (for combat formation)
+        const maxSize = window.currentState?.selectedChallenge?.maxPartySize || 4;
         if (window.currentState?.currentParty) {
+            if (window.currentState.currentParty.length >= maxSize) {
+                showError('Party is full! Remove a member before importing.');
+                return;
+            }
             window.currentState.currentParty.push(importRef);
         }
         
@@ -254,8 +259,12 @@ async function confirmImport(shareCode) {
         closeModal('importModal');
         showSuccess(`Successfully imported ${data.importReference.originalCharacterName}!`);
         
-        // Navigate to roster or party screen
-        showScreen('roster');
+        // Return to party formation if we're in party formation, otherwise roster
+        if (window.currentState?.selectedChallenge) {
+            showScreen('party');
+        } else {
+            showScreen('roster');
+        }
         
     } catch (error) {
         console.error('Import error:', error);
@@ -342,7 +351,9 @@ function openShareModal(characterId) {
         return;
     }
  
-
+    // Store the ID on the modal element so exportCharacter() can read it
+    // without needing window.currentState (which may not be on window if
+    // currentState is declared with let/const in game-data.js)
     const modal = document.getElementById('shareModal');
     if (modal) modal.dataset.characterId = characterId;
  
@@ -383,10 +394,18 @@ function openImportModal() {
     confirmBtn.disabled = true;
     warning.style.display = 'block';
     
-    // Add listener for manual code entry
+    // Add debounced listener for manual code entry
+    let importSearchTimeout = null;
     codeInput.oninput = async () => {
+        clearTimeout(importSearchTimeout);
         const code = codeInput.value.trim();
-        if (code.length >= 10) {  // Minimum share code length
+        if (code.length < 10) {
+            preview.innerHTML = '';
+            preview.style.display = 'none';
+            confirmBtn.disabled = true;
+            return;
+        }
+        importSearchTimeout = setTimeout(async () => {
             try {
                 const response = await fetch(`${BACKEND_URL}/api/character/import/${code}`);
                 if (response.ok) {
@@ -400,12 +419,17 @@ function openImportModal() {
                     preview.style.display = 'block';
                     confirmBtn.disabled = false;
                     confirmBtn.onclick = () => confirmImport(code);
+                } else {
+                    preview.innerHTML = `<p style="color: #ff6b6b;">Invalid share code</p>`;
+                    preview.style.display = 'block';
+                    confirmBtn.disabled = true;
                 }
             } catch (error) {
                 preview.innerHTML = `<p style="color: #ff6b6b;">Invalid share code</p>`;
                 preview.style.display = 'block';
+                confirmBtn.disabled = true;
             }
-        }
+        }, 400); // Wait 400ms after last keystroke before hitting the server
     };
     
     modal.style.display = 'flex';

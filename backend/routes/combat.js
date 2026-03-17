@@ -6,32 +6,26 @@ const db = require('../database');
 const fs = require('fs');
 const path = require('path');
 
+const DEFAULT_SAFE_CHALLENGE = 'challenge_goblin_camp';
+
 let combatEngine;
-let gameData;
 
 function initializeCombatEngine() {
     if (!combatEngine) {
         try {
             const dataDir = path.join(__dirname, '../data');
-            const skillsPath = path.join(dataDir, 'skills.json');
-            const enemyTypesPath = path.join(dataDir, 'enemy-types.json');
-            const racesPath = path.join(dataDir, 'races.json');
-            const gearPath = path.join(dataDir, 'items.json');
-            const statusesPath = path.join(dataDir, 'statuses.json');
+            const skills    = JSON.parse(fs.readFileSync(path.join(dataDir, 'skills.json'),      'utf8'));
+            const enemyTypes = JSON.parse(fs.readFileSync(path.join(dataDir, 'enemy-types.json'), 'utf8'));
+            const races     = JSON.parse(fs.readFileSync(path.join(dataDir, 'races.json'),        'utf8'));
+            const gear      = JSON.parse(fs.readFileSync(path.join(dataDir, 'items.json'),        'utf8'));
+            const statuses  = JSON.parse(fs.readFileSync(path.join(dataDir, 'statuses.json'),     'utf8'));
 
-            const skills = JSON.parse(fs.readFileSync(skillsPath, 'utf8'));
-            const enemyTypes = JSON.parse(fs.readFileSync(enemyTypesPath, 'utf8'));
-            const races = JSON.parse(fs.readFileSync(racesPath, 'utf8'));
-            const gear = JSON.parse(fs.readFileSync(gearPath, 'utf8'));
-            const statuses = JSON.parse(fs.readFileSync(statusesPath, 'utf8'));
-            
             const statusEngine = new StatusEngine(statuses);
             combatEngine = new CombatEngine(skills, enemyTypes, races, gear, statusEngine);
-            gameData = { skills, enemyTypes, races, gear };
-            
+
             console.log('[COMBAT] Combat engine initialized');
         } catch (error) {
-            console.error('Failed to initialize combat engine:', error);
+            console.error('[COMBAT] Failed to initialize combat engine:', error);
             throw error;
         }
     }
@@ -41,34 +35,27 @@ function initializeCombatEngine() {
 router.post('/start', async (req, res) => {
     try {
         initializeCombatEngine();
-        
+
         const { partySnapshots, challengeID, challenges } = req.body;
 
         if (!partySnapshots || !challengeID || !challenges) {
-            return res.status(400).json({ 
-                error: 'Missing required fields: partySnapshots, challengeID, challenges' 
+            return res.status(400).json({
+                error: 'Missing required fields: partySnapshots, challengeID, challenges'
             });
         }
 
-        // Add this BEFORE the find() call
-console.log('[DEBUG] challengeID:', challengeID);
-console.log('[DEBUG] challenges array:', JSON.stringify(challenges, null, 2));
-console.log('[DEBUG] First challenge ID:', challenges[0]?.id);
-
         const challenge = challenges.find(c => c.id === challengeID);
         if (!challenge) {
-            return res.status(404).json({ error: 'Challenge not found' });
+            return res.status(404).json({ error: `Challenge not found: ${challengeID}` });
         }
 
-        // Hydrate imported character snapshots before combat.
-        // The frontend only stores a minimal reference for imported characters
-        // (importId, characterName, level, race) with no stats or skills.
-        // We must fetch the original character's full data from the DB here.
         const rawDb = db.getDatabase();
+
+        // 1. Hydrate imported character snapshots
+        // Imported characters carry only minimal data from the frontend.
+        // Fetch the original character's full stats/skills/equipment from the DB.
         const hydratedSnapshots = await Promise.all(partySnapshots.map(async (snapshot) => {
-            // Imported characters use their importId as characterID and have no stats
             if (snapshot.isImported || !snapshot.stats) {
-                // Look up the import record to find the original character
                 const importRec = await new Promise((resolve, reject) => {
                     rawDb.get(
                         `SELECT * FROM character_imports WHERE import_id = ?`,
@@ -80,98 +67,126 @@ console.log('[DEBUG] First challenge ID:', challenges[0]?.id);
                 if (importRec) {
                     const originalChar = await db.getCharacter(importRec.original_character_id);
                     if (originalChar) {
-                        console.log(`[COMBAT] Hydrated imported character "${snapshot.characterName}" from original ${importRec.original_character_id}`);
+                        console.log(`[COMBAT] Hydrated import "${snapshot.characterName}" from ${importRec.original_character_id}`);
                         return {
                             ...snapshot,
-                            characterID: snapshot.characterID, // keep import ID for stat tracking
-                            stats: originalChar.stats,
-                            skills: originalChar.skills,
-                            equipment: originalChar.equipment,
+                            stats:       originalChar.stats,
+                            skills:      originalChar.skills,
+                            equipment:   originalChar.equipment,
                             consumables: originalChar.consumables || [],
-                            level: originalChar.level,
+                            level:       originalChar.level,
                         };
                     }
                 }
-
-                // Import record not found — warn and let combatEngine defaults handle it
-                console.warn(`[COMBAT] Could not hydrate imported character "${snapshot.characterName}" (ID: ${snapshot.characterID}) — no import record found`);
+                console.warn(`[COMBAT] Could not hydrate import "${snapshot.characterName}" (${snapshot.characterID}) — no import record`);
             }
             return snapshot;
         }));
 
+        // 2. Run simulation
         const result = combatEngine.runCombat(hydratedSnapshots, challenge);
 
-        // LINKED REFERENCE: Update ORIGINAL character's stats
+        const isVictory = result.result === 'victory';
+        const isDefeat  = result.result === 'defeat' || result.result === 'loss';
+
+        // 3. Safety Net: track last successful challenge per player character
+        let nextChallengeId = challengeID;
+
+        const mainParticipant = result.participants?.playerCharacters?.find(p => !p.isImported);
+        if (mainParticipant) {
+            // Resolve the real character ID (may be an import reference)
+            const importRef = await new Promise((resolve, reject) => {
+                rawDb.get(
+                    `SELECT * FROM character_imports WHERE import_id = ?`,
+                    [mainParticipant.characterID],
+                    (err, row) => { if (err) reject(err); else resolve(row); }
+                );
+            });
+            const targetId = importRef ? importRef.original_character_id : mainParticipant.characterID;
+
+            if (isVictory) {
+                await new Promise((resolve, reject) => {
+                    rawDb.run(
+                        `UPDATE characters SET lastSuccessfulChallengeId = ?, lastModified = ? WHERE id = ?`,
+                        [challengeID, Date.now(), targetId],
+                        (err) => { if (err) reject(err); else resolve(); }
+                    );
+                });
+                nextChallengeId = challengeID;
+                console.log(`[SAFETY NET] ${targetId} won. Safe zone → ${challengeID}`);
+
+            } else if (isDefeat) {
+                const charData = await db.getCharacter(targetId);
+                nextChallengeId = charData?.lastSuccessfulChallengeId || DEFAULT_SAFE_CHALLENGE;
+                console.log(`[SAFETY NET] ${targetId} lost. Falling back to → ${nextChallengeId}`);
+            }
+        }
+
+        // 4. Update combat stats for all participants
         if (result.result !== 'retreated' && result.participants?.playerCharacters) {
-            const rawDb = db.getDatabase();
-            
             for (const participant of result.participants.playerCharacters) {
                 const importRef = await new Promise((resolve, reject) => {
                     rawDb.get(
                         `SELECT * FROM character_imports WHERE import_id = ?`,
                         [participant.characterID],
-                        (err, row) => {
-                            if (err) reject(err);
-                            else resolve(row);
-                        }
+                        (err, row) => { if (err) reject(err); else resolve(row); }
                     );
                 });
 
-                let targetCharacterId = participant.characterID;
-                
+                const targetId = importRef ? importRef.original_character_id : participant.characterID;
+
+                // Update import usage count if applicable
                 if (importRef) {
-                    targetCharacterId = importRef.original_character_id;
-                    
                     await new Promise((resolve, reject) => {
                         rawDb.run(
-                            `UPDATE character_imports 
-                             SET times_used = times_used + 1, last_used_at = CURRENT_TIMESTAMP 
-                             WHERE import_id = ?`,
+                            `UPDATE character_imports SET times_used = times_used + 1, last_used_at = CURRENT_TIMESTAMP WHERE import_id = ?`,
                             [participant.characterID],
-                            (err) => {
-                                if (err) reject(err);
-                                else resolve();
-                            }
+                            (err) => { if (err) reject(err); else resolve(); }
                         );
                     });
-                    
-                    console.log(`[COMBAT] Imported character used, updating original: ${targetCharacterId}`);
+                    console.log(`[COMBAT] Import used, updating original: ${targetId}`);
                 }
 
-                const character = await db.getCharacter(targetCharacterId);
+                const character = await db.getCharacter(targetId);
                 if (character) {
                     combatEngine.updateCombatStats(character, result, challenge);
                     await db.saveCharacter(character);
                     console.log(`[STATS] Updated combat stats for ${character.name}`);
+                } else {
+                    console.warn(`[STATS] Character ${targetId} not found, skipping stats update.`);
                 }
             }
         }
 
+        // 5. Persist combat log
         if (result.shouldPersist && result.result !== 'retreated') {
             await db.saveCombatLog({
                 id: result.combatID,
                 challengeID,
-                partyID: partySnapshots.map(s => s.characterID).join(','),
-                startTime: Date.now(),
-                result: result.result,
+                partyID:    partySnapshots.map(s => s.characterID).join(','),
+                startTime:  Date.now(),
+                result:     result.result,
                 totalTurns: result.totalTurns,
-                log: result
+                log:        result
             });
         }
 
+        // 6. Respond
         res.json({
-            combatID: result.combatID,
-            result: result.result,
-            totalTurns: result.totalTurns,
-            turns: result.turns,
-            segments: result.segments,
-            participants: result.participants,
-            rewards: result.rewards,
+            combatID:      result.combatID,
+            result:        result.result,
+            totalTurns:    result.totalTurns,
+            turns:         result.turns,
+            segments:      result.segments,
+            participants:  result.participants,
+            rewards:       result.rewards,
             shouldPersist: result.shouldPersist,
-            retreated: result.result === 'retreated'
+            retreated:     result.result === 'retreated',
+            nextChallengeId
         });
+
     } catch (error) {
-        console.error('[COMBAT] Error:', error);
+        console.error('[COMBAT] Critical error:', error);
         res.status(500).json({ error: 'Combat simulation failed', details: error.message });
     }
 });
@@ -179,12 +194,10 @@ console.log('[DEBUG] First challenge ID:', challenges[0]?.id);
 router.get('/:combatID', async (req, res) => {
     try {
         const log = await db.getCombatLog(req.params.combatID);
-        if (!log) {
-            return res.status(404).json({ error: 'Combat log not found' });
-        }
+        if (!log) return res.status(404).json({ error: 'Combat log not found' });
         res.json(log);
     } catch (error) {
-        console.error('Error retrieving combat log:', error);
+        console.error('[COMBAT] Error retrieving log:', error);
         res.status(500).json({ error: 'Failed to retrieve combat log' });
     }
 });
@@ -194,7 +207,7 @@ router.get('/history/:characterID', async (req, res) => {
         const logs = await db.getCombatLogs(req.params.characterID);
         res.json(logs);
     } catch (error) {
-        console.error('Error retrieving combat history:', error);
+        console.error('[COMBAT] Error retrieving history:', error);
         res.status(500).json({ error: 'Failed to retrieve combat history' });
     }
 });
