@@ -489,7 +489,9 @@ async function applyCombatRewards(combatData) {
 
         for (const participant of combatData.participants.playerCharacters) {
             const charId = participant.characterID;
+            // Skip imported characters and bots (bots are in gameData.bots, not the DB)
             if (charId.startsWith('import_')) continue;
+            if (window.gameData?.bots?.some(b => b.characterID === charId)) continue;
 
             const character = await getCharacter(charId);
             if (!character) continue;
