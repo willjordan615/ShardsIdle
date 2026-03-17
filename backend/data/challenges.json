@@ -13,7 +13,14 @@
         "title": "The Perimeter",
         "description": "Two scouts patrol the outer fence. They haven't spotted you yet.",
         "enemies": [
-          { "enemyTypeID": "goblin_scout", "countRange": [2, 3], "level": 1 }
+          {
+            "enemyTypeID": "goblin_scout",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 1
+          }
         ]
       },
       {
@@ -21,8 +28,22 @@
         "title": "The Archery Nest",
         "description": "You breach the fence, but an archer has line of sight from a watchtower!",
         "enemies": [
-          { "enemyTypeID": "goblin_archer", "countRange": [1, 2], "level": 2 },
-          { "enemyTypeID": "goblin_scout", "countRange": [1, 2], "level": 1 }
+          {
+            "enemyTypeID": "goblin_archer",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 2
+          },
+          {
+            "enemyTypeID": "goblin_scout",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 1
+          }
         ],
         "preCombatOpportunities": [
           {
@@ -39,13 +60,13 @@
             },
             "failureEffect": {
               "type": "apply_direct_damage",
-              "magnitude": 0.20,
+              "magnitude": 0.2,
               "statScale": "maxHP",
               "narrative": "The footwork fails! A stray arrow catches a party member as they stumble."
             },
             "fallbackEffect": {
               "type": "apply_direct_damage",
-              "magnitude": 0.30,
+              "magnitude": 0.3,
               "statScale": "maxHP",
               "narrative": "Lacking the Footwork skill to evade, the party is forced to sprint across open ground. Arrows rain down, striking home before they can reach cover!"
             }
@@ -57,9 +78,66 @@
       "baseXP": 300,
       "baseGold": 100,
       "lootTable": [
-        { "itemID": "iron_sword", "rarity": "common", "dropChance": 0.35 },
-        { "itemID": "leather_armor", "rarity": "common", "dropChance": 0.30 },
-        { "itemID": "wooden_shield", "rarity": "common", "dropChance": 0.25 }
+        {
+          "itemID": "goblin_dagger",
+          "rarity": "common",
+          "dropChance": 0.4
+        },
+        {
+          "itemID": "dagger_rusty_tier0",
+          "rarity": "common",
+          "dropChance": 0.25
+        },
+        {
+          "itemID": "axe_iron_tier0",
+          "rarity": "common",
+          "dropChance": 0.2
+        },
+        {
+          "itemID": "sword_iron_tier0",
+          "rarity": "common",
+          "dropChance": 0.2
+        },
+        {
+          "itemID": "chest_leather_tunic_tier0",
+          "rarity": "common",
+          "dropChance": 0.2
+        },
+        {
+          "itemID": "head_leather_hood_tier0",
+          "rarity": "common",
+          "dropChance": 0.15
+        },
+        {
+          "itemID": "shield_wood_tier0",
+          "rarity": "common",
+          "dropChance": 0.15
+        },
+        {
+          "itemID": "health_potion_minor",
+          "rarity": "common",
+          "dropChance": 0.5
+        },
+        {
+          "itemID": "stamina_potion_minor",
+          "rarity": "common",
+          "dropChance": 0.3
+        },
+        {
+          "itemID": "consumable_tool_torch",
+          "rarity": "common",
+          "dropChance": 0.25
+        },
+        {
+          "itemID": "dagger_iron_tier0",
+          "rarity": "uncommon",
+          "dropChance": 0.1
+        },
+        {
+          "itemID": "chest_chain_shirt_tier0",
+          "rarity": "uncommon",
+          "dropChance": 0.08
+        }
       ]
     }
   },
@@ -77,7 +155,14 @@
         "title": "Webbed Entrance",
         "description": "The entrance is covered in thick silk. Small spiders skitter in the shadows.",
         "enemies": [
-          { "enemyTypeID": "spider_small", "countRange": [2, 4], "level": 3 }
+          {
+            "enemyTypeID": "spider_small",
+            "countRange": [
+              2,
+              4
+            ],
+            "level": 3
+          }
         ],
         "preCombatOpportunities": [
           {
@@ -134,7 +219,14 @@
         "title": "The Upper Ledge (Secret)",
         "description": "You overlook the Queen's chamber from above.",
         "enemies": [
-          { "enemyTypeID": "spider_large", "countRange": [1, 1], "level": 4 }
+          {
+            "enemyTypeID": "spider_large",
+            "countRange": [
+              1,
+              1
+            ],
+            "level": 4
+          }
         ]
       },
       {
@@ -142,8 +234,22 @@
         "title": "The Queen's Chamber",
         "description": "Deep inside, a massive spider guards its brood.",
         "enemies": [
-          { "enemyTypeID": "spider_large", "countRange": [1, 2], "level": 4 },
-          { "enemyTypeID": "spider_small", "countRange": [2, 3], "level": 3 }
+          {
+            "enemyTypeID": "spider_large",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 4
+          },
+          {
+            "enemyTypeID": "spider_small",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 3
+          }
         ]
       }
     ],
@@ -151,9 +257,21 @@
       "baseXP": 750,
       "baseGold": 250,
       "lootTable": [
-        { "itemID": "steel_helm", "rarity": "uncommon", "dropChance": 0.40 },
-        { "itemID": "silver_dagger", "rarity": "uncommon", "dropChance": 0.35 },
-        { "itemID": "boots_speed", "rarity": "uncommon", "dropChance": 0.25 }
+        {
+          "itemID": "steel_helm",
+          "rarity": "uncommon",
+          "dropChance": 0.4
+        },
+        {
+          "itemID": "silver_dagger",
+          "rarity": "uncommon",
+          "dropChance": 0.35
+        },
+        {
+          "itemID": "boots_speed",
+          "rarity": "uncommon",
+          "dropChance": 0.25
+        }
       ]
     }
   },
@@ -171,7 +289,14 @@
         "title": "The Flank",
         "description": "Warriors charge from the treeline.",
         "enemies": [
-          { "enemyTypeID": "orc_warrior", "countRange": [2, 4], "level": 6 }
+          {
+            "enemyTypeID": "orc_warrior",
+            "countRange": [
+              2,
+              4
+            ],
+            "level": 6
+          }
         ]
       },
       {
@@ -179,8 +304,22 @@
         "title": "Shaman's Support",
         "description": "A shaman appears on a ridge.",
         "enemies": [
-          { "enemyTypeID": "orc_warrior", "countRange": [1, 2], "level": 6 },
-          { "enemyTypeID": "orc_shaman", "countRange": [1, 1], "level": 7 }
+          {
+            "enemyTypeID": "orc_warrior",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 6
+          },
+          {
+            "enemyTypeID": "orc_shaman",
+            "countRange": [
+              1,
+              1
+            ],
+            "level": 7
+          }
         ]
       }
     ],
@@ -188,8 +327,16 @@
       "baseXP": 1500,
       "baseGold": 500,
       "lootTable": [
-        { "itemID": "mage_robe", "rarity": "uncommon", "dropChance": 0.45 },
-        { "itemID": "plate_helm", "rarity": "rare", "dropChance": 0.20 }
+        {
+          "itemID": "mage_robe",
+          "rarity": "uncommon",
+          "dropChance": 0.45
+        },
+        {
+          "itemID": "plate_helm",
+          "rarity": "rare",
+          "dropChance": 0.2
+        }
       ]
     }
   },
@@ -207,8 +354,22 @@
         "title": "The Hoard Guard",
         "description": "Guardians block the way.",
         "enemies": [
-          { "enemyTypeID": "orc_warrior", "countRange": [2, 3], "level": 10 },
-          { "enemyTypeID": "orc_shaman", "countRange": [1, 2], "level": 10 }
+          {
+            "enemyTypeID": "orc_warrior",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 10
+          },
+          {
+            "enemyTypeID": "orc_shaman",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 10
+          }
         ]
       },
       {
@@ -216,7 +377,14 @@
         "title": "The Ancient Wyrm",
         "description": "The dragon awakens.",
         "enemies": [
-          { "enemyTypeID": "dragon_ancient", "countRange": [1, 1], "level": 12 }
+          {
+            "enemyTypeID": "dragon_ancient",
+            "countRange": [
+              1,
+              1
+            ],
+            "level": 12
+          }
         ]
       }
     ],
@@ -224,8 +392,16 @@
       "baseXP": 5000,
       "baseGold": 2000,
       "lootTable": [
-        { "itemID": "plate_armor", "rarity": "rare", "dropChance": 0.60 },
-        { "itemID": "dragon_scale_shield", "rarity": "epic", "dropChance": 0.25 }
+        {
+          "itemID": "plate_armor",
+          "rarity": "rare",
+          "dropChance": 0.6
+        },
+        {
+          "itemID": "dragon_scale_shield",
+          "rarity": "epic",
+          "dropChance": 0.25
+        }
       ]
     }
   }

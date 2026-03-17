@@ -580,7 +580,10 @@ function updateChallengeStatusBanner() {
             banner.innerHTML = `
                 <span style="color:#4cd964;">⚔️ Active:</span>
                 <span style="color:#ffd700; margin-left:6px;">${challengeName}</span>
-                <button id="returnFromChallengeBtn" onclick="requestLoopExit()" class="secondary" style="font-size:0.85rem; padding:6px 14px; margin-left:auto;">⏹ Return from Challenge</button>
+                <div style="margin-left:auto; display:flex; gap:8px;">
+                    <button onclick="showScreen('combatlog')" class="secondary" style="font-size:0.85rem; padding:6px 14px;">▶ Watch</button>
+                    <button id="returnFromChallengeBtn" onclick="requestLoopExit()" class="secondary" style="font-size:0.85rem; padding:6px 14px;">⏹ Return from Challenge</button>
+                </div>
             `;
         }
 

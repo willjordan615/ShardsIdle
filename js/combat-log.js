@@ -79,7 +79,7 @@ async function displayCombatLog(combatData) {
             partyStatus.appendChild(div);
         });
 
-        // Helper to (re)render enemy bars
+        // Helper to render enemy bars (used by legacy single-stage fallback)
         const renderEnemies = (enemies) => {
             enemyStatus.innerHTML = '';
             enemies.forEach(e => {
@@ -95,14 +95,62 @@ async function displayCombatLog(combatData) {
             });
         };
 
-        if (combatData.participants.enemies.length > 0) {
-            renderEnemies(combatData.participants.enemies);
-        }
+        // Don't pre-populate enemies from participants.enemies — that reflects the
+        // final stage's pool, not stage 1. Each stage reveals its own enemies when
+        // its intro finishes. Show a placeholder until then.
+        enemyStatus.innerHTML = '<div class="enemy-panel-placeholder">⚔️ Awaiting encounter...</div>';
 
         // --- PLAYBACK ---
         const hasSegments  = combatData.segments && Array.isArray(combatData.segments) && combatData.segments.length > 0;
         const DEFAULT_DELAY = 1000;
         let overallResult  = 'draw';
+
+        // --- Stage banner helpers ---
+        const stageBanner       = document.getElementById('stageBanner');
+        const stageBannerTitle  = document.getElementById('stageBannerTitle');
+        const stageBannerPre    = document.getElementById('stageBannerPreCombat');
+
+        function showStageBanner(title) {
+            if (!stageBanner) return;
+            stageBanner.style.display = 'block';
+            stageBannerTitle.textContent = title;
+            stageBannerPre.innerHTML = '';
+            stageBanner.classList.remove('banner-fade-in');
+            void stageBanner.offsetWidth; // force reflow
+            stageBanner.classList.add('banner-fade-in');
+        }
+
+        function hideStageBanner() {
+            if (!stageBanner) return;
+            stageBanner.style.display = 'none';
+            stageBannerTitle.textContent = '';
+            stageBannerPre.innerHTML = '';
+        }
+
+        async function flashAndRevealEnemies(enemies) {
+            for (let i = 0; i < enemies.length; i++) {
+                // Flash the banner
+                if (stageBanner) {
+                    stageBanner.classList.remove('banner-flash');
+                    void stageBanner.offsetWidth;
+                    stageBanner.classList.add('banner-flash');
+                }
+                // Slide in the corresponding enemy
+                const e = enemies[i];
+                const div = document.createElement('div');
+                div.className = 'combatant';
+                div.id = `enemy-${e.enemyID}`;
+                div.innerHTML = `
+                    <div class="combatant-name">${e.enemyName}</div>
+                    <div class="combatant-hp">HP: <span class="hp-value">${e.maxHP}</span> / ${e.maxHP}</div>
+                    <div class="health-bar"><div class="health-bar-fill" style="width:100%"></div><div class="health-bar-text">100%</div></div>
+                `;
+                div.classList.add('combatant-slide-in');
+                enemyStatus.appendChild(div);
+                // Brief pause between each enemy reveal
+                await sleep(320);
+            }
+        }
 
         if (hasSegments) {
             console.log(`[COMBAT] Playing ${combatData.segments.length} stage(s)...`);
@@ -110,30 +158,51 @@ async function displayCombatLog(combatData) {
             for (const segment of combatData.segments) {
                 console.log(`[STAGE] ${segment.stageId}: ${segment.title}`);
 
-                // Stage intro narrative
-                const introEl = document.createElement('div');
-                introEl.className = 'combat-turn narrative-turn';
-                introEl.innerHTML = `
-                    <div class="turn-header" style="color:#ffd700;font-weight:bold;">${segment.title}</div>
-                    <div class="turn-message" style="font-style:italic;color:#ccc;">${segment.introText}</div>
-                `;
-                logDisplay.appendChild(introEl);
-                logDisplay.scrollTop = logDisplay.scrollHeight;
-                await sleep(4000);
+                // Clear enemy panel between stages
+                enemyStatus.innerHTML = '';
 
-        // Update enemy panel for this stage
-                // FIX #2: Always re-seed hpMaxes from the segment snapshot so stage 1
-                // enemies use their own maxHP, not the last stage's enemy pool.
-                if (segment.participantsSnapshot && segment.participantsSnapshot.enemies.length > 0) {
+                // 1. Show stage banner with title
+                showStageBanner(segment.title);
+
+                // 2. Separate pre-combat turns from combat turns
+                const preCombatTurns = segment.turns.filter(
+                    t => t.action?.type === 'pre_combat_skill' || t.action?.type === 'pre_combat_fallback'
+                );
+                const combatTurns = segment.turns.filter(
+                    t => t.action?.type !== 'pre_combat_skill' && t.action?.type !== 'pre_combat_fallback'
+                );
+
+                // 3. If there's a pre-combat opportunity, show it in the banner
+                if (preCombatTurns.length > 0) {
+                    await sleep(600); // let banner fade in finish
+                    const pc = preCombatTurns[0];
+                    const icon = pc.result?.success ? '✅' : '❌';
+                    const skillName = pc.action?.name || pc.action?.skillID || 'Skill check';
+                    const narrative = pc.result?.message || '';
+                    const color = pc.result?.success ? '#4cd964' : '#d4484a';
+                    const preCombatEl = document.createElement('div');
+                    preCombatEl.className = 'pre-combat-reveal';
+                    preCombatEl.style.cssText = `color:${color};`;
+                    preCombatEl.innerHTML = `<strong>${icon} ${skillName}</strong> — ${narrative}`;
+                    stageBannerPre.appendChild(preCombatEl);
+                    await sleep(1800); // read the result
+                } else {
+                    await sleep(1200); // brief pause on title alone
+                }
+
+                // 4. Seed hpMaxes and flash-reveal enemies
+                if (segment.participantsSnapshot?.enemies.length > 0) {
                     segment.participantsSnapshot.enemies.forEach(e => {
                         hpMaxes[e.enemyID]   = e.maxHP;
                         hpCurrent[e.enemyID] = e.maxHP;
                     });
-                    renderEnemies(segment.participantsSnapshot.enemies);
+                    await flashAndRevealEnemies(segment.participantsSnapshot.enemies);
                 }
 
-                // Play each turn
-                for (const turn of segment.turns) {
+                await sleep(400); // brief beat before combat turns start
+
+                // 5. Play combat turns (pre-combat already consumed by banner)
+                for (const turn of combatTurns) {
                     const turnDelay = turn.result?.delay || DEFAULT_DELAY;
                     renderTurn(turn, logDisplay, hpMaxes, hpCurrent);
                     updateHealthBars(turn, hpMaxes, hpCurrent);
@@ -141,14 +210,23 @@ async function displayCombatLog(combatData) {
                     await sleep(turnDelay);
                 }
 
-                // Stage summary
-                const summaryEl = document.createElement('div');
-                summaryEl.className = 'combat-turn summary-turn';
-                summaryEl.innerHTML = `
-                    <div class="turn-header" style="color:#aaa;">Stage Complete</div>
-                    <div class="turn-message" style="color:#fff;border-left:3px solid ${segment.status === 'victory' ? '#4caf50' : '#f44336'};padding-left:10px;">${segment.summaryText}</div>
+                // 6. Stage summary — update banner to show outcome, then log it
+                const outcomeColor = segment.status === 'victory' ? '#4cd964' : '#f44336';
+                const outcomeIcon  = segment.status === 'victory' ? '⚔️ Stage Clear' : '💀 Defeated';
+                if (stageBannerPre) {
+                    const summaryEl = document.createElement('div');
+                    summaryEl.style.cssText = `color:${outcomeColor}; margin-top:6px; font-style:normal; font-weight:bold; font-size:0.85rem;`;
+                    summaryEl.textContent = outcomeIcon;
+                    stageBannerPre.appendChild(summaryEl);
+                }
+
+                // Also log the stage summary for the mechanics layer
+                const summaryLogEl = document.createElement('div');
+                summaryLogEl.className = 'combat-turn summary-turn';
+                summaryLogEl.innerHTML = `
+                    <div class="turn-message" style="color:#aaa;border-left:3px solid ${outcomeColor};padding-left:10px;font-style:italic;">${segment.summaryText}</div>
                 `;
-                logDisplay.appendChild(summaryEl);
+                logDisplay.appendChild(summaryLogEl);
                 logDisplay.scrollTop = logDisplay.scrollHeight;
 
                 if (segment.status === 'defeat' || segment.status === 'loss') {
@@ -162,7 +240,7 @@ async function displayCombatLog(combatData) {
                 }
 
                 if (segment !== combatData.segments[combatData.segments.length - 1]) {
-                    await sleep(2000);
+                    await sleep(1800);
                 }
             }
         } else {
@@ -574,6 +652,11 @@ try {
         }
     }
 
+    // Track saved character objects by ID so the loot section can reuse them
+    // without a second getCharacter() call that would return a stale DB snapshot
+    // and overwrite XP we just saved.
+    const savedCharacters = {};
+
     for (const participant of combatData.participants.playerCharacters) {
         const charId = participant.characterID;
         
@@ -583,6 +666,12 @@ try {
 
         const character = await getCharacter(charId);
         if (!character) continue;
+
+        // Log current discovery XP so we can confirm accumulation across combats
+        const discoveries = character.skills.filter(s => s.discovered && (s.skillLevel || 0) < 1);
+        if (discoveries.length > 0) {
+            discoveries.forEach(s => console.log(`[XP] 📖 ${s.skillID} entering combat rewards at XP: ${(s.skillXP||0).toFixed(0)} / 120`));
+        }
 
         const oldLevel = character.level || 1;
 
@@ -708,6 +797,7 @@ try {
         });
 
         await saveCharacterToServer(character);
+        savedCharacters[charId] = character; // keep in-memory for loot section
 
         // --- PATCH: SYNC STATE FOR NEXT COMBAT ---
         if (window.currentState && window.currentState.currentParty) {
@@ -725,36 +815,55 @@ try {
         // --- END PATCH ---
     }
 
-    // Apply Loot
-    if (rewards.lootDropped && rewards.lootDropped.length > 0) {
-        const firstParticipant = combatData.participants.playerCharacters.find(
-            p => !p.characterID.startsWith('import_') && !window.gameData?.bots?.some(b => b.characterID === p.characterID)
-        );
+        // Apply Loot
+        if (rewards.lootDropped && rewards.lootDropped.length > 0) {
+            const firstParticipant = combatData.participants.playerCharacters.find(
+                p => !p.characterID.startsWith('import_') && !window.gameData?.bots?.some(b => b.characterID === p.characterID)
+            );
 
-        if (firstParticipant) {
-            const firstCharId = firstParticipant.characterID;
-            const character = await getCharacter(firstCharId);
-            
-            if (character) {
-                if (!character.inventory) character.inventory = [];
-                rewards.lootDropped.forEach(loot => {
-                    character.inventory.push({ itemID: loot.itemID, rarity: loot.rarity, acquiredAt: Date.now() });
-                });
-                showSafeSuccess(`Loot obtained: ${rewards.lootDropped.map(l => l.itemID).join(', ')}`);
-                await saveCharacterToServer(character);
+            if (firstParticipant) {
+                const firstCharId = firstParticipant.characterID;
+                // Use the already-saved in-memory copy if available — avoids re-fetching
+                // a stale DB snapshot that would overwrite XP we just saved.
+                const character = savedCharacters[firstCharId] || await getCharacter(firstCharId);
+                
+                if (character) {
+                    if (!character.inventory) character.inventory = [];
+                    if (!character.consumables) character.consumables = {};
 
-                if (window.currentState && window.currentState.currentParty) {
-                    const partyIndex = window.currentState.currentParty.findIndex(
-                        m => m.characterID === firstCharId || m.id === firstCharId
-                    );
-                    if (partyIndex !== -1) {
-                        window.currentState.currentParty[partyIndex].inventory = character.inventory;
-                        console.log(`[STATE SYNC] Updated inventory in currentState for ${character.name}`);
+                    const consumableDrops = [];
+                    const inventoryDrops  = [];
+
+                    rewards.lootDropped.forEach(loot => {
+                        const itemDef = window.gameData?.gear?.find(g => g.id === loot.itemID);
+                        if (itemDef?.slot_id1 === 'consumable' || itemDef?.slot === 'consumable') {
+                            character.consumables[loot.itemID] = (character.consumables[loot.itemID] || 0) + 1;
+                            consumableDrops.push(itemDef?.name || loot.itemID);
+                        } else {
+                            character.inventory.push({ itemID: loot.itemID, rarity: loot.rarity, acquiredAt: Date.now() });
+                            inventoryDrops.push(itemDef?.name || loot.itemID);
+                        }
+                    });
+
+                    const allDropNames = [
+                        ...consumableDrops.map(n => `${n} (belt)`),
+                        ...inventoryDrops
+                    ];
+                    showSafeSuccess(`Loot obtained: ${allDropNames.join(', ')}`);
+                    await saveCharacterToServer(character);
+
+                    if (window.currentState && window.currentState.currentParty) {
+                        const partyIndex = window.currentState.currentParty.findIndex(
+                            m => m.characterID === firstCharId || m.id === firstCharId
+                        );
+                        if (partyIndex !== -1) {
+                            window.currentState.currentParty[partyIndex].inventory = character.inventory;
+                            console.log(`[STATE SYNC] Updated inventory in currentState for ${character.name}`);
+                        }
                     }
                 }
             }
         }
-    }
 
     if (typeof renderRoster === 'function') await renderRoster();
     if (window.currentState?.detailCharacterId && typeof showCharacterDetail === 'function') {

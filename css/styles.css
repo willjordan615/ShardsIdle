@@ -791,3 +791,89 @@ select:focus {
     display: block;
     width: 100%;
 }
+
+/* =========================================
+   ENEMY PANEL SLIDE-IN ANIMATION
+   ========================================= */
+@keyframes slideInFromRight {
+    from {
+        opacity: 0;
+        transform: translateX(24px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.combatant-slide-in {
+    animation: slideInFromRight 0.35s ease forwards;
+}
+
+.enemy-panel-placeholder {
+    color: #8b7355;
+    font-style: italic;
+    font-size: 0.9rem;
+    text-align: center;
+    padding: 1.5rem 0;
+    letter-spacing: 1px;
+}
+
+/* =========================================
+   STAGE BANNER
+   ========================================= */
+#stageBanner {
+    margin-bottom: 1.5rem;
+    border: 1px solid #d4af37;
+    border-radius: 6px;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(10,14,39,0.95) 0%, rgba(26,26,46,0.95) 100%);
+}
+
+#stageBannerTitle {
+    padding: 1rem 1.5rem 0.75rem;
+    font-size: 1.3rem;
+    font-weight: bold;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #d4af37;
+    text-align: center;
+    border-bottom: 1px solid rgba(212,175,55,0.2);
+}
+
+#stageBannerPreCombat {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+    font-style: italic;
+    line-height: 1.5;
+    min-height: 0;
+    transition: min-height 0.3s ease;
+}
+
+@keyframes bannerFlash {
+    0%   { background: linear-gradient(135deg, rgba(10,14,39,0.95) 0%, rgba(26,26,46,0.95) 100%); }
+    40%  { background: linear-gradient(135deg, rgba(212,175,55,0.18) 0%, rgba(26,26,46,0.95) 100%); }
+    100% { background: linear-gradient(135deg, rgba(10,14,39,0.95) 0%, rgba(26,26,46,0.95) 100%); }
+}
+
+.banner-flash {
+    animation: bannerFlash 0.45s ease forwards;
+}
+
+@keyframes bannerFadeIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.banner-fade-in {
+    animation: bannerFadeIn 0.4s ease forwards;
+}
+
+@keyframes preCombatReveal {
+    from { opacity: 0; transform: translateX(-6px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+.pre-combat-reveal {
+    animation: preCombatReveal 0.35s ease forwards;
+}

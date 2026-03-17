@@ -162,13 +162,24 @@ router.post('/start', async (req, res) => {
                     const incoming = incomingSkillsMap.get(dbSkill.skillID);
                     
                     if (incoming) {
-                        // Skill was used/discovered: Update XP, Level, UsageCount from result
-                        // We spread dbSkill first to keep any extra DB fields, then overwrite with incoming data
-                        finalSkills.push({ ...dbSkill, ...incoming });
+                        // CRITICAL: For discovery-phase skills (level 0), the engine never
+                        // awards XP — that is frontend-only. Always keep the DB's skillXP
+                        // and skillLevel so the frontend's accumulated progress isn't wiped
+                        // on the next combat's backend save.
+                        const isDiscoveryPhase = (dbSkill.skillLevel || 0) < 1;
+                        if (isDiscoveryPhase) {
+                            finalSkills.push({
+                                ...incoming,
+                                skillXP:    dbSkill.skillXP    ?? incoming.skillXP,
+                                skillLevel: dbSkill.skillLevel ?? incoming.skillLevel,
+                            });
+                        } else {
+                            // Level 1+ skills: engine result is authoritative
+                            finalSkills.push({ ...dbSkill, ...incoming });
+                        }
                         processedSkillIDs.add(dbSkill.skillID);
                     } else {
-                        // Skill exists in DB but NOT in result (e.g., Lunge wasn't used this turn)
-                        // KEEP IT exactly as is to prevent deletion and XP loss
+                        // Skill exists in DB but NOT in result — keep exactly as-is
                         finalSkills.push(dbSkill);
                         processedSkillIDs.add(dbSkill.skillID);
                     }
@@ -190,14 +201,18 @@ router.post('/start', async (req, res) => {
             character.skills = finalSkills;
             // --- PATCH END ---
 
-            // Log newly discovered child skills (XP:0 here is correct — frontend awards XP after this save)
-            const newDiscoveries = finalSkills.filter(s => s.discovered && (s.skillLevel || 0) < 1);
-            if (newDiscoveries.length > 0) {
-                newDiscoveries.forEach(s => {
-                    console.log(`[SKILL SYNC] ✨ ${character.name} has discovered skill: ${s.skillID} (Lv.0, XP:0 — frontend will award discovery XP)`);
-                });
-            }
-            console.log(`[SKILL SYNC] ${character.name}: ${finalSkills.length} skills saved (${newDiscoveries.length} new discoveries this combat).`);
+            // Log only skills that weren't in the DB before this combat (genuinely new this run)
+            const existingDBIds = new Set((character.skills || []).map(s => s.skillID));
+            const trulyNew = finalSkills.filter(s => s.discovered && (s.skillLevel || 0) < 1 && !existingDBIds.has(s.skillID));
+            const inProgress = finalSkills.filter(s => s.discovered && (s.skillLevel || 0) < 1 && existingDBIds.has(s.skillID));
+
+            trulyNew.forEach(s => {
+                console.log(`[SKILL SYNC] ✨ ${character.name} discovered: ${s.skillID} (XP:0 — frontend will award discovery XP)`);
+            });
+            inProgress.forEach(s => {
+                console.log(`[SKILL SYNC] 📖 ${character.name} ${s.skillID}: preserving XP:${(s.skillXP||0).toFixed(0)} from DB`);
+            });
+            console.log(`[SKILL SYNC] ${character.name}: ${finalSkills.length} skills saved (${trulyNew.length} new this combat, ${inProgress.length} in discovery).`);
 
             // 4. Update aggregate stats (wins, losses, etc.)
             combatEngine.updateCombatStats(character, result, challenge);
