@@ -153,13 +153,17 @@ function getDeviceId() {
 /**
  * Return to character detail screen after combat.
  * Reloads the character so XP, loot, and stats are fresh.
+ * Also clears idle loop state since this is only called on hard stops (retreat).
  */
 function returnToHub() {
+    if (window.currentState) {
+        window.currentState.idleActive = false;
+        window.currentState.pendingLoopExit = false;
+    }
     const characterId = window.currentState?.detailCharacterId;
     if (characterId && typeof showCharacterDetail === 'function') {
         showCharacterDetail(characterId);
     } else {
-        // Fallback to roster if no character is loaded
         showScreen('roster');
     }
 }

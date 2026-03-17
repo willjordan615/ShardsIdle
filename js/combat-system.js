@@ -9,6 +9,9 @@ if (typeof window.currentState === 'undefined') {
         currentParty: [],
         selectedBots: [],
         detailCharacterId: null,
+        // Idle loop state
+        idleActive: false,       // true while the auto-restart loop is running
+        pendingLoopExit: false,  // set by "Return from Challenge" — exits after current combat
         // Character creation state (used by character-management.js)
         selectedRace: null,
         selectedSkills: [],
@@ -399,6 +402,11 @@ async function startCombat(forcedChallengeId) {
         // Save Current Challenge ID to Window for Fallback
         window.lastChallengeId = currentState.selectedChallenge.id;
 
+        // Mark the idle loop as active so character detail can show the banner
+        currentState.idleActive = true;
+        currentState.pendingLoopExit = false;
+        updateChallengeStatusBanner();
+
         console.log('[COMBAT] Starting combat:', requestBody.challengeID);
 
         const response = await fetch(`${BACKEND_URL}/api/combat/start`, {
@@ -531,4 +539,66 @@ async function loadPublicCompanions() {
         console.error('Load public companions error:', error);
         container.innerHTML = '<div class="card" style="text-align: center; color: #d4484a; grid-column: 1 / -1;">Failed to load public characters</div>';
     }
+}
+
+/**
+ * Navigate to character detail screen without stopping the idle loop.
+ * Called from the "👤 View Character" button on the combat log screen.
+ */
+function viewCharacterDuringCombat() {
+    const charId = currentState.detailCharacterId;
+    if (charId && typeof showCharacterDetail === 'function') {
+        showCharacterDetail(charId);
+    } else {
+        showScreen('detail');
+    }
+}
+
+/**
+ * Update the challenge status banner on the character detail screen.
+ * Called whenever idleActive or pendingLoopExit changes.
+ */
+function updateChallengeStatusBanner() {
+    const banner    = document.getElementById('challengeStatusBanner');
+    const returnBtn = document.getElementById('returnFromChallengeBtn');
+    const selectBtn = document.getElementById('selectChallengeBtn');
+
+    if (!banner) return;
+
+    if (currentState.idleActive) {
+        const challengeName = currentState.selectedChallenge?.name || 'a challenge';
+
+        if (currentState.pendingLoopExit) {
+            banner.style.display = 'flex';
+            banner.innerHTML = `
+                <span style="color:#ffd700;">⏳ Finishing current challenge...</span>
+                <span style="color:#aaa; font-size:0.85em; margin-left:8px;">Will return here when done.</span>
+            `;
+            // returnFromChallengeBtn was replaced by innerHTML — re-hide not needed
+        } else {
+            banner.style.display = 'flex';
+            banner.innerHTML = `
+                <span style="color:#4cd964;">⚔️ Active:</span>
+                <span style="color:#ffd700; margin-left:6px;">${challengeName}</span>
+                <button id="returnFromChallengeBtn" onclick="requestLoopExit()" class="secondary" style="font-size:0.85rem; padding:6px 14px; margin-left:auto;">⏹ Return from Challenge</button>
+            `;
+        }
+
+        // Hide "Select Challenge" while idle loop is running
+        if (selectBtn) selectBtn.style.display = 'none';
+    } else {
+        banner.style.display = 'none';
+        if (selectBtn) selectBtn.style.display = '';
+    }
+}
+
+/**
+ * Request a graceful exit from the idle loop.
+ * The current combat runs to completion; the loop doesn't restart.
+ */
+function requestLoopExit() {
+    if (!currentState.idleActive) return;
+    currentState.pendingLoopExit = true;
+    updateChallengeStatusBanner();
+    console.log('[IDLE] Loop exit requested — will stop after current combat.');
 }

@@ -320,6 +320,21 @@ async function displayCombatLog(combatData) {
                     clearInterval(interval);
                     const m = document.getElementById('combatResultModal');
                     if (m) m.style.display = 'none';
+
+                    // Graceful exit: player requested loop stop, current combat already finished
+                    if (window.currentState.pendingLoopExit) {
+                        console.log('[IDLE] Pending exit — stopping loop after this combat.');
+                        window.currentState.idleActive = false;
+                        window.currentState.pendingLoopExit = false;
+                        if (typeof updateChallengeStatusBanner === 'function') updateChallengeStatusBanner();
+                        if (typeof showCharacterDetail === 'function' && window.currentState.detailCharacterId) {
+                            showCharacterDetail(window.currentState.detailCharacterId);
+                        } else if (typeof returnToHub === 'function') {
+                            returnToHub();
+                        }
+                        return;
+                    }
+
                     if (typeof startCombat === 'function') {
                         console.log(`[IDLE] Auto-starting: ${targetChallengeId}`);
                         startCombat();
@@ -362,6 +377,12 @@ window.cancelAutoRestart = function() {
     if (window.currentRestartInterval) clearInterval(window.currentRestartInterval);
     const modal = document.getElementById('combatResultModal');
     if (modal) modal.style.display = 'none';
+    // Hard stop — only reached if called outside the countdown (e.g. retreat modal)
+    if (window.currentState) {
+        window.currentState.idleActive = false;
+        window.currentState.pendingLoopExit = false;
+    }
+    if (typeof updateChallengeStatusBanner === 'function') updateChallengeStatusBanner();
     if (typeof returnToHub === 'function') returnToHub();
 };
 

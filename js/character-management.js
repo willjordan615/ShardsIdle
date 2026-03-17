@@ -749,6 +749,8 @@ async function showCharacterDetail(characterId) {
 renderImportBadge(character);
         
         showScreen('detail');
+        // Refresh idle loop status banner whenever character detail is shown
+        if (typeof updateChallengeStatusBanner === 'function') updateChallengeStatusBanner();
     } catch (error) {
         console.error('Error showing character detail:', error);
         showError('Failed to load character details');

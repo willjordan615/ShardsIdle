@@ -94,9 +94,14 @@
 
         <!-- CHARACTER DETAIL SCREEN -->
         <div id="detail" class="screen">
+            <!-- Challenge status banner: shown when idle loop is active -->
+            <div id="challengeStatusBanner" style="display:none; background:rgba(76,217,100,0.08); border:1px solid rgba(76,217,100,0.3); border-radius:6px; padding:10px 14px; margin-bottom:12px; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+                <span>⚔️ Active challenge</span>
+                <button id="returnFromChallengeBtn" onclick="requestLoopExit()" class="secondary" style="display:none; font-size:0.85rem; padding:6px 14px;">⏹ Return from Challenge</button>
+            </div>
             <div class="nav-buttons">
                 <button onclick="showScreen('roster')" class="secondary">← Back to Roster</button>
-                <button onclick="selectCharacterForChallenge(currentState.detailCharacterId)">Select Challenge</button>
+                <button id="selectChallengeBtn" onclick="selectCharacterForChallenge(currentState.detailCharacterId)">Select Challenge</button>
             </div>
 
             <h2 id="detailName">Character Name</h2>
@@ -299,7 +304,7 @@
         <!-- COMBAT LOG SCREEN -->
         <div id="combatlog" class="screen">
             <div class="nav-buttons">
-                <button onclick="showScreen('roster')" class="secondary">← Back to Roster</button>
+                <button onclick="viewCharacterDuringCombat()" class="secondary">👤 View Character</button>
             </div>
 
             <h2>Combat Log</h2>
