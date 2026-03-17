@@ -553,11 +553,20 @@ class CombatEngine {
       combatID,
       result: combatResult,
       totalTurns: globalTurnCount,
-      segments, 
+      segments,  
       turns: segments.flatMap(s => s.turns), 
       participants: {
         playerCharacters: playerCharacters.map(p => ({
-          characterID: p.id, characterName: p.name, maxHP: p.maxHP, finalHP: p.currentHP, maxMana: p.maxMana, finalMana: p.currentMana, maxStamina: p.maxStamina, finalStamina: p.currentStamina, defeated: p.defeated
+          characterID: p.id, 
+          characterName: p.name, 
+          maxHP: p.maxHP, 
+          finalHP: p.currentHP, 
+          maxMana: p.maxMana, 
+          finalMana: p.currentMana, 
+          maxStamina: p.maxStamina, 
+          finalStamina: p.currentStamina, 
+          defeated: p.defeated,
+          skills: p.skills // ✅ ADD THIS LINE TO PRESERVE UPDATED SKILLS
         })),
         enemies: segments[segments.length-1]?.participantsSnapshot.enemies || []
       },

@@ -122,41 +122,64 @@ router.post('/start', async (req, res) => {
             }
         }
 
-        // 4. Update combat stats for all participants
-        if (result.result !== 'retreated' && result.participants?.playerCharacters) {
-            for (const participant of result.participants.playerCharacters) {
-                const importRef = await new Promise((resolve, reject) => {
-                    rawDb.get(
-                        `SELECT * FROM character_imports WHERE import_id = ?`,
+ // 4. Update combat stats AND persist skill progression for all participants
+    if (result.result !== 'retreated' && result.participants?.playerCharacters) {
+        for (const participant of result.participants.playerCharacters) {
+            // Skip imports for DB write (they are handled via original_character_id)
+            if (participant.characterID.startsWith('import_')) {
+                // Still need to update the import usage count
+                await new Promise((resolve, reject) => {
+                    rawDb.run(
+                        `UPDATE character_imports SET times_used = times_used + 1, last_used_at = CURRENT_TIMESTAMP WHERE import_id = ?`,
                         [participant.characterID],
-                        (err, row) => { if (err) reject(err); else resolve(row); }
+                        (err) => { if (err) reject(err); else resolve(); }
                     );
                 });
+                continue; 
+            }
 
-                const targetId = importRef ? importRef.original_character_id : participant.characterID;
+            const targetId = participant.characterID;
+            const character = await db.getCharacter(targetId);
 
-                // Update import usage count if applicable
-                if (importRef) {
-                    await new Promise((resolve, reject) => {
-                        rawDb.run(
-                            `UPDATE character_imports SET times_used = times_used + 1, last_used_at = CURRENT_TIMESTAMP WHERE import_id = ?`,
-                            [participant.characterID],
-                            (err) => { if (err) reject(err); else resolve(); }
-                        );
-                    });
-                    console.log(`[COMBAT] Import used, updating original: ${targetId}`);
-                }
-
-                const character = await db.getCharacter(targetId);
-                if (character) {
-                    combatEngine.updateCombatStats(character, result, challenge);
-                    await db.saveCharacter(character);
-                    console.log(`[STATS] Updated combat stats for ${character.name}`);
+            if (character) {
+                // --- CRITICAL FIX: FORCE SKILL OVERWRITE ---
+                
+                // 1. Find the matching participant in the result (should be 'participant' itself)
+                // We trust the 'participant' object passed in the loop as it comes directly from the engine's final state
+                if (participant.skills && Array.isArray(participant.skills)) {
+                    const oldCount = character.skills ? character.skills.length : 0;
+                    const newCount = participant.skills.length;
+                    
+                    // Overwrite the skills array entirely with the engine's final state
+                    character.skills = participant.skills;
+                    
+                    console.log(`[SKILL SYNC] ${character.name}: Skills updated from ${oldCount} → ${newCount}`);
+                    
+                    // Debug: Check for Lunge specifically
+                    const hasLunge = character.skills.some(s => s.skillID === 'lunge');
+                    if (hasLunge) {
+                        const lunge = character.skills.find(s => s.skillID === 'lunge');
+                        console.log(`[SKILL SYNC] ✅ Lunge found! Level: ${lunge.skillLevel}, XP: ${lunge.skillXP}`);
+                    } else {
+                        console.log(`[SKILL SYNC] ❌ Lunge NOT found in updated skills list.`);
+                        console.log(`[SKILL SYNC] Available IDs:`, character.skills.map(s => s.skillID));
+                    }
                 } else {
-                    console.warn(`[STATS] Character ${targetId} not found, skipping stats update.`);
+                    console.warn(`[SKILL SYNC] ⚠️ No skills array found in participant data for ${character.name}`);
                 }
+                // -------------------------------------------
+
+                // 2. Update aggregate stats (wins, losses, etc.)
+                combatEngine.updateCombatStats(character, result, challenge);
+
+                // 3. SAVE TO DATABASE
+                await db.saveCharacter(character);
+                console.log(`[DB SAVE] ✅ Successfully saved ${character.name} (Skills Count: ${character.skills.length})`);
+            } else {
+                console.warn(`[DB SAVE] ⚠️ Character ${targetId} not found. Skipping.`);
             }
         }
+    }
 
         // 5. Persist combat log
         if (result.shouldPersist && result.result !== 'retreated') {
