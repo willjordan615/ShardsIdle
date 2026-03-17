@@ -165,6 +165,10 @@ async function equipItem(character, itemId, inventoryIndex) {
     await saveCharacterToServer(character);
     await showCharacterDetail(character.id);
     closeModal('equipmentSwapModal');
+
+    // Destroy tooltip after DOM rebuilds
+    if (typeof destroyGearTooltip === 'function') destroyGearTooltip();
+
     showSuccess(`${item.name} equipped!`);
 }
 
@@ -173,10 +177,8 @@ async function equipItem(character, itemId, inventoryIndex) {
  * Unequip an item
  */
 async function unequipItem(character, slot) {
-    // ✅ FIX: Force close any open tooltips immediately upon click
-    if (typeof destroyGearTooltip === 'function') {
-        destroyGearTooltip();
-    }
+    // Force close any open tooltips immediately upon click
+    if (typeof destroyGearTooltip === 'function') destroyGearTooltip();
 
     const itemId = character.equipment[slot];
     if (!itemId) return;
@@ -193,6 +195,11 @@ async function unequipItem(character, slot) {
     await saveCharacterToServer(character);
     await showCharacterDetail(character.id);
     await showEquipmentSwap();
+
+    // Destroy again after DOM rebuilds — mouse may still be hovering
+    // over the same position, triggering a new tooltip on the redrawn card
+    if (typeof destroyGearTooltip === 'function') destroyGearTooltip();
+
     showSuccess('Item unequipped');
 }
 

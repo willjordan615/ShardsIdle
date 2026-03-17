@@ -1,6 +1,38 @@
 // combat-system.js
 // Handles challenge selection, party formation, and combat execution
 
+// ✅ 1. DECLARE GLOBAL STATE ONCE (guarded against double-load)
+if (typeof window.currentState === 'undefined') {
+    window.currentState = {
+        // Combat state
+        selectedChallenge: null,
+        currentParty: [],
+        selectedBots: [],
+        detailCharacterId: null,
+        // Character creation state (used by character-management.js)
+        selectedRace: null,
+        selectedSkills: [],
+        selectedWeaponType: null,
+        allocatedStats: { conviction: 0, endurance: 0, ambition: 0, harmony: 0 },
+        pointsRemaining: 25
+    };
+}
+var currentState = window.currentState;
+
+/**
+ * Escape a string for safe use in HTML attribute values and content.
+ * FIX #4: Replaces the old single-quote-only escape with full HTML escaping
+ * to prevent XSS via crafted character names or race values.
+ */
+function escapeHtml(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+
 /**
  * Render available challenges
  */
@@ -8,9 +40,14 @@ function renderChallenges() {
     const container = document.getElementById('challengeContainer');
     if (!container) return;
     
+    if (!window.gameData || !window.gameData.challenges) {
+        console.error('[CHALLENGES] gameData not loaded yet.');
+        return;
+    }
+
     container.innerHTML = '';
     
-    gameData.challenges.forEach(challenge => {
+    window.gameData.challenges.forEach(challenge => {
         const card = document.createElement('div');
         card.className = 'card';
         card.onclick = async () => await selectChallenge(challenge);
@@ -46,7 +83,7 @@ async function selectChallenge(challenge) {
     currentState.selectedChallenge = challenge;
     currentState.selectedBots = [];
     currentState.currentParty = [];
-    renderPartyFormation();
+    await renderPartyFormation();
     showScreen('party');
 }
 
@@ -54,7 +91,12 @@ async function selectChallenge(challenge) {
  * Render party formation screen
  */
 async function renderPartyFormation() {
-    const character = await getCharacter(currentState.detailCharacterId);  // ← ADD await
+    if (!currentState.detailCharacterId) {
+        showError('No character selected.');
+        return;
+    }
+
+    const character = await getCharacter(currentState.detailCharacterId);
     if (!character) {
         showError('Failed to load character');
         return;
@@ -64,8 +106,11 @@ async function renderPartyFormation() {
     const challenge = currentState.selectedChallenge;
     if (!challenge) return;
     
-    document.getElementById('partyChallengeName').textContent = challenge.name;
-    document.getElementById('partyChallengeMeta').textContent = 
+    const nameEl = document.getElementById('partyChallengeName');
+    const metaEl = document.getElementById('partyChallengeMeta');
+    
+    if (nameEl) nameEl.textContent = challenge.name;
+    if (metaEl) metaEl.textContent = 
         `Difficulty ${challenge.difficulty} • Recommended Level ${challenge.recommendedLevel}`;
     
     renderCurrentParty();
@@ -107,8 +152,9 @@ function renderBotsSelection() {
     container.innerHTML = '';
     
     const challenge = currentState.selectedChallenge;
+    if (!challenge || !window.gameData || !window.gameData.bots) return;
     
-    gameData.bots.forEach(bot => {
+    window.gameData.bots.forEach(bot => {
         const isSelected = currentState.currentParty.some(m => m.characterID === bot.characterID);
         const canAdd = currentState.currentParty.length < challenge.maxPartySize && !isSelected;
         
@@ -145,6 +191,8 @@ function renderBotsSelection() {
  */
 function addBotToParty(bot) {
     const challenge = currentState.selectedChallenge;
+    if (!challenge) return;
+
     if (currentState.currentParty.length < challenge.maxPartySize) {
         currentState.currentParty.push(JSON.parse(JSON.stringify(bot)));
         currentState.selectedBots.push(bot.characterID);
@@ -178,6 +226,10 @@ function removeFromParty(idx) {
  */
 function confirmPartyAndStart() {
     const challenge = currentState.selectedChallenge;
+    if (!challenge) {
+        showError('No challenge selected.');
+        return;
+    }
     if (currentState.currentParty.length < challenge.minPartySize) {
         showError(`This challenge requires at least ${challenge.minPartySize} party members.`);
         return;
@@ -225,10 +277,8 @@ function showCompanionTab(tab) {
 
 /**
  * Add a public character to the current party
- * ADDED: For savestate sharing system
  */
 async function addPublicCompanion(shareCode, characterName, level, race) {
-    // Check party size limit
     const challenge = currentState.selectedChallenge;
     const maxPartySize = challenge?.maxPartySize || 4;
     
@@ -238,7 +288,6 @@ async function addPublicCompanion(shareCode, characterName, level, race) {
     }
     
     try {
-        // Import the character first to get a reference
         const response = await fetch(`${BACKEND_URL}/api/character/import/${shareCode}`);
         
         if (!response.ok) {
@@ -248,15 +297,14 @@ async function addPublicCompanion(shareCode, characterName, level, race) {
         
         const data = await response.json();
 
-        // Prevent a player from using their own exported character as a companion.
-        // Check against every non-imported party member (i.e. characters they own).
         const deviceId = getDeviceId();
-        if (!isDevMode() && deviceId && data.importReference.ownerUserId === deviceId) {
+        // Prevent using own character as companion
+        if (deviceId && data.importReference.ownerUserId === deviceId) {
             showError('You cannot use your own character as a companion.');
             return;
         }
 
-        // Also prevent adding the same import twice
+        // Prevent duplicates
         const alreadyInParty = currentState.currentParty.some(
             m => m.originalCharacterId === data.importReference.originalCharacterId
         );
@@ -265,19 +313,23 @@ async function addPublicCompanion(shareCode, characterName, level, race) {
             return;
         }
 
-        // Add to current party
+        // FIX #1: Include stats, skills, consumables, and equipment so startCombat
+        // can build a valid partySnapshot for imported characters.
         currentState.currentParty.push({
             characterID: data.importReference.importId,
             characterName: data.importReference.originalCharacterName,
             level: data.importReference.level,
             race: data.importReference.race,
+            stats: data.importReference.stats || {},
+            skills: data.importReference.skills || [],
+            consumables: data.importReference.consumables || {},
+            equipment: data.importReference.equipment || {},
             isImported: true,
             isBot: false,
             originalCharacterId: data.importReference.originalCharacterId,
             canReExport: false
         });
         
-        // Save to localStorage for persistence
         const savedImports = JSON.parse(localStorage.getItem('importedCharacters') || '[]');
         savedImports.push({
             characterID: data.importReference.importId,
@@ -292,7 +344,9 @@ async function addPublicCompanion(shareCode, characterName, level, race) {
         });
         localStorage.setItem('importedCharacters', JSON.stringify(savedImports));
         
-        showSuccess(`Added ${characterName} to party!`);
+        // FIX #2: Use the confirmed server name instead of the raw parameter
+        // to ensure the success message reflects what was actually imported.
+        showSuccess(`Added ${data.importReference.originalCharacterName} to party!`);
         renderCurrentParty();
         renderBotsSelection();
         
@@ -304,9 +358,27 @@ async function addPublicCompanion(shareCode, characterName, level, race) {
 
 /**
  * Start combat
+ * @param {string} [forcedChallengeId] - Optional ID to override currentState.selectedChallenge (for auto-retry)
  */
-async function startCombat() {
+async function startCombat(forcedChallengeId) {
     try {
+        // ✅ FIX: Handle Forced Challenge ID (for Auto-Retry Loop)
+        if (forcedChallengeId) {
+            if (!window.gameData || !window.gameData.challenges) {
+                throw new Error('Game data not loaded yet.');
+            }
+            const newChallenge = window.gameData.challenges.find(c => c.id === forcedChallengeId);
+            if (!newChallenge) {
+                throw new Error(`Challenge not found: ${forcedChallengeId}`);
+            }
+            currentState.selectedChallenge = newChallenge;
+            console.log(`[COMBAT] Force-starting challenge: ${forcedChallengeId}`);
+        }
+
+        if (!currentState.selectedChallenge) {
+            throw new Error('No challenge selected.');
+        }
+
         const partySnapshots = currentState.currentParty.map(member => ({
             characterID: member.characterID || member.id,
             characterName: member.characterName || member.name,
@@ -314,38 +386,42 @@ async function startCombat() {
             stats: member.stats,
             skills: member.skills,
             consumables: member.consumables || {},
-            equipment: member.equipment
+            equipment: member.equipment,
+            isImported: member.isImported || false
         }));
-        
+
         const requestBody = {
             partySnapshots,
             challengeID: currentState.selectedChallenge.id,
-            challenges: gameData.challenges
+            challenges: window.gameData.challenges
         };
-        
-        console.log('[COMBAT] Starting combat with request:', requestBody.challengeID);
+
+        // Save Current Challenge ID to Window for Fallback
+        window.lastChallengeId = currentState.selectedChallenge.id;
+
+        console.log('[COMBAT] Starting combat:', requestBody.challengeID);
 
         const response = await fetch(`${BACKEND_URL}/api/combat/start`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(requestBody)
         });
-        
+
         if (!response.ok) {
             throw new Error(`Server error: ${response.status}`);
         }
-        
+
         const combatResult = await response.json();
-        
+
         console.log('[COMBAT] Server response received. Result:', combatResult.result);
         
-        // ✅ FIX: Switch to the combat screen IMMEDIATELY
-        showScreen('combatlog'); 
+        if (combatResult.nextChallengeId) {
+            console.log('[COMBAT] Server suggests next challenge:', combatResult.nextChallengeId);
+        }
 
-        // ✅ THEN start the playback (which will now be visible)
-        // We remove 'await' here so the function returns immediately and doesn't block UI
+        showScreen('combatlog'); 
         displayCombatLog(combatResult); 
-        
+
     } catch (error) {
         console.error('Combat error:', error);
         showError('Failed to start combat: ' + error.message);
@@ -354,7 +430,6 @@ async function startCombat() {
 
 /**
  * Load public characters for companion selection
- * ADDED: For savestate sharing system
  */
 async function loadPublicCompanions() {
     const container = document.getElementById('publicCompanionsList');
@@ -363,18 +438,24 @@ async function loadPublicCompanions() {
     container.innerHTML = '<div class="card" style="text-align: center; color: #8b7355; grid-column: 1 / -1;">Loading...</div>';
     
     try {
-        const level = document.getElementById('publicLevelFilter')?.value || '';
-        const sortBy = document.getElementById('publicSortFilter')?.value || 'imports';
-        const search = document.getElementById('publicSearchFilter')?.value || '';
+        const levelFilter = document.getElementById('publicLevelFilter');
+        const sortFilter = document.getElementById('publicSortFilter');
+        const searchFilter = document.getElementById('publicSearchFilter');
+
+        const level = levelFilter ? levelFilter.value : '';
+        const sortBy = sortFilter ? sortFilter.value : 'imports';
+        const search = searchFilter ? searchFilter.value : '';
         
-        const params = new URLSearchParams({ level, sortBy, limit: '20' });
+        // FIX #3: Only append 'level' if it has a value, to avoid sending
+        // an empty level= param that may cause unintended server-side filtering.
+        const params = new URLSearchParams({ sortBy, limit: '20' });
+        if (level) params.append('level', level);
         const response = await fetch(`${BACKEND_URL}/api/character/browse?${params}`);
         
         if (!response.ok) throw new Error('Failed to load');
         
         const data = await response.json();
         
-        // Filter by search term
         let characters = data.characters;
         if (search) {
             const searchLower = search.toLowerCase();
@@ -390,42 +471,64 @@ async function loadPublicCompanions() {
         }
         
         const deviceId = getDeviceId();
-        container.innerHTML = characters.map(char => {
+
+        // FIX #4: Build cards using DOM methods and data-* attributes instead of
+        // inline onclick strings, eliminating the XSS risk from user-supplied
+        // character names and race values that previously only escaped single quotes.
+        container.innerHTML = '';
+        characters.forEach(char => {
             const stats = char.combatStats || {};
-            const isOwn = !isDevMode() && char.ownerUserId && char.ownerUserId === deviceId;
+            const isOwn = deviceId && char.ownerUserId && char.ownerUserId === deviceId;
             const alreadyAdded = currentState.currentParty.some(m => m.originalCharacterId === char.originalCharacterId);
             const disabled = isOwn || alreadyAdded;
             const disabledLabel = isOwn ? 'Your Character' : alreadyAdded ? 'Already in Party' : null;
-            return `
-                <div class="card"
-                    ${disabled ? 'style="opacity:0.45;cursor:not-allowed;"' : `onclick="addPublicCompanion('${char.shareCode}', '${char.characterName.replace(/'/g, "\'")}', ${char.level}, '${char.race}')" style="cursor:pointer;"`}>
-                    <div class="card-title">${char.characterName}</div>
-                    <div class="card-subtitle">Level ${char.level} ${char.race}</div>
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-top: 0.5rem;">
-                        <div style="background: rgba(10, 14, 39, 0.6); padding: 0.25rem; border-radius: 4px; text-align: center;">
-                            <div style="color: #8b7355; font-size: 0.7rem;">Wins</div>
-                            <div style="color: #4cd964; font-weight: bold;">${stats.wins || 0}</div>
-                        </div>
-                        <div style="background: rgba(10, 14, 39, 0.6); padding: 0.25rem; border-radius: 4px; text-align: center;">
-                            <div style="color: #8b7355; font-size: 0.7rem;">Win Rate</div>
-                            <div style="color: #d4af37; font-weight: bold;">${stats.winRate || '0.000'}</div>
-                        </div>
+
+            const card = document.createElement('div');
+            card.className = 'card';
+
+            if (disabled) {
+                card.style.opacity = '0.45';
+                card.style.cursor = 'not-allowed';
+            } else {
+                card.style.cursor = 'pointer';
+                card.dataset.shareCode = char.shareCode;
+                card.dataset.characterName = char.characterName;
+                card.dataset.level = char.level;
+                card.dataset.race = char.race;
+                card.addEventListener('click', () => {
+                    addPublicCompanion(
+                        card.dataset.shareCode,
+                        card.dataset.characterName,
+                        Number(card.dataset.level),
+                        card.dataset.race
+                    );
+                });
+            }
+
+            card.innerHTML = `
+                <div class="card-title">${escapeHtml(char.characterName)}</div>
+                <div class="card-subtitle">Level ${char.level} ${escapeHtml(char.race)}</div>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-top: 0.5rem;">
+                    <div style="background: rgba(10, 14, 39, 0.6); padding: 0.25rem; border-radius: 4px; text-align: center;">
+                        <div style="color: #8b7355; font-size: 0.7rem;">Wins</div>
+                        <div style="color: #4cd964; font-weight: bold;">${stats.wins || 0}</div>
                     </div>
-                    <div style="margin-top: 0.5rem; color: #8b7355; font-size: 0.75rem; text-align: center;">
-                        Imported by ${char.importCount || 0} players
+                    <div style="background: rgba(10, 14, 39, 0.6); padding: 0.25rem; border-radius: 4px; text-align: center;">
+                        <div style="color: #8b7355; font-size: 0.7rem;">Win Rate</div>
+                        <div style="color: #d4af37; font-weight: bold;">${stats.winRate || '0.000'}</div>
                     </div>
-                    <button class="secondary" style="width: 100%; margin-top: 0.5rem; font-size: 0.85rem;" ${disabled ? 'disabled' : ''}>${disabledLabel || 'Add to Party'}</button>
                 </div>
+                <div style="margin-top: 0.5rem; color: #8b7355; font-size: 0.75rem; text-align: center;">
+                    Imported by ${char.importCount || 0} players
+                </div>
+                <button class="secondary" style="width: 100%; margin-top: 0.5rem; font-size: 0.85rem;" ${disabled ? 'disabled' : ''}>${disabledLabel || 'Add to Party'}</button>
             `;
-        }).join('');
+
+            container.appendChild(card);
+        });
         
     } catch (error) {
         console.error('Load public companions error:', error);
         container.innerHTML = '<div class="card" style="text-align: center; color: #d4484a; grid-column: 1 / -1;">Failed to load public characters</div>';
     }
 }
-
-
-
-
-

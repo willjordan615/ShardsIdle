@@ -13,17 +13,8 @@ let gameData = {
     characters: []
 };
 
-let currentState = {
-    detailCharacterId: null,
-    selectedChallenge: null,
-    currentParty: [],
-    selectedBots: [],
-    selectedRace: null,
-    selectedSkills: [],
-    selectedWeaponType: null,
-    allocatedStats: { conviction: 0, endurance: 0, ambition: 0, harmony: 0 },
-    pointsRemaining: 25
-};
+// NOTE: currentState is declared and owned by combat-system.js.
+// Access it via the global `currentState` or `window.currentState`.
 
 /**
  * Initialize the game by loading all data from backend and localStorage

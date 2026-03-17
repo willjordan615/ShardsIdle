@@ -1,4 +1,4 @@
 @echo off
-cd C:\Users\wtsna\Desktop\NewGame\backend
+cd C:\Users\wtsna\Desktop\ShardsIdle\backend
 npm start
 pause
