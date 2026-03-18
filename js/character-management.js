@@ -957,18 +957,22 @@ async function openSkillSwapModal(character, slotIndex) {
     const otherSlotSkillID = character.skills[otherSlotIndex]?.skillID;
     const currentSlotSkillID = character.skills[slotIndex]?.skillID;
 
-    // Filter Equippable Skills
+    // Filter equippable skills:
+    // - Must be a starter skill OR owned at level 1+
+    // - Must not be the skill already in THIS slot (no-op swap)
+    // - CONSUMABLE skills are excluded
+    // Note: the skill in the OTHER slot IS included — swapping the two equipped
+    // skills is valid and should always be available.
     const equippableSkills = window.gameData.skills.filter(s => {
         if (s.category && s.category.includes('CONSUMABLE')) return false;
-        
+
         const isStarter = s.isStarterSkill === true;
         const ownedRecord = character.skills.find(rec => rec.skillID === s.id);
         const isOwnedAndUnlocked = ownedRecord && (ownedRecord.skillLevel || 0) >= 1;
-        
+
         if (!isStarter && !isOwnedAndUnlocked) return false;
-        if (s.id === otherSlotSkillID) return false; // Prevent duplicate in other slot
-        if (s.id === currentSlotSkillID) return false; // Prevent selecting current
-        
+        if (s.id === currentSlotSkillID) return false; // already in this slot
+
         return true;
     });
 
@@ -1044,25 +1048,35 @@ async function confirmSkillSwap(character, slotIndex, newSkillID) {
         skillToUnequip = oldSkillRecord;
     }
 
-    // 3. Rebuild the Skills Array Cleanly
-    // FIX: previous code always pushed newSkill first, so swapping slot 1 silently
-    // placed the new skill into slot 0 and the other skill into slot 1.
-    // We now respect slotIndex when ordering the first two entries.
-
-    const otherSlotIndex  = slotIndex === 0 ? 1 : 0;
-    const otherSlotID     = character.skills[otherSlotIndex]?.skillID;
+    // 3. Rebuild the skills array cleanly, respecting slotIndex.
+    const otherSlotIndex   = slotIndex === 0 ? 1 : 0;
+    const otherSlotID      = character.skills[otherSlotIndex]?.skillID;
     const otherSkillRecord = character.skills.find(s => s.skillID === otherSlotID);
 
-    // Skills beyond index 1 that are not being moved into a slot
+    // Determine what goes into the OTHER slot after this swap:
+    // - If the player picked the skill that's currently in the other slot,
+    //   the old skill from THIS slot should move there (a clean slot-swap).
+    // - Otherwise the other slot stays as-is and the old skill moves to unequipped.
+    const isSlotSwap = (newSkillID === otherSlotID);
+
+    let newOtherSlotRecord;
+    if (isSlotSwap) {
+        // The old skill from the current slot takes the other slot's place
+        newOtherSlotRecord = oldSkillRecord || null;
+    } else {
+        newOtherSlotRecord = otherSkillRecord || null;
+    }
+
+    // Skills beyond index 1 that are not being moved into either slot
     const unequippedSkills = character.skills.filter((s, idx) => {
-        if (idx === 0 || idx === 1) return false;      // skip equipped pair
-        if (s.skillID === newSkillID) return false;    // being promoted to a slot
-        if (s.skillID === otherSlotID) return false;   // safety
+        if (idx === 0 || idx === 1) return false;       // skip current equipped pair
+        if (s.skillID === newSkillID) return false;     // moving to this slot
+        if (isSlotSwap && s.skillID === otherSlotID) return false; // moving to other slot
         return true;
     });
 
-    // If the kicked-out skill is not already in the pool, add it
-    if (skillToUnequip && !unequippedSkills.some(s => s.skillID === skillToUnequip.skillID)) {
+    // If we're not doing a slot-swap, the kicked-out old skill goes to unequipped
+    if (!isSlotSwap && skillToUnequip && !unequippedSkills.some(s => s.skillID === skillToUnequip.skillID)) {
         unequippedSkills.push(skillToUnequip);
     }
 
@@ -1070,9 +1084,9 @@ async function confirmSkillSwap(character, slotIndex, newSkillID) {
     const finalSkills = [];
     if (slotIndex === 0) {
         finalSkills.push(newSkillRecord);
-        if (otherSkillRecord) finalSkills.push(otherSkillRecord);
+        if (newOtherSlotRecord) finalSkills.push(newOtherSlotRecord);
     } else {
-        if (otherSkillRecord) finalSkills.push(otherSkillRecord);
+        if (newOtherSlotRecord) finalSkills.push(newOtherSlotRecord);
         finalSkills.push(newSkillRecord);
     }
     finalSkills.push(...unequippedSkills);

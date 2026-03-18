@@ -679,7 +679,8 @@ class CombatEngine {
           maxStamina: p.maxStamina, 
           finalStamina: p.currentStamina, 
           defeated: p.defeated,
-          skills: p.skills // ✅ ADD THIS LINE TO PRESERVE UPDATED SKILLS
+          skills: p.skills, // preserve updated skills
+          consumables: p.consumables // preserve decremented consumable quantities
         })),
         enemies: segments[segments.length-1]?.participantsSnapshot.enemies || []
       },
@@ -1274,11 +1275,13 @@ class CombatEngine {
         if (cat === 'BUFF' || cat === 'DEFENSE') score *= 0.5;
     }
 
-    // ── Buff window — small bonus for buffing when healthy ──
+    // ── Buff window — bonus for buffing when healthy and not outnumbered ──
+    // Reduce DEFENSE value when enemies outnumber the party — pressure demands damage, not self-buffing.
     if ((cat === 'BUFF' || cat === 'DEFENSE') &&
-        character.currentHP > character.maxHP * 0.6 &&
+        character.currentHP > character.maxHP * 0.75 &&
         resourceRatio > 0.5) {
-        score *= 1.2;
+        const enemyPressure = aliveEnemies.length > players.filter(p => !p.defeated).length;
+        score *= enemyPressure ? 0.6 : 1.15;
     }
 
     // ── Support profile: HEALING_AOE bonus when 2+ allies are hurt ──
@@ -1614,6 +1617,22 @@ class CombatEngine {
         actor.currentStamina = Math.max(0, actor.currentStamina - skill.costAmount);
     } else if (skill.costType === 'mana') {
         actor.currentMana = Math.max(0, actor.currentMana - skill.costAmount);
+    }
+
+    // Decrement consumable belt quantity if this skill came from a belt item
+    if (actor.type === 'player' && actor.consumables && typeof actor.consumables === 'object') {
+        const consumables = actor.consumables;
+        for (const [consumableId, qty] of Object.entries(consumables)) {
+            if (qty <= 0) continue;
+            const itemDef = this.gear.find(g => g.id === consumableId);
+            if (!itemDef) continue;
+            const itemSkillId = itemDef.skillID || itemDef.effect_skillid;
+            if (itemSkillId === skill.id) {
+                consumables[consumableId]--;
+                console.log(`[CONSUMABLE] ${actor.name} used ${itemDef.name} (${consumables[consumableId]} remaining)`);
+                break;
+            }
+        }
     }
 
     // Get skill level

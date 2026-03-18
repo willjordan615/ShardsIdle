@@ -6,7 +6,9 @@
 //       character-management.js and ui-helpers.js respectively.
 //       Do not redefine them here.
 
-const BACKEND_URL = 'http://localhost:3001';
+// Empty string = use same origin. Works whether running locally (localhost:3001)
+// or deployed to any host, since the backend always serves the frontend.
+const BACKEND_URL = '';
 
 let gameData = {
     races: [],

@@ -361,12 +361,16 @@ async function displayCombatLog(combatData) {
         if (modal) modal.style.display = 'flex';
 
         // Trigger rewards and/or countdown
+        // applyCombatRewards always runs — it handles skill XP on all outcomes.
+        // Character XP and loot only apply on victory (rewards object will be empty otherwise).
         if (finalResult === 'victory') {
             await applyCombatRewards(combatData);
             startCountdown(window.victoryCountdownSeconds || 7, nextId);
         } else if (finalResult === 'loss' || finalResult === 'defeat') {
+            await applyCombatRewards(combatData);
             startCountdown(5, nextId);
         } else if (finalResult === 'retreated') {
+            await applyCombatRewards(combatData);
             setTimeout(() => {
                 if (modal) modal.style.display = 'none';
                 if (typeof returnToHub === 'function') returnToHub();
@@ -735,11 +739,9 @@ function updateResourceBars(resourceStates) {
 // --- REWARD PROCESSOR ---
 async function applyCombatRewards(combatData) {
 try {
-    const rewards = combatData.rewards;
-    if (!rewards) {
-        console.warn('[REWARDS] No rewards in combat data.');
-        return;
-    }
+    // rewards may be null on defeat/retreat — skill XP should still apply.
+    // Treat missing rewards as empty rather than bailing out early.
+    const rewards = combatData.rewards || { experienceGained: {}, lootDropped: [] };
 
     const allTurns = combatData.segments
         ? combatData.segments.flatMap(s => s.turns)
@@ -942,6 +944,7 @@ try {
                 window.currentState.currentParty[partyIndex].skills = character.skills;
                 window.currentState.currentParty[partyIndex].experience = character.experience;
                 window.currentState.currentParty[partyIndex].level = character.level;
+                window.currentState.currentParty[partyIndex].consumables = character.consumables;
                 console.log(`[STATE SYNC] Updated currentState for ${character.name} (Skills: ${character.skills.length})`);
             }
         }

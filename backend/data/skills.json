@@ -2229,7 +2229,7 @@
     "effects": [
       {
         "type": "apply_debuff",
-        "targets": "self",
+        "targets": "single_enemy",
         "debuff": "confused",
         "chance": 1.0,
         "duration": 2,
@@ -2237,7 +2237,7 @@
       },
       {
         "type": "apply_debuff",
-        "targets": "self",
+        "targets": "single_enemy",
         "debuff": "dazed",
         "chance": 1.0,
         "duration": 2,

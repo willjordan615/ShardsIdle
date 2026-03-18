@@ -123,7 +123,7 @@ router.post('/start', async (req, res) => {
         }
 
  // 4. Update combat stats AND persist skill progression for all participants
-    if (result.result !== 'retreated' && result.participants?.playerCharacters) {
+    if (result.participants?.playerCharacters) {
         for (const participant of result.participants.playerCharacters) {
             // Skip imports for DB write (they are handled via original_character_id)
             if (participant.characterID.startsWith('import_')) {
