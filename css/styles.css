@@ -52,8 +52,8 @@
     --space-xl:  2rem;
     --space-2xl: 3rem;
 
-    --font-display: 'Cinzel', 'Palatino Linotype', 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', serif;
-    --font-body:    'Lato', 'Segoe UI', 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
+    --font-display: 'Cinzel', 'Palatino Linotype', serif;
+    --font-body:    'Lato', 'Segoe UI', sans-serif;
 
     --radius-sm: 3px;
     --radius-md: 6px;
@@ -1125,7 +1125,6 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
     height: 22px;
     border-radius: 4px;
     font-size: 0.75rem;
-    font-family: 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
     cursor: help;
     border: 1px solid transparent;
     transition: transform 0.1s ease, border-color 0.1s ease;
@@ -1147,31 +1146,28 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
     border-color: rgba(76, 217, 100, 0.35);
 }
 
-/* Tooltip via title attribute is handled by browser natively,
-   but we style a custom tooltip for better readability */
+/* Custom tooltip — reads data-tooltip, avoids browser native title conflict */
 .status-pip::after {
-    content: attr(title);
+    content: attr(data-tooltip);
     position: absolute;
-    bottom: calc(100% + 6px);
+    bottom: calc(100% + 8px);
     left: 50%;
     transform: translateX(-50%);
     background: rgba(7, 10, 24, 0.97);
     color: var(--text-primary);
     font-family: var(--font-body);
-    font-size: 0.72rem;
+    font-size: 0.78rem;
+    font-weight: 500;
     line-height: 1.4;
     white-space: nowrap;
-    padding: 0.35rem 0.6rem;
-    border-radius: 3px;
-    border: 1px solid rgba(139, 115, 85, 0.4);
+    padding: 0.4rem 0.7rem;
+    border-radius: 4px;
+    border: 1px solid rgba(139, 115, 85, 0.45);
     pointer-events: none;
     opacity: 0;
-    transition: opacity 0.15s ease;
-    z-index: 100;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.6);
-    max-width: 220px;
-    white-space: normal;
-    text-align: center;
+    transition: opacity 0.12s ease;
+    z-index: 200;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.7);
 }
 
 .status-pip:hover::after {

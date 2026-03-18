@@ -236,11 +236,11 @@ async function displayCombatLog(combatData) {
                 }
 
                 // Post-stage sweep: ensure all enemies at 0 HP are visually defeated.
-                // Catches kills from procs, DoTs, or any path that didn't fire animateHit with isDefeat=true.
+                // Uses finalHP from the engine snapshot as the authoritative source —
+                // hpCurrent tracking misses kills from procs and DoTs.
                 if (segment.participantsSnapshot?.enemies) {
                     segment.participantsSnapshot.enemies.forEach(e => {
-                        const currentHP = hpCurrent[e.enemyID] ?? e.finalHP ?? 0;
-                        if (currentHP <= 0 || e.defeated) {
+                        if (e.finalHP <= 0 || e.defeated) {
                             const outer = document.getElementById(`enemy-${e.enemyID}`);
                             if (outer) {
                                 const inner = outer.querySelector('.combatant-inner') || outer;
@@ -595,7 +595,8 @@ function updateStatusEffects(combatantId, statuses) {
     el.innerHTML = statuses.map(s => {
         const info = data[s.id] || { emoji: '⚠️', tooltip: s.id, type: 'debuff' };
         const cls  = info.type === 'buff' ? 'status-pip status-pip-buff' : 'status-pip status-pip-debuff';
-        return `<span class="${cls}" title="${info.tooltip} (${s.duration} turns)">${info.emoji}</span>`;
+        const label = info.type === 'buff' ? info.tooltip : info.tooltip;
+        return `<span class="${cls}" data-tooltip="${label} (${s.duration}t)">${info.emoji}</span>`;
     }).join('');
 }
 
