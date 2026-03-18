@@ -12,7 +12,7 @@
         <header>
             <h1>Shards Idle</h1>
             <p class="subtitle">An Asynchronous Group-Based PvE RPG</p>
-            <button onclick="openSettings()" class="settings-btn secondary" title="Settings">⚙ Settings</button>
+            <button id="settingsOpenBtn" class="settings-btn secondary" title="Settings">⚙ Settings</button>
         </header>
 
         <!-- ROSTER SCREEN -->
@@ -986,3 +986,5 @@
 
     // Apply on load
     document.addEventListener('DOMContentLoaded', () => {
+        const settingsBtn = document.getElementById('settingsOpenBtn');
+        if (settingsBtn) settingsBtn.addEventListener('click', openSettings);
