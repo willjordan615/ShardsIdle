@@ -311,25 +311,62 @@ class CombatEngine {
       const stats = snapshot.stats || { conviction: 0, endurance: 0, ambition: 0, harmony: 0 };
       const skills = Array.isArray(snapshot.skills) ? snapshot.skills : [];
       const level = snapshot.level || 1;
+      const equipment = snapshot.equipment || {};
+
+      // Apply stat bonuses from all equipped items (weapons + armor)
+      // Items carry short-name stat fields (con, end, amb, har) that boost character stats.
+      const statFieldMap = { con: 'conviction', end: 'endurance', amb: 'ambition', har: 'harmony' };
+      const equipmentSlots = ['mainHand', 'offHand', 'head', 'chest', 'legs', 'hands', 'feet', 'accessory1', 'accessory2'];
+      const boostedStats = { ...stats }; // don't mutate the original snapshot stats
+      equipmentSlots.forEach(slot => {
+        const itemId = equipment[slot];
+        if (!itemId) return;
+        const itemDef = this.gear.find(g => g.id === itemId);
+        if (!itemDef) return;
+        Object.entries(statFieldMap).forEach(([shortKey, longKey]) => {
+          if (itemDef[shortKey]) boostedStats[longKey] = (boostedStats[longKey] || 0) + itemDef[shortKey];
+        });
+      });
+
+      // Sum armor and evasion from all equipped armor pieces.
+      // armor → flat damage reduction; phys_ev/mag_ev → hit chance reduction (separate).
+      const armorSlots = ['head', 'chest', 'offHand', 'legs', 'hands', 'feet'];
+      let totalArmor = 0;
+      let totalPhysEv = 0;
+      let totalMagEv  = 0;
+      armorSlots.forEach(slot => {
+        const itemId = equipment[slot];
+        if (!itemId) return;
+        const itemDef = this.gear.find(g => g.id === itemId);
+        if (!itemDef) return;
+        totalArmor  += itemDef.armor   || 0;
+        totalPhysEv += itemDef.phys_ev || 0;
+        totalMagEv  += itemDef.mag_ev  || 0;
+      });
+      // armorValue: used in calculateDamage as flat damage reduction (not %).
+      // physEvasion / magEvasion: used in calculateHitChance to reduce attacker hit chance.
+      const armorValue  = totalArmor;
+      const physEvasion = totalPhysEv;
+      const magEvasion  = totalMagEv;
 
       return {
         id: snapshot.characterID,
         name: snapshot.characterName,
         type: 'player',
-        stats,
+        stats: boostedStats,
         level,
-        maxHP: this.calculateMaxHP(stats, level, true),
-        currentHP: this.calculateMaxHP(stats, level, true),
-        maxMana: this.calculateMaxMana(stats, level, true),
-        currentMana: this.calculateMaxMana(stats, level, true),
-        maxStamina: this.calculateMaxStamina(stats, level, true),
-        currentStamina: this.calculateMaxStamina(stats, level, true),
+        maxHP: this.calculateMaxHP(boostedStats, level, true),
+        currentHP: this.calculateMaxHP(boostedStats, level, true),
+        maxMana: this.calculateMaxMana(boostedStats, level, true),
+        currentMana: this.calculateMaxMana(boostedStats, level, true),
+        maxStamina: this.calculateMaxStamina(boostedStats, level, true),
+        currentStamina: this.calculateMaxStamina(boostedStats, level, true),
         skills,
         consumables: snapshot.consumables || {},
-        equipment: snapshot.equipment || [],
-        // Augmented skill pool: equipped skills + active consumable belt skills.
-        // Consumable belt skills are available as long as quantity > 0.
-        // This is recalculated each turn via getAugmentedSkillPool().
+        equipment,
+        armorValue,    // flat damage reduction
+        physEvasion,   // reduces physical hit chance against this character
+        magEvasion,    // reduces magical hit chance against this character
         defeated: false,
         index: idx,
         statusEffects: []
@@ -491,9 +528,6 @@ class CombatEngine {
           if (this.isCombatFinished(playerCharacters, enemies)) break;
         }
 
-        playerCharacters.forEach(p => this.regenerateResources(p));
-        enemies.forEach(e => this.regenerateResources(e));
-
         [...playerCharacters, ...enemies].forEach(combatant => {
           if (combatant.defeated) return;
           const statusResults = this.statusEngine.processStatusEffects(combatant);
@@ -542,6 +576,10 @@ class CombatEngine {
             }
           }
         });
+
+        // Regen fires AFTER status effects so debuffs apply to the pre-regen pool
+        playerCharacters.forEach(p => this.regenerateResources(p));
+        enemies.forEach(e => this.regenerateResources(e));
 
         if (stageTurns.length > 0) {
           stageTurns[stageTurns.length - 1].playerResourceStates = playerCharacters.map(p => ({
@@ -1148,6 +1186,18 @@ class CombatEngine {
     if (!target) {
         return { roll: null, result: { message: 'Target not found', success: false, delay: finalDelay } };
     }
+    // Target may have died earlier in the same round — redirect to a valid target
+    if (target.defeated) {
+        const aliveEnemies = enemies.filter(e => !e.defeated);
+        const alivePlayers = players.filter(p => !p.defeated);
+        // If actor is player redirect to alive enemy; if enemy redirect to alive player
+        const redirectPool = actor.type === 'player' ? aliveEnemies : alivePlayers;
+        if (redirectPool.length === 0) {
+            return { roll: null, result: { message: 'No valid targets remaining.', success: false, delay: finalDelay } };
+        }
+        action.target = redirectPool.reduce((min, t) => t.currentHP < min.currentHP ? t : min).id;
+        return this.resolveAction(action, actor, players, enemies);
+    }
 
     const hitChance = this.calculateHitChance(actor, skill, target, skillLevel);
     const rolled = Math.random();
@@ -1270,22 +1320,17 @@ class CombatEngine {
 
     // If weapon has damage types, split proportionally
     if (weaponTotalDamage > 0 && Object.keys(weaponDamageBreakdown).length > 0) {
-      // Roll defense ONCE for the entire attack (not per type)
-      let defenseMultiplier = 1.0;
-      if (target.maxDefense) {
-        const defense = Math.random() * target.maxDefense;
-        defenseMultiplier = (1 - defense / 100);
-      }
+      // Flat armor reduction — subtract armorValue directly from total damage before splitting.
+      // armorValue comes from equipped armor items (head + chest + etc.), not a percentage roll.
+      const armorReduction = target.armorValue || 0;
+      const damageAfterArmor = Math.max(0, totalDamage - armorReduction);
 
       for (const [damageType, typeDamage] of Object.entries(weaponDamageBreakdown)) {
         // Calculate proportion of this damage type relative to original weapon dmg
         const proportion = typeDamage / weaponTotalDamage;
 
-        // Split the VARIANCE-ADJUSTED total damage by this proportion
-        let typeDamagePortion = totalDamage * proportion;
-
-        // Apply defense (same roll for all types)
-        typeDamagePortion = typeDamagePortion * defenseMultiplier;
+        // Split the armor-reduced total damage by proportion
+        let typeDamagePortion = damageAfterArmor * proportion;
 
         // Apply resistance for this specific damage type
         if (target.resistances && target.resistances[damageType]) {
@@ -1299,11 +1344,9 @@ class CombatEngine {
     } 
     // No weapon damage types - apply defense/resistance to total
     else {
-      finalDamage = totalDamage;
-      if (target.maxDefense) {
-        const defense = Math.random() * target.maxDefense;
-        finalDamage = finalDamage * (1 - defense / 100);
-      }
+      // Flat armor reduction for no-weapon-type damage
+      const armorReduction = target.armorValue || 0;
+      finalDamage = Math.max(0, totalDamage - armorReduction);
       // Check skill effect for damage type resistance
       if (skill.effects?.[0]?.damageType && target.resistances) {
         const resistance = target.resistances[skill.effects[0].damageType] || 0;
@@ -1428,7 +1471,17 @@ class CombatEngine {
     let hitChance = skill.baseHitChance || CONSTANTS.BASE_HIT_CHANCE;
     hitChance += (actor.stats.conviction || 0) * 0.1;
     hitChance += skillLevel * 0.02;
-    hitChance -= (target.maxDefense || 0) * 0.05;
+    // Physical evasion reduces hit chance for physical skills; magical evasion for magical.
+    // Each point of evasion = 0.5% reduction in attacker hit chance.
+    // target may be null for AOE skills — guard against it.
+    if (target) {
+        const damageType = skill.effects?.[0]?.damageType || 'physical';
+        const isMagical = ['fire','ice','lightning','arcane','holy','shadow'].includes(damageType);
+        const evasion = isMagical
+            ? (target.magEvasion  || 0)
+            : (target.physEvasion || 0);
+        hitChance -= evasion * 0.5;
+    }
     return Math.max(CONSTANTS.STAT_CAP_MIN, Math.min(CONSTANTS.STAT_CAP_MAX, hitChance));
   }
 
@@ -1515,6 +1568,13 @@ class CombatEngine {
             const maxMana = this.calculateMaxMana(enemyType.stats, enemyLevel, false);
             const maxStamina = this.calculateMaxStamina(enemyType.stats, enemyLevel, false);
 
+            // Also sum armor from equipped chest piece if any
+            let enemyArmor = enemyType.baseDefense || 0;
+            if (equipment.chest) {
+                const chestItem = this.gear.find(g => g.id === equipment.chest);
+                if (chestItem?.armor) enemyArmor += chestItem.armor;
+            }
+
             enemies.push({
                 id: `enemy_${enemyType.id.trim()}_${String(globalEnemyIndex).padStart(3, '0')}`,
                 name: enemyType.name.trim(),
@@ -1526,7 +1586,9 @@ class CombatEngine {
                 maxStamina: maxStamina, currentStamina: maxStamina,
                 skills: selectedSkills,
                 defeated: false,
-                maxDefense: enemyType.baseDefense,
+                armorValue: enemyArmor,
+                physEvasion: enemyType.physEvasion || 0,
+                magEvasion: enemyType.magEvasion  || 0,
                 resistances: {},
                 statusEffects: [],
                 equipment: equipment

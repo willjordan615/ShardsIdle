@@ -132,16 +132,18 @@ async function equipItem(character, itemId, inventoryIndex) {
     const item = gameData.gear.find(g => g.id === itemId);
     if (!item) return;
     
-    // Determine which slot to equip to based on item type
-    let targetSlot = 'mainHand';  // Default
-    if (item.type === 'shield' || item.slot_id1 === 'offHand') {
-        targetSlot = 'offHand';
-    } else if (['head', 'circlet', 'helm', 'chain', 'plate', 'cloth', 'leather', 'robe', 'vestments'].includes(item.type)) {
+    // Determine target slot from slot_id1 (authoritative) with type as fallback
+    const slotId = item.slot_id1 || item.slot || item.type || '';
+    let targetSlot = 'mainHand'; // default
+    if (slotId === 'head') {
         targetSlot = 'head';
-    } else if (['chest', 'cuirass', 'chain', 'plate', 'cloth', 'leather', 'robe', 'vestments'].includes(item.type)) {
+    } else if (slotId === 'chest') {
         targetSlot = 'chest';
-    } else if (item.type.includes('ring') || item.type === 'amulet' || item.type === 'cloak' || item.type === 'belt') {
-        // Use first available accessory slot
+    } else if (slotId === 'offHand' || slotId === 'shield' || item.type === 'shield') {
+        targetSlot = 'offHand';
+    } else if (slotId === 'mainHand' || slotId === 'weapon') {
+        targetSlot = 'mainHand';
+    } else if (['ring', 'amulet', 'cloak', 'belt', 'accessory'].includes(slotId) || item.type === 'accessory') {
         targetSlot = character.equipment.accessory1 ? 'accessory2' : 'accessory1';
     }
     

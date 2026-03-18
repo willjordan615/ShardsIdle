@@ -142,11 +142,20 @@ function calculateTotalStats(character) {
         harmony:    character.stats.harmony    || 0
     };
 
+    // Item stat fields use short keys: con, end, amb, har
+    const statFieldMap = { con: 'conviction', end: 'endurance', amb: 'ambition', har: 'harmony' };
+
     if (character.equipment) {
         Object.values(character.equipment).forEach(itemId => {
             if (!itemId) return;
             const item = gameData.gear.find(g => g.id === itemId);
-            if (item && item.statBonuses) {
+            if (!item) return;
+            // Short-key bonuses (con, end, amb, har) — primary format
+            Object.entries(statFieldMap).forEach(([shortKey, longKey]) => {
+                if (item[shortKey]) totalStats[longKey] += item[shortKey];
+            });
+            // Long-key bonuses via statBonuses object — legacy fallback
+            if (item.statBonuses) {
                 totalStats.conviction += item.statBonuses.conviction || 0;
                 totalStats.endurance  += item.statBonuses.endurance  || 0;
                 totalStats.ambition   += item.statBonuses.ambition   || 0;
@@ -159,15 +168,18 @@ function calculateTotalStats(character) {
 }
 
 /**
- * Calculate derived stats (HP, Mana, Stamina) from base stats only.
+ * Calculate derived stats (HP, Mana, Stamina) from base stats.
+ * Mirrors combatEngine.js calculateMaxHP/Mana/Stamina exactly so the
+ * character detail screen shows what will actually be used in combat.
  */
 function calculateDerivedStats(character) {
     const level = character.level || 1;
-    const stats = character.stats || {};
+    const stats = calculateTotalStats(character); // include equipment bonuses
+    const GROWTH = { hp: 1.12, resource: 1.10 };
 
-    const hp      = Math.floor((100 + (level - 1) * 20) * (1 + (stats.endurance || 0) / 300));
-    const mana    = Math.floor((50  + (level - 1) * 10) * (1 + ((stats.harmony || 0) * 0.7 + (stats.endurance || 0) * 0.3) / 300));
-    const stamina = Math.floor((75  + (level - 1) * 15) * (1 + ((stats.endurance || 0) * 0.7 + (stats.conviction || 0) * 0.3) / 300));
+    const hp      = Math.floor(50  * Math.pow(GROWTH.hp,       level - 1) * (1 + (stats.endurance || 0) / 300));
+    const mana    = Math.floor(80  * Math.pow(GROWTH.resource, level - 1) * (1 + ((stats.harmony || 0) * 0.7 + (stats.endurance || 0) * 0.3) / 300));
+    const stamina = Math.floor(80  * Math.pow(GROWTH.resource, level - 1) * (1 + ((stats.endurance || 0) * 0.7 + (stats.conviction || 0) * 0.3) / 300));
 
     return { hp, mana, stamina };
 }
