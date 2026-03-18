@@ -27,7 +27,8 @@
     },
     "armorValue": 1,
     "physEvasion": 2,
-    "magEvasion": 0
+    "magEvasion": 0,
+    "aiProfile": "aggressive"
   },
   {
     "id": "goblin_archer",
@@ -57,7 +58,8 @@
     },
     "armorValue": 0,
     "physEvasion": 3,
-    "magEvasion": 0
+    "magEvasion": 0,
+    "aiProfile": "tactical"
   },
   {
     "id": "spider_small",
@@ -86,7 +88,8 @@
     },
     "armorValue": 1,
     "physEvasion": 2,
-    "magEvasion": 0
+    "magEvasion": 0,
+    "aiProfile": "aggressive"
   },
   {
     "id": "spider_large",
@@ -116,7 +119,8 @@
     },
     "armorValue": 2,
     "physEvasion": 1,
-    "magEvasion": 0
+    "magEvasion": 0,
+    "aiProfile": "berserker"
   },
   {
     "id": "orc_warrior",
@@ -146,7 +150,8 @@
     },
     "armorValue": 4,
     "physEvasion": 0,
-    "magEvasion": 0
+    "magEvasion": 0,
+    "aiProfile": "berserker"
   },
   {
     "id": "orc_shaman",
@@ -176,7 +181,8 @@
     },
     "armorValue": 1,
     "physEvasion": 1,
-    "magEvasion": 3
+    "magEvasion": 3,
+    "aiProfile": "support"
   },
   {
     "id": "dragon_ancient",
@@ -208,6 +214,7 @@
     },
     "armorValue": 12,
     "physEvasion": 2,
-    "magEvasion": 5
+    "magEvasion": 5,
+    "aiProfile": "tactical"
   }
 ]

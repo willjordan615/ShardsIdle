@@ -1,5 +1,108 @@
 [
   {
+    "id": "channel",
+    "name": "Channel",
+    "description": "Draw ambient energy inward and project it outward as a raw arcane pulse.",
+    "category": "DAMAGE_MAGIC",
+    "parentSkills": [],
+    "basePower": 5,
+    "baseHitChance": 0.9,
+    "critChance": 0.04,
+    "critMultiplier": 1.5,
+    "delay": 1100,
+    "costType": "mana",
+    "costAmount": 6,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "arcane",
+        "chance": 1.0
+      }
+    ],
+    "masteryUnlockAt": 150
+  },
+  {
+    "id": "prayer",
+    "name": "Prayer",
+    "description": "Center the spirit through focused devotion, attuning to forces beyond the physical.",
+    "category": "BUFF",
+    "parentSkills": [],
+    "basePower": 4,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 1200,
+    "costType": "mana",
+    "costAmount": 5,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "buff": "spell_amplification",
+        "duration": 2,
+        "chance": 1.0
+      }
+    ],
+    "masteryUnlockAt": 150
+  },
+  {
+    "id": "attunement",
+    "name": "Attunement",
+    "description": "Resonate with living and natural systems, sensing the flow of life around you.",
+    "category": "UTILITY",
+    "parentSkills": [],
+    "basePower": 3,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 1300,
+    "costType": "stamina",
+    "costAmount": 5,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "buff": "protection",
+        "duration": 2,
+        "chance": 1.0
+      }
+    ],
+    "masteryUnlockAt": 150
+  },
+  {
+    "id": "stalk",
+    "name": "Stalk",
+    "description": "Move with deliberate patience, tracking without being noticed.",
+    "category": "UTILITY",
+    "parentSkills": [],
+    "basePower": 3,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 1400,
+    "costType": "stamina",
+    "costAmount": 6,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "buff": "stealth",
+        "duration": 2,
+        "chance": 1.0
+      }
+    ],
+    "masteryUnlockAt": 200
+  },
+  {
     "id": "aim",
     "name": "Aim",
     "category": "DAMAGE_SINGLE",
@@ -145,7 +248,8 @@
         "magnitude": 0.5,
         "duration": 1
       }
-    ]
+    ],
+    "masteryUnlockAt": 300
   },
   {
     "id": "buff_all_stats",
@@ -327,7 +431,12 @@
         "magnitude": 0.5,
         "duration": 2
       }
-    ]
+    ],
+    "parentSkills": [
+      "channel",
+      "rest"
+    ],
+    "masteryUnlockAt": 200
   },
   {
     "id": "climb_surface",
@@ -441,7 +550,8 @@
         "scalesBy": "basePower",
         "magnitude": 0.6
       }
-    ]
+    ],
+    "masteryUnlockAt": 200
   },
   {
     "id": "focus",
@@ -615,7 +725,8 @@
         "magnitude": 0.5,
         "duration": 2
       }
-    ]
+    ],
+    "masteryUnlockAt": 250
   },
   {
     "id": "proc_bleed",
@@ -1256,7 +1367,12 @@
         "chance": 0.3,
         "duration": 2
       }
-    ]
+    ],
+    "parentSkills": [
+      "channel",
+      "consumable_tool_torch"
+    ],
+    "masteryUnlockAt": 200
   },
   {
     "id": "rest",
@@ -1500,7 +1616,12 @@
         "chance": 0.15,
         "duration": 1
       }
-    ]
+    ],
+    "parentSkills": [
+      "channel",
+      "shout"
+    ],
+    "masteryUnlockAt": 200
   },
   {
     "id": "shout",
@@ -2230,7 +2351,8 @@
         "debuff": "knockback",
         "duration": 1
       }
-    ]
+    ],
+    "masteryUnlockAt": 200
   },
   {
     "id": "haymaker",
@@ -2690,7 +2812,8 @@
         "magnitude": 0.2,
         "duration": 4
       }
-    ]
+    ],
+    "masteryUnlockAt": 300
   },
   {
     "id": "mend",
@@ -2724,6 +2847,5081 @@
         "targets": "single_ally",
         "scalesBy": "basePower",
         "magnitude": 0.9
+      }
+    ],
+    "masteryUnlockAt": 300
+  },
+  {
+    "id": "arcane_bolt",
+    "name": "Arcane Bolt",
+    "description": "Focuses mental energy into a concentrated projectile of raw magic.",
+    "category": "DAMAGE_MAGIC",
+    "parentSkills": [
+      "channel",
+      "focus"
+    ],
+    "basePower": 10,
+    "baseHitChance": 0.95,
+    "critChance": 0.1,
+    "critMultiplier": 1.5,
+    "delay": 1000,
+    "costType": "mana",
+    "costAmount": 10,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "arcane",
+        "chance": 1.0
+      }
+    ],
+    "masteryUnlockAt": 300
+  },
+  {
+    "id": "shadow_bolt",
+    "name": "Shadow Bolt",
+    "description": "Twists spiritual attunement and deception into a bolt of dark energy.",
+    "category": "DAMAGE_MAGIC",
+    "parentSkills": [
+      "prayer",
+      "misdirect"
+    ],
+    "basePower": 9,
+    "baseHitChance": 0.9,
+    "critChance": 0.15,
+    "critMultiplier": 1.6,
+    "delay": 1100,
+    "costType": "mana",
+    "costAmount": 10,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "shadow",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "weaken",
+        "duration": 3,
+        "chance": 0.4
+      }
+    ],
+    "masteryUnlockAt": 300
+  },
+  {
+    "id": "holy_light",
+    "name": "Holy Light",
+    "description": "Channels faith through practical care to manifest healing radiance.",
+    "category": "HEALING",
+    "parentSkills": [
+      "prayer",
+      "first_aid"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.05,
+    "critMultiplier": 1.5,
+    "delay": 1500,
+    "costType": "mana",
+    "costAmount": 12,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "heal",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "buff": "protection",
+        "duration": 5,
+        "chance": 0.5
+      }
+    ],
+    "masteryUnlockAt": 300
+  },
+  {
+    "id": "nature_touch",
+    "name": "Nature Touch",
+    "description": "Resonates with living systems during rest to accelerate natural recovery.",
+    "category": "HEALING",
+    "parentSkills": [
+      "attunement",
+      "rest"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.05,
+    "critMultiplier": 1.5,
+    "delay": 2000,
+    "costType": "mana",
+    "costAmount": 10,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "heal",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "buff": "harmony",
+        "duration": 10,
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "apply_poison",
+    "name": "Apply Poison",
+    "description": "Uses knowledge of natural toxins and deception to coat weapons.",
+    "category": "UTILITY",
+    "parentSkills": [
+      "attunement",
+      "misdirect"
+    ],
+    "basePower": 5,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 1000,
+    "costType": "stamina",
+    "costAmount": 10,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "buff": "poison_weapon",
+        "duration": 30,
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "smite",
+    "name": "Smite",
+    "description": "Infuses a basic physical strike with divine conviction.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "prayer",
+      "basic_attack"
+    ],
+    "basePower": 12,
+    "baseHitChance": 0.9,
+    "critChance": 0.1,
+    "critMultiplier": 1.5,
+    "delay": 1200,
+    "costType": "mana",
+    "costAmount": 15,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "holy",
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "arcane_strike",
+    "name": "Arcane Strike",
+    "description": "Channels raw energy directly into a physical blow.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "channel",
+      "basic_attack"
+    ],
+    "basePower": 11,
+    "baseHitChance": 0.9,
+    "critChance": 0.1,
+    "critMultiplier": 1.5,
+    "delay": 1100,
+    "costType": "mana",
+    "costAmount": 12,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "arcane",
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "slash",
+    "name": "Slash",
+    "description": "A precise cutting motion combining force with targeting.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "basic_attack",
+      "aim"
+    ],
+    "basePower": 10,
+    "baseHitChance": 0.95,
+    "critChance": 0.15,
+    "critMultiplier": 1.6,
+    "delay": 900,
+    "costType": "stamina",
+    "costAmount": 12,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "slashing",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "bleed",
+        "duration": 3,
+        "chance": 0.4
+      }
+    ],
+    "masteryUnlockAt": 250
+  },
+  {
+    "id": "pummel",
+    "name": "Pummel",
+    "description": "A heavy impact combining shoving force with a direct strike.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "shove",
+      "basic_attack"
+    ],
+    "basePower": 14,
+    "baseHitChance": 0.85,
+    "critChance": 0.05,
+    "critMultiplier": 1.5,
+    "delay": 1300,
+    "costType": "stamina",
+    "costAmount": 15,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "bludgeoning",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "dazed",
+        "duration": 2,
+        "chance": 0.5
+      }
+    ],
+    "masteryUnlockAt": 200
+  },
+  {
+    "id": "pierce",
+    "name": "Pierce",
+    "description": "A targeted thrust utilizing footwork to close distance accurately.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "aim",
+      "footwork"
+    ],
+    "basePower": 11,
+    "baseHitChance": 0.95,
+    "critChance": 0.2,
+    "critMultiplier": 1.7,
+    "delay": 800,
+    "costType": "stamina",
+    "costAmount": 12,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "piercing",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "armor_break",
+        "duration": 5,
+        "chance": 0.3
+      }
+    ],
+    "masteryUnlockAt": 250
+  },
+  {
+    "id": "stone_skin",
+    "name": "Stone Skin",
+    "description": "Hardens the body by resonating with the earth while blocking.",
+    "category": "DEFENSE",
+    "parentSkills": [
+      "block",
+      "attunement"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 500,
+    "costType": "mana",
+    "costAmount": 15,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "buff": "defense",
+        "duration": 10,
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "blood_letting",
+    "name": "Blood Letting",
+    "description": "A slash aimed specifically at vulnerable points to cause bleeding.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "slash",
+      "sense"
+    ],
+    "basePower": 12,
+    "baseHitChance": 0.9,
+    "critChance": 0.2,
+    "critMultiplier": 1.8,
+    "delay": 1000,
+    "costType": "stamina",
+    "costAmount": 14,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "slashing",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "bleed",
+        "duration": 5,
+        "chance": 0.8
+      }
+    ]
+  },
+  {
+    "id": "mind_spike",
+    "name": "Mind Spike",
+    "description": "Focuses mental energy into a shock that targets the nervous system.",
+    "category": "DAMAGE_MAGIC",
+    "parentSkills": [
+      "focus",
+      "shock"
+    ],
+    "basePower": 13,
+    "baseHitChance": 0.95,
+    "critChance": 0.15,
+    "critMultiplier": 1.6,
+    "delay": 900,
+    "costType": "mana",
+    "costAmount": 14,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "electric",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "silence",
+        "duration": 2,
+        "chance": 0.4
+      }
+    ]
+  },
+  {
+    "id": "shadow_step",
+    "name": "Shadow Step",
+    "description": "Uses misdirection and footwork to vanish momentarily.",
+    "category": "UTILITY",
+    "parentSkills": [
+      "misdirect",
+      "footwork"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 500,
+    "costType": "mana",
+    "costAmount": 15,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "buff": "stealth",
+        "duration": 5,
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "buff": "evasion_boost",
+        "duration": 3,
+        "chance": 1.0
+      }
+    ],
+    "masteryUnlockAt": 350
+  },
+  {
+    "id": "vitality_boost",
+    "name": "Vitality Boost",
+    "description": "Accelerates natural recovery through deep rest and attunement.",
+    "category": "BUFF",
+    "parentSkills": [
+      "rest",
+      "attunement"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 1000,
+    "costType": "mana",
+    "costAmount": 10,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "buff": "all_stats",
+        "duration": 30,
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "flaming_edge",
+    "name": "Flaming Edge",
+    "description": "Coats a slashing weapon in sustained flame for extra damage.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "slash",
+      "produce_flame"
+    ],
+    "basePower": 18,
+    "baseHitChance": 0.9,
+    "critChance": 0.15,
+    "critMultiplier": 1.6,
+    "delay": 1000,
+    "costType": "mana",
+    "costAmount": 18,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "slashing",
+        "chance": 1.0
+      },
+      {
+        "type": "damage",
+        "damageType": "fire",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "burn",
+        "duration": 4,
+        "chance": 0.7
+      }
+    ]
+  },
+  {
+    "id": "ice_pierce",
+    "name": "Ice Pierce",
+    "description": "A piercing thrust that freezes the wound upon impact.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "pierce",
+      "chill"
+    ],
+    "basePower": 17,
+    "baseHitChance": 0.95,
+    "critChance": 0.2,
+    "critMultiplier": 1.7,
+    "delay": 900,
+    "costType": "mana",
+    "costAmount": 18,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "piercing",
+        "chance": 1.0
+      },
+      {
+        "type": "damage",
+        "damageType": "cold",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "slow",
+        "duration": 4,
+        "chance": 0.8
+      }
+    ]
+  },
+  {
+    "id": "shocking_blow",
+    "name": "Shocking Blow",
+    "description": "Delivers a pummeling strike charged with electric energy.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "pummel",
+      "shock"
+    ],
+    "basePower": 20,
+    "baseHitChance": 0.85,
+    "critChance": 0.1,
+    "critMultiplier": 1.5,
+    "delay": 1200,
+    "costType": "mana",
+    "costAmount": 20,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "bludgeoning",
+        "chance": 1.0
+      },
+      {
+        "type": "damage",
+        "damageType": "electric",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "stun",
+        "duration": 2,
+        "chance": 0.5
+      }
+    ]
+  },
+  {
+    "id": "arcane_lunge",
+    "name": "Arcane Lunge",
+    "description": "Propels the fighter forward with arcane energy during a lunge.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "lunge",
+      "arcane_bolt"
+    ],
+    "basePower": 19,
+    "baseHitChance": 0.9,
+    "critChance": 0.15,
+    "critMultiplier": 1.6,
+    "delay": 800,
+    "costType": "mana",
+    "costAmount": 20,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "arcane",
+        "chance": 1.0
+      },
+      {
+        "type": "damage",
+        "damageType": "physical",
+        "chance": 0.5
+      }
+    ]
+  },
+  {
+    "id": "holy_smite",
+    "name": "Holy Smite",
+    "description": "A divine strike empowered by the radiance of holy light.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "smite",
+      "holy_light"
+    ],
+    "basePower": 22,
+    "baseHitChance": 0.9,
+    "critChance": 0.15,
+    "critMultiplier": 1.7,
+    "delay": 1300,
+    "costType": "mana",
+    "costAmount": 22,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "holy",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "cursed",
+        "duration": 5,
+        "chance": 0.5
+      }
+    ]
+  },
+  {
+    "id": "shadow_strike",
+    "name": "Shadow Strike",
+    "description": "A physical attack infused with the deceptive power of shadow.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "shadow_bolt",
+      "basic_attack"
+    ],
+    "basePower": 18,
+    "baseHitChance": 0.9,
+    "critChance": 0.2,
+    "critMultiplier": 1.8,
+    "delay": 900,
+    "costType": "mana",
+    "costAmount": 18,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "shadow",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "weaken",
+        "duration": 4,
+        "chance": 0.6
+      }
+    ]
+  },
+  {
+    "id": "venomous_slash",
+    "name": "Venomous Slash",
+    "description": "A cutting attack that injects natural toxins into the wound.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "slash",
+      "apply_poison"
+    ],
+    "basePower": 16,
+    "baseHitChance": 0.95,
+    "critChance": 0.15,
+    "critMultiplier": 1.6,
+    "delay": 1000,
+    "costType": "stamina",
+    "costAmount": 16,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "slashing",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "poison",
+        "duration": 6,
+        "chance": 0.8
+      }
+    ]
+  },
+  {
+    "id": "nature_wrap",
+    "name": "Nature Wrap",
+    "description": "Uses a shoving motion to entangle the enemy in living vines.",
+    "category": "CONTROL",
+    "parentSkills": [
+      "nature_touch",
+      "shove"
+    ],
+    "basePower": 10,
+    "baseHitChance": 0.85,
+    "critChance": 0.05,
+    "critMultiplier": 1.5,
+    "delay": 1200,
+    "costType": "mana",
+    "costAmount": 18,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "nature",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "stun",
+        "duration": 2,
+        "chance": 0.6
+      }
+    ]
+  },
+  {
+    "id": "burning_aura",
+    "name": "Burning Aura",
+    "description": "Projects a shout that ignites the air around the caster.",
+    "category": "DAMAGE_AOE",
+    "parentSkills": [
+      "produce_flame",
+      "shout"
+    ],
+    "basePower": 14,
+    "baseHitChance": 0.8,
+    "critChance": 0.05,
+    "critMultiplier": 1.5,
+    "delay": 1500,
+    "costType": "mana",
+    "costAmount": 25,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "fire",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "burn",
+        "duration": 3,
+        "chance": 0.5
+      }
+    ]
+  },
+  {
+    "id": "frost_nova",
+    "name": "Frost Nova",
+    "description": "Releases a wave of cold energy through a forceful projection.",
+    "category": "DAMAGE_AOE",
+    "parentSkills": [
+      "chill",
+      "shout"
+    ],
+    "basePower": 13,
+    "baseHitChance": 0.8,
+    "critChance": 0.05,
+    "critMultiplier": 1.5,
+    "delay": 1400,
+    "costType": "mana",
+    "costAmount": 25,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "cold",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "slow",
+        "duration": 3,
+        "chance": 0.8
+      }
+    ]
+  },
+  {
+    "id": "arcane_barrier",
+    "name": "Arcane Barrier",
+    "description": "Constructs a shield of magical energy to block incoming attacks.",
+    "category": "DEFENSE",
+    "parentSkills": [
+      "arcane_bolt",
+      "block"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 500,
+    "costType": "mana",
+    "costAmount": 20,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "buff": "spell_amplification",
+        "duration": 10,
+        "chance": 1.0
+      },
+      {
+        "type": "defense",
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "shadow_veil",
+    "name": "Shadow Veil",
+    "description": "Wraps the caster in shadows to obscure their presence.",
+    "category": "UTILITY",
+    "parentSkills": [
+      "shadow_bolt",
+      "misdirect"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 600,
+    "costType": "mana",
+    "costAmount": 18,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "buff": "stealth",
+        "duration": 8,
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "healing_light",
+    "name": "Healing Light",
+    "description": "Expands holy light into an area of effect restorative field.",
+    "category": "HEALING_AOE",
+    "parentSkills": [
+      "holy_light",
+      "rest"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.05,
+    "critMultiplier": 1.5,
+    "delay": 2000,
+    "costType": "mana",
+    "costAmount": 25,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "heal",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "buff": "protection",
+        "duration": 8,
+        "chance": 0.6
+      }
+    ]
+  },
+  {
+    "id": "regrowth",
+    "name": "Regrowth",
+    "description": "Accelerates natural healing over time using nature magic.",
+    "category": "HEALING",
+    "parentSkills": [
+      "nature_touch",
+      "first_aid"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.05,
+    "critMultiplier": 1.5,
+    "delay": 1500,
+    "costType": "mana",
+    "costAmount": 20,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "heal",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "buff": "harmony",
+        "duration": 15,
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "poison_cloud",
+    "name": "Poison Cloud",
+    "description": "Releases a toxic gas cloud through a forceful exhalation.",
+    "category": "DAMAGE_AOE",
+    "parentSkills": [
+      "apply_poison",
+      "shout"
+    ],
+    "basePower": 12,
+    "baseHitChance": 0.8,
+    "critChance": 0.05,
+    "critMultiplier": 1.5,
+    "delay": 1300,
+    "costType": "mana",
+    "costAmount": 22,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "poison",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "poison",
+        "duration": 5,
+        "chance": 0.8
+      }
+    ]
+  },
+  {
+    "id": "counter_strike",
+    "name": "Counter Strike",
+    "description": "A defensive slash executed immediately after blocking.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "block",
+      "slash"
+    ],
+    "basePower": 16,
+    "baseHitChance": 0.95,
+    "critChance": 0.2,
+    "critMultiplier": 1.8,
+    "delay": 600,
+    "costType": "stamina",
+    "costAmount": 15,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "slashing",
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "riposte",
+    "name": "Riposte",
+    "description": "A precise piercing counter-attack following a successful block.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "block",
+      "pierce"
+    ],
+    "basePower": 17,
+    "baseHitChance": 0.95,
+    "critChance": 0.25,
+    "critMultiplier": 1.9,
+    "delay": 600,
+    "costType": "stamina",
+    "costAmount": 15,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "piercing",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "bleed",
+        "duration": 3,
+        "chance": 0.5
+      }
+    ]
+  },
+  {
+    "id": "blood_fury",
+    "name": "Blood Fury",
+    "description": "Enters a rage state fueled by the sight of bleeding wounds.",
+    "category": "BUFF",
+    "parentSkills": [
+      "blood_letting",
+      "shout"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 500,
+    "costType": "stamina",
+    "costAmount": 20,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "buff": "attack_boost",
+        "duration": 10,
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "buff": "speed_boost",
+        "duration": 10,
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "mental_fortitude",
+    "name": "Mental Fortitude",
+    "description": "Strengthens the mind against shock and mental intrusion.",
+    "category": "BUFF",
+    "parentSkills": [
+      "mind_spike",
+      "focus"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 500,
+    "costType": "mana",
+    "costAmount": 18,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "buff": "protection",
+        "duration": 15,
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "assassinate",
+    "name": "Assassinate",
+    "description": "A lethal strike from stealth targeting a known weak point.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "shadow_step",
+      "weak_point"
+    ],
+    "basePower": 25,
+    "baseHitChance": 0.95,
+    "critChance": 0.5,
+    "critMultiplier": 2.5,
+    "delay": 1000,
+    "costType": "stamina",
+    "costAmount": 25,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "shadow",
+        "chance": 1.0
+      },
+      {
+        "type": "damage",
+        "damageType": "physical",
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "vitality_surge",
+    "name": "Vitality Surge",
+    "description": "A shout that amplifies the body's natural recovery rate.",
+    "category": "BUFF",
+    "parentSkills": [
+      "vitality_boost",
+      "shout"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 800,
+    "costType": "stamina",
+    "costAmount": 20,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "buff": "all_stats",
+        "duration": 20,
+        "chance": 1.0
+      },
+      {
+        "type": "heal",
+        "chance": 0.5
+      }
+    ]
+  },
+  {
+    "id": "stone_fist",
+    "name": "Stone Fist",
+    "description": "Encases the fist in stone for a devastating pummeling attack.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "stone_skin",
+      "pummel"
+    ],
+    "basePower": 22,
+    "baseHitChance": 0.85,
+    "critChance": 0.1,
+    "critMultiplier": 1.5,
+    "delay": 1400,
+    "costType": "mana",
+    "costAmount": 22,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "bludgeoning",
+        "chance": 1.0
+      },
+      {
+        "type": "damage",
+        "damageType": "nature",
+        "chance": 0.5
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "stun",
+        "duration": 2,
+        "chance": 0.6
+      }
+    ]
+  },
+  {
+    "id": "lightning_chain",
+    "name": "Lightning Chain",
+    "description": "Arcs electric energy between multiple targets.",
+    "category": "DAMAGE_AOE",
+    "parentSkills": [
+      "shock",
+      "arcane_bolt"
+    ],
+    "basePower": 16,
+    "baseHitChance": 0.9,
+    "critChance": 0.1,
+    "critMultiplier": 1.5,
+    "delay": 1200,
+    "costType": "mana",
+    "costAmount": 25,
+    "hitCount": {
+      "min": 2,
+      "max": 4
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "electric",
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "ice_shard",
+    "name": "Ice Shard",
+    "description": "Forms a sharp projectile of ice for long-range precision.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "chill",
+      "aim"
+    ],
+    "basePower": 18,
+    "baseHitChance": 0.95,
+    "critChance": 0.2,
+    "critMultiplier": 1.7,
+    "delay": 1000,
+    "costType": "mana",
+    "costAmount": 18,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "cold",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "slow",
+        "duration": 3,
+        "chance": 0.7
+      }
+    ]
+  },
+  {
+    "id": "fireball",
+    "name": "Fireball",
+    "description": "Condenses flame into a volatile sphere of explosive energy.",
+    "category": "DAMAGE_AOE",
+    "parentSkills": [
+      "produce_flame",
+      "focus"
+    ],
+    "basePower": 20,
+    "baseHitChance": 0.85,
+    "critChance": 0.1,
+    "critMultiplier": 1.5,
+    "delay": 1500,
+    "costType": "mana",
+    "costAmount": 28,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "fire",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "burn",
+        "duration": 4,
+        "chance": 0.6
+      }
+    ]
+  },
+  {
+    "id": "shadow_tendril",
+    "name": "Shadow Tendril",
+    "description": "Manifests shadows into grasping limbs to restrain enemies.",
+    "category": "CONTROL",
+    "parentSkills": [
+      "shadow_bolt",
+      "attunement"
+    ],
+    "basePower": 12,
+    "baseHitChance": 0.85,
+    "critChance": 0.05,
+    "critMultiplier": 1.5,
+    "delay": 1200,
+    "costType": "mana",
+    "costAmount": 22,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "shadow",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "stun",
+        "duration": 2,
+        "chance": 0.5
+      }
+    ]
+  },
+  {
+    "id": "holy_word",
+    "name": "Holy Word",
+    "description": "Speaks a divine command that heals and protects allies.",
+    "category": "HEALING_AOE",
+    "parentSkills": [
+      "holy_light",
+      "shout"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.05,
+    "critMultiplier": 1.5,
+    "delay": 1800,
+    "costType": "mana",
+    "costAmount": 30,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "heal",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "buff": "protection",
+        "duration": 10,
+        "chance": 0.8
+      }
+    ]
+  },
+  {
+    "id": "entangle",
+    "name": "Entangle",
+    "description": "Causes roots to erupt from the ground to trap moving enemies.",
+    "category": "CONTROL",
+    "parentSkills": [
+      "nature_touch",
+      "footwork"
+    ],
+    "basePower": 8,
+    "baseHitChance": 0.8,
+    "critChance": 0.05,
+    "critMultiplier": 1.5,
+    "delay": 1000,
+    "costType": "mana",
+    "costAmount": 20,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "nature",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "slow",
+        "duration": 4,
+        "chance": 0.9
+      }
+    ]
+  },
+  {
+    "id": "acid_splash",
+    "name": "Acid Splash",
+    "description": "Corrosive ice that melts armor and chills the bone.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "apply_poison",
+      "chill"
+    ],
+    "basePower": 19,
+    "baseHitChance": 0.9,
+    "critChance": 0.1,
+    "critMultiplier": 1.5,
+    "delay": 1100,
+    "costType": "mana",
+    "costAmount": 22,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "poison",
+        "chance": 1.0
+      },
+      {
+        "type": "damage",
+        "damageType": "cold",
+        "chance": 0.5
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "weaken",
+        "duration": 4,
+        "chance": 0.6
+      }
+    ]
+  },
+  {
+    "id": "mana_shield",
+    "name": "Mana Shield",
+    "description": "Converts resting mana into a protective barrier.",
+    "category": "DEFENSE",
+    "parentSkills": [
+      "arcane_bolt",
+      "rest"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 500,
+    "costType": "mana",
+    "costAmount": 25,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "buff": "spell_amplification",
+        "duration": 15,
+        "chance": 1.0
+      },
+      {
+        "type": "defense",
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "inferno_slice",
+    "name": "Inferno Slice",
+    "description": "A lunging attack that leaves a trail of fire.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "flaming_edge",
+      "lunge"
+    ],
+    "basePower": 28,
+    "baseHitChance": 0.9,
+    "critChance": 0.15,
+    "critMultiplier": 1.6,
+    "delay": 900,
+    "costType": "mana",
+    "costAmount": 30,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "fire",
+        "chance": 1.0
+      },
+      {
+        "type": "damage",
+        "damageType": "slashing",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "burn",
+        "duration": 5,
+        "chance": 0.8
+      }
+    ]
+  },
+  {
+    "id": "glacial_javelin",
+    "name": "Glacial Javelin",
+    "description": "A massive spear of ice thrown with piercing precision.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "ice_pierce",
+      "aim"
+    ],
+    "basePower": 32,
+    "baseHitChance": 0.95,
+    "critChance": 0.25,
+    "critMultiplier": 1.8,
+    "delay": 1200,
+    "costType": "mana",
+    "costAmount": 32,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "cold",
+        "chance": 1.0
+      },
+      {
+        "type": "damage",
+        "damageType": "piercing",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "slow",
+        "duration": 5,
+        "chance": 0.9
+      }
+    ]
+  },
+  {
+    "id": "storm_hammer",
+    "name": "Storm Hammer",
+    "description": "A heavy blow that calls down lightning upon impact.",
+    "category": "DAMAGE_AOE",
+    "parentSkills": [
+      "shocking_blow",
+      "haymaker"
+    ],
+    "basePower": 30,
+    "baseHitChance": 0.8,
+    "critChance": 0.1,
+    "critMultiplier": 1.5,
+    "delay": 1600,
+    "costType": "mana",
+    "costAmount": 35,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "electric",
+        "chance": 1.0
+      },
+      {
+        "type": "damage",
+        "damageType": "bludgeoning",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "stun",
+        "duration": 3,
+        "chance": 0.6
+      }
+    ]
+  },
+  {
+    "id": "arcane_dash",
+    "name": "Arcane Dash",
+    "description": "Teleports short distances while striking with arcane energy.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "arcane_lunge",
+      "footwork"
+    ],
+    "basePower": 26,
+    "baseHitChance": 0.95,
+    "critChance": 0.2,
+    "critMultiplier": 1.7,
+    "delay": 700,
+    "costType": "mana",
+    "costAmount": 28,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "arcane",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "buff": "evasion_boost",
+        "duration": 3,
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "divine_judgment",
+    "name": "Divine Judgment",
+    "description": "A focused holy strike that punishes the wicked.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "holy_smite",
+      "focus"
+    ],
+    "basePower": 35,
+    "baseHitChance": 0.9,
+    "critChance": 0.2,
+    "critMultiplier": 1.8,
+    "delay": 1500,
+    "costType": "mana",
+    "costAmount": 35,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "holy",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "cursed",
+        "duration": 8,
+        "chance": 0.7
+      }
+    ]
+  },
+  {
+    "id": "void_rend",
+    "name": "Void Rend",
+    "description": "Tears reality with a shadow-infused slash.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "shadow_strike",
+      "slash"
+    ],
+    "basePower": 30,
+    "baseHitChance": 0.9,
+    "critChance": 0.25,
+    "critMultiplier": 1.9,
+    "delay": 1000,
+    "costType": "mana",
+    "costAmount": 30,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "shadow",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "weaken",
+        "duration": 6,
+        "chance": 0.7
+      }
+    ]
+  },
+  {
+    "id": "plague_carrier",
+    "name": "Plague Carrier",
+    "description": "Spreads a virulent poison through a cutting attack.",
+    "category": "DAMAGE_AOE",
+    "parentSkills": [
+      "venomous_slash",
+      "poison_cloud"
+    ],
+    "basePower": 24,
+    "baseHitChance": 0.85,
+    "critChance": 0.1,
+    "critMultiplier": 1.5,
+    "delay": 1300,
+    "costType": "mana",
+    "costAmount": 32,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "poison",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "poison",
+        "duration": 8,
+        "chance": 0.9
+      }
+    ]
+  },
+  {
+    "id": "primal_crush",
+    "name": "Primal Crush",
+    "description": "A nature-infused smash that roots the enemy in place.",
+    "category": "CONTROL",
+    "parentSkills": [
+      "nature_wrap",
+      "stone_fist"
+    ],
+    "basePower": 28,
+    "baseHitChance": 0.85,
+    "critChance": 0.1,
+    "critMultiplier": 1.5,
+    "delay": 1500,
+    "costType": "mana",
+    "costAmount": 32,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "nature",
+        "chance": 1.0
+      },
+      {
+        "type": "damage",
+        "damageType": "bludgeoning",
+        "chance": 0.5
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "stun",
+        "duration": 3,
+        "chance": 0.7
+      }
+    ]
+  },
+  {
+    "id": "ring_of_fire",
+    "name": "Ring of Fire",
+    "description": "Creates a moving circle of flame around the caster.",
+    "category": "DAMAGE_AOE",
+    "parentSkills": [
+      "burning_aura",
+      "footwork"
+    ],
+    "basePower": 22,
+    "baseHitChance": 0.8,
+    "critChance": 0.05,
+    "critMultiplier": 1.5,
+    "delay": 1000,
+    "costType": "mana",
+    "costAmount": 35,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "fire",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "burn",
+        "duration": 4,
+        "chance": 0.6
+      }
+    ]
+  },
+  {
+    "id": "blizzard",
+    "name": "Blizzard",
+    "description": "A massive storm of ice and wind that slows all enemies.",
+    "category": "DAMAGE_AOE",
+    "parentSkills": [
+      "frost_nova",
+      "shout"
+    ],
+    "basePower": 25,
+    "baseHitChance": 0.8,
+    "critChance": 0.05,
+    "critMultiplier": 1.5,
+    "delay": 1800,
+    "costType": "mana",
+    "costAmount": 40,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "cold",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "slow",
+        "duration": 5,
+        "chance": 0.9
+      }
+    ]
+  },
+  {
+    "id": "spell_reflection",
+    "name": "Spell Reflection",
+    "description": "Reflects incoming magic using an arcane barrier.",
+    "category": "DEFENSE",
+    "parentSkills": [
+      "arcane_barrier",
+      "block"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 500,
+    "costType": "mana",
+    "costAmount": 30,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "defense",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "buff": "echo",
+        "duration": 5,
+        "chance": 0.5
+      }
+    ]
+  },
+  {
+    "id": "shadow_clone",
+    "name": "Shadow Clone",
+    "description": "Creates a decoy from shadow to misdirect enemies.",
+    "category": "UTILITY",
+    "parentSkills": [
+      "shadow_veil",
+      "misdirect"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 800,
+    "costType": "mana",
+    "costAmount": 25,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "buff": "evasion_boost",
+        "duration": 10,
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "mass_heal",
+    "name": "Mass Heal",
+    "description": "A powerful restorative light that heals all allies.",
+    "category": "HEALING_AOE",
+    "parentSkills": [
+      "healing_light",
+      "rest"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.1,
+    "critMultiplier": 1.5,
+    "delay": 2500,
+    "costType": "mana",
+    "costAmount": 45,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "heal",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "buff": "protection",
+        "duration": 10,
+        "chance": 0.8
+      }
+    ]
+  },
+  {
+    "id": "forest_embrace",
+    "name": "Forest Embrace",
+    "description": "Heals allies while entangling enemies in the same area.",
+    "category": "HEALING_AOE",
+    "parentSkills": [
+      "regrowth",
+      "entangle"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.05,
+    "critMultiplier": 1.5,
+    "delay": 2000,
+    "costType": "mana",
+    "costAmount": 35,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "heal",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "slow",
+        "duration": 4,
+        "chance": 0.7
+      }
+    ]
+  },
+  {
+    "id": "toxic_fog",
+    "name": "Toxic Fog",
+    "description": "A stealthy poison cloud that obscures vision.",
+    "category": "DAMAGE_AOE",
+    "parentSkills": [
+      "poison_cloud",
+      "shadow_veil"
+    ],
+    "basePower": 20,
+    "baseHitChance": 0.8,
+    "critChance": 0.05,
+    "critMultiplier": 1.5,
+    "delay": 1400,
+    "costType": "mana",
+    "costAmount": 30,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "poison",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "poison",
+        "duration": 6,
+        "chance": 0.8
+      },
+      {
+        "type": "apply_buff",
+        "buff": "stealth",
+        "duration": 5,
+        "chance": 0.5
+      }
+    ]
+  },
+  {
+    "id": "shield_bash",
+    "name": "Shield Bash",
+    "description": "A heavy counter-attack using the shield as a weapon.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "counter_strike",
+      "shove"
+    ],
+    "basePower": 24,
+    "baseHitChance": 0.9,
+    "critChance": 0.1,
+    "critMultiplier": 1.5,
+    "delay": 1000,
+    "costType": "stamina",
+    "costAmount": 25,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "bludgeoning",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "stun",
+        "duration": 2,
+        "chance": 0.6
+      }
+    ]
+  },
+  {
+    "id": "bleed_out",
+    "name": "Bleed Out",
+    "description": "Exploits bleeding wounds to deal massive damage.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "blood_fury",
+      "weak_point"
+    ],
+    "basePower": 30,
+    "baseHitChance": 0.9,
+    "critChance": 0.3,
+    "critMultiplier": 2.0,
+    "delay": 1100,
+    "costType": "stamina",
+    "costAmount": 30,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "physical",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "bleed",
+        "duration": 6,
+        "chance": 0.9
+      }
+    ]
+  },
+  {
+    "id": "psychic_barrier",
+    "name": "Psychic Barrier",
+    "description": "A mental shield that reinforces arcane defenses.",
+    "category": "DEFENSE",
+    "parentSkills": [
+      "mental_fortitude",
+      "arcane_barrier"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 500,
+    "costType": "mana",
+    "costAmount": 30,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "buff": "protection",
+        "duration": 15,
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "buff": "spell_amplification",
+        "duration": 10,
+        "chance": 0.5
+      }
+    ]
+  },
+  {
+    "id": "silent_death",
+    "name": "Silent Death",
+    "description": "An untraceable assassination from the shadows.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "assassinate",
+      "shadow_step"
+    ],
+    "basePower": 40,
+    "baseHitChance": 0.95,
+    "critChance": 0.6,
+    "critMultiplier": 2.5,
+    "delay": 800,
+    "costType": "stamina",
+    "costAmount": 35,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "shadow",
+        "chance": 1.0
+      },
+      {
+        "type": "damage",
+        "damageType": "physical",
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "berserker_rage",
+    "name": "Berserker Rage",
+    "description": "A warcry that pushes the body beyond its limits.",
+    "category": "BUFF",
+    "parentSkills": [
+      "blood_fury",
+      "warcry"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 500,
+    "costType": "stamina",
+    "costAmount": 30,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "buff": "attack_boost",
+        "duration": 15,
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "buff": "strength",
+        "duration": 15,
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "endurance_crack",
+        "duration": 20,
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "earthquake",
+    "name": "Earthquake",
+    "description": "Slams the ground with stone fists to shatter the earth.",
+    "category": "DAMAGE_AOE",
+    "parentSkills": [
+      "stone_fist",
+      "shove"
+    ],
+    "basePower": 32,
+    "baseHitChance": 0.8,
+    "critChance": 0.1,
+    "critMultiplier": 1.5,
+    "delay": 1800,
+    "costType": "mana",
+    "costAmount": 40,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "bludgeoning",
+        "chance": 1.0
+      },
+      {
+        "type": "damage",
+        "damageType": "nature",
+        "chance": 0.5
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "stun",
+        "duration": 3,
+        "chance": 0.7
+      }
+    ]
+  },
+  {
+    "id": "chain_lightning",
+    "name": "Chain Lightning",
+    "description": "A focused bolt of lightning that arcs to multiple targets.",
+    "category": "DAMAGE_AOE",
+    "parentSkills": [
+      "lightning_chain",
+      "focus"
+    ],
+    "basePower": 26,
+    "baseHitChance": 0.9,
+    "critChance": 0.15,
+    "critMultiplier": 1.6,
+    "delay": 1300,
+    "costType": "mana",
+    "costAmount": 35,
+    "hitCount": {
+      "min": 3,
+      "max": 5
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "electric",
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "ice_lance",
+    "name": "Ice Lance",
+    "description": "A long-range piercing projectile of absolute cold.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "ice_shard",
+      "pierce"
+    ],
+    "basePower": 30,
+    "baseHitChance": 0.95,
+    "critChance": 0.25,
+    "critMultiplier": 1.8,
+    "delay": 1100,
+    "costType": "mana",
+    "costAmount": 32,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "cold",
+        "chance": 1.0
+      },
+      {
+        "type": "damage",
+        "damageType": "piercing",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "slow",
+        "duration": 5,
+        "chance": 0.8
+      }
+    ]
+  },
+  {
+    "id": "meteor",
+    "name": "Meteor",
+    "description": "Calls down a burning rock from the sky.",
+    "category": "DAMAGE_AOE",
+    "parentSkills": [
+      "fireball",
+      "aim"
+    ],
+    "basePower": 35,
+    "baseHitChance": 0.85,
+    "critChance": 0.15,
+    "critMultiplier": 1.6,
+    "delay": 2000,
+    "costType": "mana",
+    "costAmount": 45,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "fire",
+        "chance": 1.0
+      },
+      {
+        "type": "damage",
+        "damageType": "bludgeoning",
+        "chance": 0.5
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "burn",
+        "duration": 6,
+        "chance": 0.8
+      }
+    ]
+  },
+  {
+    "id": "shadow_grasp",
+    "name": "Shadow Grasp",
+    "description": "Tendrils of shadow that drain life from the enemy.",
+    "category": "CONTROL",
+    "parentSkills": [
+      "shadow_tendril",
+      "entangle"
+    ],
+    "basePower": 20,
+    "baseHitChance": 0.85,
+    "critChance": 0.05,
+    "critMultiplier": 1.5,
+    "delay": 1400,
+    "costType": "mana",
+    "costAmount": 30,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "shadow",
+        "chance": 1.0
+      },
+      {
+        "type": "heal",
+        "chance": 0.5
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "stun",
+        "duration": 3,
+        "chance": 0.6
+      }
+    ]
+  },
+  {
+    "id": "phoenix_strike",
+    "name": "Phoenix Strike",
+    "description": "A fiery attack that heals the user on critical hits.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "inferno_slice",
+      "mend"
+    ],
+    "basePower": 45,
+    "baseHitChance": 0.9,
+    "critChance": 0.2,
+    "critMultiplier": 1.8,
+    "delay": 1200,
+    "costType": "mana",
+    "costAmount": 45,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "fire",
+        "chance": 1.0
+      },
+      {
+        "type": "damage",
+        "damageType": "slashing",
+        "chance": 1.0
+      },
+      {
+        "type": "heal",
+        "chance": 0.3
+      }
+    ]
+  },
+  {
+    "id": "absolute_zero",
+    "name": "Absolute Zero",
+    "description": "Freezes the target completely, stopping time briefly.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "glacial_javelin",
+      "chill"
+    ],
+    "basePower": 50,
+    "baseHitChance": 0.9,
+    "critChance": 0.3,
+    "critMultiplier": 2.0,
+    "delay": 1500,
+    "costType": "mana",
+    "costAmount": 50,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "cold",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "stun",
+        "duration": 4,
+        "chance": 0.8
+      }
+    ]
+  },
+  {
+    "id": "thunder_god",
+    "name": "Thunder God",
+    "description": "Becomes one with the storm, striking all enemies.",
+    "category": "DAMAGE_AOE",
+    "parentSkills": [
+      "storm_hammer",
+      "shock"
+    ],
+    "basePower": 45,
+    "baseHitChance": 0.85,
+    "critChance": 0.15,
+    "critMultiplier": 1.6,
+    "delay": 1800,
+    "costType": "mana",
+    "costAmount": 55,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "electric",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "stun",
+        "duration": 3,
+        "chance": 0.7
+      }
+    ]
+  },
+  {
+    "id": "blink_strike",
+    "name": "Blink Strike",
+    "description": "Teleports behind the enemy and strikes with arcane force.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "arcane_dash",
+      "arcane_bolt"
+    ],
+    "basePower": 48,
+    "baseHitChance": 0.95,
+    "critChance": 0.25,
+    "critMultiplier": 1.9,
+    "delay": 800,
+    "costType": "mana",
+    "costAmount": 50,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "arcane",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "buff": "evasion_boost",
+        "duration": 5,
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "heavens_fury",
+    "name": "Heaven's Fury",
+    "description": "A divine AOE attack that purges evil.",
+    "category": "DAMAGE_AOE",
+    "parentSkills": [
+      "divine_judgment",
+      "holy_word"
+    ],
+    "basePower": 50,
+    "baseHitChance": 0.9,
+    "critChance": 0.2,
+    "critMultiplier": 1.8,
+    "delay": 2000,
+    "costType": "mana",
+    "costAmount": 60,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "holy",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "cursed",
+        "duration": 10,
+        "chance": 0.8
+      }
+    ]
+  },
+  {
+    "id": "demon_form",
+    "name": "Demon Form",
+    "description": "Transforms into a shadow entity, boosting all stats.",
+    "category": "BUFF",
+    "parentSkills": [
+      "void_rend",
+      "shadow_clone"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 1000,
+    "costType": "mana",
+    "costAmount": 50,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "buff": "all_stats",
+        "duration": 20,
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "buff": "stealth",
+        "duration": 5,
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "bio_hazard",
+    "name": "Bio Hazard",
+    "description": "Creates a zone of toxic nature magic that decays everything.",
+    "category": "DAMAGE_AOE",
+    "parentSkills": [
+      "plague_carrier",
+      "nature_touch"
+    ],
+    "basePower": 40,
+    "baseHitChance": 0.85,
+    "critChance": 0.1,
+    "critMultiplier": 1.5,
+    "delay": 1600,
+    "costType": "mana",
+    "costAmount": 50,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "poison",
+        "chance": 1.0
+      },
+      {
+        "type": "damage",
+        "damageType": "nature",
+        "chance": 0.5
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "poison",
+        "duration": 10,
+        "chance": 0.9
+      }
+    ]
+  },
+  {
+    "id": "titan_foot",
+    "name": "Titan Foot",
+    "description": "A massive stomp that crushes and roots enemies.",
+    "category": "DAMAGE_AOE",
+    "parentSkills": [
+      "primal_crush",
+      "footwork"
+    ],
+    "basePower": 38,
+    "baseHitChance": 0.85,
+    "critChance": 0.1,
+    "critMultiplier": 1.5,
+    "delay": 1500,
+    "costType": "mana",
+    "costAmount": 45,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "bludgeoning",
+        "chance": 1.0
+      },
+      {
+        "type": "damage",
+        "damageType": "nature",
+        "chance": 0.5
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "stun",
+        "duration": 3,
+        "chance": 0.7
+      }
+    ]
+  },
+  {
+    "id": "hellfire",
+    "name": "Hellfire",
+    "description": "Unholy fire that burns the soul as well as the body.",
+    "category": "DAMAGE_AOE",
+    "parentSkills": [
+      "ring_of_fire",
+      "shadow_bolt"
+    ],
+    "basePower": 42,
+    "baseHitChance": 0.85,
+    "critChance": 0.15,
+    "critMultiplier": 1.6,
+    "delay": 1700,
+    "costType": "mana",
+    "costAmount": 55,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "fire",
+        "chance": 1.0
+      },
+      {
+        "type": "damage",
+        "damageType": "shadow",
+        "chance": 0.5
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "burn",
+        "duration": 6,
+        "chance": 0.8
+      }
+    ]
+  },
+  {
+    "id": "permafrost",
+    "name": "Permafrost",
+    "description": "An eternal winter that freezes enemies in place.",
+    "category": "DAMAGE_AOE",
+    "parentSkills": [
+      "blizzard",
+      "frostbite"
+    ],
+    "basePower": 45,
+    "baseHitChance": 0.85,
+    "critChance": 0.15,
+    "critMultiplier": 1.6,
+    "delay": 2000,
+    "costType": "mana",
+    "costAmount": 60,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "cold",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "slow",
+        "duration": 8,
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "mirror_image",
+    "name": "Mirror Image",
+    "description": "Creates perfect magical copies of the caster.",
+    "category": "UTILITY",
+    "parentSkills": [
+      "spell_reflection",
+      "shadow_veil"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 800,
+    "costType": "mana",
+    "costAmount": 40,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "buff": "evasion_boost",
+        "duration": 15,
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "buff": "stealth",
+        "duration": 5,
+        "chance": 0.5
+      }
+    ]
+  },
+  {
+    "id": "necromancy",
+    "name": "Necromancy",
+    "description": "Drains life from enemies to heal the caster.",
+    "category": "HEALING",
+    "parentSkills": [
+      "shadow_grasp",
+      "first_aid"
+    ],
+    "basePower": 25,
+    "baseHitChance": 0.9,
+    "critChance": 0.1,
+    "critMultiplier": 1.5,
+    "delay": 1500,
+    "costType": "mana",
+    "costAmount": 40,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "shadow",
+        "chance": 1.0
+      },
+      {
+        "type": "heal",
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "executioner",
+    "name": "Executioner",
+    "description": "A holy strike that instantly kills weakened foes.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "bleed_out",
+      "smite"
+    ],
+    "basePower": 60,
+    "baseHitChance": 0.9,
+    "critChance": 0.4,
+    "critMultiplier": 2.2,
+    "delay": 1200,
+    "costType": "stamina",
+    "costAmount": 50,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "holy",
+        "chance": 1.0
+      },
+      {
+        "type": "damage",
+        "damageType": "physical",
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "mind_control",
+    "name": "Mind Control",
+    "description": "Takes control of an enemy's mind temporarily.",
+    "category": "CONTROL",
+    "parentSkills": [
+      "psychic_barrier",
+      "misdirect"
+    ],
+    "basePower": 0,
+    "baseHitChance": 0.7,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 1000,
+    "costType": "mana",
+    "costAmount": 50,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_debuff",
+        "debuff": "confused",
+        "duration": 5,
+        "chance": 0.8
+      }
+    ]
+  },
+  {
+    "id": "void_walk",
+    "name": "Void Walk",
+    "description": "Steps into the shadow realm, becoming untouchable.",
+    "category": "UTILITY",
+    "parentSkills": [
+      "silent_death",
+      "shadow_step"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 500,
+    "costType": "mana",
+    "costAmount": 45,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "buff": "stealth",
+        "duration": 10,
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "buff": "evasion_boost",
+        "duration": 10,
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "sunfall",
+    "name": "Sunfall",
+    "description": "Calls down the power of the sun to incinerate the battlefield.",
+    "category": "DAMAGE_AOE",
+    "parentSkills": [
+      "phoenix_strike",
+      "meteor"
+    ],
+    "basePower": 75,
+    "baseHitChance": 0.9,
+    "critChance": 0.2,
+    "critMultiplier": 1.8,
+    "delay": 2500,
+    "costType": "mana",
+    "costAmount": 70,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "fire",
+        "chance": 1.0
+      },
+      {
+        "type": "damage",
+        "damageType": "holy",
+        "chance": 0.5
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "burn",
+        "duration": 10,
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "eternal_winter",
+    "name": "Eternal Winter",
+    "description": "Freezes time and space in a domain of absolute cold.",
+    "category": "DAMAGE_AOE",
+    "parentSkills": [
+      "absolute_zero",
+      "blizzard"
+    ],
+    "basePower": 70,
+    "baseHitChance": 0.9,
+    "critChance": 0.2,
+    "critMultiplier": 1.8,
+    "delay": 2500,
+    "costType": "mana",
+    "costAmount": 70,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "cold",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "stun",
+        "duration": 5,
+        "chance": 0.8
+      }
+    ]
+  },
+  {
+    "id": "storm_of_a_thousand_storms",
+    "name": "Storm of a Thousand Storms",
+    "description": "Summons a cataclysmic electrical storm.",
+    "category": "DAMAGE_AOE",
+    "parentSkills": [
+      "thunder_god",
+      "chain_lightning"
+    ],
+    "basePower": 65,
+    "baseHitChance": 0.85,
+    "critChance": 0.15,
+    "critMultiplier": 1.6,
+    "delay": 2200,
+    "costType": "mana",
+    "costAmount": 65,
+    "hitCount": {
+      "min": 5,
+      "max": 10
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "electric",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "stun",
+        "duration": 2,
+        "chance": 0.6
+      }
+    ]
+  },
+  {
+    "id": "reality_fracture",
+    "name": "Reality Fracture",
+    "description": "Shatters the fabric of space to damage and confuse enemies.",
+    "category": "DAMAGE_AOE",
+    "parentSkills": [
+      "blink_strike",
+      "spell_reflection"
+    ],
+    "basePower": 55,
+    "baseHitChance": 0.9,
+    "critChance": 0.2,
+    "critMultiplier": 1.7,
+    "delay": 1500,
+    "costType": "mana",
+    "costAmount": 60,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "arcane",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "confused",
+        "duration": 4,
+        "chance": 0.7
+      }
+    ]
+  },
+  {
+    "id": "apocalypse",
+    "name": "Apocalypse",
+    "description": "Unleashes holy fire upon the world.",
+    "category": "DAMAGE_AOE",
+    "parentSkills": [
+      "heavens_fury",
+      "hellfire"
+    ],
+    "basePower": 80,
+    "baseHitChance": 0.9,
+    "critChance": 0.2,
+    "critMultiplier": 1.8,
+    "delay": 3000,
+    "costType": "mana",
+    "costAmount": 70,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "holy",
+        "chance": 1.0
+      },
+      {
+        "type": "damage",
+        "damageType": "fire",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "cursed",
+        "duration": 10,
+        "chance": 0.9
+      }
+    ]
+  },
+  {
+    "id": "lord_of_decay",
+    "name": "Lord of Decay",
+    "description": "Commands the forces of entropy to rot all flesh.",
+    "category": "DAMAGE_AOE",
+    "parentSkills": [
+      "bio_hazard",
+      "necromancy"
+    ],
+    "basePower": 60,
+    "baseHitChance": 0.85,
+    "critChance": 0.15,
+    "critMultiplier": 1.6,
+    "delay": 2000,
+    "costType": "mana",
+    "costAmount": 65,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "poison",
+        "chance": 1.0
+      },
+      {
+        "type": "damage",
+        "damageType": "shadow",
+        "chance": 0.5
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "poison",
+        "duration": 12,
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "omnipotence",
+    "name": "Omnipotence",
+    "description": "A mental command that bends reality to the caster's will.",
+    "category": "BUFF",
+    "parentSkills": [
+      "mind_control",
+      "warcry"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 1000,
+    "costType": "mana",
+    "costAmount": 60,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "buff": "all_stats",
+        "duration": 30,
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "buff": "spell_amplification",
+        "duration": 30,
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "shadow_wound",
+    "name": "Shadow Wound",
+    "description": "A slashing attack that leaves a lingering shadow injury.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "slash",
+      "shadow_bolt"
+    ],
+    "basePower": 18,
+    "baseHitChance": 0.9,
+    "critChance": 0.15,
+    "critMultiplier": 1.6,
+    "delay": 1000,
+    "costType": "mana",
+    "costAmount": 18,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "slashing",
+        "chance": 1.0
+      },
+      {
+        "type": "damage",
+        "damageType": "shadow",
+        "chance": 0.5
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "weaken",
+        "duration": 4,
+        "chance": 0.6
+      }
+    ]
+  },
+  {
+    "id": "sacred_grove",
+    "name": "Sacred Grove",
+    "description": "Creates a field of blessed natural growth that heals allies.",
+    "category": "HEALING_AOE",
+    "parentSkills": [
+      "holy_light",
+      "nature_touch"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.05,
+    "critMultiplier": 1.5,
+    "delay": 2000,
+    "costType": "mana",
+    "costAmount": 20,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "heal",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "buff": "harmony",
+        "duration": 10,
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "volatile_venom",
+    "name": "Volatile Venom",
+    "description": "An arcane bolt infused with unstable alchemical toxins.",
+    "category": "DAMAGE_MAGIC",
+    "parentSkills": [
+      "apply_poison",
+      "arcane_bolt"
+    ],
+    "basePower": 16,
+    "baseHitChance": 0.9,
+    "critChance": 0.1,
+    "critMultiplier": 1.5,
+    "delay": 1100,
+    "costType": "mana",
+    "costAmount": 18,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "arcane",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "poison",
+        "duration": 5,
+        "chance": 0.7
+      }
+    ]
+  },
+  {
+    "id": "divine_frost",
+    "name": "Divine Frost",
+    "description": "Holy energy manifests as freezing cold purity.",
+    "category": "DAMAGE_MAGIC",
+    "parentSkills": [
+      "chill",
+      "holy_light"
+    ],
+    "basePower": 17,
+    "baseHitChance": 0.9,
+    "critChance": 0.1,
+    "critMultiplier": 1.5,
+    "delay": 1200,
+    "costType": "mana",
+    "costAmount": 18,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "cold",
+        "chance": 1.0
+      },
+      {
+        "type": "damage",
+        "damageType": "holy",
+        "chance": 0.5
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "slow",
+        "duration": 3,
+        "chance": 0.8
+      }
+    ]
+  },
+  {
+    "id": "septic_flame",
+    "name": "Septic Flame",
+    "description": "Fire that burns with a toxic, infectious heat.",
+    "category": "DAMAGE_MAGIC",
+    "parentSkills": [
+      "produce_flame",
+      "apply_poison"
+    ],
+    "basePower": 15,
+    "baseHitChance": 0.9,
+    "critChance": 0.1,
+    "critMultiplier": 1.5,
+    "delay": 1100,
+    "costType": "mana",
+    "costAmount": 18,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "fire",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "burn",
+        "duration": 4,
+        "chance": 0.6
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "poison",
+        "duration": 4,
+        "chance": 0.6
+      }
+    ]
+  },
+  {
+    "id": "runic_smash",
+    "name": "Runic Smash",
+    "description": "A heavy blow empowered by arcane runes.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "pummel",
+      "arcane_bolt"
+    ],
+    "basePower": 19,
+    "baseHitChance": 0.85,
+    "critChance": 0.1,
+    "critMultiplier": 1.5,
+    "delay": 1300,
+    "costType": "mana",
+    "costAmount": 20,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "bludgeoning",
+        "chance": 1.0
+      },
+      {
+        "type": "damage",
+        "damageType": "arcane",
+        "chance": 0.5
+      }
+    ]
+  },
+  {
+    "id": "entropic_decay",
+    "name": "Entropic Decay",
+    "description": "Shadow magic accelerates natural rot and entropy.",
+    "category": "DAMAGE_MAGIC",
+    "parentSkills": [
+      "shadow_bolt",
+      "nature_touch"
+    ],
+    "basePower": 16,
+    "baseHitChance": 0.9,
+    "critChance": 0.1,
+    "critMultiplier": 1.5,
+    "delay": 1200,
+    "costType": "mana",
+    "costAmount": 18,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "shadow",
+        "chance": 1.0
+      },
+      {
+        "type": "damage",
+        "damageType": "nature",
+        "chance": 0.5
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "weaken",
+        "duration": 5,
+        "chance": 0.7
+      }
+    ]
+  },
+  {
+    "id": "neuro_toxin",
+    "name": "Neuro Toxin",
+    "description": "Electric shock delivers poison directly to the nervous system.",
+    "category": "DAMAGE_MAGIC",
+    "parentSkills": [
+      "shock",
+      "apply_poison"
+    ],
+    "basePower": 17,
+    "baseHitChance": 0.9,
+    "critChance": 0.15,
+    "critMultiplier": 1.6,
+    "delay": 1000,
+    "costType": "mana",
+    "costAmount": 18,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "electric",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "stun",
+        "duration": 2,
+        "chance": 0.5
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "poison",
+        "duration": 4,
+        "chance": 0.7
+      }
+    ]
+  },
+  {
+    "id": "shadow_misdirection",
+    "name": "Shadow Misdirection",
+    "description": "Uses shadows to create multiple deceptive images.",
+    "category": "UTILITY",
+    "parentSkills": [
+      "shadow_step",
+      "misdirect"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 600,
+    "costType": "mana",
+    "costAmount": 15,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "buff": "stealth",
+        "duration": 6,
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "buff": "evasion_boost",
+        "duration": 6,
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "faith_armor",
+    "name": "Faith Armor",
+    "description": "Prayer hardens the skin like stone through divine will.",
+    "category": "DEFENSE",
+    "parentSkills": [
+      "stone_skin",
+      "prayer"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 500,
+    "costType": "mana",
+    "costAmount": 18,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "buff": "defense",
+        "duration": 15,
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "buff": "protection",
+        "duration": 10,
+        "chance": 0.5
+      }
+    ]
+  },
+  {
+    "id": "sacred_roots",
+    "name": "Sacred Roots",
+    "description": "Holy light causes vines to grow and restrain enemies.",
+    "category": "CONTROL",
+    "parentSkills": [
+      "entangle",
+      "holy_light"
+    ],
+    "basePower": 10,
+    "baseHitChance": 0.85,
+    "critChance": 0.05,
+    "critMultiplier": 1.5,
+    "delay": 1400,
+    "costType": "mana",
+    "costAmount": 25,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "holy",
+        "chance": 1.0
+      },
+      {
+        "type": "damage",
+        "damageType": "nature",
+        "chance": 0.5
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "stun",
+        "duration": 2,
+        "chance": 0.6
+      }
+    ]
+  },
+  {
+    "id": "mana_cycle",
+    "name": "Mana Cycle",
+    "description": "Converts vitality into renewable magical energy.",
+    "category": "RESTORATION",
+    "parentSkills": [
+      "vitality_boost",
+      "arcane_bolt"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 1000,
+    "costType": "mana",
+    "costAmount": 10,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "restore_resource",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "buff": "spell_amplification",
+        "duration": 10,
+        "chance": 0.5
+      }
+    ]
+  },
+  {
+    "id": "terror_cry",
+    "name": "Terror Cry",
+    "description": "A warcry infused with shadow that instills fear.",
+    "category": "BUFF",
+    "parentSkills": [
+      "warcry",
+      "shadow_bolt"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 800,
+    "costType": "mana",
+    "costAmount": 20,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "buff": "attack_boost",
+        "duration": 10,
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "confused",
+        "duration": 3,
+        "chance": 0.6
+      }
+    ]
+  },
+  {
+    "id": "divine_barrier",
+    "name": "Divine Barrier",
+    "description": "A mana shield reinforced by spiritual prayer.",
+    "category": "DEFENSE",
+    "parentSkills": [
+      "mana_shield",
+      "prayer"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 500,
+    "costType": "mana",
+    "costAmount": 25,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "defense",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "buff": "protection",
+        "duration": 12,
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "rooted_healing",
+    "name": "Rooted Healing",
+    "description": "Healing light that roots enemies in place.",
+    "category": "HEALING_AOE",
+    "parentSkills": [
+      "healing_light",
+      "entangle"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.05,
+    "critMultiplier": 1.5,
+    "delay": 1800,
+    "costType": "mana",
+    "costAmount": 30,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "heal",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "slow",
+        "duration": 4,
+        "chance": 0.8
+      }
+    ]
+  },
+  {
+    "id": "shadow_riposte",
+    "name": "Shadow Riposte",
+    "description": "A counter-attack that repositions the user through shadows.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "counter_strike",
+      "shadow_step"
+    ],
+    "basePower": 24,
+    "baseHitChance": 0.95,
+    "critChance": 0.2,
+    "critMultiplier": 1.7,
+    "delay": 700,
+    "costType": "mana",
+    "costAmount": 25,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "shadow",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "buff": "evasion_boost",
+        "duration": 3,
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "thorned_regeneration",
+    "name": "Thorned Regeneration",
+    "description": "Regrowth that manifests defensive thorns.",
+    "category": "HEALING",
+    "parentSkills": [
+      "regrowth",
+      "nature_wrap"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.05,
+    "critMultiplier": 1.5,
+    "delay": 1500,
+    "costType": "mana",
+    "costAmount": 28,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "heal",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "buff": "defense",
+        "duration": 10,
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "corrosive_wound",
+    "name": "Corrosive Wound",
+    "description": "A venomous slash enhanced by acidic properties.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "venomous_slash",
+      "acid_splash"
+    ],
+    "basePower": 26,
+    "baseHitChance": 0.9,
+    "critChance": 0.15,
+    "critMultiplier": 1.6,
+    "delay": 1100,
+    "costType": "mana",
+    "costAmount": 28,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "poison",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "weaken",
+        "duration": 6,
+        "chance": 0.8
+      }
+    ]
+  },
+  {
+    "id": "smothering_darkness",
+    "name": "Smothering Darkness",
+    "description": "Toxic fog thickened by shadow into a choking void.",
+    "category": "DAMAGE_AOE",
+    "parentSkills": [
+      "toxic_fog",
+      "shadow_veil"
+    ],
+    "basePower": 40,
+    "baseHitChance": 0.85,
+    "critChance": 0.1,
+    "critMultiplier": 1.5,
+    "delay": 1600,
+    "costType": "mana",
+    "costAmount": 45,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "poison",
+        "chance": 1.0
+      },
+      {
+        "type": "damage",
+        "damageType": "shadow",
+        "chance": 0.5
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "silence",
+        "duration": 3,
+        "chance": 0.6
+      }
+    ]
+  },
+  {
+    "id": "bark_carapace",
+    "name": "Bark Carapace",
+    "description": "Stone skin reinforced with living bark.",
+    "category": "DEFENSE",
+    "parentSkills": [
+      "nature_wrap",
+      "stone_skin"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 600,
+    "costType": "mana",
+    "costAmount": 25,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "buff": "defense",
+        "duration": 15,
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "buff": "protection",
+        "duration": 10,
+        "chance": 0.5
+      }
+    ]
+  },
+  {
+    "id": "plague_bloom",
+    "name": "Plague Bloom",
+    "description": "Regrowth twisted to spread disease instead of health.",
+    "category": "DAMAGE_AOE",
+    "parentSkills": [
+      "plague_carrier",
+      "regrowth"
+    ],
+    "basePower": 42,
+    "baseHitChance": 0.85,
+    "critChance": 0.1,
+    "critMultiplier": 1.5,
+    "delay": 1800,
+    "costType": "mana",
+    "costAmount": 45,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "poison",
+        "chance": 1.0
+      },
+      {
+        "type": "damage",
+        "damageType": "nature",
+        "chance": 0.5
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "poison",
+        "duration": 8,
+        "chance": 0.9
+      }
+    ]
+  },
+  {
+    "id": "venom_storm",
+    "name": "Venom Storm",
+    "description": "Lightning that carries toxic spores.",
+    "category": "DAMAGE_AOE",
+    "parentSkills": [
+      "poison_cloud",
+      "lightning_chain"
+    ],
+    "basePower": 28,
+    "baseHitChance": 0.85,
+    "critChance": 0.1,
+    "critMultiplier": 1.5,
+    "delay": 1400,
+    "costType": "mana",
+    "costAmount": 35,
+    "hitCount": {
+      "min": 2,
+      "max": 4
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "electric",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "poison",
+        "duration": 5,
+        "chance": 0.7
+      }
+    ]
+  },
+  {
+    "id": "rotting_grasp",
+    "name": "Rotting Grasp",
+    "description": "Shadow tendrils that decay natural life.",
+    "category": "CONTROL",
+    "parentSkills": [
+      "shadow_grasp",
+      "nature_touch"
+    ],
+    "basePower": 38,
+    "baseHitChance": 0.85,
+    "critChance": 0.1,
+    "critMultiplier": 1.5,
+    "delay": 1500,
+    "costType": "mana",
+    "costAmount": 40,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "shadow",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "stun",
+        "duration": 3,
+        "chance": 0.7
+      }
+    ]
+  },
+  {
+    "id": "martyrdom",
+    "name": "Martyrdom",
+    "description": "Sacrifices health to heal allies with holy light.",
+    "category": "HEALING_AOE",
+    "parentSkills": [
+      "healing_light",
+      "basic_attack"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.05,
+    "critMultiplier": 1.5,
+    "delay": 1500,
+    "costType": "mana",
+    "costAmount": 20,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "heal",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "endurance_crack",
+        "duration": 10,
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "retaliatory_heal",
+    "name": "Retaliatory Heal",
+    "description": "Heals the caster when successfully countering an attack.",
+    "category": "HEALING",
+    "parentSkills": [
+      "mend",
+      "counter_strike"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.1,
+    "critMultiplier": 1.5,
+    "delay": 600,
+    "costType": "mana",
+    "costAmount": 25,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "heal",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "buff": "protection",
+        "duration": 5,
+        "chance": 0.5
+      }
+    ]
+  },
+  {
+    "id": "persistent_life",
+    "name": "Persistent Life",
+    "description": "Regrowth that heals over multiple turns.",
+    "category": "HEALING",
+    "parentSkills": [
+      "regrowth",
+      "rest"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.05,
+    "critMultiplier": 1.5,
+    "delay": 1500,
+    "costType": "mana",
+    "costAmount": 25,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "heal",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "buff": "harmony",
+        "duration": 15,
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "resurrection_rite",
+    "name": "Resurrection Rite",
+    "description": "A holy word combined with first aid to revive fallen allies.",
+    "category": "HEALING",
+    "parentSkills": [
+      "holy_word",
+      "first_aid"
+    ],
+    "basePower": 0,
+    "baseHitChance": 0.8,
+    "critChance": 0.1,
+    "critMultiplier": 1.5,
+    "delay": 3000,
+    "costType": "mana",
+    "costAmount": 50,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "heal",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "buff": "protection",
+        "duration": 10,
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "life_link",
+    "name": "Life Link",
+    "description": "Attunement that shares healing between holy light recipients.",
+    "category": "HEALING",
+    "parentSkills": [
+      "holy_light",
+      "attunement"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.05,
+    "critMultiplier": 1.5,
+    "delay": 1200,
+    "costType": "mana",
+    "costAmount": 18,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "heal",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "buff": "unity",
+        "duration": 10,
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "sanctuary",
+    "name": "Sanctuary",
+    "description": "A holy word that creates a safe zone behind a block.",
+    "category": "DEFENSE",
+    "parentSkills": [
+      "holy_word",
+      "block"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 1000,
+    "costType": "mana",
+    "costAmount": 30,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "defense",
+        "chance": 1.0
+      },
+      {
+        "type": "heal",
+        "chance": 0.5
+      }
+    ]
+  },
+  {
+    "id": "caustic_mend",
+    "name": "Caustic Mend",
+    "description": "Healing mist that damages enemies standing in it.",
+    "category": "HEALING_AOE",
+    "parentSkills": [
+      "mend",
+      "poison_cloud"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.05,
+    "critMultiplier": 1.5,
+    "delay": 1600,
+    "costType": "mana",
+    "costAmount": 30,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "heal",
+        "chance": 1.0
+      },
+      {
+        "type": "damage",
+        "damageType": "poison",
+        "chance": 0.5
+      }
+    ]
+  },
+  {
+    "id": "frozen_cry",
+    "name": "Frozen Cry",
+    "description": "A warcry so cold it freezes the air.",
+    "category": "CONTROL",
+    "parentSkills": [
+      "warcry",
+      "frost_nova"
+    ],
+    "basePower": 15,
+    "baseHitChance": 0.85,
+    "critChance": 0.1,
+    "critMultiplier": 1.5,
+    "delay": 1400,
+    "costType": "mana",
+    "costAmount": 30,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "cold",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "stun",
+        "duration": 2,
+        "chance": 0.6
+      }
+    ]
+  },
+  {
+    "id": "decay_aura",
+    "name": "Decay Aura",
+    "description": "Shadow energy that rots natural life in an area.",
+    "category": "DAMAGE_AOE",
+    "parentSkills": [
+      "shadow_bolt",
+      "attunement"
+    ],
+    "basePower": 14,
+    "baseHitChance": 0.85,
+    "critChance": 0.1,
+    "critMultiplier": 1.5,
+    "delay": 1200,
+    "costType": "mana",
+    "costAmount": 18,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "shadow",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "weaken",
+        "duration": 4,
+        "chance": 0.7
+      }
+    ]
+  },
+  {
+    "id": "crystal_skin",
+    "name": "Crystal Skin",
+    "description": "Arcane energy crystallizes the skin into armor.",
+    "category": "DEFENSE",
+    "parentSkills": [
+      "arcane_bolt",
+      "stone_skin"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 500,
+    "costType": "mana",
+    "costAmount": 20,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "buff": "defense",
+        "duration": 12,
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "buff": "spell_amplification",
+        "duration": 10,
+        "chance": 0.5
+      }
+    ]
+  },
+  {
+    "id": "holy_roots",
+    "name": "Holy Roots",
+    "description": "Vines empowered by divine conviction.",
+    "category": "CONTROL",
+    "parentSkills": [
+      "smite",
+      "entangle"
+    ],
+    "basePower": 22,
+    "baseHitChance": 0.85,
+    "critChance": 0.1,
+    "critMultiplier": 1.5,
+    "delay": 1400,
+    "costType": "mana",
+    "costAmount": 28,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "holy",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "stun",
+        "duration": 2,
+        "chance": 0.6
+      }
+    ]
+  },
+  {
+    "id": "phantom_lunge",
+    "name": "Phantom Lunge",
+    "description": "A lunge that disappears into shadows mid-charge.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "lunge",
+      "shadow_step"
+    ],
+    "basePower": 20,
+    "baseHitChance": 0.95,
+    "critChance": 0.2,
+    "critMultiplier": 1.7,
+    "delay": 800,
+    "costType": "mana",
+    "costAmount": 22,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "shadow",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "buff": "evasion_boost",
+        "duration": 3,
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "alchemy_fire",
+    "name": "Alchemy Fire",
+    "description": "Fire used to cauterize wounds while damaging enemies.",
+    "category": "HEALING",
+    "parentSkills": [
+      "produce_flame",
+      "first_aid"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.05,
+    "critMultiplier": 1.5,
+    "delay": 1200,
+    "costType": "mana",
+    "costAmount": 18,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "heal",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "burn",
+        "duration": 3,
+        "chance": 0.5
+      }
+    ]
+  },
+  {
+    "id": "storm_seed",
+    "name": "Storm Seed",
+    "description": "Plants a seed that grows into a lightning rod.",
+    "category": "DAMAGE_MAGIC",
+    "parentSkills": [
+      "shock",
+      "nature_touch"
+    ],
+    "basePower": 16,
+    "baseHitChance": 0.9,
+    "critChance": 0.15,
+    "critMultiplier": 1.6,
+    "delay": 1300,
+    "costType": "mana",
+    "costAmount": 20,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "electric",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "stun",
+        "duration": 2,
+        "chance": 0.5
+      }
+    ]
+  },
+  {
+    "id": "blood_ice",
+    "name": "Blood Ice",
+    "description": "Freezes blood within a wound to cause internal damage.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "chill",
+      "blood_letting"
+    ],
+    "basePower": 24,
+    "baseHitChance": 0.9,
+    "critChance": 0.2,
+    "critMultiplier": 1.7,
+    "delay": 1100,
+    "costType": "mana",
+    "costAmount": 25,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "cold",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "bleed",
+        "duration": 5,
+        "chance": 0.8
+      }
+    ]
+  },
+  {
+    "id": "echoing_prayer",
+    "name": "Echoing Prayer",
+    "description": "A shout that carries a prayer across the battlefield.",
+    "category": "BUFF",
+    "parentSkills": [
+      "prayer",
+      "shout"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 800,
+    "costType": "mana",
+    "costAmount": 15,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "buff": "protection",
+        "duration": 10,
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "buff": "attack_boost",
+        "duration": 10,
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "arcane_pummel",
+    "name": "Arcane Pummel",
+    "description": "A heavy blow infused with arcane strike energy.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "pummel",
+      "arcane_strike"
+    ],
+    "basePower": 18,
+    "baseHitChance": 0.85,
+    "critChance": 0.1,
+    "critMultiplier": 1.5,
+    "delay": 1300,
+    "costType": "mana",
+    "costAmount": 20,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "bludgeoning",
+        "chance": 1.0
+      },
+      {
+        "type": "damage",
+        "damageType": "arcane",
+        "chance": 0.5
+      }
+    ]
+  },
+  {
+    "id": "flaming_shove",
+    "name": "Flaming Shove",
+    "description": "A shove that pushes enemies into a wall of fire.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "shove",
+      "produce_flame"
+    ],
+    "basePower": 14,
+    "baseHitChance": 0.85,
+    "critChance": 0.1,
+    "critMultiplier": 1.5,
+    "delay": 1000,
+    "costType": "mana",
+    "costAmount": 16,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "fire",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "knockback",
+        "duration": 0,
+        "chance": 0.6
+      }
+    ]
+  },
+  {
+    "id": "ice_block",
+    "name": "Ice Block",
+    "description": "A block that freezes attackers on contact.",
+    "category": "DEFENSE",
+    "parentSkills": [
+      "block",
+      "chill"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 500,
+    "costType": "mana",
+    "costAmount": 15,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "defense",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "slow",
+        "duration": 3,
+        "chance": 0.5
+      }
+    ]
+  },
+  {
+    "id": "shockwave",
+    "name": "Shockwave",
+    "description": "A shove amplified by electric shock.",
+    "category": "DAMAGE_AOE",
+    "parentSkills": [
+      "shove",
+      "shock"
+    ],
+    "basePower": 12,
+    "baseHitChance": 0.85,
+    "critChance": 0.05,
+    "critMultiplier": 1.5,
+    "delay": 1000,
+    "costType": "mana",
+    "costAmount": 18,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "electric",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "stun",
+        "duration": 1,
+        "chance": 0.4
+      }
+    ]
+  },
+  {
+    "id": "shadow_block",
+    "name": "Shadow Block",
+    "description": "A block that phases into shadows to avoid damage.",
+    "category": "DEFENSE",
+    "parentSkills": [
+      "block",
+      "shadow_veil"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 500,
+    "costType": "mana",
+    "costAmount": 25,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "defense",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "buff": "evasion_boost",
+        "duration": 5,
+        "chance": 0.5
+      }
+    ]
+  },
+  {
+    "id": "holy_shove",
+    "name": "Holy Shove",
+    "description": "A shove empowered by holy light.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "shove",
+      "holy_light"
+    ],
+    "basePower": 14,
+    "baseHitChance": 0.9,
+    "critChance": 0.1,
+    "critMultiplier": 1.5,
+    "delay": 1000,
+    "costType": "mana",
+    "costAmount": 16,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "holy",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "knockback",
+        "duration": 0,
+        "chance": 0.6
+      }
+    ]
+  },
+  {
+    "id": "nature_pierce",
+    "name": "Nature Pierce",
+    "description": "A piercing attack that sprouts thorns in the wound.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "pierce",
+      "nature_touch"
+    ],
+    "basePower": 16,
+    "baseHitChance": 0.95,
+    "critChance": 0.2,
+    "critMultiplier": 1.7,
+    "delay": 900,
+    "costType": "mana",
+    "costAmount": 18,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "piercing",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "bleed",
+        "duration": 4,
+        "chance": 0.6
+      }
+    ]
+  },
+  {
+    "id": "poison_lunge",
+    "name": "Poison Lunge",
+    "description": "A lunge that injects poison on impact.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "lunge",
+      "apply_poison"
+    ],
+    "basePower": 17,
+    "baseHitChance": 0.9,
+    "critChance": 0.15,
+    "critMultiplier": 1.6,
+    "delay": 900,
+    "costType": "stamina",
+    "costAmount": 18,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "physical",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "poison",
+        "duration": 5,
+        "chance": 0.8
+      }
+    ]
+  },
+  {
+    "id": "arcane_shield_bash",
+    "name": "Arcane Shield Bash",
+    "description": "A shield bash reinforced with arcane energy.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "shield_bash",
+      "arcane_bolt"
+    ],
+    "basePower": 40,
+    "baseHitChance": 0.9,
+    "critChance": 0.1,
+    "critMultiplier": 1.5,
+    "delay": 1200,
+    "costType": "mana",
+    "costAmount": 40,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "bludgeoning",
+        "chance": 1.0
+      },
+      {
+        "type": "damage",
+        "damageType": "arcane",
+        "chance": 0.5
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "stun",
+        "duration": 2,
+        "chance": 0.6
+      }
+    ]
+  },
+  {
+    "id": "fire_wall",
+    "name": "Fire Wall",
+    "description": "A block that projects a wall of flame.",
+    "category": "DEFENSE",
+    "parentSkills": [
+      "produce_flame",
+      "block"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 600,
+    "costType": "mana",
+    "costAmount": 18,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "defense",
+        "chance": 1.0
+      },
+      {
+        "type": "damage",
+        "damageType": "fire",
+        "chance": 0.5
+      }
+    ]
+  },
+  {
+    "id": "wind_cut",
+    "name": "Wind Cut",
+    "description": "A slash that uses footwork to create a vacuum blade.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "slash",
+      "footwork"
+    ],
+    "basePower": 15,
+    "baseHitChance": 0.95,
+    "critChance": 0.15,
+    "critMultiplier": 1.6,
+    "delay": 900,
+    "costType": "stamina",
+    "costAmount": 16,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "slashing",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "buff": "speed_boost",
+        "duration": 3,
+        "chance": 0.5
+      }
+    ]
+  },
+  {
+    "id": "grounded_strike",
+    "name": "Grounded Strike",
+    "description": "A basic attack that draws power from the earth.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "basic_attack",
+      "attunement"
+    ],
+    "basePower": 12,
+    "baseHitChance": 0.9,
+    "critChance": 0.1,
+    "critMultiplier": 1.5,
+    "delay": 1000,
+    "costType": "stamina",
+    "costAmount": 12,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "physical",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "buff": "defense",
+        "duration": 5,
+        "chance": 0.5
+      }
+    ]
+  },
+  {
+    "id": "silent_prayer",
+    "name": "Silent Prayer",
+    "description": "A prayer cast without sound to avoid detection.",
+    "category": "UTILITY",
+    "parentSkills": [
+      "prayer",
+      "misdirect"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 600,
+    "costType": "mana",
+    "costAmount": 12,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "buff": "stealth",
+        "duration": 8,
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "focused_rest",
+    "name": "Focused Rest",
+    "description": "Rest that recovers resources faster through concentration.",
+    "category": "RESTORATION",
+    "parentSkills": [
+      "rest",
+      "focus"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 1000,
+    "costType": "none",
+    "costAmount": 0,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "restore_resource",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "buff": "haste",
+        "duration": 5,
+        "chance": 0.5
+      }
+    ]
+  },
+  {
+    "id": "hunter_mark",
+    "name": "Hunter Mark",
+    "description": "Aiming while stalking reveals the target's weaknesses.",
+    "category": "UTILITY",
+    "parentSkills": [
+      "aim",
+      "stalk"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 500,
+    "costType": "stamina",
+    "costAmount": 10,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_debuff",
+        "debuff": "weaken",
+        "duration": 10,
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "stalking_shadow",
+    "name": "Stalking Shadow",
+    "description": "Stalking enhanced by shadow stepping.",
+    "category": "UTILITY",
+    "parentSkills": [
+      "stalk",
+      "shadow_step"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 600,
+    "costType": "mana",
+    "costAmount": 15,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "buff": "stealth",
+        "duration": 10,
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "buff": "speed_boost",
+        "duration": 5,
+        "chance": 0.5
+      }
+    ]
+  },
+  {
+    "id": "divine_reflection",
+    "name": "Divine Reflection",
+    "description": "Spell reflection empowered by holy light.",
+    "category": "DEFENSE",
+    "parentSkills": [
+      "spell_reflection",
+      "holy_light"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 500,
+    "costType": "mana",
+    "costAmount": 40,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "defense",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "buff": "protection",
+        "duration": 10,
+        "chance": 0.8
+      }
+    ]
+  },
+  {
+    "id": "penitent_strike",
+    "name": "Penitent Strike",
+    "description": "A smite that heals the caster based on blood let.",
+    "category": "DAMAGE_SINGLE",
+    "parentSkills": [
+      "smite",
+      "blood_letting"
+    ],
+    "basePower": 26,
+    "baseHitChance": 0.9,
+    "critChance": 0.15,
+    "critMultiplier": 1.6,
+    "delay": 1200,
+    "costType": "mana",
+    "costAmount": 28,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "holy",
+        "chance": 1.0
+      },
+      {
+        "type": "heal",
+        "chance": 0.5
+      }
+    ]
+  },
+  {
+    "id": "atonement",
+    "name": "Atonement",
+    "description": "Mending wounds through prayerful sacrifice.",
+    "category": "HEALING",
+    "parentSkills": [
+      "mend",
+      "prayer"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.05,
+    "critMultiplier": 1.5,
+    "delay": 1500,
+    "costType": "mana",
+    "costAmount": 18,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "heal",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "buff": "protection",
+        "duration": 8,
+        "chance": 0.5
+      }
+    ]
+  },
+  {
+    "id": "judgment_field",
+    "name": "Judgment Field",
+    "description": "Holy word that entangles and judges enemies.",
+    "category": "CONTROL",
+    "parentSkills": [
+      "holy_word",
+      "entangle"
+    ],
+    "basePower": 20,
+    "baseHitChance": 0.85,
+    "critChance": 0.1,
+    "critMultiplier": 1.5,
+    "delay": 1600,
+    "costType": "mana",
+    "costAmount": 30,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "holy",
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "debuff": "cursed",
+        "duration": 5,
+        "chance": 0.7
+      }
+    ]
+  },
+  {
+    "id": "spirit_walk",
+    "name": "Spirit Walk",
+    "description": "Void walking while attuned to the natural spirit realm.",
+    "category": "UTILITY",
+    "parentSkills": [
+      "void_walk",
+      "attunement"
+    ],
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 600,
+    "costType": "mana",
+    "costAmount": 60,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "buff": "stealth",
+        "duration": 15,
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "buff": "evasion_boost",
+        "duration": 15,
+        "chance": 1.0
       }
     ]
   }

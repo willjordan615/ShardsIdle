@@ -984,7 +984,13 @@
         applySettings(settings);
     });
 
-    // Apply on load
+    // Apply settings on load and wire settings button
     document.addEventListener('DOMContentLoaded', () => {
+        applySettings(loadSettings());
         const settingsBtn = document.getElementById('settingsOpenBtn');
         if (settingsBtn) settingsBtn.addEventListener('click', openSettings);
+    });
+    </script>
+
+</body>
+</html>
