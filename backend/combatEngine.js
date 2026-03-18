@@ -316,7 +316,7 @@ class CombatEngine {
       // Apply stat bonuses from all equipped items (weapons + armor)
       // Items carry short-name stat fields (con, end, amb, har) that boost character stats.
       const statFieldMap = { con: 'conviction', end: 'endurance', amb: 'ambition', har: 'harmony' };
-      const equipmentSlots = ['mainHand', 'offHand', 'head', 'chest', 'legs', 'hands', 'feet', 'accessory1', 'accessory2'];
+      const equipmentSlots = ['mainHand', 'offHand', 'head', 'chest', 'accessory1', 'accessory2'];
       const boostedStats = { ...stats }; // don't mutate the original snapshot stats
       equipmentSlots.forEach(slot => {
         const itemId = equipment[slot];
@@ -330,7 +330,7 @@ class CombatEngine {
 
       // Sum armor and evasion from all equipped armor pieces.
       // armor → flat damage reduction; phys_ev/mag_ev → hit chance reduction (separate).
-      const armorSlots = ['head', 'chest', 'offHand', 'legs', 'hands', 'feet'];
+      const armorSlots = ['head', 'chest', 'offHand', 'accessory1', 'accessory2'];
       let totalArmor = 0;
       let totalPhysEv = 0;
       let totalMagEv  = 0;
@@ -979,6 +979,14 @@ class CombatEngine {
         if (healSkill) return { type: 'skill', skillID: healSkill.id, target: enemy.id };
     }
 
+    // Resource restoration — use when both stamina and mana are critically low
+    const staminaRatio = enemy.currentStamina / enemy.maxStamina;
+    const manaRatio    = enemy.currentMana    / enemy.maxMana;
+    if (staminaRatio < 0.15 && manaRatio < 0.15) {
+        const restoreSkill = this.getEnemySkillByCategory(enemy.skills, 'RESTORATION');
+        if (restoreSkill) return { type: 'skill', skillID: restoreSkill.id, target: enemy.id };
+    }
+
     // Support profile: occasionally buff/heal allies
     if (profile === 'support' && aliveEnemies.length > 1 && Math.random() < 0.35) {
         const buffSkill = this.getEnemySkillByCategory(enemy.skills, 'BUFF');
@@ -990,12 +998,12 @@ class CombatEngine {
         }
     }
 
-    // Build all usable skills (include CONTROL, BUFF, DEFENSE — not just DAMAGE)
+    // Build all usable skills (include CONTROL, BUFF, DEFENSE, RESTORATION — not just DAMAGE)
     const usableSkills = enemy.skills
         .map(skillID => this.skills.find(s => s.id === skillID))
         .filter(s => s && this.hasResources(enemy, s) &&
             ['DAMAGE_SINGLE','DAMAGE_AOE','DAMAGE_MAGIC','DAMAGE_AOE_MAGIC',
-             'CONTROL','BUFF','DEFENSE','UTILITY'].includes(s.category)
+             'CONTROL','BUFF','DEFENSE','UTILITY','RESTORATION'].includes(s.category)
         );
 
     if (usableSkills.length === 0) {
@@ -1150,8 +1158,14 @@ class CombatEngine {
       alivePlayers,
       highestThreatScore,
       lastUsedSkillId:  actor.lastUsedSkillId || null,
-      staminaBudgetRatio: actor.currentStamina / (actor.maxStamina / Math.max(1, stagesRemaining + 1)),
-      manaBudgetRatio:    actor.currentMana    / (actor.maxMana    / Math.max(1, stagesRemaining + 1)),
+      // Budget ratios only meaningful for players persisting across stages.
+      // Enemies respawn fresh each stage so conservation pressure doesn't apply.
+      staminaBudgetRatio: actor.type === 'player'
+          ? actor.currentStamina / (actor.maxStamina / Math.max(1, stagesRemaining + 1))
+          : 1.0,
+      manaBudgetRatio: actor.type === 'player'
+          ? actor.currentMana / (actor.maxMana / Math.max(1, stagesRemaining + 1))
+          : 1.0,
     };
   }
 
@@ -2141,6 +2155,7 @@ class CombatEngine {
             let equipment = { mainHand: null, chest: null, offHand: null };
             
             if (enemyType.equipment && Array.isArray(enemyType.equipment)) {
+                // Array format: ["fangs_tiny"] — find weapon and armor by item properties
                 const weapon = enemyType.equipment.map(itemId => this.gear.find(g => g.id === itemId)).find(item => item && (item.slot_id1 === 'mainHand' || item.type.includes('weapon') || item.dmg1));
                 if (weapon) {
                     equipment.mainHand = weapon.id;
@@ -2148,6 +2163,13 @@ class CombatEngine {
                 }
                 const armor = enemyType.equipment.map(itemId => this.gear.find(g => g.id === itemId)).find(item => item && (item.slot_id1 === 'chest' || item.armor));
                 if (armor) equipment.chest = armor.id;
+            } else if (enemyType.equipment && typeof enemyType.equipment === 'object') {
+                // Object format: { mainHand: "goblin_dagger", offHand: null, ... }
+                equipment = { ...equipment, ...enemyType.equipment };
+                if (i === 0 && equipment.mainHand) {
+                    const weapon = this.gear.find(g => g.id === equipment.mainHand);
+                    if (weapon) console.log(`[EQUIP] ${enemyType.name} (Lvl ${enemyLevel}) equipped ${weapon.name}`);
+                }
             }
 
             const maxHP = this.calculateMaxHP(enemyType.stats, enemyLevel, false);

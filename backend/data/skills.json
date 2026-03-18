@@ -1373,7 +1373,7 @@
     ],
     "parentSkills": [
       "channel",
-      "consumable_tool_torch"
+      "light_area"
     ],
     "masteryUnlockAt": 200
   },

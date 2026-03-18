@@ -258,17 +258,17 @@
       "baseGold": 250,
       "lootTable": [
         {
-          "itemID": "steel_helm",
+          "itemID": "head_steel_helm_tier1",
           "rarity": "uncommon",
           "dropChance": 0.4
         },
         {
-          "itemID": "silver_dagger",
+          "itemID": "dagger_silver_tier2",
           "rarity": "uncommon",
           "dropChance": 0.35
         },
         {
-          "itemID": "boots_speed",
+          "itemID": "acc_boots_studded_tier1",
           "rarity": "uncommon",
           "dropChance": 0.25
         }
@@ -328,12 +328,12 @@
       "baseGold": 500,
       "lootTable": [
         {
-          "itemID": "mage_robe",
+          "itemID": "chest_mage_vestments_tier1",
           "rarity": "uncommon",
           "dropChance": 0.45
         },
         {
-          "itemID": "plate_helm",
+          "itemID": "head_steel_helm_tier1",
           "rarity": "rare",
           "dropChance": 0.2
         }
@@ -393,12 +393,12 @@
       "baseGold": 2000,
       "lootTable": [
         {
-          "itemID": "plate_armor",
+          "itemID": "chest_dragon_scale_tier5",
           "rarity": "rare",
           "dropChance": 0.6
         },
         {
-          "itemID": "dragon_scale_shield",
+          "itemID": "head_dragonbone_helm_tier5",
           "rarity": "epic",
           "dropChance": 0.25
         }
