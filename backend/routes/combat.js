@@ -226,8 +226,8 @@ router.post('/start', async (req, res) => {
         }
     }
 
-        // 5. Persist combat log
-        if (result.shouldPersist && result.result !== 'retreated') {
+        // 5. Persist combat log (all outcomes including retreats)
+        if (result.shouldPersist || result.result === 'retreated') {
             await db.saveCombatLog({
                 id: result.combatID,
                 challengeID,
@@ -276,6 +276,30 @@ router.get('/history/:characterID', async (req, res) => {
         res.json(logs);
     } catch (error) {
         console.error('[COMBAT] Error retrieving history:', error);
+        res.status(500).json({ error: 'Failed to retrieve combat history' });
+    }
+});
+
+// Lightweight summary — strips full log payload, returns only display fields
+router.get('/history/:characterID/summary', async (req, res) => {
+    try {
+        const logs = await db.getCombatLogs(req.params.characterID);
+        const summary = logs.map(l => ({
+            id:          l.id,
+            challengeID: l.challengeID,
+            result:      l.result,
+            totalTurns:  l.totalTurns,
+            createdAt:   l.createdAt,
+            // Pull stage summaries from the log without sending full turn data
+            stages: (l.log?.segments || []).map(s => ({
+                title:       s.title,
+                status:      s.status,
+                summaryText: s.summaryText
+            }))
+        }));
+        res.json(summary);
+    } catch (error) {
+        console.error('[COMBAT] Error retrieving history summary:', error);
         res.status(500).json({ error: 'Failed to retrieve combat history' });
     }
 });

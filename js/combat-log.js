@@ -1,9 +1,57 @@
 // combat-log.js
 // Handles combat log display with metered playback and rewards
 
+// Pause state
+window.combatPaused = false;
+
+window.toggleCombatPause = function() {
+    window.combatPaused = !window.combatPaused;
+    const btn = document.getElementById('pauseBtn');
+    if (btn) btn.textContent = window.combatPaused ? '▶ Resume' : '⏸ Pause';
+};
+
+// Scroll tracking — stop auto-scroll when user scrolls up manually
+let _userScrolledUp = false;
+
+window.resumeCombatScroll = function() {
+    _userScrolledUp = false;
+    const log = document.getElementById('combatLogDisplay');
+    if (log) log.scrollTop = log.scrollHeight;
+    const btn = document.getElementById('scrollResumeBtn');
+    if (btn) btn.style.display = 'none';
+};
+
+function _initScrollTracking() {
+    const log = document.getElementById('combatLogDisplay');
+    if (!log) return;
+    log.addEventListener('scroll', () => {
+        const atBottom = log.scrollTop + log.clientHeight >= log.scrollHeight - 10;
+        _userScrolledUp = !atBottom;
+        const btn = document.getElementById('scrollResumeBtn');
+        if (btn) btn.style.display = _userScrolledUp ? 'inline-block' : 'none';
+    });
+}
+
+function _scrollLogToBottom(logDisplay) {
+    if (!_userScrolledUp) logDisplay.scrollTop = logDisplay.scrollHeight;
+}
+
 function sleep(ms) {
     const multiplier = window.combatSpeedMultiplier || 1.0;
-    return new Promise(resolve => setTimeout(resolve, ms * multiplier));
+    const duration = ms * multiplier;
+    // Poll pause state in 100ms increments
+    return new Promise(resolve => {
+        let elapsed = 0;
+        const interval = setInterval(() => {
+            if (!window.combatPaused) {
+                elapsed += 100;
+                if (elapsed >= duration) {
+                    clearInterval(interval);
+                    resolve();
+                }
+            }
+        }, 100);
+    });
 }
 
 // --- SAFE UI HELPERS ---
@@ -50,6 +98,73 @@ async function displayCombatLog(combatData) {
         enemyStatus.innerHTML   = '';
         logDisplay.innerHTML    = '';
         resultDisplay.innerHTML = '';
+
+        // Reset pause and scroll state for new combat
+        window.combatPaused = false;
+        _userScrolledUp = false;
+        const pauseBtn = document.getElementById('pauseBtn');
+        if (pauseBtn) pauseBtn.textContent = '⏸ Pause';
+        const scrollBtn = document.getElementById('scrollResumeBtn');
+        if (scrollBtn) scrollBtn.style.display = 'none';
+        _initScrollTracking();
+
+        // Init live stats tracking
+        const _stats = {}; // characterID -> { name, dmgDealt, dmgTaken, healed }
+        combatData.participants.playerCharacters.forEach(pc => {
+            _stats[pc.characterID] = { name: pc.characterName, dmgDealt: 0, dmgTaken: 0, healed: 0 };
+        });
+        const statsPanel  = document.getElementById('combatStatsPanel');
+        const statsContent = document.getElementById('combatStatsContent');
+        if (statsPanel) statsPanel.style.display = 'block';
+
+        function _updateStatsDisplay() {
+            if (!statsContent) return;
+            statsContent.innerHTML = Object.values(_stats).map(s =>
+                `<div style="min-width:160px; padding:4px 8px; background:rgba(255,255,255,0.04); border-radius:4px;">
+                    <div style="color:#d4af37; font-weight:500; margin-bottom:2px;">${s.name}</div>
+                    <div style="color:#ff6b6b;">DMG dealt: ${s.dmgDealt}</div>
+                    <div style="color:#aaa;">DMG taken: ${s.dmgTaken}</div>
+                    <div style="color:#4eff7f;">Healed: ${s.healed}</div>
+                </div>`
+            ).join('');
+        }
+        _updateStatsDisplay();
+
+        function _trackTurnStats(turn) {
+            if (!turn.result) return;
+            const actorId = turn.actor;
+
+            // Damage dealt by this actor
+            if (turn.result.damageDealt > 0 && _stats[actorId]) {
+                _stats[actorId].dmgDealt += turn.result.damageDealt;
+            }
+
+            // Damage taken — any party member appearing in targets[]
+            if (turn.result.targets) {
+                turn.result.targets.forEach(t => {
+                    if (_stats[t.targetId] && t.damage > 0) {
+                        _stats[t.targetId].dmgTaken += t.damage;
+                    }
+                });
+            }
+
+            // Heals — non-damage turns where a party member's HP went up
+            // hpCurrent tracks live HP; if hpAfter > hpCurrent the target was healed
+            if (turn.result.damageDealt === 0 && turn.result.targets) {
+                turn.result.targets.forEach(t => {
+                    if (!_stats[t.targetId]) return;
+                    if (t.hpAfter === undefined) return;
+                    const prev = hpCurrent[t.targetId];
+                    if (prev !== undefined && t.hpAfter > prev) {
+                        _stats[t.targetId].healed += (t.hpAfter - prev);
+                    }
+                });
+            }
+
+            // Self-heals via status ticks (heal targets may not appear in targets[])
+            // Covered by the status turn handler — hpCurrent is updated by updateHealthBars
+            // before _trackTurnStats is called, so delta is already applied.
+        }
 
         // HP tracking maps
         const hpMaxes   = {};
@@ -215,9 +330,11 @@ async function displayCombatLog(combatData) {
                 // 5. Play combat turns (pre-combat already consumed by banner)
                 for (const turn of combatTurns) {
                     const turnDelay = turn.result?.delay || DEFAULT_DELAY;
+                    _trackTurnStats(turn);  // before updateHealthBars so heal deltas are correct
                     renderTurn(turn, logDisplay, hpMaxes, hpCurrent);
                     updateHealthBars(turn, hpMaxes, hpCurrent);
                     if (turn.playerResourceStates) updateResourceBars(turn.playerResourceStates);
+                    _updateStatsDisplay();
 
                     // Animate attacker lunge + target hit/defeat — unified targets[] format
                     if (turn.result?.damageDealt > 0 && turn.actor && turn.action?.type === 'skill') {
@@ -263,7 +380,7 @@ async function displayCombatLog(combatData) {
                     <div class="turn-message" style="color:#aaa;border-left:3px solid ${outcomeColor};padding-left:10px;font-style:italic;">${segment.summaryText}</div>
                 `;
                 logDisplay.appendChild(summaryLogEl);
-                logDisplay.scrollTop = logDisplay.scrollHeight;
+                _scrollLogToBottom(logDisplay);
 
                 if (segment.status === 'defeat' || segment.status === 'loss') {
                     overallResult = 'loss';
@@ -284,15 +401,22 @@ async function displayCombatLog(combatData) {
             const turns = combatData.turns || [];
             for (const turn of turns) {
                 const turnDelay = turn.result?.delay || DEFAULT_DELAY;
+                _trackTurnStats(turn);  // before updateHealthBars so heal deltas are correct
                 renderTurn(turn, logDisplay, hpMaxes, hpCurrent);
                 updateHealthBars(turn, hpMaxes, hpCurrent);
                 if (turn.playerResourceStates) updateResourceBars(turn.playerResourceStates);
+                _updateStatsDisplay();
                 await sleep(turnDelay);
             }
             overallResult = combatData.result;
         }
 
         // --- RESULT MODAL ---
+        // Combat is over — stop pause, hide stats panel
+        window.combatPaused = false;
+        const _pauseBtnEnd = document.getElementById('pauseBtn');
+        if (_pauseBtnEnd) _pauseBtnEnd.textContent = '⏸ Pause';
+
         const finalResult  = combatData.result;
         const nextId       = combatData.nextChallengeId || window.lastChallengeId || 'challenge_goblin_camp';
 
@@ -492,7 +616,7 @@ function renderTurn(turn, logDisplay, hpMaxes, hpCurrent) {
             <div class="turn-message">${turn.result?.message}</div>
         `;
         logDisplay.appendChild(turnEl);
-        logDisplay.scrollTop = logDisplay.scrollHeight;
+        _scrollLogToBottom(logDisplay);
         return;
     }
 
@@ -511,7 +635,7 @@ function renderTurn(turn, logDisplay, hpMaxes, hpCurrent) {
             <div class="turn-message">${turn.result?.message || skillName + ' fires!'}</div>
         `;
         logDisplay.appendChild(turnEl);
-        logDisplay.scrollTop = logDisplay.scrollHeight;
+        _scrollLogToBottom(logDisplay);
         return;
     }
 
@@ -554,7 +678,7 @@ function renderTurn(turn, logDisplay, hpMaxes, hpCurrent) {
             `;
             logDisplay.appendChild(turnEl);
         }
-        logDisplay.scrollTop = logDisplay.scrollHeight;
+        _scrollLogToBottom(logDisplay);
         return;
     }
 
@@ -568,7 +692,7 @@ function renderTurn(turn, logDisplay, hpMaxes, hpCurrent) {
             <div class="turn-message">${turn.result?.message || 'Status effect ticks...'}</div>
         `;
         logDisplay.appendChild(turnEl);
-        logDisplay.scrollTop = logDisplay.scrollHeight;
+        _scrollLogToBottom(logDisplay);
         return;
     }
 
@@ -585,7 +709,7 @@ function renderTurn(turn, logDisplay, hpMaxes, hpCurrent) {
         ${isHit ? `<div class="turn-damage">Damage: ${turn.result.damageDealt}</div>` : ''}
     `;
     logDisplay.appendChild(turnEl);
-    logDisplay.scrollTop = logDisplay.scrollHeight;
+    _scrollLogToBottom(logDisplay);
 }
 
 // --- HEALTH BAR UPDATERS ---

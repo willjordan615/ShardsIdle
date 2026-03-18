@@ -718,7 +718,7 @@ class CombatEngine {
         turns,
         participants: { playerCharacters: [], enemies: [] },
         rewards: null,
-        shouldPersist: false
+        shouldPersist: true
     };
   }
 

@@ -17,6 +17,10 @@
 
         <!-- ROSTER SCREEN -->
         <div id="roster" class="screen active">
+            <div id="connectionError" style="display:none; margin-bottom:1rem; padding:1rem 1.25rem; background:rgba(212,60,60,0.12); border:1px solid #d43c3c; border-radius:6px; color:#ff8080;">
+                <strong>⚠ Cannot connect to server.</strong>
+                Make sure the backend is running: open a terminal in the <code>backend/</code> folder and run <code>npm start</code>, then refresh this page.
+            </div>
             <div class="nav-buttons">
                 <button onclick="showScreen('create')">Create Character</button>
             </div>
@@ -120,7 +124,10 @@
                 <button id="selectChallengeBtn" onclick="selectCharacterForChallenge(currentState.detailCharacterId)">Select Challenge</button>
             </div>
 
-            <h2 id="detailName">Character Name</h2>
+            <div style="display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:0.25rem;">
+                <h2 id="detailName" style="margin:0;">Character Name</h2>
+                <button onclick="openCombatHistoryModal()" class="secondary" style="font-size:0.8rem; padding:4px 12px;">📜 Combat History</button>
+            </div>
             <p id="detailRace" style="color: #8b7355; margin-bottom: 2rem;">Race</p>
 
             <div class="grid-2">
@@ -222,11 +229,23 @@
                 </div>
                 <p id="aiProfileSaveMsg" style="color: #4cd964; margin-top: 0.5rem; font-size: 0.85rem; min-height: 1.2em;"></p>
             </div>
-
             <div style="text-align: center; margin-top: 2rem;">
                 <button onclick="deleteCharacter(currentState.detailCharacterId)" class="danger">Delete Character</button>
                 <!-- ADDED: Share Character Button -->
                 <button onclick="openShareModal(currentState.detailCharacterId)" class="secondary" style="margin-left: 1rem;">📤 Share Character</button>
+            </div>
+        </div>
+
+        <!-- COMBAT HISTORY MODAL -->
+        <div id="combatHistoryModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:2000; justify-content:center; align-items:center;">
+            <div style="background:#1a1a2e; border:2px solid #d4af37; border-radius:8px; padding:20px; width:90%; max-width:640px; max-height:82vh; display:flex; flex-direction:column;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-shrink:0;">
+                    <h3 style="color:#ffd700; margin:0;">📜 Combat History</h3>
+                    <button onclick="document.getElementById('combatHistoryModal').style.display='none'" style="padding:4px 12px; background:#4a2a2a; color:#fff; border:none; border-radius:4px; cursor:pointer;">✕ Close</button>
+                </div>
+                <div id="combatHistoryDisplay" style="overflow-y:auto; font-size:0.85rem; flex:1;">
+                    <p style="color:#666; font-style:italic;">Loading...</p>
+                </div>
             </div>
         </div>
 
@@ -339,6 +358,7 @@
         <div id="combatlog" class="screen">
             <div class="nav-buttons">
                 <button onclick="viewCharacterDuringCombat()" class="secondary">👤 View Character</button>
+                <button id="pauseBtn" onclick="toggleCombatPause()" class="secondary" style="margin-left:8px;">⏸ Pause</button>
             </div>
 
             <!-- Stage banner: title + pre-combat result + enemy flash reveal -->
@@ -358,8 +378,14 @@
                 </div>
             </div>
 
+            <!-- Live combat statistics -->
+            <div id="combatStatsPanel" style="margin:0.75rem 0; padding:0.75rem 1rem; background:rgba(20,30,50,0.6); border:1px solid rgba(212,175,55,0.2); border-radius:6px; display:none;">
+                <div style="font-size:0.75rem; color:#888; letter-spacing:1px; text-transform:uppercase; margin-bottom:0.5rem;">Combat Stats</div>
+                <div id="combatStatsContent" style="display:flex; flex-wrap:wrap; gap:1rem; font-size:0.85rem;"></div>
+            </div>
+
             <div class="section">
-                <h3>Battle Log</h3>
+                <h3>Battle Log <button id="scrollResumeBtn" onclick="resumeCombatScroll()" style="display:none; margin-left:8px; padding:2px 8px; font-size:0.75rem; background:#2a4a6a; color:#fff; border:1px solid #4a6a8a; border-radius:3px; cursor:pointer;">↓ Latest</button></h3>
                 <div class="combat-log" id="combatLogDisplay"></div>
             </div>
 
@@ -541,10 +567,16 @@
     <!-- APP INITIALIZATION -->
     <script>
         (async function() {
+            const roster = document.getElementById('rosterContainer');
+            if (roster) roster.innerHTML = '<p style="color:#666; text-align:center; padding:2rem;">Connecting to server...</p>';
             const success = await initializeGame();
             if (success) {
                 initCharacterCreation();
                 await renderRoster();
+            } else {
+                const banner = document.getElementById('connectionError');
+                if (banner) banner.style.display = 'block';
+                if (roster) roster.innerHTML = '';
             }
         })();
     </script>

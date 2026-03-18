@@ -748,6 +748,7 @@ async function showCharacterDetail(characterId) {
         renderConsumableBelt(character);
         renderExportButton(character); 
 renderImportBadge(character);
+        renderCombatHistory(characterId);
 
         // Populate Combat Style section
         const profile = character.aiProfile || 'balanced';
@@ -1480,6 +1481,146 @@ function renderExportButton(character) {
         exportBtn.onclick = () => openShareModal(capturedId);
     }
 }
+
+/**
+ * Fetch combat history and cache it; called when character detail loads.
+ */
+async function renderCombatHistory(characterId) {
+    // Pre-fetch and cache so the modal opens instantly
+    window._combatHistoryCharId = characterId;
+    window._combatHistoryCache  = null;
+    try {
+        const response = await fetch(`${BACKEND_URL}/api/combat/history/${characterId}/summary`);
+        if (!response.ok) throw new Error(`Server error: ${response.status}`);
+        window._combatHistoryCache = await response.json();
+    } catch (err) {
+        console.error('[HISTORY]', err);
+    }
+}
+
+/**
+ * Open the combat history modal and render cached results.
+ */
+function openCombatHistoryModal() {
+    const modal     = document.getElementById('combatHistoryModal');
+    const container = document.getElementById('combatHistoryDisplay');
+    if (!modal || !container) return;
+
+    modal.style.display = 'flex';
+
+    const logs = window._combatHistoryCache;
+    if (!logs || logs.length === 0) {
+        container.innerHTML = '<p style="color:#888; font-style:italic; padding:1rem 0;">No combat history yet. Send this character on a challenge to see results here.</p>';
+        return;
+    }
+
+    const resultColors = { victory:'#4cd964', loss:'#d4484a', defeat:'#d4484a', retreated:'#aaa' };
+    const resultLabels = { victory:'VICTORY',  loss:'DEFEATED', defeat:'DEFEATED', retreated:'RETREATED' };
+
+    const challengeNames = {};
+    (window.gameData?.challenges || []).forEach(c => { challengeNames[c.id] = c.name; });
+
+    container.innerHTML = logs.slice(0, 20).map(log => {
+        const color     = resultColors[log.result] || '#aaa';
+        const label     = resultLabels[log.result] || log.result.toUpperCase();
+        const date      = new Date(log.createdAt).toLocaleDateString(undefined, { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+        const challenge = challengeNames[log.challengeID] || (log.challengeID?.replace('challenge_','').replace(/_/g,' ') || 'Unknown');
+
+        const stageRows = (log.stages || []).map(s => {
+            const sc = s.status === 'victory' ? '#4cd964' : '#d4484a';
+            return `<div style="font-size:0.78rem; margin-top:3px; padding:3px 8px; border-left:2px solid ${sc}; color:#888;">
+                <span style="color:${sc}; font-weight:500;">${s.title}: ${s.status?.toUpperCase()}</span>
+                ${s.summaryText ? `<span style="color:#666;"> — ${s.summaryText}</span>` : ''}
+            </div>`;
+        }).join('');
+
+        return `<div style="margin-bottom:10px; padding:10px 12px; background:rgba(20,30,50,0.7); border:1px solid rgba(255,255,255,0.06); border-left:3px solid ${color}; border-radius:4px;">
+            <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:3px;">
+                <span style="color:#d4af37; font-weight:500; font-size:0.9rem;">${challenge}</span>
+                <span style="color:${color}; font-size:0.8rem; font-weight:600;">${label}</span>
+            </div>
+            <div style="color:#555; font-size:0.75rem; margin-bottom:6px;">${date} &middot; ${log.totalTurns} turns</div>
+            ${stageRows}
+            <div style="display:flex; gap:6px; margin-top:8px;">
+                <button onclick="viewCombatTextLog('${log.id}')" style="font-size:0.75rem; padding:3px 10px; background:#1a2a3a; color:#aaa; border:1px solid #334; border-radius:3px; cursor:pointer;">📄 View Log</button>
+                <button onclick="replayCombatLog('${log.id}')" style="font-size:0.75rem; padding:3px 10px; background:#1a2a3a; color:#d4af37; border:1px solid #554; border-radius:3px; cursor:pointer;">▶ Replay</button>
+            </div>
+            <div id="textlog-${log.id}" style="display:none; margin-top:8px; max-height:260px; overflow-y:auto; background:rgba(0,0,0,0.3); border-radius:4px; padding:8px; font-size:0.75rem; color:#aaa; font-family:monospace;"></div>
+        </div>`;
+    }).join('') || '<p style="color:#666; font-style:italic;">No combat history yet.</p>';
+}
+
+
+/**
+ * Fetch full log and render as readable text inline under the history entry.
+ */
+async function viewCombatTextLog(combatId) {
+    const container = document.getElementById(`textlog-${combatId}`);
+    if (!container) return;
+
+    // Toggle off if already open
+    if (container.style.display !== 'none') {
+        container.style.display = 'none';
+        return;
+    }
+
+    container.style.display = 'block';
+    container.textContent = 'Loading...';
+
+    try {
+        const response = await fetch(`${BACKEND_URL}/api/combat/${combatId}`);
+        if (!response.ok) throw new Error(`Server error: ${response.status}`);
+        const data = await response.json();
+        const fullLog = data.log || data;
+
+        const allTurns = fullLog.segments
+            ? fullLog.segments.flatMap(s => s.turns)
+            : (fullLog.turns || []);
+
+        if (allTurns.length === 0) {
+            container.textContent = 'No turn data available.';
+            return;
+        }
+
+        container.innerHTML = allTurns.map(turn => {
+            if (turn.action?.type === 'status') {
+                return `<div style="color:#555; padding:1px 0;">[Status] ${turn.result?.message || ''}</div>`;
+            }
+            const msg = turn.result?.message || '';
+            const dmg = turn.result?.damageDealt > 0 ? ` <span style="color:#ff6b6b;">(${turn.result.damageDealt} dmg)</span>` : '';
+            const hit = turn.roll?.hit === false ? ' <span style="color:#666;">MISS</span>' : '';
+            const crit = turn.roll?.crit ? ' <span style="color:#ffd700;">CRIT</span>' : '';
+            return `<div style="padding:1px 0; border-bottom:1px solid rgba(255,255,255,0.04);">${msg}${dmg}${hit}${crit}</div>`;
+        }).join('');
+
+    } catch (err) {
+        container.textContent = 'Could not load log.';
+        console.error('[TEXTLOG]', err);
+    }
+}
+
+/**
+ * Fetch full log and replay it on the combat log screen.
+ */
+async function replayCombatLog(combatId) {
+    document.getElementById('combatHistoryModal').style.display = 'none';
+
+    try {
+        const response = await fetch(`${BACKEND_URL}/api/combat/${combatId}`);
+        if (!response.ok) throw new Error(`Server error: ${response.status}`);
+        const data = await response.json();
+        const fullLog = data.log || data;
+
+        showScreen('combatlog');
+        if (typeof displayCombatLog === 'function') {
+            await displayCombatLog(fullLog);
+        }
+    } catch (err) {
+        if (typeof showSafeError === 'function') showSafeError('Could not load combat replay.');
+        console.error('[REPLAY]', err);
+    }
+}
+
 
 /**
  * Show import badge on character detail screen
