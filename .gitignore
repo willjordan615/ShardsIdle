@@ -1,1 +1,4 @@
-shardsidle.zip
+backend/node_modules/
+backend/data/game.db
+*.bat
+*.zip
