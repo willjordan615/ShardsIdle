@@ -2,7 +2,8 @@
 // Handles combat log display with metered playback and rewards
 
 function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    const multiplier = window.combatSpeedMultiplier || 1.0;
+    return new Promise(resolve => setTimeout(resolve, ms * multiplier));
 }
 
 // --- SAFE UI HELPERS ---
@@ -328,7 +329,7 @@ async function displayCombatLog(combatData) {
             if (titleEl) { titleEl.textContent = 'VICTORY!'; titleEl.style.color = '#4cd964'; }
             if (statusTextEl) {
                 statusTextEl.style.color = '#ffd700';
-                statusTextEl.innerHTML = `Auto-restarting in <span id="countdownTimer" style="font-weight:bold;font-size:1.1rem;">7</span>s...`;
+                statusTextEl.innerHTML = `Auto-restarting in <span id="countdownTimer" style="font-weight:bold;font-size:1.1rem;">${window.victoryCountdownSeconds || 7}</span>s...`;
             }
         } else if (finalResult === 'defeat' || finalResult === 'loss') {
             if (titleEl) { titleEl.textContent = 'DEFEATED'; titleEl.style.color = '#d4484a'; }
@@ -348,7 +349,7 @@ async function displayCombatLog(combatData) {
         // Trigger rewards and/or countdown
         if (finalResult === 'victory') {
             await applyCombatRewards(combatData);
-            startCountdown(7, nextId);
+            startCountdown(window.victoryCountdownSeconds || 7, nextId);
         } else if (finalResult === 'loss' || finalResult === 'defeat') {
             startCountdown(5, nextId);
         } else if (finalResult === 'retreated') {
@@ -587,8 +588,7 @@ function updateSingleHealthBar(targetId, newHP, hpMaxes, hpCurrent, type) {
 // --- COMBATANT ANIMATION HELPERS ---
 
 function triggerCombatantAnimation(id, cssClass, durationMs) {
-    // Animate .combatant-inner so transform doesn't conflict with the outer
-    // .combatant's slide-in animation (which locks transform via fill-mode: forwards)
+    if (window.combatAnimationsEnabled === false) return;
     const outer = document.getElementById(`party-${id}`) || document.getElementById(`enemy-${id}`);
     if (!outer) return;
     const el = outer.querySelector('.combatant-inner') || outer;

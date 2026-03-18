@@ -1569,7 +1569,7 @@ class CombatEngine {
             const maxStamina = this.calculateMaxStamina(enemyType.stats, enemyLevel, false);
 
             // Also sum armor from equipped chest piece if any
-            let enemyArmor = enemyType.baseDefense || 0;
+            let enemyArmor = enemyType.armorValue || 0;
             if (equipment.chest) {
                 const chestItem = this.gear.find(g => g.id === equipment.chest);
                 if (chestItem?.armor) enemyArmor += chestItem.armor;
@@ -1586,9 +1586,9 @@ class CombatEngine {
                 maxStamina: maxStamina, currentStamina: maxStamina,
                 skills: selectedSkills,
                 defeated: false,
-                armorValue: enemyArmor,
+                armorValue:  enemyArmor,
                 physEvasion: enemyType.physEvasion || 0,
-                magEvasion: enemyType.magEvasion  || 0,
+                magEvasion:  enemyType.magEvasion  || 0,
                 resistances: {},
                 statusEffects: [],
                 equipment: equipment

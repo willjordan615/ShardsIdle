@@ -10,7 +10,12 @@
       "harmony": 10
     },
     "baseDefense": 5,
-    "availableSkills": ["basic_attack", "footwork", "shove", "misdirect"],
+    "availableSkills": [
+      "basic_attack",
+      "footwork",
+      "shove",
+      "misdirect"
+    ],
     "skillSelectionCount": 2,
     "equipment": {
       "mainHand": "goblin_dagger",
@@ -19,7 +24,10 @@
       "chest": null,
       "accessory1": null,
       "accessory2": null
-    }
+    },
+    "armorValue": 1,
+    "physEvasion": 2,
+    "magEvasion": 0
   },
   {
     "id": "goblin_archer",
@@ -32,7 +40,12 @@
       "harmony": 5
     },
     "baseDefense": 0,
-    "availableSkills": ["basic_attack", "aim", "footwork", "shove"],
+    "availableSkills": [
+      "basic_attack",
+      "aim",
+      "footwork",
+      "shove"
+    ],
     "skillSelectionCount": 2,
     "equipment": {
       "mainHand": "goblin_bow",
@@ -41,7 +54,10 @@
       "chest": null,
       "accessory1": null,
       "accessory2": null
-    }
+    },
+    "armorValue": 0,
+    "physEvasion": 3,
+    "magEvasion": 0
   },
   {
     "id": "spider_small",
@@ -54,7 +70,11 @@
       "harmony": 10
     },
     "baseDefense": 5,
-    "availableSkills": ["basic_attack", "block", "sense"],
+    "availableSkills": [
+      "basic_attack",
+      "block",
+      "sense"
+    ],
     "skillSelectionCount": 2,
     "equipment": {
       "mainHand": "fangs_tiny",
@@ -63,7 +83,10 @@
       "chest": null,
       "accessory1": null,
       "accessory2": null
-    }
+    },
+    "armorValue": 1,
+    "physEvasion": 2,
+    "magEvasion": 0
   },
   {
     "id": "spider_large",
@@ -76,7 +99,12 @@
       "harmony": 15
     },
     "baseDefense": 10,
-    "availableSkills": ["basic_attack", "block", "shove", "sense"],
+    "availableSkills": [
+      "basic_attack",
+      "block",
+      "shove",
+      "sense"
+    ],
     "skillSelectionCount": 2,
     "equipment": {
       "mainHand": "fangs_small",
@@ -85,7 +113,10 @@
       "chest": null,
       "accessory1": null,
       "accessory2": null
-    }
+    },
+    "armorValue": 2,
+    "physEvasion": 1,
+    "magEvasion": 0
   },
   {
     "id": "orc_warrior",
@@ -98,7 +129,12 @@
       "harmony": 20
     },
     "baseDefense": 8,
-    "availableSkills": ["basic_attack", "shove", "block", "misdirect"],
+    "availableSkills": [
+      "basic_attack",
+      "shove",
+      "block",
+      "misdirect"
+    ],
     "skillSelectionCount": 2,
     "equipment": {
       "mainHand": "fangs_small",
@@ -107,7 +143,10 @@
       "chest": null,
       "accessory1": null,
       "accessory2": null
-    }
+    },
+    "armorValue": 4,
+    "physEvasion": 0,
+    "magEvasion": 0
   },
   {
     "id": "orc_shaman",
@@ -120,7 +159,12 @@
       "harmony": 70
     },
     "baseDefense": 3,
-    "availableSkills": ["produce_flame", "first_aid", "rest", "shout"],
+    "availableSkills": [
+      "produce_flame",
+      "first_aid",
+      "rest",
+      "shout"
+    ],
     "skillSelectionCount": 2,
     "equipment": {
       "mainHand": "fangs_small",
@@ -129,7 +173,10 @@
       "chest": null,
       "accessory1": null,
       "accessory2": null
-    }
+    },
+    "armorValue": 1,
+    "physEvasion": 1,
+    "magEvasion": 3
   },
   {
     "id": "dragon_ancient",
@@ -142,7 +189,14 @@
       "harmony": 50
     },
     "baseDefense": 25,
-    "availableSkills": ["basic_attack", "shove", "block", "produce_flame", "shout", "sense"],
+    "availableSkills": [
+      "basic_attack",
+      "shove",
+      "block",
+      "produce_flame",
+      "shout",
+      "sense"
+    ],
     "skillSelectionCount": 2,
     "equipment": {
       "mainHand": "fangs_small",
@@ -151,6 +205,9 @@
       "chest": null,
       "accessory1": null,
       "accessory2": null
-    }
+    },
+    "armorValue": 12,
+    "physEvasion": 2,
+    "magEvasion": 5
   }
 ]

@@ -12,6 +12,7 @@
         <header>
             <h1>Shards Idle</h1>
             <p class="subtitle">An Asynchronous Group-Based PvE RPG</p>
+            <button onclick="openSettings()" class="settings-btn secondary" title="Settings">⚙ Settings</button>
         </header>
 
         <!-- ROSTER SCREEN -->
@@ -514,6 +515,474 @@
             }
         })();
     </script>
-    
-</body>
-</html>
+
+    <!-- SETTINGS MODAL -->
+    <div id="settingsModal">
+        <div style="max-width:860px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem;">
+                <h2 style="margin:0;">⚙ Settings</h2>
+                <button class="secondary" onclick="closeModal('settingsModal')" style="padding:0.4rem 0.8rem; font-size:0.75rem;">✕ Close</button>
+            </div>
+
+            <!-- Tab Bar -->
+            <div class="settings-tabs">
+                <button class="settings-tab settings-tab-active" data-tab="appearance">🎨 Appearance</button>
+                <button class="settings-tab" data-tab="gameplay">⚔ Gameplay</button>
+                <button class="settings-tab" data-tab="sound">🔊 Sound</button>
+                <button class="settings-tab" data-tab="accessibility">♿ Accessibility</button>
+            </div>
+
+            <!-- APPEARANCE TAB -->
+            <div class="settings-tab-content" id="settings-tab-appearance">
+                <div class="settings-grid">
+
+                    <div class="settings-group">
+                        <h3>Colour Theme</h3>
+                        <p class="settings-desc">The primary accent colour used throughout the interface.</p>
+                        <div class="settings-options">
+                            <button class="settings-opt" data-setting="theme" data-value="gold">
+                                <span class="theme-swatch" style="background:#d4af37;"></span>Dark Gold
+                            </button>
+                            <button class="settings-opt" data-setting="theme" data-value="blue">
+                                <span class="theme-swatch" style="background:#5ab4ff;"></span>Deep Blue
+                            </button>
+                            <button class="settings-opt" data-setting="theme" data-value="crimson">
+                                <span class="theme-swatch" style="background:#e85050;"></span>Crimson
+                            </button>
+                            <button class="settings-opt" data-setting="theme" data-value="emerald">
+                                <span class="theme-swatch" style="background:#4cd964;"></span>Emerald
+                            </button>
+                            <button class="settings-opt" data-setting="theme" data-value="violet">
+                                <span class="theme-swatch" style="background:#c060f0;"></span>Violet
+                            </button>
+                            <button class="settings-opt" data-setting="theme" data-value="mono">
+                                <span class="theme-swatch" style="background:#c8c8c8;"></span>Monochrome
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>Background</h3>
+                        <p class="settings-desc">The base darkness and atmosphere of the UI.</p>
+                        <div class="settings-options">
+                            <button class="settings-opt" data-setting="background" data-value="dark">Dark</button>
+                            <button class="settings-opt" data-setting="background" data-value="darker">Darker</button>
+                            <button class="settings-opt" data-setting="background" data-value="darkest">Darkest</button>
+                            <button class="settings-opt" data-setting="background" data-value="midnight">Midnight</button>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>Display Font</h3>
+                        <p class="settings-desc">Used for headings, titles, and buttons.</p>
+                        <div class="settings-options">
+                            <button class="settings-opt" data-setting="displayFont" data-value="cinzel" style="font-family:'Cinzel',serif;">Cinzel</button>
+                            <button class="settings-opt" data-setting="displayFont" data-value="palatino" style="font-family:'Palatino Linotype',serif;">Palatino</button>
+                            <button class="settings-opt" data-setting="displayFont" data-value="georgia" style="font-family:Georgia,serif;">Georgia</button>
+                            <button class="settings-opt" data-setting="displayFont" data-value="trajan" style="font-family:'Trajan Pro','Times New Roman',serif;">Trajan</button>
+                            <button class="settings-opt" data-setting="displayFont" data-value="system" style="font-family:ui-serif,serif;">System Serif</button>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>Body Font</h3>
+                        <p class="settings-desc">Used for descriptions, combat log, and body text.</p>
+                        <div class="settings-options">
+                            <button class="settings-opt" data-setting="bodyFont" data-value="lato" style="font-family:'Lato',sans-serif;">Lato</button>
+                            <button class="settings-opt" data-setting="bodyFont" data-value="opensans" style="font-family:'Open Sans',sans-serif;">Open Sans</button>
+                            <button class="settings-opt" data-setting="bodyFont" data-value="raleway" style="font-family:'Raleway',sans-serif;">Raleway</button>
+                            <button class="settings-opt" data-setting="bodyFont" data-value="system" style="font-family:ui-sans-serif,sans-serif;">System Sans</button>
+                            <button class="settings-opt" data-setting="bodyFont" data-value="mono" style="font-family:'Courier New',monospace;">Monospace</button>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>UI Density</h3>
+                        <p class="settings-desc">Controls spacing between elements throughout the UI.</p>
+                        <div class="settings-options">
+                            <button class="settings-opt" data-setting="density" data-value="compact">Compact</button>
+                            <button class="settings-opt" data-setting="density" data-value="comfortable">Comfortable</button>
+                            <button class="settings-opt" data-setting="density" data-value="spacious">Spacious</button>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>Card Style</h3>
+                        <p class="settings-desc">The visual style of cards and panels.</p>
+                        <div class="settings-options">
+                            <button class="settings-opt" data-setting="cardStyle" data-value="default">Standard</button>
+                            <button class="settings-opt" data-setting="cardStyle" data-value="sharp">Sharp</button>
+                            <button class="settings-opt" data-setting="cardStyle" data-value="rounded">Rounded</button>
+                            <button class="settings-opt" data-setting="cardStyle" data-value="bordered">High Border</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- GAMEPLAY TAB -->
+            <div class="settings-tab-content" id="settings-tab-gameplay" style="display:none;">
+                <div class="settings-grid">
+
+                    <div class="settings-group">
+                        <h3>Text Size</h3>
+                        <p class="settings-desc">Base font size throughout the interface.</p>
+                        <div class="settings-options">
+                            <button class="settings-opt" data-setting="fontSize" data-value="small">Small (14px)</button>
+                            <button class="settings-opt" data-setting="fontSize" data-value="medium">Medium (16px)</button>
+                            <button class="settings-opt" data-setting="fontSize" data-value="large">Large (18px)</button>
+                            <button class="settings-opt" data-setting="fontSize" data-value="xl">X-Large (20px)</button>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>Combat Log Speed</h3>
+                        <p class="settings-desc">How fast the combat playback runs.</p>
+                        <div class="settings-options">
+                            <button class="settings-opt" data-setting="combatSpeed" data-value="0.25">Rapid (0.25x)</button>
+                            <button class="settings-opt" data-setting="combatSpeed" data-value="0.5">Fast (0.5x)</button>
+                            <button class="settings-opt" data-setting="combatSpeed" data-value="1.0">Normal (1x)</button>
+                            <button class="settings-opt" data-setting="combatSpeed" data-value="1.5">Slow (1.5x)</button>
+                            <button class="settings-opt" data-setting="combatSpeed" data-value="2.0">Very Slow (2x)</button>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>Victory Screen Duration</h3>
+                        <p class="settings-desc">How long the results screen stays before auto-continuing.</p>
+                        <div class="settings-options">
+                            <button class="settings-opt" data-setting="victoryDuration" data-value="3">Brief (3s)</button>
+                            <button class="settings-opt" data-setting="victoryDuration" data-value="7">Normal (7s)</button>
+                            <button class="settings-opt" data-setting="victoryDuration" data-value="15">Extended (15s)</button>
+                            <button class="settings-opt" data-setting="victoryDuration" data-value="999">Manual</button>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>Combat Animations</h3>
+                        <p class="settings-desc">Hit shake and attack lunge effects on combatant cards.</p>
+                        <div class="settings-options">
+                            <button class="settings-opt" data-setting="combatAnimations" data-value="full">Full</button>
+                            <button class="settings-opt" data-setting="combatAnimations" data-value="reduced">Reduced</button>
+                            <button class="settings-opt" data-setting="combatAnimations" data-value="off">Off</button>
+                        </div>
+                    </div>
+
+                    <div class="settings-group settings-group-stub">
+                        <h3>Loot Notification Style <span class="stub-badge">Coming Soon</span></h3>
+                        <p class="settings-desc">How item drops are shown after combat.</p>
+                        <div class="settings-options">
+                            <button class="settings-opt" disabled>Toast Only</button>
+                            <button class="settings-opt" disabled>Modal Panel</button>
+                            <button class="settings-opt" disabled>Both</button>
+                        </div>
+                    </div>
+
+                    <div class="settings-group settings-group-stub">
+                        <h3>Auto-Challenge <span class="stub-badge">Coming Soon</span></h3>
+                        <p class="settings-desc">Automatically re-run the last challenge on login.</p>
+                        <div class="settings-options">
+                            <button class="settings-opt" disabled>Off</button>
+                            <button class="settings-opt" disabled>On</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- SOUND TAB -->
+            <div class="settings-tab-content" id="settings-tab-sound" style="display:none;">
+                <div class="settings-stub-notice">
+                    <div class="stub-icon">🔊</div>
+                    <h3>Sound Coming Soon</h3>
+                    <p>Audio options will appear here when sound is added to the game. This includes master volume, music volume, combat effects, and UI sounds.</p>
+                </div>
+            </div>
+
+            <!-- ACCESSIBILITY TAB -->
+            <div class="settings-tab-content" id="settings-tab-accessibility" style="display:none;">
+                <div class="settings-grid">
+
+                    <div class="settings-group">
+                        <h3>Reduce Motion</h3>
+                        <p class="settings-desc">Disables screen transitions, card hover effects, and banner animations.</p>
+                        <div class="settings-options">
+                            <button class="settings-opt" data-setting="reduceMotion" data-value="off">Off</button>
+                            <button class="settings-opt" data-setting="reduceMotion" data-value="on">On</button>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>High Contrast Text</h3>
+                        <p class="settings-desc">Increases the brightness of body and secondary text for easier reading.</p>
+                        <div class="settings-options">
+                            <button class="settings-opt" data-setting="highContrast" data-value="off">Off</button>
+                            <button class="settings-opt" data-setting="highContrast" data-value="on">On</button>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>Combat Log Height</h3>
+                        <p class="settings-desc">How tall the combat log panel is during battles.</p>
+                        <div class="settings-options">
+                            <button class="settings-opt" data-setting="logHeight" data-value="small">Small (320px)</button>
+                            <button class="settings-opt" data-setting="logHeight" data-value="medium">Medium (480px)</button>
+                            <button class="settings-opt" data-setting="logHeight" data-value="large">Large (640px)</button>
+                            <button class="settings-opt" data-setting="logHeight" data-value="xl">X-Large (800px)</button>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>Tooltip Delay</h3>
+                        <p class="settings-desc">How long to hover before item and stat tooltips appear.</p>
+                        <div class="settings-options">
+                            <button class="settings-opt" data-setting="tooltipDelay" data-value="0">Instant</button>
+                            <button class="settings-opt" data-setting="tooltipDelay" data-value="300">Fast (0.3s)</button>
+                            <button class="settings-opt" data-setting="tooltipDelay" data-value="500">Normal (0.5s)</button>
+                            <button class="settings-opt" data-setting="tooltipDelay" data-value="1000">Slow (1s)</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div style="margin-top:1.5rem; display:flex; gap:1rem; justify-content:flex-end; border-top:1px solid var(--gold-border); padding-top:1.5rem;">
+                <button class="secondary" onclick="resetSettings()">Reset to Defaults</button>
+                <button onclick="closeModal('settingsModal')">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // ============================================================
+    //  SETTINGS SYSTEM
+    // ============================================================
+
+    const SETTINGS_DEFAULTS = {
+        fontSize:          'medium',
+        density:           'comfortable',
+        theme:             'gold',
+        background:        'dark',
+        combatSpeed:       '1.0',
+        victoryDuration:   '7',
+        displayFont:       'cinzel',
+        bodyFont:          'lato',
+        cardStyle:         'default',
+        combatAnimations:  'full',
+        reduceMotion:      'off',
+        highContrast:      'off',
+        logHeight:         'medium',
+        tooltipDelay:      '500',
+    };
+
+    const FONT_STACKS = {
+        displayFont: {
+            cinzel:   "'Cinzel', 'Palatino Linotype', serif",
+            palatino: "'Palatino Linotype', 'Book Antiqua', Palatino, serif",
+            georgia:  "Georgia, 'Times New Roman', serif",
+            trajan:   "'Trajan Pro', 'Times New Roman', serif",
+            system:   "ui-serif, serif",
+        },
+        bodyFont: {
+            lato:     "'Lato', 'Segoe UI', sans-serif",
+            opensans: "'Open Sans', 'Segoe UI', sans-serif",
+            raleway:  "'Raleway', 'Segoe UI', sans-serif",
+            system:   "ui-sans-serif, system-ui, sans-serif",
+            mono:     "'Courier New', 'Lucida Console', monospace",
+        }
+    };
+
+    const THEME_TOKENS = {
+        gold: {
+            '--gold': '#d4af37', '--gold-bright': '#f0ce60',
+            '--gold-dim': '#8b7355', '--gold-border': 'rgba(212,175,55,0.28)',
+            '--gold-glow': 'rgba(212,175,55,0.15)',
+        },
+        blue: {
+            '--gold': '#5ab4ff', '--gold-bright': '#88ccff',
+            '--gold-dim': '#3a7aaa', '--gold-border': 'rgba(90,180,255,0.28)',
+            '--gold-glow': 'rgba(90,180,255,0.15)',
+        },
+        crimson: {
+            '--gold': '#e85050', '--gold-bright': '#ff7070',
+            '--gold-dim': '#8a3030', '--gold-border': 'rgba(232,80,80,0.28)',
+            '--gold-glow': 'rgba(232,80,80,0.15)',
+        },
+        emerald: {
+            '--gold': '#4cd964', '--gold-bright': '#7af09a',
+            '--gold-dim': '#2a7a3a', '--gold-border': 'rgba(76,217,100,0.28)',
+            '--gold-glow': 'rgba(76,217,100,0.15)',
+        },
+        violet: {
+            '--gold': '#c060f0', '--gold-bright': '#e090ff',
+            '--gold-dim': '#703090', '--gold-border': 'rgba(192,96,240,0.28)',
+            '--gold-glow': 'rgba(192,96,240,0.15)',
+        },
+        mono: {
+            '--gold': '#c8c8c8', '--gold-bright': '#f0f0f0',
+            '--gold-dim': '#707070', '--gold-border': 'rgba(200,200,200,0.28)',
+            '--gold-glow': 'rgba(200,200,200,0.12)',
+        },
+    };
+
+    const BACKGROUND_TOKENS = {
+        dark:     { '--ink-deep': '#070a18', '--ink-dark': '#0d1128', '--ink-mid': '#121830' },
+        darker:   { '--ink-deep': '#040610', '--ink-dark': '#0a0d1e', '--ink-mid': '#0e1226' },
+        darkest:  { '--ink-deep': '#020308', '--ink-dark': '#060810', '--ink-mid': '#090c18' },
+        midnight: { '--ink-deep': '#050010', '--ink-dark': '#0a0020', '--ink-mid': '#100030' },
+    };
+
+    const FONT_SIZE_SCALE = {
+        small:  { base: '14px', logFont: '0.82rem', statVal: '1.2rem',  derivedVal: '1.5rem' },
+        medium: { base: '16px', logFont: '0.95rem', statVal: '1.35rem', derivedVal: '1.7rem' },
+        large:  { base: '18px', logFont: '1.05rem', statVal: '1.5rem',  derivedVal: '1.9rem' },
+        xl:     { base: '20px', logFont: '1.15rem', statVal: '1.65rem', derivedVal: '2.1rem' },
+    };
+
+    const DENSITY_SCALE = {
+        compact:     { spaceMd: '0.65rem', spaceLg: '1rem',    spaceXl: '1.4rem' },
+        comfortable: { spaceMd: '1rem',    spaceLg: '1.5rem',  spaceXl: '2rem'   },
+        spacious:    { spaceMd: '1.3rem',  spaceLg: '2rem',    spaceXl: '2.8rem' },
+    };
+
+    const CARD_STYLE = {
+        default:  { '--radius-md': '6px',  '--radius-lg': '10px', borderWidth: '1px' },
+        sharp:    { '--radius-md': '2px',  '--radius-lg': '3px',  borderWidth: '1px' },
+        rounded:  { '--radius-md': '12px', '--radius-lg': '18px', borderWidth: '1px' },
+        bordered: { '--radius-md': '6px',  '--radius-lg': '10px', borderWidth: '2px' },
+    };
+
+    const LOG_HEIGHT = {
+        small:  '320px',
+        medium: '480px',
+        large:  '640px',
+        xl:     '800px',
+    };
+
+    // ---- Core functions ----
+
+    function loadSettings() {
+        const saved = localStorage.getItem('shardsIdleSettings');
+        return saved ? { ...SETTINGS_DEFAULTS, ...JSON.parse(saved) } : { ...SETTINGS_DEFAULTS };
+    }
+
+    function saveSettings(settings) {
+        localStorage.setItem('shardsIdleSettings', JSON.stringify(settings));
+    }
+
+    function applySettings(settings) {
+        const root = document.documentElement;
+
+        // Font size
+        const fs = FONT_SIZE_SCALE[settings.fontSize] || FONT_SIZE_SCALE.medium;
+        document.body.style.fontSize = fs.base;
+        root.style.setProperty('--log-font-size', fs.logFont);
+
+        // Density
+        const d = DENSITY_SCALE[settings.density] || DENSITY_SCALE.comfortable;
+        root.style.setProperty('--space-md', d.spaceMd);
+        root.style.setProperty('--space-lg', d.spaceLg);
+        root.style.setProperty('--space-xl', d.spaceXl);
+
+        // Theme
+        const t = THEME_TOKENS[settings.theme] || THEME_TOKENS.gold;
+        Object.entries(t).forEach(([k, v]) => root.style.setProperty(k, v));
+        root.style.setProperty('--log-accent', t['--gold']);
+        root.style.setProperty('--log-header', t['--gold-bright']);
+
+        // Background
+        const bg = BACKGROUND_TOKENS[settings.background] || BACKGROUND_TOKENS.dark;
+        Object.entries(bg).forEach(([k, v]) => root.style.setProperty(k, v));
+
+        // Display font
+        root.style.setProperty('--font-display', FONT_STACKS.displayFont[settings.displayFont] || FONT_STACKS.displayFont.cinzel);
+
+        // Body font
+        root.style.setProperty('--font-body', FONT_STACKS.bodyFont[settings.bodyFont] || FONT_STACKS.bodyFont.lato);
+
+        // Card style
+        const cs = CARD_STYLE[settings.cardStyle] || CARD_STYLE.default;
+        root.style.setProperty('--radius-md', cs['--radius-md']);
+        root.style.setProperty('--radius-lg', cs['--radius-lg']);
+
+        // Combat log height
+        const lh = LOG_HEIGHT[settings.logHeight] || LOG_HEIGHT.medium;
+        document.querySelectorAll('.combat-log').forEach(el => el.style.height = lh);
+
+        // High contrast
+        if (settings.highContrast === 'on') {
+            root.style.setProperty('--text-secondary', '#d0c8b0');
+            root.style.setProperty('--text-muted', '#909080');
+        } else {
+            root.style.setProperty('--text-secondary', '#b8a888');
+            root.style.setProperty('--text-muted', '#5a5060');
+        }
+
+        // Reduce motion
+        if (settings.reduceMotion === 'on') {
+            root.style.setProperty('--animation-duration', '0.001ms');
+            document.body.classList.add('reduce-motion');
+        } else {
+            root.style.removeProperty('--animation-duration');
+            document.body.classList.remove('reduce-motion');
+        }
+
+        // Combat animations
+        window.combatAnimationsEnabled = settings.combatAnimations !== 'off';
+        window.combatAnimationsReduced = settings.combatAnimations === 'reduced';
+
+        // Combat speed
+        window.combatSpeedMultiplier = parseFloat(settings.combatSpeed) || 1.0;
+
+        // Victory duration
+        window.victoryCountdownSeconds = parseInt(settings.victoryDuration) || 7;
+
+        // Tooltip delay
+        window.tooltipDelay = parseInt(settings.tooltipDelay) ?? 500;
+
+        refreshSettingsUI(settings);
+    }
+
+    function refreshSettingsUI(settings) {
+        document.querySelectorAll('.settings-opt').forEach(btn => {
+            if (btn.disabled) return;
+            btn.classList.toggle('settings-opt-active',
+                settings[btn.dataset.setting] === btn.dataset.value
+            );
+        });
+    }
+
+    function openSettings() {
+        const settings = loadSettings();
+        refreshSettingsUI(settings);
+        document.getElementById('settingsModal').style.display = 'flex';
+    }
+
+    function resetSettings() {
+        saveSettings(SETTINGS_DEFAULTS);
+        applySettings(SETTINGS_DEFAULTS);
+    }
+
+    // Tab switching
+    document.addEventListener('click', (e) => {
+        const tab = e.target.closest('.settings-tab');
+        if (tab) {
+            document.querySelectorAll('.settings-tab').forEach(t => t.classList.remove('settings-tab-active'));
+            document.querySelectorAll('.settings-tab-content').forEach(c => c.style.display = 'none');
+            tab.classList.add('settings-tab-active');
+            const content = document.getElementById('settings-tab-' + tab.dataset.tab);
+            if (content) content.style.display = 'block';
+            return;
+        }
+
+        // Settings option clicks
+        const btn = e.target.closest('.settings-opt');
+        if (!btn || btn.disabled) return;
+        const settings = loadSettings();
+        settings[btn.dataset.setting] = btn.dataset.value;
+        saveSettings(settings);
+        applySettings(settings);
+    });
+
+    // Apply on load
+    document.addEventListener('DOMContentLoaded', () => {
