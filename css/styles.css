@@ -877,3 +877,57 @@ select:focus {
 .pre-combat-reveal {
     animation: preCombatReveal 0.35s ease forwards;
 }
+
+/* =========================================
+   COMBATANT ATTACK / DAMAGE ANIMATIONS
+   ========================================= */
+
+/* Attacker lunges toward the enemy panel */
+@keyframes attackLungeRight {
+    0%   { transform: translateX(0); }
+    40%  { transform: translateX(10px); }
+    100% { transform: translateX(0); }
+}
+@keyframes attackLungeLeft {
+    0%   { transform: translateX(0); }
+    40%  { transform: translateX(-10px); }
+    100% { transform: translateX(0); }
+}
+.combatant-attack-right {
+    animation: attackLungeRight 0.22s ease forwards;
+}
+.combatant-attack-left {
+    animation: attackLungeLeft 0.22s ease forwards;
+}
+
+/* Target shakes and flashes red on hit */
+@keyframes hitShake {
+    0%   { transform: translateX(0);    background: rgba(212,72,74,0.25); }
+    20%  { transform: translateX(-5px); background: rgba(212,72,74,0.4);  }
+    40%  { transform: translateX(4px);  background: rgba(212,72,74,0.3);  }
+    60%  { transform: translateX(-3px); background: rgba(212,72,74,0.2);  }
+    80%  { transform: translateX(2px);  background: rgba(212,72,74,0.1);  }
+    100% { transform: translateX(0);    background: transparent;           }
+}
+@keyframes critShake {
+    0%   { transform: translateX(0)    scale(1);    background: rgba(255,140,0,0.35); }
+    15%  { transform: translateX(-7px) scale(1.03); background: rgba(255,140,0,0.55); }
+    35%  { transform: translateX(6px)  scale(0.98); background: rgba(255,140,0,0.4);  }
+    55%  { transform: translateX(-4px) scale(1.01); background: rgba(255,140,0,0.25); }
+    75%  { transform: translateX(3px)  scale(1);    background: rgba(255,140,0,0.1);  }
+    100% { transform: translateX(0)    scale(1);    background: transparent;           }
+}
+@keyframes defeatFade {
+    0%   { opacity: 1; }
+    100% { opacity: 0.25; filter: grayscale(1); }
+}
+.combatant-hit {
+    animation: hitShake 0.35s ease forwards;
+}
+.combatant-crit {
+    animation: critShake 0.4s ease forwards;
+}
+.combatant-defeated {
+    animation: defeatFade 0.5s ease forwards;
+    animation-fill-mode: forwards;
+}

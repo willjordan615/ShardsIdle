@@ -110,10 +110,11 @@ async function displayCombatLog(combatData) {
         const stageBannerTitle  = document.getElementById('stageBannerTitle');
         const stageBannerPre    = document.getElementById('stageBannerPreCombat');
 
-        function showStageBanner(title) {
+        function showStageBanner(title, subtext) {
             if (!stageBanner) return;
             stageBanner.style.display = 'block';
-            stageBannerTitle.textContent = title;
+            stageBannerTitle.innerHTML = title
+                + (subtext ? `<div style="font-size:0.7rem; font-weight:normal; color:#aaa; letter-spacing:1px; text-transform:none; margin-top:4px; font-style:italic;">${subtext}</div>` : '');
             stageBannerPre.innerHTML = '';
             stageBanner.classList.remove('banner-fade-in');
             void stageBanner.offsetWidth; // force reflow
@@ -162,7 +163,7 @@ async function displayCombatLog(combatData) {
                 enemyStatus.innerHTML = '';
 
                 // 1. Show stage banner with title
-                showStageBanner(segment.title);
+                showStageBanner(segment.title, segment.introText);
 
                 // 2. Separate pre-combat turns from combat turns
                 const preCombatTurns = segment.turns.filter(
@@ -207,6 +208,20 @@ async function displayCombatLog(combatData) {
                     renderTurn(turn, logDisplay, hpMaxes, hpCurrent);
                     updateHealthBars(turn, hpMaxes, hpCurrent);
                     if (turn.playerResourceStates) updateResourceBars(turn.playerResourceStates);
+
+                    // Animate attacker lunge + target hit/defeat
+                    if (turn.result?.damageDealt > 0 && turn.actor && turn.action?.type === 'skill') {
+                        animateAttacker(turn.actor, turn.result?.targetId);
+                        if (turn.result?.targetId) {
+                            animateHit(turn.result.targetId, turn.roll?.crit, turn.result.targetHPAfter === 0);
+                        }
+                    }
+                    // AOE hits
+                    if (turn.result?.targets?.length > 0 && turn.actor) {
+                        animateAttacker(turn.actor, null);
+                        turn.result.targets.forEach(t => animateHit(t.targetId, turn.roll?.crit, t.hpAfter === 0));
+                    }
+
                     await sleep(turnDelay);
                 }
 
@@ -598,6 +613,39 @@ function updateSingleHealthBar(targetId, newHP, hpMaxes, hpCurrent, type) {
     return false;
 }
 
+// --- COMBATANT ANIMATION HELPERS ---
+
+function triggerCombatantAnimation(id, cssClass, durationMs) {
+    // Try both party and enemy prefixes
+    const el = document.getElementById(`party-${id}`) || document.getElementById(`enemy-${id}`);
+    if (!el) return;
+    el.classList.remove(cssClass);
+    void el.offsetWidth; // force reflow so re-adding the class restarts the animation
+    el.classList.add(cssClass);
+    setTimeout(() => el.classList.remove(cssClass), durationMs);
+}
+
+function animateAttacker(actorId, targetId) {
+    // Determine direction: party members lunge right, enemies lunge left
+    const isParty = !!document.getElementById(`party-${actorId}`);
+    const cls = isParty ? 'combatant-attack-right' : 'combatant-attack-left';
+    triggerCombatantAnimation(actorId, cls, 250);
+}
+
+function animateHit(targetId, isCrit, isDefeat) {
+    if (isDefeat) {
+        const el = document.getElementById(`party-${targetId}`) || document.getElementById(`enemy-${targetId}`);
+        if (el) {
+            el.classList.remove('combatant-hit', 'combatant-crit');
+            el.classList.add('combatant-defeated');
+        }
+    } else if (isCrit) {
+        triggerCombatantAnimation(targetId, 'combatant-crit', 450);
+    } else {
+        triggerCombatantAnimation(targetId, 'combatant-hit', 380);
+    }
+}
+
 function updateResourceBars(resourceStates) {
     resourceStates.forEach(state => {
         const actorEl = document.getElementById(`party-${state.characterID}`);
@@ -738,8 +786,11 @@ try {
             const skillRef = character.skills.find(s => s.skillID === skillID);
             
             if (!skillRef) {
-                // Only warn if it's NOT a discovery turn (discoveries should be injected now)
-                if (!turn.isFirstDiscovery) {
+                // Expected for NO_RESOURCES desperation skills (last_stand, etc.) which
+                // any character can use but won't own. Only warn for genuinely unexpected cases.
+                const skillDef = allSkills.find(s => s.id === skillID);
+                const isDesperationSkill = skillDef?.category === 'NO_RESOURCES';
+                if (!turn.isFirstDiscovery && !isDesperationSkill) {
                     console.warn(`[XP] Skill ${skillID} not found for ${character.name}. Skipping.`);
                 }
                 return;
@@ -751,13 +802,13 @@ try {
             // --- LOGIC BRANCH A: DISCOVERY PHASE (Level 0) ---
             if (skillRef.skillLevel < 1) {
                 if (turn.isChildSkillProc) {
-                    // Flat 20 XP per proc toward the 120 XP unlock threshold (~6 procs)
+                    // Procced from parent combo — full discovery XP (~6 procs to unlock)
                     xpToAward = 20.0;
                 } else {
-                    // Skill is Level 0 but NOT procced. No XP.
-                    return; 
+                    // Used directly while still at level 0 — reduced rate (~24 uses to unlock)
+                    xpToAward = 5.0;
                 }
-            } 
+            }
             // --- LOGIC BRANCH B: MASTERY PHASE (Level >= 1) ---
             else {
                 // Standard XP for intentional use

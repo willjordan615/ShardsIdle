@@ -11,7 +11,7 @@
       {
         "stageId": 1,
         "title": "The Perimeter",
-        "description": "Two scouts patrol the outer fence. They haven't spotted you yet.",
+        "description": "Scouts patrol the outer fence.",
         "enemies": [
           {
             "enemyTypeID": "goblin_scout",

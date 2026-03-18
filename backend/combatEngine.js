@@ -860,9 +860,12 @@ class CombatEngine {
   }
 
   getAvailableSkillByCategory(character, category) {
-    if (!character.skills || character.skills.length === 0) return undefined;
-    return character.skills
-        .map(s => this.skills.find(skill => skill.id === s.skillID))
+    // Resolve from the augmented pool: equipped slots + active consumable belt skills.
+    // This ensures consumable skills are selectable while qty > 0, and drop off when spent.
+    const pool = this.getAugmentedSkillPool(character);
+    if (pool.size === 0) return undefined;
+    return [...pool]
+        .map(skillID => this.skills.find(s => s.id === skillID))
         .filter(s => s && s.category === category && this.hasResources(character, s))
         .sort((a, b) => (b.basePower || 0) - (a.basePower || 0))[0];
   }
@@ -875,9 +878,11 @@ class CombatEngine {
   }
 
   getBestAvailableSkill(character, predicate) {
-    if (!character.skills || character.skills.length === 0) return undefined;
-    return character.skills
-        .map(s => this.skills.find(skill => skill.id === s.skillID))
+    // Resolve from the augmented pool: equipped slots + active consumable belt skills.
+    const pool = this.getAugmentedSkillPool(character);
+    if (pool.size === 0) return undefined;
+    return [...pool]
+        .map(skillID => this.skills.find(s => s.id === skillID))
         .filter(s => s && predicate(s))
         .sort((a, b) => (b.basePower || 0) - (a.basePower || 0))[0];
   }
@@ -890,9 +895,9 @@ class CombatEngine {
   getAugmentedSkillPool(character) {
     const pool = new Set();
 
-    // Equipped skill slots
+    // Equipped skill slots (indices 0 and 1 only)
     if (character.skills) {
-        character.skills.forEach(s => pool.add(s.skillID));
+        character.skills.slice(0, 2).forEach(s => pool.add(s.skillID));
     }
 
     // Consumable belt — add the skill linked to each consumable with qty > 0
