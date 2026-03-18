@@ -87,12 +87,23 @@ function createBrowseCard(char) {
     
     const stats = char.combatStats || {};
     const totalKills = Object.values(stats.enemyKills || {}).reduce((a, b) => a + b, 0);
-    
+
+    const profileLabels = {
+        balanced:    '⚖️ Balanced',
+        aggressive:  '⚔️ Aggressive',
+        cautious:    '🛡️ Cautious',
+        support:     '💚 Support',
+        disruptor:   '🌀 Disruptor',
+        opportunist: '🗡️ Opportunist'
+    };
+    const profileBadge = profileLabels[char.aiProfile] || '⚖️ Balanced';
+
     card.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
             <div>
                 <h3 style="margin: 0; color: #4eff7f;">${char.characterName}</h3>
                 <p style="margin: 0.25rem 0 0; color: #888;">Level ${char.level} ${char.race}</p>
+                <span style="display:inline-block; margin-top: 0.4rem; font-size: 0.8rem; color: #aaa; background: rgba(255,255,255,0.07); border-radius: 4px; padding: 2px 8px;">${profileBadge}</span>
             </div>
             <div style="text-align: right;">
                 <div style="color: #888; font-size: 0.85rem;">Share Code</div>

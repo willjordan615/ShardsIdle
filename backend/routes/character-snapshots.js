@@ -73,6 +73,7 @@ router.post('/export', async (req, res) => {
             build_description: buildDescription || null,
             is_public: isPublic ? 1 : 0,
             import_count: 0,
+            ai_profile: character.aiProfile || 'balanced',
             last_shared_at: new Date().toISOString(),
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
@@ -85,9 +86,9 @@ router.post('/export', async (req, res) => {
                 (snapshot_id, character_id, owner_user_id, share_code, character_name, level, race, 
                  stats, skills, equipment, combat_stats, party_stats,
                  avatar_id, avatar_color, avatar_frame, title,
-                 build_name, build_description, is_public, import_count, 
-                 created_at, updated_at, last_shared_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 build_name, build_description, is_public, import_count,
+                 ai_profile, created_at, updated_at, last_shared_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             `, [
                 snapshot.snapshot_id,
                 snapshot.character_id,
@@ -109,6 +110,7 @@ router.post('/export', async (req, res) => {
                 snapshot.build_description,
                 snapshot.is_public,
                 snapshot.import_count,
+                snapshot.ai_profile,
                 snapshot.created_at,
                 snapshot.updated_at,
                 snapshot.last_shared_at
@@ -211,7 +213,8 @@ router.get('/import/:shareCode', async (req, res) => {
                 shareCode: shareCode,
                 importedAt: new Date().toISOString(),
                 canReExport: false,
-                isLinkedReference: true
+                isLinkedReference: true,
+                aiProfile: originalCharacter?.aiProfile || snapshot.ai_profile || 'balanced'
             },
             originalStats: {
                 wins: JSON.parse(snapshot.combat_stats).wins,
@@ -313,7 +316,8 @@ const characters = await Promise.all(snapshots.map(async (s) => {
         ownerUserId: s.owner_user_id,
         avatarId: s.avatar_id,
         title: s.title,
-        lastActiveAt: s.last_active_at
+        lastActiveAt: s.last_active_at,
+        aiProfile: s.ai_profile || 'balanced'
     };
 }));
 // ===============================================

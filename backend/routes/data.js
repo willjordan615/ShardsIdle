@@ -17,6 +17,7 @@ function loadGameData() {
         gameData.gear = JSON.parse(fs.readFileSync(path.join(dataDir, 'items.json'), 'utf8'));
         gameData.consumables = JSON.parse(fs.readFileSync(path.join(dataDir, 'consumables.json'), 'utf8'));
         gameData.bots = JSON.parse(fs.readFileSync(path.join(dataDir, 'bots.json'), 'utf8'));
+        gameData.statuses = JSON.parse(fs.readFileSync(path.join(dataDir, 'statuses.json'), 'utf8'));
         
         console.log('Game data loaded successfully');
     } catch (error) {

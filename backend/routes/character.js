@@ -110,6 +110,30 @@ router.put('/:characterId', async (req, res) => {
 });
 
 /**
+ * PATCH /api/characters/:characterId/aiProfile
+ * Update a character's AI profile without full save
+ */
+router.patch('/:characterId/aiProfile', async (req, res) => {
+    try {
+        const { aiProfile } = req.body;
+        const valid = ['balanced','aggressive','cautious','support','disruptor','opportunist'];
+        if (!valid.includes(aiProfile)) {
+            return res.status(400).json({ success: false, error: `Invalid aiProfile. Must be one of: ${valid.join(', ')}` });
+        }
+        const character = await db.getCharacter(req.params.characterId);
+        if (!character) {
+            return res.status(404).json({ success: false, error: 'Character not found' });
+        }
+        character.aiProfile = aiProfile;
+        await db.saveCharacter(character);
+        res.json({ success: true, aiProfile });
+    } catch (error) {
+        console.error('Error updating aiProfile:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+/**
  * DELETE /api/characters/:characterId
  * Delete a character
  */

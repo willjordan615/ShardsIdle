@@ -72,6 +72,7 @@ async function displayCombatLog(combatData) {
                 <div class="combatant-inner">
                 <div class="combatant-name">${pc.characterName}</div>
                 <div class="combatant-hp">HP: <span class="hp-value">${pc.maxHP}</span> / ${pc.maxHP}</div>
+                <div class="status-effects" id="statuses-${pc.characterID}"></div>
                 <div class="health-bar"><div class="health-bar-fill" style="width:100%"></div><div class="health-bar-text">100%</div></div>
                 <div class="combatant-mana">Mana: <span class="mana-value">${pc.maxMana || 0}</span> / ${pc.maxMana || 0}</div>
                 <div class="mana-bar" style="background:#1a1a2e;border:1px solid #0f3460;height:12px;margin:2px 0;"><div class="mana-bar-fill" style="background:linear-gradient(90deg,#00d4ff,#0084d1);width:100%;height:100%;"></div></div>
@@ -93,6 +94,7 @@ async function displayCombatLog(combatData) {
                     <div class="combatant-inner">
                     <div class="combatant-name">${e.enemyName}</div>
                     <div class="combatant-hp">HP: <span class="hp-value">${e.maxHP}</span> / ${e.maxHP}</div>
+                    <div class="status-effects" id="statuses-${e.enemyID}"></div>
                     <div class="health-bar"><div class="health-bar-fill" style="width:100%"></div><div class="health-bar-text">100%</div></div>
                     </div>
                 `;
@@ -150,6 +152,7 @@ async function displayCombatLog(combatData) {
                     <div class="combatant-inner">
                     <div class="combatant-name">${e.enemyName}</div>
                     <div class="combatant-hp">HP: <span class="hp-value">${e.maxHP}</span> / ${e.maxHP}</div>
+                    <div class="status-effects" id="statuses-${e.enemyID}"></div>
                     <div class="health-bar"><div class="health-bar-fill" style="width:100%"></div><div class="health-bar-text">100%</div></div>
                     </div>
                 `;
@@ -230,6 +233,21 @@ async function displayCombatLog(combatData) {
                     }
 
                     await sleep(turnDelay);
+                }
+
+                // Post-stage sweep: ensure all enemies at 0 HP are visually defeated.
+                // Catches kills from procs, DoTs, or any path that didn't fire animateHit with isDefeat=true.
+                if (segment.participantsSnapshot?.enemies) {
+                    segment.participantsSnapshot.enemies.forEach(e => {
+                        const currentHP = hpCurrent[e.enemyID] ?? e.finalHP ?? 0;
+                        if (currentHP <= 0 || e.defeated) {
+                            const outer = document.getElementById(`enemy-${e.enemyID}`);
+                            if (outer) {
+                                const inner = outer.querySelector('.combatant-inner') || outer;
+                                inner.classList.add('combatant-defeated');
+                            }
+                        }
+                    });
                 }
 
                 // 6. Stage summary — update banner to show outcome, then log it
@@ -549,11 +567,50 @@ function renderTurn(turn, logDisplay, hpMaxes, hpCurrent) {
 
 // --- HEALTH BAR UPDATERS ---
 
+
+// Status emoji/tooltip data — populated from gameData on first use
+let _statusData = null;
+function _getStatusData() {
+    if (_statusData) return _statusData;
+    const statuses = window.gameData?.statuses || [];
+    _statusData = {};
+    statuses.forEach(s => {
+        _statusData[s.id] = {
+            emoji:   s.emoji   || '⚠️',
+            tooltip: s.tooltip || s.description || s.id,
+            type:    s.type    || 'debuff',
+        };
+    });
+    return _statusData;
+}
+
+function updateStatusEffects(combatantId, statuses) {
+    const el = document.getElementById(`statuses-${combatantId}`);
+    if (!el) return;
+    if (!statuses || statuses.length === 0) {
+        el.innerHTML = '';
+        return;
+    }
+    const data = _getStatusData();
+    el.innerHTML = statuses.map(s => {
+        const info = data[s.id] || { emoji: '⚠️', tooltip: s.id, type: 'debuff' };
+        const cls  = info.type === 'buff' ? 'status-pip status-pip-buff' : 'status-pip status-pip-debuff';
+        return `<span class="${cls}" title="${info.tooltip} (${s.duration} turns)">${info.emoji}</span>`;
+    }).join('');
+}
+
 function updateHealthBars(turn, hpMaxes, hpCurrent) {
     if (turn.result?.targets && turn.result.targets.length > 0) {
         turn.result.targets.forEach(targetInfo => {
             updateSingleHealthBar(targetInfo.targetId, targetInfo.hpAfter, hpMaxes, hpCurrent, 'enemy');
+            if (targetInfo.targetStatuses !== undefined) {
+                updateStatusEffects(targetInfo.targetId, targetInfo.targetStatuses);
+            }
         });
+        // Update actor statuses for AOE turns
+        if (turn.result.actorId && turn.result.actorStatuses !== undefined) {
+            updateStatusEffects(turn.result.actorId, turn.result.actorStatuses);
+        }
     } else if (turn.result?.targetId) {
         const targetId = turn.result.targetId;
         const newHP    = turn.result.targetHPAfter;
@@ -561,6 +618,14 @@ function updateHealthBars(turn, hpMaxes, hpCurrent) {
             const updated = updateSingleHealthBar(targetId, newHP, hpMaxes, hpCurrent, 'enemy');
             if (!updated) updateSingleHealthBar(targetId, newHP, hpMaxes, hpCurrent, 'party');
         }
+        // Update target statuses
+        if (turn.result.targetStatuses !== undefined) {
+            updateStatusEffects(targetId, turn.result.targetStatuses);
+        }
+    }
+    // Update actor statuses
+    if (turn.result?.actorId && turn.result.actorStatuses !== undefined) {
+        updateStatusEffects(turn.result.actorId, turn.result.actorStatuses);
     }
 }
 

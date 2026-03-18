@@ -585,6 +585,7 @@ async function createCharacter() {
         avatarColor: null,
         avatarFrame: null,
         title: null,
+        aiProfile: document.getElementById('aiProfileSelect')?.value || 'balanced',
         lastActiveAt: Date.now(),
         createdAt: Date.now(),
         lastModified: Date.now()
@@ -747,7 +748,24 @@ async function showCharacterDetail(characterId) {
         renderConsumableBelt(character);
         renderExportButton(character); 
 renderImportBadge(character);
-        
+
+        // Populate Combat Style section
+        const profile = character.aiProfile || 'balanced';
+        const profileLabels = {
+            balanced:    '⚖️ Balanced',
+            aggressive:  '⚔️ Aggressive',
+            cautious:    '🛡️ Cautious',
+            support:     '💚 Support',
+            disruptor:   '🌀 Disruptor',
+            opportunist: '🗡️ Opportunist'
+        };
+        const badge = document.getElementById('aiProfileBadge');
+        if (badge) badge.textContent = profileLabels[profile] || profile;
+        const select = document.getElementById('aiProfileDetailSelect');
+        if (select) select.value = profile;
+        const msg = document.getElementById('aiProfileSaveMsg');
+        if (msg) msg.textContent = '';
+
         showScreen('detail');
         // Refresh idle loop status banner whenever character detail is shown
         if (typeof updateChallengeStatusBanner === 'function') updateChallengeStatusBanner();
@@ -1128,6 +1146,45 @@ function renderConsumableBelt(character) {
 /**
  * Delete a character
  */
+async function saveAiProfile() {
+    const characterId = currentState.detailCharacterId;
+    const select = document.getElementById('aiProfileDetailSelect');
+    const msg = document.getElementById('aiProfileSaveMsg');
+    const badge = document.getElementById('aiProfileBadge');
+    if (!characterId || !select) return;
+
+    const aiProfile = select.value;
+    try {
+        const response = await fetch(`${BACKEND_URL}/api/characters/${characterId}/aiProfile`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ aiProfile })
+        });
+        if (!response.ok) throw new Error('Failed to save');
+
+        // Update local character cache
+        const character = gameData.characters.find(c => c.id === characterId);
+        if (character) character.aiProfile = aiProfile;
+
+        const profileLabels = {
+            balanced:    '⚖️ Balanced',
+            aggressive:  '⚔️ Aggressive',
+            cautious:    '🛡️ Cautious',
+            support:     '💚 Support',
+            disruptor:   '🌀 Disruptor',
+            opportunist: '🗡️ Opportunist'
+        };
+        if (badge) badge.textContent = profileLabels[aiProfile] || aiProfile;
+        if (msg) {
+            msg.textContent = 'Combat style saved.';
+            setTimeout(() => { if (msg) msg.textContent = ''; }, 2000);
+        }
+    } catch (err) {
+        if (msg) msg.textContent = 'Failed to save. Try again.';
+        console.error('saveAiProfile error:', err);
+    }
+}
+
 async function deleteCharacter(characterId) {
     if (confirm('Are you sure you want to delete this character? This cannot be undone.')) {
         try {

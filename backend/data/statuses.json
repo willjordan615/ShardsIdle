@@ -3,13 +3,15 @@
     "id": "burn",
     "name": "Burn",
     "type": "debuff",
-    "description": "Takes damage each turn from fire",
+    "description": "Fire damage each turn. Reduces endurance.",
+    "emoji": "\ud83d\udd25",
+    "tooltip": "Burning \u2014 fire damage each turn, endurance reduced",
     "defaultDuration": 3,
     "defaultMagnitude": 1,
     "effects": {
       "damagePerTurn": "magnitude * 5",
       "statReduction": {
-        "endurance": 0.2
+        "endurance": 0.15
       }
     }
   },
@@ -17,7 +19,9 @@
     "id": "poison",
     "name": "Poison",
     "type": "debuff",
-    "description": "Takes damage each turn from toxins",
+    "description": "Poison damage each turn. Reduces conviction.",
+    "emoji": "\ud83d\udc0d",
+    "tooltip": "Poisoned \u2014 poison damage each turn, conviction reduced",
     "defaultDuration": 4,
     "defaultMagnitude": 1,
     "effects": {
@@ -31,7 +35,9 @@
     "id": "bleed",
     "name": "Bleed",
     "type": "debuff",
-    "description": "Takes damage each turn from wounds",
+    "description": "Bleed damage each turn. Reduces endurance.",
+    "emoji": "\ud83e\ude78",
+    "tooltip": "Bleeding \u2014 bleed damage each turn, endurance reduced",
     "defaultDuration": 3,
     "defaultMagnitude": 1,
     "effects": {
@@ -45,7 +51,9 @@
     "id": "stun",
     "name": "Stun",
     "type": "debuff",
-    "description": "Unable to act this turn",
+    "description": "Cannot act this turn.",
+    "emoji": "\ud83d\udcab",
+    "tooltip": "Stunned \u2014 cannot act this turn",
     "defaultDuration": 1,
     "defaultMagnitude": 1,
     "effects": {
@@ -53,37 +61,26 @@
     }
   },
   {
-    "id": "freeze",
-    "name": "Freeze",
+    "id": "sleep",
+    "name": "Sleep",
     "type": "debuff",
-    "description": "Immobilized, actions take longer",
+    "description": "Deeply unconscious. Cannot act. Broken by taking damage.",
+    "emoji": "\ud83d\ude34",
+    "tooltip": "Asleep \u2014 cannot act, broken by damage",
     "defaultDuration": 2,
     "defaultMagnitude": 1,
     "effects": {
-      "skillDelayMultiplier": 1.5,
-      "statReduction": {
-        "ambition": 0.3
-      }
-    }
-  },
-  {
-    "id": "blind",
-    "name": "Blind",
-    "type": "debuff",
-    "description": "Reduced accuracy and evasion",
-    "defaultDuration": 2,
-    "defaultMagnitude": 1,
-    "effects": {
-      "statReduction": {
-        "ambition": 0.4
-      }
+      "skipTurn": true,
+      "incomingDamageMultiplier": 1.3
     }
   },
   {
     "id": "silence",
     "name": "Silence",
     "type": "debuff",
-    "description": "Cannot use mana-based skills",
+    "description": "Cannot use mana-based skills.",
+    "emoji": "\ud83e\udd10",
+    "tooltip": "Silenced \u2014 mana skills are blocked",
     "defaultDuration": 2,
     "defaultMagnitude": 1,
     "effects": {
@@ -91,258 +88,34 @@
     }
   },
   {
-    "id": "weaken",
-    "name": "Weaken",
+    "id": "freeze",
+    "name": "Freeze",
     "type": "debuff",
-    "description": "Reduced damage output",
-    "defaultDuration": 3,
-    "defaultMagnitude": 1,
-    "effects": {
-      "statReduction": {
-        "conviction": 0.3
-      }
-    }
-  },
-  {
-    "id": "cursed",
-    "name": "Cursed",
-    "type": "debuff",
-    "description": "Increased damage taken, reduced stamina recovery",
-    "defaultDuration": 3,
-    "defaultMagnitude": 1,
-    "effects": {
-      "incomingDamageMultiplier": 1.2,
-      "staminaRegenMultiplier": 0.5,
-      "statReduction": {
-        "harmony": 0.3
-      }
-    }
-  },
-  {
-    "id": "dazed",
-    "name": "Dazed",
-    "type": "debuff",
-    "description": "Lowered attack, accuracy, and dodge",
+    "description": "Immobilized by cold. Actions are significantly slower.",
+    "emoji": "\ud83e\uddca",
+    "tooltip": "Frozen \u2014 actions take much longer",
     "defaultDuration": 2,
     "defaultMagnitude": 1,
     "effects": {
+      "skillDelayMultiplier": 1.6,
       "statReduction": {
-        "conviction": 0.25,
-        "ambition": 0.25,
-        "endurance": 0.15
-      }
-    }
-  },
-  {
-    "id": "haste",
-    "name": "Haste",
-    "type": "buff",
-    "description": "Actions are faster",
-    "defaultDuration": 3,
-    "defaultMagnitude": 1,
-    "effects": {
-      "skillDelayMultiplier": 0.7,
-      "statBoost": {
         "ambition": 0.2
       }
     }
   },
   {
-    "id": "strength",
-    "name": "Strength Boost",
-    "type": "buff",
-    "description": "Increased damage output",
-    "defaultDuration": 3,
-    "defaultMagnitude": 1,
-    "effects": {
-      "statBoost": {
-        "conviction": 0.3
-      }
-    }
-  },
-  {
-    "id": "fortitude",
-    "name": "Fortitude",
-    "type": "buff",
-    "description": "Reduced damage taken",
-    "defaultDuration": 3,
-    "defaultMagnitude": 1,
-    "effects": {
-      "incomingDamageMultiplier": 0.8,
-      "statBoost": {
-        "endurance": 0.25
-      }
-    }
-  },
-  {
-    "id": "regen",
-    "name": "Regeneration",
-    "type": "buff",
-    "description": "Restores health each turn",
-    "defaultDuration": 4,
-    "defaultMagnitude": 1,
-    "effects": {
-      "healPerTurn": "magnitude * 8",
-      "statBoost": {
-        "harmony": 0.2
-      }
-    }
-  },
-  {
-    "id": "focus",
-    "name": "Focus",
-    "type": "buff",
-    "description": "Increased accuracy and crit chance",
-    "defaultDuration": 3,
-    "defaultMagnitude": 1,
-    "effects": {
-      "statBoost": {
-        "ambition": 0.3,
-        "conviction": 0.15
-      }
-    }
-  },
-  {
-    "id": "barrier",
-    "name": "Barrier",
-    "type": "buff",
-    "description": "Absorbs damage equal to magnitude * 20",
-    "defaultDuration": 3,
-    "defaultMagnitude": 1,
-    "effects": {
-      "barrierHP": "magnitude * 20"
-    }
-  },
-  {
-    "id": "conviction_surge",
-    "name": "Conviction Surge",
-    "type": "buff",
-    "description": "Conviction-based stat boost (damage, spells, utility)",
-    "defaultDuration": 3,
-    "defaultMagnitude": 1,
-    "effects": {
-      "statBoost": {
-        "conviction": 0.4
-      }
-    }
-  },
-  {
-    "id": "endurance_shield",
-    "name": "Endurance Shield",
-    "type": "buff",
-    "description": "Endurance-based defense boost",
-    "defaultDuration": 3,
-    "defaultMagnitude": 1,
-    "effects": {
-      "incomingDamageMultiplier": 0.75,
-      "statBoost": {
-        "endurance": 0.3
-      }
-    }
-  },
-  {
-    "id": "ambition_edge",
-    "name": "Ambition Edge",
-    "type": "buff",
-    "description": "Ambition-based precision and crit boost",
-    "defaultDuration": 3,
-    "defaultMagnitude": 1,
-    "effects": {
-      "statBoost": {
-        "ambition": 0.4
-      }
-    }
-  },
-  {
-    "id": "harmony_bond",
-    "name": "Harmony Bond",
-    "type": "buff",
-    "description": "Harmony-based healing and support boost",
-    "defaultDuration": 3,
-    "defaultMagnitude": 1,
-    "effects": {
-      "statBoost": {
-        "harmony": 0.4
-      },
-      "healPerTurn": "magnitude * 5"
-    }
-  },
-  {
-    "id": "conviction_drain",
-    "name": "Conviction Drain",
+    "id": "weaken",
+    "name": "Weaken",
     "type": "debuff",
-    "description": "Reduced conviction and damage",
+    "description": "Reduced conviction and ambition. Deals less damage.",
+    "emoji": "\ud83d\udcc9",
+    "tooltip": "Weakened \u2014 deals less damage",
     "defaultDuration": 3,
     "defaultMagnitude": 1,
     "effects": {
       "statReduction": {
-        "conviction": 0.4
-      }
-    }
-  },
-  {
-    "id": "endurance_crack",
-    "name": "Endurance Crack",
-    "type": "debuff",
-    "description": "Cracked defenses, increased damage taken",
-    "defaultDuration": 3,
-    "defaultMagnitude": 1,
-    "effects": {
-      "incomingDamageMultiplier": 1.3,
-      "statReduction": {
-        "endurance": 0.35
-      }
-    }
-  },
-  {
-    "id": "ambition_falter",
-    "name": "Ambition Falter",
-    "type": "debuff",
-    "description": "Lost focus, reduced accuracy and initiative",
-    "defaultDuration": 2,
-    "defaultMagnitude": 1,
-    "effects": {
-      "statReduction": {
-        "ambition": 0.5
-      }
-    }
-  },
-  {
-    "id": "harmony_discord",
-    "name": "Harmony Discord",
-    "type": "debuff",
-    "description": "Internal chaos, reduced healing and support",
-    "defaultDuration": 3,
-    "defaultMagnitude": 1,
-    "effects": {
-      "statReduction": {
-        "harmony": 0.4
-      },
-      "staminaRegenMultiplier": 0.6
-    }
-  },
-  {
-    "id": "knockback",
-    "name": "Knockback",
-    "type": "debuff",
-    "description": "Knocked back, next action delayed",
-    "defaultDuration": 1,
-    "defaultMagnitude": 1,
-    "effects": {
-      "skillDelayMultiplier": 1.3
-    }
-  },
-  {
-    "id": "confused",
-    "name": "Confused",
-    "type": "debuff",
-    "description": "Confused and disoriented",
-    "defaultDuration": 2,
-    "defaultMagnitude": 1,
-    "effects": {
-      "statReduction": {
-        "ambition": 0.5,
-        "conviction": 0.3
+        "conviction": 0.2,
+        "ambition": 0.15
       }
     }
   },
@@ -350,12 +123,203 @@
     "id": "slow",
     "name": "Slow",
     "type": "debuff",
-    "description": "Movement and actions slowed",
-    "defaultDuration": 2,
+    "description": "Actions take longer. Reduced ambition.",
+    "emoji": "\ud83d\udc22",
+    "tooltip": "Slowed \u2014 actions take longer",
+    "defaultDuration": 3,
     "defaultMagnitude": 1,
     "effects": {
       "skillDelayMultiplier": 1.4,
       "statReduction": {
+        "ambition": 0.1
+      }
+    }
+  },
+  {
+    "id": "knockback",
+    "name": "Knockback",
+    "type": "debuff",
+    "description": "Knocked back. Next action is delayed.",
+    "emoji": "\ud83d\udca8",
+    "tooltip": "Knocked Back \u2014 next action delayed",
+    "defaultDuration": 1,
+    "defaultMagnitude": 1,
+    "effects": {
+      "skillDelayMultiplier": 1.5
+    }
+  },
+  {
+    "id": "blind",
+    "name": "Blind",
+    "type": "debuff",
+    "description": "Reduced accuracy and evasion.",
+    "emoji": "\ud83d\ude48",
+    "tooltip": "Blinded \u2014 reduced accuracy and evasion",
+    "defaultDuration": 2,
+    "defaultMagnitude": 1,
+    "effects": {
+      "statReduction": {
+        "ambition": 0.25,
+        "conviction": 0.1
+      }
+    }
+  },
+  {
+    "id": "confused",
+    "name": "Confused",
+    "type": "debuff",
+    "description": "Disoriented. Reduced harmony and ambition.",
+    "emoji": "\u2753",
+    "tooltip": "Confused \u2014 disoriented, reduced harmony and ambition",
+    "defaultDuration": 2,
+    "defaultMagnitude": 1,
+    "effects": {
+      "statReduction": {
+        "harmony": 0.2,
+        "ambition": 0.2
+      }
+    }
+  },
+  {
+    "id": "dazed",
+    "name": "Dazed",
+    "type": "debuff",
+    "description": "Dazed. Reduced conviction, ambition, and harmony.",
+    "emoji": "\ud83d\ude35",
+    "tooltip": "Dazed \u2014 reduced conviction, ambition, and harmony",
+    "defaultDuration": 2,
+    "defaultMagnitude": 1,
+    "effects": {
+      "statReduction": {
+        "conviction": 0.15,
+        "ambition": 0.15,
+        "harmony": 0.1
+      }
+    }
+  },
+  {
+    "id": "cursed",
+    "name": "Cursed",
+    "type": "debuff",
+    "description": "Takes more damage. Stamina recovery reduced.",
+    "emoji": "\ud83d\udc80",
+    "tooltip": "Cursed \u2014 takes more damage, reduced stamina recovery",
+    "defaultDuration": 3,
+    "defaultMagnitude": 1,
+    "effects": {
+      "incomingDamageMultiplier": 1.2,
+      "staminaRegenMultiplier": 0.5,
+      "statReduction": {
+        "endurance": 0.1
+      }
+    }
+  },
+  {
+    "id": "armor_break",
+    "name": "Armor Break",
+    "type": "debuff",
+    "description": "Defenses shattered. Takes significantly more damage.",
+    "emoji": "\ud83e\ude96",
+    "tooltip": "Armor Broken \u2014 significantly increased damage taken",
+    "defaultDuration": 3,
+    "defaultMagnitude": 1,
+    "effects": {
+      "incomingDamageMultiplier": 1.35,
+      "statReduction": {
+        "endurance": 0.25
+      }
+    }
+  },
+  {
+    "id": "conviction_drain",
+    "name": "Conviction Drain",
+    "type": "debuff",
+    "description": "Reduced conviction. Deals less damage, weaker spells.",
+    "emoji": "\ud83e\udec0",
+    "tooltip": "Conviction Drained \u2014 reduced damage and spell power",
+    "defaultDuration": 3,
+    "defaultMagnitude": 1,
+    "effects": {
+      "statReduction": {
+        "conviction": 0.25
+      }
+    }
+  },
+  {
+    "id": "endurance_crack",
+    "name": "Endurance Crack",
+    "type": "debuff",
+    "description": "Cracked defenses. Takes more damage.",
+    "emoji": "\ud83e\udea8",
+    "tooltip": "Endurance Cracked \u2014 defenses compromised, takes more damage",
+    "defaultDuration": 2,
+    "defaultMagnitude": 1,
+    "effects": {
+      "incomingDamageMultiplier": 1.2,
+      "statReduction": {
+        "endurance": 0.2
+      }
+    }
+  },
+  {
+    "id": "ambition_falter",
+    "name": "Ambition Falter",
+    "type": "debuff",
+    "description": "Lost focus. Reduced accuracy and initiative.",
+    "emoji": "\ud83c\udf00",
+    "tooltip": "Ambition Faltered \u2014 reduced accuracy and initiative",
+    "defaultDuration": 2,
+    "defaultMagnitude": 1,
+    "effects": {
+      "statReduction": {
+        "ambition": 0.3
+      }
+    }
+  },
+  {
+    "id": "harmony_discord",
+    "name": "Harmony Discord",
+    "type": "debuff",
+    "description": "Internal chaos. Reduced healing and support effectiveness.",
+    "emoji": "\ud83d\udd07",
+    "tooltip": "Harmony Discord \u2014 reduced healing and support",
+    "defaultDuration": 3,
+    "defaultMagnitude": 1,
+    "effects": {
+      "statReduction": {
+        "harmony": 0.3
+      },
+      "staminaRegenMultiplier": 0.7
+    }
+  },
+  {
+    "id": "attack_boost",
+    "name": "Attack Boost",
+    "type": "buff",
+    "description": "Attacks deal more damage.",
+    "emoji": "\ud83d\udd34",
+    "tooltip": "Attack Boosted \u2014 attacks deal more damage",
+    "defaultDuration": 3,
+    "defaultMagnitude": 1,
+    "effects": {
+      "statBoost": {
+        "conviction": 0.2,
+        "ambition": 0.1
+      }
+    }
+  },
+  {
+    "id": "strength",
+    "name": "Strength",
+    "type": "buff",
+    "description": "Greatly increased conviction and ambition.",
+    "emoji": "\ud83d\udcaa",
+    "tooltip": "Strength \u2014 greatly increased damage output",
+    "defaultDuration": 4,
+    "defaultMagnitude": 1,
+    "effects": {
+      "statBoost": {
+        "conviction": 0.3,
         "ambition": 0.2
       }
     }
@@ -364,25 +328,117 @@
     "id": "spell_amplification",
     "name": "Spell Amplification",
     "type": "buff",
-    "description": "Spells are more powerful",
+    "description": "Spells and magic skills are more powerful.",
+    "emoji": "\u2728",
+    "tooltip": "Spell Amplified \u2014 spells deal more damage",
     "defaultDuration": 3,
     "defaultMagnitude": 1,
     "effects": {
       "statBoost": {
-        "conviction": 0.3
+        "harmony": 0.25,
+        "conviction": 0.15
       }
     }
   },
   {
-    "id": "attack_boost",
-    "name": "Attack Boost",
+    "id": "poison_weapon",
+    "name": "Poison Weapon",
     "type": "buff",
-    "description": "Attacks are more powerful",
+    "description": "Weapon coated in poison. Attacks have a 25% chance to poison the target.",
+    "emoji": "\u2620\ufe0f",
+    "tooltip": "Weapon Poisoned \u2014 attacks apply poison on hit (25% chance)",
+    "defaultDuration": 4,
+    "defaultMagnitude": 1,
+    "effects": {
+      "statBoost": {
+        "ambition": 0.1
+      }
+    },
+    "onHitProc": {
+      "skillId": "proc_poison",
+      "chance": 25
+    }
+  },
+  {
+    "id": "stun_weapon",
+    "name": "Stun Weapon",
+    "type": "buff",
+    "description": "Weapon charged with stunning force. Attacks have a 15% chance to stun.",
+    "emoji": "\u26a1",
+    "tooltip": "Weapon Charged \u2014 attacks can stun on hit (15% chance)",
     "defaultDuration": 3,
     "defaultMagnitude": 1,
     "effects": {
       "statBoost": {
-        "conviction": 0.25
+        "conviction": 0.1
+      }
+    },
+    "onHitProc": {
+      "skillId": "proc_stun",
+      "chance": 15
+    }
+  },
+  {
+    "id": "fortitude",
+    "name": "Fortitude",
+    "type": "buff",
+    "description": "Reduced damage taken. Increased endurance.",
+    "emoji": "\ud83d\udee1\ufe0f",
+    "tooltip": "Fortitude \u2014 reduced incoming damage",
+    "defaultDuration": 2,
+    "defaultMagnitude": 1,
+    "effects": {
+      "incomingDamageMultiplier": 0.75,
+      "statBoost": {
+        "endurance": 0.2
+      }
+    }
+  },
+  {
+    "id": "protection",
+    "name": "Protection",
+    "type": "buff",
+    "description": "Blessed protection reduces all incoming damage.",
+    "emoji": "\ud83d\udd35",
+    "tooltip": "Protected \u2014 all incoming damage reduced",
+    "defaultDuration": 3,
+    "defaultMagnitude": 1,
+    "effects": {
+      "incomingDamageMultiplier": 0.7,
+      "statBoost": {
+        "endurance": 0.15
+      }
+    }
+  },
+  {
+    "id": "barrier",
+    "name": "Barrier",
+    "type": "buff",
+    "description": "Magical barrier absorbs incoming damage.",
+    "emoji": "\ud83d\udd35",
+    "tooltip": "Barrier \u2014 absorbs incoming damage",
+    "defaultDuration": 3,
+    "defaultMagnitude": 1,
+    "effects": {
+      "incomingDamageMultiplier": 0.6,
+      "statBoost": {
+        "endurance": 0.1
+      }
+    }
+  },
+  {
+    "id": "endurance_shield",
+    "name": "Endurance Shield",
+    "type": "buff",
+    "description": "Greatly increased endurance-based defenses.",
+    "emoji": "\ud83c\udfcb\ufe0f",
+    "tooltip": "Endurance Shield \u2014 greatly boosted defenses",
+    "defaultDuration": 3,
+    "defaultMagnitude": 1,
+    "effects": {
+      "incomingDamageMultiplier": 0.8,
+      "statBoost": {
+        "endurance": 0.35
       }
     }
   },
@@ -390,13 +446,64 @@
     "id": "evasion_boost",
     "name": "Evasion Boost",
     "type": "buff",
-    "description": "Increased agility makes the target harder to hit",
-    "defaultDuration": 2,
+    "description": "Increased agility. Harder to hit, faster actions.",
+    "emoji": "\ud83d\udca8",
+    "tooltip": "Evasion Boosted \u2014 harder to hit",
+    "defaultDuration": 3,
     "defaultMagnitude": 1,
     "effects": {
       "skillDelayMultiplier": 0.85,
       "statBoost": {
-        "ambition": 0.25
+        "ambition": 0.2
+      }
+    }
+  },
+  {
+    "id": "stealth",
+    "name": "Stealth",
+    "type": "buff",
+    "description": "Hidden from enemies. Next attack deals bonus damage.",
+    "emoji": "\ud83d\udc41\ufe0f",
+    "tooltip": "Stealthed \u2014 hidden, next attack deals bonus damage",
+    "defaultDuration": 2,
+    "defaultMagnitude": 1,
+    "effects": {
+      "skillDelayMultiplier": 0.8,
+      "statBoost": {
+        "ambition": 0.3,
+        "conviction": 0.2
+      }
+    }
+  },
+  {
+    "id": "regen",
+    "name": "Regeneration",
+    "type": "buff",
+    "description": "Restores health each turn.",
+    "emoji": "\ud83d\udc9a",
+    "tooltip": "Regenerating \u2014 restores health each turn",
+    "defaultDuration": 3,
+    "defaultMagnitude": 1,
+    "effects": {
+      "healPerTurn": "magnitude * 8",
+      "statBoost": {
+        "endurance": 0.1
+      }
+    }
+  },
+  {
+    "id": "haste",
+    "name": "Haste",
+    "type": "buff",
+    "description": "Actions are significantly faster.",
+    "emoji": "\u26a1",
+    "tooltip": "Haste \u2014 actions are faster",
+    "defaultDuration": 3,
+    "defaultMagnitude": 1,
+    "effects": {
+      "skillDelayMultiplier": 0.65,
+      "statBoost": {
+        "ambition": 0.15
       }
     }
   },
@@ -404,14 +511,419 @@
     "id": "speed_boost",
     "name": "Speed Boost",
     "type": "buff",
-    "description": "Adrenaline surges through the veins \u2014 faster and harder",
-    "defaultDuration": 2,
+    "description": "Faster actions and improved initiative.",
+    "emoji": "\ud83d\udfe1",
+    "tooltip": "Speed Boosted \u2014 faster and harder hitting",
+    "defaultDuration": 3,
     "defaultMagnitude": 1,
     "effects": {
-      "skillDelayMultiplier": 0.8,
+      "skillDelayMultiplier": 0.75,
       "statBoost": {
         "ambition": 0.2,
         "conviction": 0.1
+      }
+    }
+  },
+  {
+    "id": "focus",
+    "name": "Focus",
+    "type": "buff",
+    "description": "Increased accuracy and crit chance via conviction boost.",
+    "emoji": "\ud83c\udfaf",
+    "tooltip": "Focused \u2014 increased accuracy and crit chance",
+    "defaultDuration": 3,
+    "defaultMagnitude": 1,
+    "effects": {
+      "statBoost": {
+        "conviction": 0.25,
+        "ambition": 0.1
+      }
+    }
+  },
+  {
+    "id": "all_stats",
+    "name": "All Stats",
+    "type": "buff",
+    "description": "All stats boosted. Everything is enhanced.",
+    "emoji": "\u2b50",
+    "tooltip": "All Stats Boosted \u2014 every attribute improved",
+    "defaultDuration": 4,
+    "defaultMagnitude": 1,
+    "effects": {
+      "statBoost": {
+        "conviction": 0.15,
+        "endurance": 0.15,
+        "ambition": 0.15,
+        "harmony": 0.15
+      }
+    }
+  },
+  {
+    "id": "conviction_surge",
+    "name": "Conviction Surge",
+    "type": "buff",
+    "description": "Conviction greatly boosted. Damage and spells enhanced.",
+    "emoji": "\u2694\ufe0f",
+    "tooltip": "Conviction Surge \u2014 boosted damage and spells",
+    "defaultDuration": 3,
+    "defaultMagnitude": 1,
+    "effects": {
+      "statBoost": {
+        "conviction": 0.35
+      }
+    }
+  },
+  {
+    "id": "ambition_edge",
+    "name": "Ambition Edge",
+    "type": "buff",
+    "description": "Ambition greatly boosted. Precision and crit enhanced.",
+    "emoji": "\ud83d\udde1\ufe0f",
+    "tooltip": "Ambition Edge \u2014 boosted precision and crit",
+    "defaultDuration": 3,
+    "defaultMagnitude": 1,
+    "effects": {
+      "statBoost": {
+        "ambition": 0.35
+      }
+    }
+  },
+  {
+    "id": "harmony_bond",
+    "name": "Harmony Bond",
+    "type": "buff",
+    "description": "Harmony greatly boosted. Healing and support enhanced.",
+    "emoji": "\ud83c\udf3f",
+    "tooltip": "Harmony Bond \u2014 boosted healing and support",
+    "defaultDuration": 3,
+    "defaultMagnitude": 1,
+    "effects": {
+      "healPerTurn": "magnitude * 4",
+      "statBoost": {
+        "harmony": 0.35
+      }
+    }
+  },
+  {
+    "id": "harmony",
+    "name": "Harmony",
+    "type": "buff",
+    "description": "Attuned to natural rhythms. Harmony and endurance boosted.",
+    "emoji": "\ud83c\udf38",
+    "tooltip": "Harmony \u2014 attuned to natural rhythms, harmony and endurance boosted",
+    "defaultDuration": 3,
+    "defaultMagnitude": 1,
+    "effects": {
+      "statBoost": {
+        "harmony": 0.25,
+        "endurance": 0.1
+      }
+    }
+  },
+  {
+    "id": "echo",
+    "name": "Echo",
+    "type": "buff",
+    "description": "Skills resonate, boosting harmony and conviction.",
+    "emoji": "\ud83d\udd14",
+    "tooltip": "Echo \u2014 skills resonate, boosted harmony and conviction",
+    "defaultDuration": 2,
+    "defaultMagnitude": 1,
+    "effects": {
+      "statBoost": {
+        "harmony": 0.2,
+        "conviction": 0.15
+      }
+    }
+  },
+  {
+    "id": "unity",
+    "name": "Unity",
+    "type": "buff",
+    "description": "Bonded with allies. All stats moderately boosted.",
+    "emoji": "\ud83e\udd1d",
+    "tooltip": "Unity \u2014 bonded with allies, all stats boosted",
+    "defaultDuration": 3,
+    "defaultMagnitude": 1,
+    "effects": {
+      "statBoost": {
+        "conviction": 0.1,
+        "endurance": 0.1,
+        "ambition": 0.1,
+        "harmony": 0.2
+      }
+    }
+  },
+  {
+    "id": "amplify",
+    "name": "Amplify",
+    "type": "buff",
+    "description": "Amplified power. Conviction and ambition greatly boosted.",
+    "emoji": "\ud83d\udce1",
+    "tooltip": "Amplified \u2014 conviction and ambition greatly boosted",
+    "defaultDuration": 2,
+    "defaultMagnitude": 1,
+    "effects": {
+      "statBoost": {
+        "conviction": 0.3,
+        "ambition": 0.25
+      }
+    }
+  },
+  {
+    "id": "loot_luck",
+    "name": "Loot Luck",
+    "type": "buff",
+    "description": "Fortune favours you. Better loot odds after combat.",
+    "emoji": "\ud83c\udf40",
+    "tooltip": "Lucky \u2014 improved loot quality after combat",
+    "defaultDuration": 10,
+    "defaultMagnitude": 1,
+    "effects": {
+      "statBoost": {
+        "harmony": 0.1
+      }
+    }
+  },
+  {
+    "id": "defense",
+    "name": "Defense",
+    "type": "buff",
+    "description": "Defensive stance. Incoming damage reduced.",
+    "emoji": "\ud83d\udee1\ufe0f",
+    "tooltip": "Defense Stance \u2014 incoming damage reduced",
+    "defaultDuration": 1,
+    "defaultMagnitude": 1,
+    "effects": {
+      "incomingDamageMultiplier": 0.7,
+      "statBoost": {
+        "endurance": 0.15
+      }
+    }
+  },
+  {
+    "id": "taunt",
+    "name": "Taunt",
+    "type": "buff",
+    "description": "Drawing enemy attention. Enemies are forced to target you.",
+    "emoji": "\ud83d\ude24",
+    "tooltip": "Taunting \u2014 enemies are compelled to attack you",
+    "defaultDuration": 2,
+    "defaultMagnitude": 1,
+    "effects": {
+      "statBoost": {
+        "endurance": 0.1
+      }
+    }
+  },
+  {
+    "id": "poison_weak",
+    "name": "Weak Poison",
+    "type": "debuff",
+    "description": "Mild poison. Small damage each turn.",
+    "emoji": "\ud83d\udfe2",
+    "tooltip": "Weakly Poisoned \u2014 mild poison damage each turn",
+    "defaultDuration": 3,
+    "defaultMagnitude": 1,
+    "effects": {
+      "damagePerTurn": "magnitude * 2"
+    }
+  },
+  {
+    "id": "poison_strong",
+    "name": "Strong Poison",
+    "type": "debuff",
+    "description": "Potent poison. Heavy damage each turn. Reduces conviction.",
+    "emoji": "\ud83d\udfe3",
+    "tooltip": "Strongly Poisoned \u2014 heavy poison damage each turn, conviction reduced",
+    "defaultDuration": 4,
+    "defaultMagnitude": 1,
+    "effects": {
+      "damagePerTurn": "magnitude * 6",
+      "statReduction": {
+        "conviction": 0.2
+      }
+    }
+  },
+  {
+    "id": "poison_deadly",
+    "name": "Deadly Poison",
+    "type": "debuff",
+    "description": "Lethal poison. Severe damage each turn. Cripples conviction and endurance.",
+    "emoji": "\u26ab",
+    "tooltip": "Deadly Poison \u2014 severe damage each turn, conviction and endurance crippled",
+    "defaultDuration": 5,
+    "defaultMagnitude": 1,
+    "effects": {
+      "damagePerTurn": "magnitude * 10",
+      "statReduction": {
+        "conviction": 0.3,
+        "endurance": 0.2
+      }
+    }
+  },
+  {
+    "id": "chilled",
+    "name": "Chilled",
+    "type": "debuff",
+    "description": "Cold seeps into the body. Damage each turn, slowed actions, reduced ambition.",
+    "emoji": "\ud83c\udf28\ufe0f",
+    "tooltip": "Chilled \u2014 cold damage each turn, actions slowed",
+    "defaultDuration": 3,
+    "defaultMagnitude": 1,
+    "effects": {
+      "damagePerTurn": "magnitude * 3",
+      "skillDelayMultiplier": 1.2,
+      "statReduction": {
+        "ambition": 0.1
+      }
+    }
+  },
+  {
+    "id": "electrified",
+    "name": "Electrified",
+    "type": "debuff",
+    "description": "Electricity arcs through the body. Damage each turn, sporadic and disorienting.",
+    "emoji": "\u26a1",
+    "tooltip": "Electrified \u2014 electric damage each turn, conviction reduced",
+    "defaultDuration": 2,
+    "defaultMagnitude": 1,
+    "effects": {
+      "damagePerTurn": "magnitude * 4",
+      "statReduction": {
+        "conviction": 0.1,
+        "ambition": 0.1
+      }
+    }
+  },
+  {
+    "id": "shadowed",
+    "name": "Shadowed",
+    "type": "debuff",
+    "description": "Shadow energy corrupts the spirit. Damage each turn, harmony drained.",
+    "emoji": "\ud83c\udf11",
+    "tooltip": "Shadowed \u2014 shadow damage each turn, harmony reduced",
+    "defaultDuration": 3,
+    "defaultMagnitude": 1,
+    "effects": {
+      "damagePerTurn": "magnitude * 3",
+      "statReduction": {
+        "harmony": 0.2
+      }
+    }
+  },
+  {
+    "id": "arcane_burn",
+    "name": "Arcane Burn",
+    "type": "debuff",
+    "description": "Unstable arcane energy tears through the body. Damage each turn, spells disrupted.",
+    "emoji": "\ud83d\udd2e",
+    "tooltip": "Arcane Burn \u2014 arcane damage each turn, conviction and harmony reduced",
+    "defaultDuration": 3,
+    "defaultMagnitude": 1,
+    "effects": {
+      "damagePerTurn": "magnitude * 4",
+      "statReduction": {
+        "conviction": 0.15,
+        "harmony": 0.1
+      }
+    }
+  },
+  {
+    "id": "mana_burn",
+    "name": "Mana Burn",
+    "type": "debuff",
+    "description": "Arcane fire consumes mana each turn. Cripples spellcasters.",
+    "emoji": "\ud83d\udd25",
+    "tooltip": "Mana Burning \u2014 mana drained each turn, mana recovery reduced",
+    "defaultDuration": 3,
+    "defaultMagnitude": 1,
+    "effects": {
+      "manaDrainPerTurn": "magnitude * 8",
+      "manaRegenMultiplier": 0.0
+    }
+  },
+  {
+    "id": "exhaustion",
+    "name": "Exhaustion",
+    "type": "debuff",
+    "description": "Completely spent. Cannot use stamina-based skills.",
+    "emoji": "\ud83d\ude2e\u200d\ud83d\udca8",
+    "tooltip": "Exhausted \u2014 stamina skills are blocked",
+    "defaultDuration": 2,
+    "defaultMagnitude": 1,
+    "effects": {
+      "blockSkillCostType": "stamina",
+      "staminaRegenMultiplier": 0.5
+    }
+  },
+  {
+    "id": "deep_wound",
+    "name": "Deep Wound",
+    "type": "debuff",
+    "description": "A wound that worsens with each strike. Escalating bleed damage.",
+    "emoji": "\ud83d\udde1\ufe0f",
+    "tooltip": "Deep Wound \u2014 escalating bleed damage, gets worse each hit",
+    "defaultDuration": 4,
+    "defaultMagnitude": 1,
+    "stackingBehaviour": "escalate",
+    "maxMagnitude": 5,
+    "effects": {
+      "damagePerTurn": "magnitude * 4",
+      "statReduction": {
+        "endurance": 0.1
+      }
+    }
+  },
+  {
+    "id": "counter_ready",
+    "name": "Counter Ready",
+    "type": "buff",
+    "description": "Poised to retaliate. The next hit taken triggers a counter-attack.",
+    "emoji": "\u2694\ufe0f",
+    "tooltip": "Counter Ready \u2014 next hit triggers a counter-attack",
+    "defaultDuration": 2,
+    "defaultMagnitude": 1,
+    "counterProc": {
+      "skillId": "basic_attack",
+      "chance": 80
+    },
+    "effects": {
+      "statBoost": {
+        "conviction": 0.1
+      }
+    }
+  },
+  {
+    "id": "marked",
+    "name": "Marked",
+    "type": "debuff",
+    "description": "Exposed and targeted. Enemies are drawn to attack this combatant.",
+    "emoji": "\ud83c\udfaf",
+    "tooltip": "Marked \u2014 enemies are more likely to target you",
+    "defaultDuration": 3,
+    "defaultMagnitude": 1,
+    "targetingWeight": 3.0,
+    "effects": {
+      "statReduction": {
+        "ambition": 0.1
+      }
+    }
+  },
+  {
+    "id": "provoked",
+    "name": "Provoked",
+    "type": "debuff",
+    "description": "Enraged and reckless. More likely to be targeted, attacks slowed.",
+    "emoji": "\ud83d\ude21",
+    "tooltip": "Provoked \u2014 likely to be targeted, actions slowed",
+    "defaultDuration": 2,
+    "defaultMagnitude": 1,
+    "targetingWeight": 2.5,
+    "effects": {
+      "skillDelayMultiplier": 1.2,
+      "statReduction": {
+        "ambition": 0.15
       }
     }
   }

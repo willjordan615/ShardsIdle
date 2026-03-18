@@ -35,12 +35,19 @@ class StatusEngine {
 
         const finalDuration = duration !== undefined ? duration : statusDef.defaultDuration;
 
-        // Check for stacking rules (some statuses don't stack, extend duration instead)
+        // Check for stacking rules
         const existingStatus = target.statusEffects?.find(s => s.id === statusId);
         if (existingStatus) {
-            // Extend duration instead of stacking
-            existingStatus.duration = Math.max(existingStatus.duration, finalDuration);
-            existingStatus.magnitude = Math.max(existingStatus.magnitude, magnitude);
+            const stackBehaviour = statusDef.stackingBehaviour || 'extend';
+            if (stackBehaviour === 'escalate') {
+                // Escalating: each reapplication increases magnitude and resets duration
+                existingStatus.magnitude = Math.min(existingStatus.magnitude + magnitude, statusDef.maxMagnitude || 5);
+                existingStatus.duration = finalDuration;
+            } else {
+                // Default: extend duration, take highest magnitude
+                existingStatus.duration = Math.max(existingStatus.duration, finalDuration);
+                existingStatus.magnitude = Math.max(existingStatus.magnitude, magnitude);
+            }
             return true;
         }
 
@@ -72,7 +79,9 @@ class StatusEngine {
             statBoosts: {},
             skillDelayMultiplier: 1.0,
             incomingDamageMultiplier: 1.0,
-            staminaRegenMultiplier: 1.0
+            staminaRegenMultiplier: 1.0,
+            manaRegenMultiplier: 1.0,
+            manaDrainPerTurn: 0
         };
 
         if (!target.statusEffects || target.statusEffects.length === 0) {
@@ -124,6 +133,16 @@ class StatusEngine {
 
             if (effects.staminaRegenMultiplier) {
                 result.staminaRegenMultiplier *= effects.staminaRegenMultiplier;
+            }
+
+            if (effects.manaRegenMultiplier) {
+                result.manaRegenMultiplier *= effects.manaRegenMultiplier;
+            }
+
+            if (effects.manaDrainPerTurn) {
+                const drain = Math.floor(this.evaluateExpression(effects.manaDrainPerTurn, activeStatus.magnitude));
+                result.manaDrainPerTurn += drain;
+                result.messages.push(`${target.name} loses ${drain} mana from ${statusDef.name}`);
             }
         });
 

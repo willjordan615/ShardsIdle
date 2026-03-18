@@ -369,7 +369,8 @@ class CombatEngine {
         magEvasion,    // reduces magical hit chance against this character
         defeated: false,
         index: idx,
-        statusEffects: []
+        statusEffects: [],
+        aiProfile: snapshot.aiProfile || 'balanced'
       };
     });
 
@@ -563,6 +564,10 @@ class CombatEngine {
           }
           if (statusResults.healed > 0) {
             combatant.currentHP = Math.min(combatant.maxHP, combatant.currentHP + statusResults.healed);
+          }
+
+          if (statusResults.manaDrainPerTurn > 0) {
+            combatant.currentMana = Math.max(0, combatant.currentMana - statusResults.manaDrainPerTurn);
           }
 
           // FIX: Apply stat boosts/reductions — previously computed but discarded.
@@ -790,7 +795,8 @@ class CombatEngine {
     const staminaRatio = character.currentStamina / character.maxStamina;
     const manaRatio    = character.currentMana    / character.maxMana;
     if (staminaRatio < 0.15 && manaRatio < 0.15) {
-        const restoreSkill = this.getAvailableSkillByCategory(character, 'RESTORATION');
+        const restoreSkill = this.getAvailableSkillByCategory(character, 'RESTORATION')
+            || this.getAvailableSkillByCategory(character, 'CONSUMABLE_RESTORATION');
         if (restoreSkill) {
             const action = { type: 'skill', skillID: restoreSkill.id, target: character.id };
             return this.checkChildSkillProc(character, action, players, enemies);
@@ -804,7 +810,8 @@ class CombatEngine {
     const damageCategories = ['DAMAGE_SINGLE','DAMAGE_AOE','DAMAGE_MAGIC','DAMAGE_AOE_MAGIC'];
     const allSkillCategories = [
         ...damageCategories,
-        'HEALING','HEALING_AOE','CONTROL','BUFF','DEFENSE','UTILITY','RESTORATION'
+        'HEALING','HEALING_AOE','CONTROL','BUFF','DEFENSE','UTILITY','RESTORATION',
+        'CONSUMABLE_HEALING','CONSUMABLE_RESTORATION','CONSUMABLE_DAMAGE'
     ];
 
     for (const skillID of pool) {
@@ -817,11 +824,22 @@ class CombatEngine {
         const cat = skill.category;
 
         if (cat === 'HEALING' || cat === 'HEALING_AOE' || cat === 'RESTORATION' ||
-            cat === 'BUFF' || cat === 'DEFENSE') {
+            cat === 'BUFF' || cat === 'DEFENSE' ||
+            cat === 'CONSUMABLE_HEALING' || cat === 'CONSUMABLE_RESTORATION') {
             target = character.id;
         } else if (cat === 'CONTROL' || cat === 'UTILITY') {
-            // Prefer highest-threat enemy for control; lowest HP for utility
-            if (profile === 'disruptor' && context.highestThreatScore > 0) {
+            // Check if skill has any self-only effects vs enemy effects
+            const hasEnemyEffect = skill.effects?.some(e =>
+                e.targets === 'single_enemy' || e.targets === 'all_enemies' ||
+                (!e.targets && (e.type === 'apply_debuff'))
+            );
+            const hasSelfOnlyEffects = skill.effects?.every(e =>
+                e.targets === 'self' || e.type === 'apply_buff'
+            );
+
+            if (hasSelfOnlyEffects && !hasEnemyEffect) {
+                target = character.id; // purely self-targeting utility/buff
+            } else if (profile === 'disruptor' && context.highestThreatScore > 0) {
                 const threatened = aliveEnemies.reduce((best, e) =>
                     this._threatScore(e) > this._threatScore(best) ? e : best
                 );
@@ -918,6 +936,41 @@ class CombatEngine {
     }
 
     const profile = enemy.aiProfile || 'aggressive';
+
+    // ── Targeting weights ──
+    // Each player gets a weight that influences how likely they are to be chosen.
+    // Taunt: greatly increases selection weight
+    // Stealth: greatly reduces selection weight (but doesn't make target immune)
+    // Weights are used when the enemy makes a random target choice.
+    const statusEngine = this.statusEngine;
+
+    function _weightedRandomTarget(pool) {
+        const weights = pool.map(p => {
+            let w = 1.0;
+            if (p.statusEffects?.some(e => e.id === 'taunt'   && e.duration > 0)) w *= 4.0;
+            if (p.statusEffects?.some(e => e.id === 'stealth' && e.duration > 0)) w *= 0.15;
+            // marked/provoked: apply targetingWeight multiplier from status definition
+            p.statusEffects?.forEach(activeStatus => {
+                const def = statusEngine?.statusMap?.[activeStatus.id];
+                if (def?.targetingWeight && activeStatus.duration > 0) {
+                    w *= def.targetingWeight;
+                }
+            });
+            return w;
+        });
+        const total = weights.reduce((a, b) => a + b, 0);
+        let roll = Math.random() * total;
+        for (let i = 0; i < pool.length; i++) {
+            roll -= weights[i];
+            if (roll <= 0) return pool[i];
+        }
+        return pool[pool.length - 1];
+    }
+
+    // Taunt: check if any player has taunt active (used to bias preferred-target logic too)
+    const tauntTarget = alivePlayers.find(p =>
+        p.statusEffects?.some(e => e.id === 'taunt' && e.duration > 0)
+    );
     const aliveEnemies = enemies.filter(e => !e.defeated);
 
     // Emergency heal
@@ -954,24 +1007,30 @@ class CombatEngine {
         // focusChance = probability of picking the "preferred" target;
         // otherwise picks randomly from alive players.
         const focusChance = {
-            aggressive: 0.70,  // usually finishes weakest, occasionally spreads
-            tactical:   0.65,  // usually hits highest threat, keeps players guessing
-            berserker:  0.40,  // fairly chaotic — high random component
-            support:    0.55,  // semi-random when attacking
+            aggressive: 0.70,
+            tactical:   0.65,
+            berserker:  0.40,
+            support:    0.55,
         }[profile] ?? 0.70;
 
         let primaryTarget = null;
+
+        // Taunt: when a taunting player exists, non-berserker profiles always use
+        // weighted random (which strongly favours the taunting player). Berserker
+        // only uses weighted random on its random rolls, not its preferred-target rolls.
         const usePreferred = Math.random() < focusChance;
 
-        if (!usePreferred) {
-            // Random target from alive players
-            primaryTarget = alivePlayers[Math.floor(Math.random() * alivePlayers.length)];
+        if (!usePreferred || profile === 'berserker') {
+            // Random selection — weights handle taunt and stealth influence
+            primaryTarget = _weightedRandomTarget(alivePlayers);
+        } else if (tauntTarget) {
+            // Preferred selection but taunt is active — honour taunt
+            primaryTarget = tauntTarget;
+            console.log(`[TAUNT] ${enemy.name} drawn to ${tauntTarget.name}`);
         } else if (profile === 'tactical') {
             primaryTarget = alivePlayers.reduce((best, p) =>
                 this._threatScore(p) > this._threatScore(best) ? p : best
             );
-        } else if (profile === 'berserker') {
-            primaryTarget = alivePlayers[Math.floor(Math.random() * alivePlayers.length)];
         } else {
             // aggressive / support / default: lowest HP
             primaryTarget = alivePlayers.reduce((min, p) => p.currentHP < min.currentHP ? p : min);
@@ -1125,6 +1184,25 @@ class CombatEngine {
         const primaryDebuff = skill.effects?.find(e => e.type === 'apply_debuff')?.debuff;
         if (primaryDebuff && this._targetHasDebuff(targetCombatant, primaryDebuff)) {
             score *= 0.55;
+        }
+    }
+
+    // ── Buff redundancy penalty — don't reapply a buff already active on self ──
+    if (cat === 'BUFF' || cat === 'DEFENSE') {
+        const primaryBuff = skill.effects?.find(e => e.type === 'apply_buff')?.buff;
+        if (primaryBuff && this._targetHasDebuff(character, primaryBuff)) {
+            score *= 0.15; // very low — almost never reapply an active buff
+        }
+    }
+
+    // ── Healing efficiency — don't heal when near full HP ──
+    if (cat === 'HEALING' || cat === 'HEALING_AOE' || cat === 'CONSUMABLE_HEALING') {
+        const healTarget = target ? [...aliveEnemies, ...players].find(c => c.id === target) : character;
+        if (healTarget) {
+            const hpRatio = healTarget.currentHP / healTarget.maxHP;
+            if (hpRatio > 0.8) score *= 0.1;       // near full — almost never heal
+            else if (hpRatio > 0.6) score *= 0.4;  // healthy — prefer damage instead
+            else if (hpRatio < 0.3) score *= 2.0;  // critical — strongly prefer heal
         }
     }
 
@@ -1375,6 +1453,8 @@ class CombatEngine {
 
   triggerWeaponProcs(actor, target, skillLevel) {
     if (!actor.equipment?.mainHand || !this.gear) return;
+    // Never proc on self — heals and buffs targeting the caster shouldn't trigger weapon effects
+    if (target.id === actor.id) return;
     const weapon = this.gear.find(g => g.id === actor.equipment.mainHand);
     if (!weapon) return;
     const procs = [];
@@ -1404,10 +1484,58 @@ class CombatEngine {
         console.log(`[PROC] ${weapon.name} triggered ${procSkill.name} on ${target.name}!`);
         this.applySkillEffects(procSkill, actor, target);
 
-        if (procSkill.effects?.some(e => e.type === 'damage' || e.type === 'apply_debuff')) {
+        if (procSkill.effects?.some(e => e.type === 'damage')) {
             const procDamage = this.calculateDamage(actor, procSkill, target, false, skillLevel);
             target.currentHP -= procDamage;
+            if (target.currentHP <= 0) {
+                target.currentHP = 0;
+                target.defeated = true;
+                console.log(`[DEBUG] ${target.name} defeated by proc! (HP: 0)`);
+            }
             console.log(`[PROC] ${procSkill.name} dealt ${procDamage} damage to ${target.name}`);
+        }
+    });
+  }
+
+  /**
+   * Fire on-hit procs from active status effect buffs on the actor.
+   * Status definitions can include an onHitProc: { skillId, chance } field.
+   * This allows buffs like poison_weapon and stun_weapon to apply their
+   * effects on a successful hit without needing weapon item entries.
+   */
+  triggerStatusProcs(actor, target, skillLevel) {
+    if (!actor.statusEffects || actor.statusEffects.length === 0) return;
+    if (target.id === actor.id) return;
+
+    actor.statusEffects.forEach(activeStatus => {
+        const statusDef = this.statusEngine.statusMap[activeStatus.id];
+        if (!statusDef?.onHitProc) return;
+
+        const { skillId, chance } = statusDef.onHitProc;
+        const rolled = Math.random() * 100;
+        if (rolled > chance) {
+            console.log(`[STATUS PROC] ${activeStatus.name} proc FAILED (chance=${chance}%, rolled=${rolled.toFixed(1)})`);
+            return;
+        }
+
+        const procSkill = this.skills.find(s => s.id === skillId);
+        if (!procSkill) {
+            console.warn(`[STATUS PROC] Skill not found: ${skillId}`);
+            return;
+        }
+
+        console.log(`[STATUS PROC] ${activeStatus.name} triggered ${procSkill.name} on ${target.name}!`);
+        this.applySkillEffects(procSkill, actor, target);
+
+        if (procSkill.effects?.some(e => e.type === 'damage')) {
+            const procDamage = this.calculateDamage(actor, procSkill, target, false, skillLevel);
+            target.currentHP -= procDamage;
+            if (target.currentHP <= 0) {
+                target.currentHP = 0;
+                target.defeated = true;
+                console.log(`[DEBUG] ${target.name} defeated by status proc! (HP: 0)`);
+            }
+            console.log(`[STATUS PROC] ${procSkill.name} dealt ${procDamage} damage to ${target.name}`);
         }
     });
   }
@@ -1426,11 +1554,28 @@ class CombatEngine {
         };
     }
 
+    // Non-offensive categories skip damage calculation, variance, and weapon procs entirely.
+    // They only apply skill effects (heals, buffs, resource restoration).
+    const NON_OFFENSIVE = new Set([
+        'HEALING','HEALING_AOE','BUFF','DEFENSE','UTILITY','RESTORATION',
+        'CONSUMABLE_HEALING','CONSUMABLE_RESTORATION'
+    ]);
+    const isOffensive = !NON_OFFENSIVE.has(skill.category);
+
     // Weapon Delay Modification
     const weapon = actor.equipment?.mainHand ? this.gear.find(g => g.id === actor.equipment.mainHand) : null;
     const delayMultiplier = weapon?.delay ? (weapon.delay === 1 ? 0.8 : weapon.delay === 3 ? 1.2 : 1.0) : 1.0;
-    const finalDelay = skill.delay * delayMultiplier;
-    console.log(`[DELAY] ${actor.name} ${skill.name}: base=${skill.delay}ms, weapon=${weapon?.delay || 'none'}, final=${finalDelay}ms`);
+
+    // Status delay multiplier (slow, haste, freeze, knockback, evasion_boost, speed_boost etc.)
+    let statusDelayMult = 1.0;
+    if (actor.statusEffects && actor.statusEffects.length > 0) {
+        const statusResult = this.statusEngine.processStatusEffects(actor);
+        statusDelayMult = statusResult.skillDelayMultiplier || 1.0;
+    }
+
+    const finalDelay = Math.round(skill.delay * delayMultiplier * statusDelayMult);
+    const statusDelayNote = statusDelayMult !== 1.0 ? `, status=${statusDelayMult.toFixed(2)}x` : '';
+    console.log(`[DELAY] ${actor.name} ${skill.name}: base=${skill.delay}ms, weapon=${weapon?.delay || 'none'}${statusDelayNote}, final=${finalDelay}ms`);
 
     // Consume resources
     if (skill.costType === 'stamina') {
@@ -1453,6 +1598,20 @@ class CombatEngine {
 
     // Handle AOE skills
     if (skill.category && skill.category.includes('AOE')) {
+        // Non-offensive AOE (e.g. HEALING_AOE) — apply effects to allies, no damage/procs
+        if (!isOffensive) {
+            const aliveAllies = players.filter(p => !p.defeated);
+            aliveAllies.forEach(ally => this.applySkillEffects(skill, actor, ally));
+            return {
+                roll: { hit: true, crit: false, hitCount: 1 },
+                result: {
+                    message: `${actor.name} uses ${skill.name}.`,
+                    damageDealt: 0, targets: aliveAllies.map(a => ({ targetId: a.id, hpAfter: a.currentHP })),
+                    success: true, delay: finalDelay
+                }
+            };
+        }
+
         const aliveEnemies = enemies.filter(e => !e.defeated);
         if (aliveEnemies.length === 0) {
             return { roll: null, result: { message: 'No targets found', success: false, delay: finalDelay } };
@@ -1486,16 +1645,30 @@ class CombatEngine {
                 enemy.defeated = true;
                 console.log(`[DEBUG] ${enemy.name} defeated! (HP: 0)`);
             }
+            // Sleep breaks on damage received
+            if (hitDamage > 0 && enemy.statusEffects?.some(e => e.id === 'sleep' && e.duration > 0)) {
+                this.statusEngine.removeStatus(enemy, 'sleep');
+                console.log(`[STATUS] ${enemy.name} woke up from damage!`);
+            }
             this.applySkillEffects(skill, actor, enemy);
             this.triggerWeaponProcs(actor, enemy, skillLevel);
-            targets.push({ targetId: enemy.id, targetName: enemy.name, damage: hitDamage, hpAfter: Math.max(0, enemy.currentHP) });
+            this.triggerStatusProcs(actor, enemy, skillLevel);
+            targets.push({
+                targetId: enemy.id,
+                targetName: enemy.name,
+                damage: hitDamage,
+                hpAfter: Math.max(0, enemy.currentHP),
+                targetStatuses: (enemy.statusEffects || []).filter(e => e.duration > 0).map(e => ({ id: e.id, duration: e.duration }))
+            });
         });
 
         return {
             roll: { hitChance, rolled, hit: true, crit: isCrit, hitCount },
             result: {
                 message: isCrit ? `${actor.name} critically hits ${targets.length} targets with ${skill.name} for ${totalDamage} total damage!` : `${actor.name} hits ${targets.length} targets with ${skill.name} for ${totalDamage} total damage.`,
-                damageDealt: totalDamage, targets, success: true, delay: finalDelay
+                damageDealt: totalDamage, targets, success: true, delay: finalDelay,
+                actorId: actor.id,
+                actorStatuses: (actor.statusEffects || []).filter(e => e.duration > 0).map(e => ({ id: e.id, duration: e.duration }))
             }
         };
     }
@@ -1516,6 +1689,25 @@ class CombatEngine {
         }
         action.target = redirectPool.reduce((min, t) => t.currentHP < min.currentHP ? t : min).id;
         return this.resolveAction(action, actor, players, enemies);
+    }
+
+    // ── Non-offensive skills: apply effects only, no hit roll, no damage, no procs ──
+    if (!isOffensive) {
+        this.applySkillEffects(skill, actor, target);
+        const _snap = (c) => (c.statusEffects || []).filter(e => e.duration > 0).map(e => ({ id: e.id, duration: e.duration }));
+        const label = skill.category === 'HEALING' || skill.category === 'HEALING_AOE'
+            ? `${actor.name} uses ${skill.name}.`
+            : `${actor.name} uses ${skill.name}.`;
+        return {
+            roll: { hit: true, crit: false, hitCount: 1 },
+            result: {
+                message: label,
+                damageDealt: 0, targetId: target.id, targetHPAfter: target.currentHP,
+                success: true, delay: finalDelay,
+                actorId: actor.id, actorStatuses: _snap(actor),
+                targetStatuses: _snap(target)
+            }
+        };
     }
 
     const hitChance = this.calculateHitChance(actor, skill, target, skillLevel);
@@ -1542,14 +1734,56 @@ class CombatEngine {
         target.defeated = true;
         console.log(`[DEBUG] ${target.name} defeated! (HP: 0)`);
     }
+
+    // Sleep breaks on damage received
+    if (totalDamage > 0 && target.statusEffects?.some(e => e.id === 'sleep' && e.duration > 0)) {
+        this.statusEngine.removeStatus(target, 'sleep');
+        console.log(`[STATUS] ${target.name} woke up from damage!`);
+    }
+
+    // Counter-ready: if target has counter_ready, fire their counter proc back at the actor
+    if (totalDamage > 0) {
+        const counterStatus = target.statusEffects?.find(e => e.id === 'counter_ready' && e.duration > 0);
+        if (counterStatus) {
+            const statusDef = this.statusEngine.statusMap['counter_ready'];
+            if (statusDef?.counterProc) {
+                const { skillId, chance } = statusDef.counterProc;
+                const rolled = Math.random() * 100;
+                if (rolled <= chance) {
+                    const counterSkill = this.skills.find(s => s.id === skillId);
+                    if (counterSkill) {
+                        console.log(`[COUNTER] ${target.name} counters ${actor.name} with ${counterSkill.name}!`);
+                        this.applySkillEffects(counterSkill, target, actor);
+                        if (counterSkill.effects?.some(e => e.type === 'damage')) {
+                            const counterDamage = this.calculateDamage(target, counterSkill, actor, false, 1);
+                            actor.currentHP -= counterDamage;
+                            if (actor.currentHP <= 0) { actor.currentHP = 0; actor.defeated = true; }
+                            console.log(`[COUNTER] ${counterSkill.name} dealt ${counterDamage} to ${actor.name}`);
+                        }
+                        this.statusEngine.removeStatus(target, 'counter_ready');
+                    }
+                }
+            }
+        }
+    }
+
     this.applySkillEffects(skill, actor, target);
     this.triggerWeaponProcs(actor, target, skillLevel);
+    this.triggerStatusProcs(actor, target, skillLevel);
+
+    // Build status snapshots for frontend display
+    const _statusSnapshot = (combatant) =>
+        (combatant.statusEffects || [])
+            .filter(e => e.duration > 0)
+            .map(e => ({ id: e.id, duration: e.duration }));
 
     return {
         roll: { hitChance, rolled, hit: true, crit: isCrit, hitCount },
         result: {
             message: isCrit ? `${actor.name} critically hits ${target.name} with ${skill.name} for ${totalDamage} damage!` : `${actor.name} hits ${target.name} with ${skill.name} for ${totalDamage} damage.`,
-            damageDealt: totalDamage, targetId: target.id, targetHPAfter: Math.max(0, target.currentHP), success: true, delay: finalDelay
+            damageDealt: totalDamage, targetId: target.id, targetHPAfter: Math.max(0, target.currentHP), success: true, delay: finalDelay,
+            actorId: actor.id, actorStatuses: _statusSnapshot(actor),
+            targetStatuses: _statusSnapshot(target)
         }
     };
   }
@@ -1782,6 +2016,51 @@ class CombatEngine {
             console.log(`[EFFECT] ${skill.name}: ${effect.buff} applied to ${buffTarget.name}`);
         } else if (effect.type === 'damage' && effect.damageType) {
             console.log(`[EFFECT] ${skill.name}: Damage effect (${effect.damageType}) processed in calculateDamage()`);
+
+        } else if (effect.type === 'cleanse') {
+            // Remove debuffs from an ally (or self)
+            // effect.statusIds: specific IDs to remove, or omit to remove all debuffs
+            // effect.targets: 'self' | 'single_ally'
+            let cleanseTarget = actor;
+            if (effect.targets === 'single_ally' && target && target.type === 'player') cleanseTarget = target;
+            if (!cleanseTarget.statusEffects) return;
+
+            const toRemove = effect.statusIds
+                ? cleanseTarget.statusEffects.filter(s => effect.statusIds.includes(s.id) && s.type === 'debuff')
+                : cleanseTarget.statusEffects.filter(s => s.type === 'debuff');
+
+            const maxRemove = effect.maxRemove || toRemove.length;
+            const removed = toRemove.slice(0, maxRemove);
+            removed.forEach(s => {
+                this.statusEngine.removeStatus(cleanseTarget, s.id);
+                console.log(`[EFFECT] ${skill.name}: Cleansed ${s.name} from ${cleanseTarget.name}`);
+            });
+            if (removed.length === 0) {
+                console.log(`[EFFECT] ${skill.name}: Nothing to cleanse on ${cleanseTarget.name}`);
+            }
+
+        } else if (effect.type === 'dispel') {
+            // Remove buffs from an enemy (or specific status IDs)
+            // effect.statusIds: specific IDs to remove, or omit to remove all buffs
+            // effect.targets: defaults to enemy target
+            let dispelTarget = target;
+            if (effect.targets === 'self') dispelTarget = actor;
+
+            if (!dispelTarget || !dispelTarget.statusEffects) return;
+
+            const toRemove = effect.statusIds
+                ? dispelTarget.statusEffects.filter(s => effect.statusIds.includes(s.id))
+                : dispelTarget.statusEffects.filter(s => s.type === 'buff');
+
+            const maxRemove = effect.maxRemove || toRemove.length;
+            const removed = toRemove.slice(0, maxRemove);
+            removed.forEach(s => {
+                this.statusEngine.removeStatus(dispelTarget, s.id);
+                console.log(`[EFFECT] ${skill.name}: Dispelled ${s.name} from ${dispelTarget.name}`);
+            });
+            if (removed.length === 0) {
+                console.log(`[EFFECT] ${skill.name}: Nothing to dispel on ${dispelTarget.name}`);
+            }
         }
     });
   }
@@ -1816,16 +2095,25 @@ class CombatEngine {
   }
 
   hasResources(actor, skill) {
+    // Check status blocks first (e.g. silence blocks mana skills)
+    if (this.statusEngine.isSkillBlocked(actor, skill)) return false;
     if (skill.costType === 'stamina') return actor.currentStamina >= skill.costAmount;
     if (skill.costType === 'mana') return actor.currentMana >= skill.costAmount;
     return true;
   }
 
   regenerateResources(combatant) {
-    const staminaRegen = Math.floor(combatant.maxStamina * 0.02);
-    const manaRegen = Math.floor(combatant.maxMana * 0.02);
+    let staminaMultiplier = 1.0;
+    let manaMultiplier = 1.0;
+    if (combatant.statusEffects && combatant.statusEffects.length > 0) {
+        const statusResult = this.statusEngine.processStatusEffects(combatant);
+        staminaMultiplier = statusResult.staminaRegenMultiplier || 1.0;
+        manaMultiplier   = statusResult.manaRegenMultiplier    || 1.0;
+    }
+    const staminaRegen = Math.floor(combatant.maxStamina * 0.02 * staminaMultiplier);
+    const manaRegen    = Math.floor(combatant.maxMana    * 0.02 * manaMultiplier);
     combatant.currentStamina = Math.min(combatant.maxStamina, combatant.currentStamina + staminaRegen);
-    combatant.currentMana = Math.min(combatant.maxMana, combatant.currentMana + manaRegen);
+    combatant.currentMana    = Math.min(combatant.maxMana,    combatant.currentMana    + manaRegen);
   }
 
   calculateInitiative(players, enemies, partySnapshots) {

@@ -122,7 +122,13 @@ function createTables() {
                 )
             `, (err) => {
                 if (err) reject(err);
-                else resolve();
+                else {
+                    // Migration: add aiProfile column to existing databases
+                    db.run(`ALTER TABLE characters ADD COLUMN aiProfile TEXT DEFAULT 'balanced'`, () => {
+                        // Ignore error — column already exists on fresh installs
+                    });
+                    resolve();
+                }
             });
         });
     });
@@ -154,7 +160,8 @@ async function initializeCharacterSnapshotsTable() {
             last_shared_at DATETIME,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            last_active_at DATETIME
+            last_active_at DATETIME,
+            ai_profile TEXT DEFAULT 'balanced'
         )
     `;
     
@@ -164,6 +171,11 @@ async function initializeCharacterSnapshotsTable() {
     await db.run('CREATE INDEX IF NOT EXISTS idx_character_level ON character_snapshots(level)');
     await db.run('CREATE INDEX IF NOT EXISTS idx_imports ON character_snapshots(import_count)');
     console.log('[DATABASE] character_snapshots table initialized');
+
+    // Migration: add ai_profile to character_snapshots
+    await new Promise((resolve) => {
+        db.run(`ALTER TABLE character_snapshots ADD COLUMN ai_profile TEXT DEFAULT 'balanced'`, () => resolve());
+    });
 
     // Migration: add lastSuccessfulChallengeId to existing databases that predate this column
     await new Promise((resolve) => {
@@ -302,8 +314,8 @@ function saveCharacter(character) {
                 ownerUserId, isPublic, shareCode, buildName, buildDescription,
                 importCount, lastSharedAt,
                 avatarId, avatarColor, avatarFrame, title, lastActiveAt,
-                createdAt, lastModified, lastSuccessfulChallengeId
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                createdAt, lastModified, lastSuccessfulChallengeId, aiProfile
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(id) DO UPDATE SET
                 name = ?, race = ?, level = ?, experience = ?,
                 conviction = ?, endurance = ?, ambition = ?, harmony = ?,
@@ -312,7 +324,7 @@ function saveCharacter(character) {
                 ownerUserId = ?, isPublic = ?, shareCode = ?, buildName = ?, buildDescription = ?,
                 importCount = ?, lastSharedAt = ?,
                 avatarId = ?, avatarColor = ?, avatarFrame = ?, title = ?, lastActiveAt = ?,
-                lastModified = ?, lastSuccessfulChallengeId = ?`,
+                lastModified = ?, lastSuccessfulChallengeId = ?, aiProfile = ?`,
             [
                 character.id, character.name, character.race, character.level, character.experience,
                 character.stats?.conviction || 0, character.stats?.endurance || 0,
@@ -332,6 +344,7 @@ function saveCharacter(character) {
                 character.lastActiveAt || Date.now(),
                 character.createdAt || Date.now(), Date.now(),
                 character.lastSuccessfulChallengeId || null,
+                character.aiProfile || 'balanced',
                 // ON CONFLICT UPDATE values
                 character.name, character.race, character.level, character.experience,
                 character.stats?.conviction || 0, character.stats?.endurance || 0,
@@ -349,7 +362,8 @@ function saveCharacter(character) {
                 character.avatarId || null, character.avatarColor || null,
                 character.avatarFrame || null, character.title || null,
                 character.lastActiveAt || Date.now(),
-                Date.now(), character.lastSuccessfulChallengeId || null
+                Date.now(), character.lastSuccessfulChallengeId || null,
+                character.aiProfile || 'balanced'
             ],
             function(err) {
                 if (err) reject(err);
@@ -397,7 +411,8 @@ function getCharacter(characterId) {
                     createdAt: row.createdAt,
                     lastModified: row.lastModified,
                     lastActiveAt: row.lastActiveAt,
-                    lastSuccessfulChallengeId: row.lastSuccessfulChallengeId || null
+                    lastSuccessfulChallengeId: row.lastSuccessfulChallengeId || null,
+                    aiProfile: row.aiProfile || 'balanced'
                 });
             } else {
                 resolve(null);
@@ -444,7 +459,8 @@ function getAllCharacters() {
                     createdAt: row.createdAt,
                     lastModified: row.lastModified,
                     lastActiveAt: row.lastActiveAt,
-                    lastSuccessfulChallengeId: row.lastSuccessfulChallengeId || null
+                    lastSuccessfulChallengeId: row.lastSuccessfulChallengeId || null,
+                    aiProfile: row.aiProfile || 'balanced'
                 })) : [];
                 resolve(characters);
             }

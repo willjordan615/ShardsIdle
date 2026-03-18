@@ -55,6 +55,21 @@
                         <h3>Starting Skills</h3>
                         <div id="skillSelect"></div>
                     </div>
+
+                    <div class="section">
+                        <h3>Combat Style</h3>
+                        <p style="color: #8b7355; margin-bottom: 1rem; font-size: 0.9rem;">How this character approaches combat decisions.</p>
+                        <div class="form-group">
+                            <select id="aiProfileSelect" style="width:100%;">
+                                <option value="balanced">⚖️ Balanced — Adapts to the situation</option>
+                                <option value="aggressive">⚔️ Aggressive — Always pushes for the kill</option>
+                                <option value="cautious">🛡️ Cautious — Prioritises survival and defense</option>
+                                <option value="support">💚 Support — Heals and buffs allies first</option>
+                                <option value="disruptor">🌀 Disruptor — Focuses on debuffs and control</option>
+                                <option value="opportunist">🗡️ Opportunist — Exploits weaknesses and procs</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -189,6 +204,24 @@
 </div>
 <!-- NEW: Container for the Confirm Button -->
 <div id="skillActionContainer" style="margin-bottom: 1rem; min-height: 40px;"></div>
+
+            <div class="section" style="margin-top: 1.5rem;">
+                <h3>Combat Style</h3>
+                <p style="color: #8b7355; margin-bottom: 1rem; font-size: 0.9rem;">How this character approaches combat decisions.</p>
+                <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                    <span id="aiProfileBadge" style="font-size: 1.1rem; font-weight: 600;"></span>
+                    <select id="aiProfileDetailSelect" style="flex: 1; min-width: 200px;">
+                        <option value="balanced">⚖️ Balanced — Adapts to the situation</option>
+                        <option value="aggressive">⚔️ Aggressive — Always pushes for the kill</option>
+                        <option value="cautious">🛡️ Cautious — Prioritises survival and defense</option>
+                        <option value="support">💚 Support — Heals and buffs allies first</option>
+                        <option value="disruptor">🌀 Disruptor — Focuses on debuffs and control</option>
+                        <option value="opportunist">🗡️ Opportunist — Exploits weaknesses and procs</option>
+                    </select>
+                    <button onclick="saveAiProfile()" class="secondary">Save Style</button>
+                </div>
+                <p id="aiProfileSaveMsg" style="color: #4cd964; margin-top: 0.5rem; font-size: 0.85rem; min-height: 1.2em;"></p>
+            </div>
 
             <div style="text-align: center; margin-top: 2rem;">
                 <button onclick="deleteCharacter(currentState.detailCharacterId)" class="danger">Delete Character</button>

@@ -78,14 +78,9 @@
       "sense"
     ],
     "skillSelectionCount": 2,
-    "equipment": {
-      "mainHand": "fangs_tiny",
-      "offHand": null,
-      "head": null,
-      "chest": null,
-      "accessory1": null,
-      "accessory2": null
-    },
+    "equipment": [
+      "fangs_tiny"
+    ],
     "armorValue": 1,
     "physEvasion": 2,
     "magEvasion": 0,
@@ -109,14 +104,9 @@
       "sense"
     ],
     "skillSelectionCount": 2,
-    "equipment": {
-      "mainHand": "fangs_small",
-      "offHand": null,
-      "head": null,
-      "chest": null,
-      "accessory1": null,
-      "accessory2": null
-    },
+    "equipment": [
+      "fangs_small"
+    ],
     "armorValue": 2,
     "physEvasion": 1,
     "magEvasion": 0,
@@ -141,7 +131,7 @@
     ],
     "skillSelectionCount": 2,
     "equipment": {
-      "mainHand": "fangs_small",
+      "mainHand": "dogchopper",
       "offHand": null,
       "head": null,
       "chest": null,
@@ -172,7 +162,7 @@
     ],
     "skillSelectionCount": 2,
     "equipment": {
-      "mainHand": "fangs_small",
+      "mainHand": "goblin_bow",
       "offHand": null,
       "head": null,
       "chest": null,
@@ -205,7 +195,7 @@
     ],
     "skillSelectionCount": 2,
     "equipment": {
-      "mainHand": "fangs_small",
+      "mainHand": "fangs_great",
       "offHand": null,
       "head": null,
       "chest": null,

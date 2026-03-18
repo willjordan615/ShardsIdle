@@ -52,8 +52,8 @@
     --space-xl:  2rem;
     --space-2xl: 3rem;
 
-    --font-display: 'Cinzel', 'Palatino Linotype', serif;
-    --font-body:    'Lato', 'Segoe UI', sans-serif;
+    --font-display: 'Cinzel', 'Palatino Linotype', 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', serif;
+    --font-body:    'Lato', 'Segoe UI', 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
 
     --radius-sm: 3px;
     --radius-md: 6px;
@@ -1104,4 +1104,76 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
 .reduce-motion *::after {
     animation-duration: 0.001ms !important;
     transition-duration: 0.001ms !important;
+}
+
+/* ============================================================
+   STATUS EFFECT PIPS ON COMBATANT CARDS
+   ============================================================ */
+.status-effects {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+    margin-top: 4px;
+    min-height: 0;
+}
+
+.status-pip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-family: 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
+    cursor: help;
+    border: 1px solid transparent;
+    transition: transform 0.1s ease, border-color 0.1s ease;
+    position: relative;
+}
+
+.status-pip:hover {
+    transform: scale(1.25);
+    z-index: 10;
+}
+
+.status-pip-debuff {
+    background: rgba(232, 72, 74, 0.18);
+    border-color: rgba(232, 72, 74, 0.4);
+}
+
+.status-pip-buff {
+    background: rgba(76, 217, 100, 0.15);
+    border-color: rgba(76, 217, 100, 0.35);
+}
+
+/* Tooltip via title attribute is handled by browser natively,
+   but we style a custom tooltip for better readability */
+.status-pip::after {
+    content: attr(title);
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(7, 10, 24, 0.97);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    line-height: 1.4;
+    white-space: nowrap;
+    padding: 0.35rem 0.6rem;
+    border-radius: 3px;
+    border: 1px solid rgba(139, 115, 85, 0.4);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    z-index: 100;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+    max-width: 220px;
+    white-space: normal;
+    text-align: center;
+}
+
+.status-pip:hover::after {
+    opacity: 1;
 }

@@ -15,6 +15,7 @@ let gameData = {
     challenges: [],
     consumables: [],
     bots: [],
+    statuses: [],
     characters: []
 };
 
@@ -38,6 +39,7 @@ async function initializeGame() {
         gameData.challenges = dataFromServer.challenges || [];
         gameData.consumables = dataFromServer.consumables || [];
         gameData.bots       = dataFromServer.bots       || [];
+        gameData.statuses   = dataFromServer.statuses   || [];
 
         // Attach to window ONLY after data is fully populated
         window.gameData = gameData;

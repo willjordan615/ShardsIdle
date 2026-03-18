@@ -390,7 +390,8 @@ async function startCombat(forcedChallengeId) {
             skills: member.skills,
             consumables: member.consumables || {},
             equipment: member.equipment,
-            isImported: member.isImported || false
+            isImported: member.isImported || false,
+            aiProfile: member.aiProfile || 'balanced'
         }));
 
         const requestBody = {
