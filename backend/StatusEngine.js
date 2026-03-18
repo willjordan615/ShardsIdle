@@ -58,7 +58,8 @@ class StatusEngine {
             name: statusDef.name,
             duration: finalDuration,
             magnitude,
-            type: statusDef.type
+            type: statusDef.type,
+            sourceId: null  // populated by engine when actor context is available
         });
 
         return true;
@@ -81,7 +82,9 @@ class StatusEngine {
             incomingDamageMultiplier: 1.0,
             staminaRegenMultiplier: 1.0,
             manaRegenMultiplier: 1.0,
-            manaDrainPerTurn: 0
+            manaDrainPerTurn: 0,
+            // Lifedrain: damage ticked that should also heal a remote source
+            sourceHeals: []  // [{ sourceId, amount }] — engine credits HP to the source combatant
         };
 
         if (!target.statusEffects || target.statusEffects.length === 0) {
@@ -143,6 +146,15 @@ class StatusEngine {
                 const drain = Math.floor(this.evaluateExpression(effects.manaDrainPerTurn, activeStatus.magnitude));
                 result.manaDrainPerTurn += drain;
                 result.messages.push(`${target.name} loses ${drain} mana from ${statusDef.name}`);
+            }
+
+            // Leech DoT: tick damage that heals the caster (sourceId stored on active status)
+            if (effects.sourceHealPerTurn && activeStatus.sourceId) {
+                const healAmount = Math.floor(this.evaluateExpression(effects.sourceHealPerTurn, activeStatus.magnitude));
+                if (healAmount > 0) {
+                    result.sourceHeals.push({ sourceId: activeStatus.sourceId, amount: healAmount });
+                    result.messages.push(`${target.name} is drained by Life Leech`);
+                }
             }
         });
 

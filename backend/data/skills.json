@@ -648,7 +648,7 @@
     "name": "Major Heal",
     "category": "HEALING",
     "description": "Restore a large amount of health.",
-    "basePower": 2.0,
+    "basePower": 0,
     "costType": "mana",
     "costAmount": 40,
     "requiredLevel": 10,
@@ -666,8 +666,8 @@
       {
         "type": "heal",
         "targets": "single_ally",
-        "scalesBy": "basePower",
-        "magnitude": 2.0
+        "scalesBy": "harmony",
+        "magnitude": 0.45
       }
     ]
   },
@@ -1026,7 +1026,7 @@
     "name": "Holy Light",
     "category": "HEALING_PROC",
     "description": "Heal with divine light.",
-    "basePower": 0.6,
+    "basePower": 0,
     "costType": "none",
     "costAmount": 0,
     "requiredLevel": 1,
@@ -1043,10 +1043,12 @@
     },
     "effects": [
       {
-        "type": "heal",
-        "targets": "all_allies",
-        "scalesBy": "basePower",
-        "magnitude": 0.6
+        "type": "apply_buff",
+        "targets": "self",
+        "buff": "regen",
+        "duration": 2,
+        "magnitude": 1,
+        "chance": 1.0
       }
     ]
   },
@@ -1768,7 +1770,7 @@
     "name": "Resurrect",
     "category": "HEALING",
     "description": "Bring an ally back to life.",
-    "basePower": 0.5,
+    "basePower": 0,
     "costType": "mana",
     "costAmount": 80,
     "requiredLevel": 15,
@@ -1787,7 +1789,7 @@
       {
         "type": "heal",
         "targets": "single_ally",
-        "scalesBy": "basePower",
+        "scalesBy": "harmony",
         "magnitude": 0.5
       }
     ]
@@ -1797,7 +1799,7 @@
     "name": "Mass Resurrect",
     "category": "HEALING",
     "description": "Bring all defeated allies back to life.",
-    "basePower": 0.3,
+    "basePower": 0,
     "costType": "mana",
     "costAmount": 120,
     "requiredLevel": 20,
@@ -1816,7 +1818,7 @@
       {
         "type": "heal",
         "targets": "all_allies",
-        "scalesBy": "basePower",
+        "scalesBy": "harmony",
         "magnitude": 0.3
       }
     ]
@@ -8523,6 +8525,142 @@
         "debuff": "marked",
         "magnitude": 1,
         "duration": 3
+      }
+    ]
+  },
+  {
+    "id": "lifetap",
+    "name": "Lifetap",
+    "description": "Tear life force directly from an enemy, healing yourself.",
+    "category": "DAMAGE_MAGIC",
+    "isStarterSkill": false,
+    "parentSkills": [],
+    "basePower": 4,
+    "baseHitChance": 0.9,
+    "critChance": 0.05,
+    "critMultiplier": 1.5,
+    "delay": 1300,
+    "costType": "mana",
+    "costAmount": 14,
+    "hitCount": {
+      "fixed": 1
+    },
+    "scalingFactors": {
+      "harmony": 0.6,
+      "conviction": 0.4
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "shadow",
+        "chance": 1.0
+      },
+      {
+        "type": "lifetap",
+        "magnitude": 0.08,
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "apply_siphon_ward",
+    "name": "Siphon Ward",
+    "description": "Curse an enemy so that each strike against them feeds you.",
+    "category": "CONTROL",
+    "isStarterSkill": false,
+    "parentSkills": [
+      "lifetap"
+    ],
+    "basePower": 2,
+    "baseHitChance": 0.9,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 1200,
+    "costType": "mana",
+    "costAmount": 16,
+    "hitCount": {
+      "fixed": 1
+    },
+    "scalingFactors": {
+      "harmony": 0.8
+    },
+    "effects": [
+      {
+        "type": "apply_debuff",
+        "debuff": "siphon_ward",
+        "duration": 3,
+        "magnitude": 1,
+        "targets": "single_enemy",
+        "chance": 0.85
+      }
+    ]
+  },
+  {
+    "id": "apply_life_leech",
+    "name": "Life Leech",
+    "description": "Bind a tendril of shadow to an enemy, draining their vitality to you each turn.",
+    "category": "CONTROL",
+    "isStarterSkill": false,
+    "parentSkills": [
+      "lifetap"
+    ],
+    "basePower": 2,
+    "baseHitChance": 0.88,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 1400,
+    "costType": "mana",
+    "costAmount": 18,
+    "hitCount": {
+      "fixed": 1
+    },
+    "scalingFactors": {
+      "harmony": 0.7,
+      "conviction": 0.3
+    },
+    "effects": [
+      {
+        "type": "apply_debuff",
+        "debuff": "life_leech",
+        "duration": 4,
+        "magnitude": 1,
+        "targets": "single_enemy",
+        "chance": 0.8
+      }
+    ]
+  },
+  {
+    "id": "apply_cursed_blood",
+    "name": "Cursed Blood",
+    "description": "Corrupt an enemy's blood so every wound they suffer sustains you.",
+    "category": "CONTROL",
+    "isStarterSkill": false,
+    "parentSkills": [
+      "lifetap",
+      "apply_siphon_ward"
+    ],
+    "basePower": 3,
+    "baseHitChance": 0.85,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 1500,
+    "costType": "mana",
+    "costAmount": 20,
+    "hitCount": {
+      "fixed": 1
+    },
+    "scalingFactors": {
+      "harmony": 0.5,
+      "conviction": 0.5
+    },
+    "effects": [
+      {
+        "type": "apply_debuff",
+        "debuff": "cursed_blood",
+        "duration": 4,
+        "magnitude": 1,
+        "targets": "single_enemy",
+        "chance": 0.75
       }
     ]
   }

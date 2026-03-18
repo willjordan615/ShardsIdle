@@ -926,5 +926,47 @@
         "ambition": 0.15
       }
     }
+  },
+  {
+    "id": "siphon_ward",
+    "name": "Siphon Ward",
+    "type": "debuff",
+    "description": "Life force drains toward attackers on each hit.",
+    "emoji": "\ud83e\ude78",
+    "tooltip": "Siphon Ward \u2014 attackers heal when striking this target",
+    "defaultDuration": 3,
+    "defaultMagnitude": 1,
+    "effects": {
+      "healAttackerOnHit": 0.15
+    }
+  },
+  {
+    "id": "life_leech",
+    "name": "Life Leech",
+    "type": "debuff",
+    "description": "Vitality bleeds away to sustain the caster.",
+    "emoji": "\ud83e\ude78",
+    "tooltip": "Life Leech \u2014 losing HP each turn, healing the one who cast it",
+    "defaultDuration": 4,
+    "defaultMagnitude": 1,
+    "effects": {
+      "damagePerTurn": "magnitude * 6",
+      "sourceHealPerTurn": "magnitude * 6"
+    }
+  },
+  {
+    "id": "cursed_blood",
+    "name": "Cursed Blood",
+    "type": "debuff",
+    "description": "Each wound feeds the one who cursed them.",
+    "emoji": "\ud83e\ude78",
+    "tooltip": "Cursed Blood \u2014 strikes against this target may leech life back",
+    "defaultDuration": 4,
+    "defaultMagnitude": 1,
+    "effects": {},
+    "onHitProcLifetap": {
+      "chance": 35,
+      "fraction": 0.25
+    }
   }
 ]

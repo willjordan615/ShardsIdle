@@ -566,6 +566,18 @@ class CombatEngine {
             combatant.currentHP = Math.min(combatant.maxHP, combatant.currentHP + statusResults.healed);
           }
 
+          // Leech DoT: credit heals to the source combatant
+          if (statusResults.sourceHeals && statusResults.sourceHeals.length > 0) {
+            const allCombatants = [...playerCharacters, ...enemies];
+            statusResults.sourceHeals.forEach(({ sourceId, amount }) => {
+              const source = allCombatants.find(c => c.id === sourceId && !c.defeated);
+              if (source) {
+                source.currentHP = Math.min(source.maxHP, source.currentHP + amount);
+                console.log(`[LIFEDRAIN] ${source.name} leeches ${amount} HP from ${combatant.name}`);
+              }
+            });
+          }
+
           if (statusResults.manaDrainPerTurn > 0) {
             combatant.currentMana = Math.max(0, combatant.currentMana - statusResults.manaDrainPerTurn);
           }
@@ -1652,7 +1664,7 @@ class CombatEngine {
 
     // ── Non-offensive skills: apply effects only, no hit roll, no damage, no procs ──
     if (!isOffensive) {
-        targetList.forEach(t => this.applySkillEffects(skill, actor, t, null, players));
+        targetList.forEach(t => this.applySkillEffects(skill, actor, t, null, players.concat(enemies)));
         const _snap = (c) => (c.statusEffects || []).filter(e => e.duration > 0).map(e => ({ id: e.id, duration: e.duration }));
         return {
             roll: { hit: true, crit: false, hitCount: 1 },
@@ -1729,9 +1741,41 @@ class CombatEngine {
             }
         }
 
-        this.applySkillEffects(skill, actor, target, null, players);
+        this.applySkillEffects(skill, actor, target, null, players.concat(enemies));
         this.triggerWeaponProcs(actor, target, skillLevel);
         this.triggerStatusProcs(actor, target, skillLevel);
+
+        // ── Reverse damage shield: healAttackerOnHit ──
+        // If the target has a siphon_ward-type debuff, the attacker (actor) is healed.
+        // Heal amount = hitDamage * fraction, scaled by actor's harmony.
+        if (hitDamage > 0) {
+            target.statusEffects?.forEach(activeStatus => {
+                const statusDef = this.statusEngine.statusMap[activeStatus.id];
+                if (!statusDef?.effects?.healAttackerOnHit) return;
+                const fraction = statusDef.effects.healAttackerOnHit;
+                const harmonyScale = 1 + ((actor.stats?.harmony || 0) / 300);
+                const healAmount = Math.max(1, Math.floor(hitDamage * fraction * harmonyScale));
+                actor.currentHP = Math.min(actor.maxHP, actor.currentHP + healAmount);
+                console.log(`[LIFEDRAIN] ${actor.name} healed ${healAmount} via ${statusDef.name} on ${target.name}`);
+            });
+        }
+
+        // ── Cursed blood: onHitProcLifetap ──
+        // When the target is hit, there's a chance it fires a lifetap back — dealing
+        // damage to the attacker and healing the target for the same amount.
+        if (hitDamage > 0 && !hasAOEEffect) {
+            target.statusEffects?.forEach(activeStatus => {
+                const statusDef = this.statusEngine.statusMap[activeStatus.id];
+                if (!statusDef?.onHitProcLifetap) return;
+                const { chance, fraction } = statusDef.onHitProcLifetap;
+                if (Math.random() * 100 > chance) return;
+                const tapAmount = Math.max(1, Math.floor(hitDamage * fraction));
+                actor.currentHP -= tapAmount;
+                if (actor.currentHP <= 0) { actor.currentHP = 0; actor.defeated = true; }
+                target.currentHP = Math.min(target.maxHP, target.currentHP + tapAmount);
+                console.log(`[LIFEDRAIN] Cursed Blood: ${target.name} leeches ${tapAmount} from ${actor.name}`);
+            });
+        }
 
         resolvedTargets.push({
             targetId: target.id,
@@ -1851,10 +1895,12 @@ class CombatEngine {
 
     // If weapon has damage types, split proportionally
     if (weaponTotalDamage > 0 && Object.keys(weaponDamageBreakdown).length > 0) {
-      // Flat armor reduction — subtract armorValue directly from total damage before splitting.
-      // armorValue comes from equipped armor items (head + chest + etc.), not a percentage roll.
-      const armorReduction = target.armorValue || 0;
-      const damageAfterArmor = Math.max(0, totalDamage - armorReduction);
+      // Percentage armor reduction: armor / (armor + K), diminishing returns, never reaches 100%.
+      // K=16 means armor=6 → 27% reduction, armor=16 → 50%, armor=30 → 65%.
+      const ARMOR_K = 16;
+      const armorValue = target.armorValue || 0;
+      const armorReduction = armorValue / (armorValue + ARMOR_K);
+      const damageAfterArmor = totalDamage * (1 - armorReduction);
 
       for (const [damageType, typeDamage] of Object.entries(weaponDamageBreakdown)) {
         // Calculate proportion of this damage type relative to original weapon dmg
@@ -1875,9 +1921,11 @@ class CombatEngine {
     } 
     // No weapon damage types - apply defense/resistance to total
     else {
-      // Flat armor reduction for no-weapon-type damage
-      const armorReduction = target.armorValue || 0;
-      finalDamage = Math.max(0, totalDamage - armorReduction);
+      // Percentage armor reduction (same formula)
+      const ARMOR_K = 16;
+      const armorValue = target.armorValue || 0;
+      const armorReduction = armorValue / (armorValue + ARMOR_K);
+      finalDamage = totalDamage * (1 - armorReduction);
       // Check skill effect for damage type resistance
       if (skill.effects?.[0]?.damageType && target.resistances) {
         const resistance = target.resistances[skill.effects[0].damageType] || 0;
@@ -1920,12 +1968,25 @@ class CombatEngine {
         }
 
         const isHeal = (effect.type === 'heal');
+        const isLifetap = (effect.type === 'lifetap');
         const isRestoreResource = (effect.type === 'restore_resource');
         const isRestorePool = (effect.type === 'restore_pool');
 
-        if (isHeal || isRestoreResource || isRestorePool) {
+        if (isHeal || isLifetap || isRestoreResource || isRestorePool) {
             let poolType = '';
             let recipient = actor;
+
+            if (isLifetap) {
+                // Heal the actor (caster) for a harmony-scaled fraction of the target's current damage taken.
+                // magnitude = fraction of target's maxHP to heal actor for.
+                poolType = 'hp';
+                recipient = actor;
+                const harmonyScale = 1 + ((actor.stats?.harmony || 0) / 300);
+                const healAmount = Math.max(1, Math.floor((target?.maxHP || 1) * effect.magnitude * harmonyScale));
+                recipient.currentHP = Math.min(recipient.maxHP, recipient.currentHP + healAmount);
+                console.log(`[LIFETAP] ${skill.name}: ${actor.name} leeches ${healAmount} HP (harmony scale ${harmonyScale.toFixed(2)})`);
+                return;
+            }
 
             if (isHeal) {
                 poolType = 'hp';
@@ -1982,13 +2043,18 @@ class CombatEngine {
             if (effect.targets === 'self') debuffTarget = actor;
             if (debuffTarget) {
                 this.statusEngine.applyStatus(debuffTarget, effect.debuff, effect.duration, effect.magnitude || 1);
+                // Stamp sourceId so leech DoTs know who to credit heals to
+                const applied = debuffTarget.statusEffects?.find(s => s.id === effect.debuff);
+                if (applied) applied.sourceId = actor.id;
                 console.log(`[EFFECT] ${skill.name}: ${effect.debuff} applied to ${debuffTarget.name}`);
             }
         } else if (effect.type === 'apply_buff' && effect.buff) {
             let buffTarget = actor;
             if (effect.targets === 'single_ally' && target && target.type === 'player') buffTarget = target;
             if (effect.targets === 'all_allies' && allPlayers) {
-                const allies = allPlayers.filter(p => !p.defeated);
+                // Allies are combatants on the same side as the actor, not always the player party.
+                // enemies have type 'enemy'; players have type 'player'.
+                const allies = allPlayers.filter(p => !p.defeated && p.type === actor.type);
                 allies.forEach(ally => {
                     this.statusEngine.applyStatus(ally, effect.buff, effect.duration, effect.magnitude || 1);
                 });
