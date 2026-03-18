@@ -1062,6 +1062,12 @@ class CombatEngine {
                 score *= 0.5;
             }
 
+            // Buff redundancy penalty — don't recast a buff already active on self
+            const mainBuff = skill.effects?.find(e => e.type === 'apply_buff' && (e.targets === 'self' || !e.targets))?.buff;
+            if (mainBuff && enemy.statusEffects?.some(s => s.id === mainBuff && s.duration > 0)) {
+                score *= 0.15;
+            }
+
             // AOE bonus
             if (cat.includes('AOE') && alivePlayers.length >= 2) {
                 score *= (alivePlayers.length * 0.5);
@@ -1596,197 +1602,155 @@ class CombatEngine {
         Math.floor(Math.random() * (skill.hitCount?.max - skill.hitCount?.min + 1)) + (skill.hitCount?.min || 1);
     console.log(`[HITCOUNT] ${actor.name} ${skill.name}: rolling ${hitCount} hit(s)`);
 
-    // Handle AOE skills
-    if (skill.category && skill.category.includes('AOE')) {
-        // Non-offensive AOE (e.g. HEALING_AOE) — apply effects to allies, no damage/procs
-        if (!isOffensive) {
-            const aliveAllies = players.filter(p => !p.defeated);
-            aliveAllies.forEach(ally => this.applySkillEffects(skill, actor, ally));
-            return {
-                roll: { hit: true, crit: false, hitCount: 1 },
-                result: {
-                    message: `${actor.name} uses ${skill.name}.`,
-                    damageDealt: 0, targets: aliveAllies.map(a => ({ targetId: a.id, hpAfter: a.currentHP })),
-                    success: true, delay: finalDelay
-                }
-            };
-        }
+    // ── Determine target list from effect definitions ──
+    // AOE is driven by effect targets, not category name.
+    // all_enemies → all alive enemies; all_allies → all alive players
+    const hasAOEEffect = skill.effects?.some(e =>
+        e.targets === 'all_enemies' || e.targets === 'all_allies' || e.targets === 'all_entities'
+    );
+    const isAllyAOE = skill.effects?.some(e => e.targets === 'all_allies');
 
-        const aliveEnemies = enemies.filter(e => !e.defeated);
-        if (aliveEnemies.length === 0) {
+    let targetList;
+    if (hasAOEEffect) {
+        targetList = isAllyAOE
+            ? players.filter(p => !p.defeated)
+            : enemies.filter(e => !e.defeated);
+        if (targetList.length === 0) {
             return { roll: null, result: { message: 'No targets found', success: false, delay: finalDelay } };
         }
-
-        const hitChance = this.calculateHitChance(actor, skill, null, skillLevel);
-        const rolled = Math.random();
-        const hit = rolled <= hitChance;
-
-        if (!hit) {
-            return {
-                roll: { hitChance, rolled, hit: false, crit: false },
-                result: { message: `${actor.name}'s ${skill.name} misses all targets!`, damageDealt: 0, targets: [], success: false, delay: finalDelay }
-            };
+    } else {
+        const singleTarget = players.concat(enemies).find(t => t.id === action.target);
+        if (!singleTarget) {
+            return { roll: null, result: { message: 'Target not found', success: false, delay: finalDelay } };
         }
-
-        const isCrit = Math.random() <= this.calculateCritChance(actor, skill);
-        let totalDamage = 0;
-        const targets = [];
-
-        aliveEnemies.forEach(enemy => {
-            let hitDamage = 0;
-            for (let i = 0; i < hitCount; i++) {
-                const damage = this.calculateDamage(actor, skill, enemy, isCrit, skillLevel);
-                hitDamage += damage;
+        if (singleTarget.defeated) {
+            const aliveEnemies = enemies.filter(e => !e.defeated);
+            const alivePlayers = players.filter(p => !p.defeated);
+            const redirectPool = actor.type === 'player' ? aliveEnemies : alivePlayers;
+            if (redirectPool.length === 0) {
+                return { roll: null, result: { message: 'No valid targets remaining.', success: false, delay: finalDelay } };
             }
-            totalDamage += hitDamage;
-            enemy.currentHP -= hitDamage;
-            if (enemy.currentHP <= 0) {
-                enemy.currentHP = 0;
-                enemy.defeated = true;
-                console.log(`[DEBUG] ${enemy.name} defeated! (HP: 0)`);
-            }
-            // Sleep breaks on damage received
-            if (hitDamage > 0 && enemy.statusEffects?.some(e => e.id === 'sleep' && e.duration > 0)) {
-                this.statusEngine.removeStatus(enemy, 'sleep');
-                console.log(`[STATUS] ${enemy.name} woke up from damage!`);
-            }
-            this.applySkillEffects(skill, actor, enemy);
-            this.triggerWeaponProcs(actor, enemy, skillLevel);
-            this.triggerStatusProcs(actor, enemy, skillLevel);
-            targets.push({
-                targetId: enemy.id,
-                targetName: enemy.name,
-                damage: hitDamage,
-                hpAfter: Math.max(0, enemy.currentHP),
-                targetStatuses: (enemy.statusEffects || []).filter(e => e.duration > 0).map(e => ({ id: e.id, duration: e.duration }))
-            });
-        });
-
-        return {
-            roll: { hitChance, rolled, hit: true, crit: isCrit, hitCount },
-            result: {
-                message: isCrit ? `${actor.name} critically hits ${targets.length} targets with ${skill.name} for ${totalDamage} total damage!` : `${actor.name} hits ${targets.length} targets with ${skill.name} for ${totalDamage} total damage.`,
-                damageDealt: totalDamage, targets, success: true, delay: finalDelay,
-                actorId: actor.id,
-                actorStatuses: (actor.statusEffects || []).filter(e => e.duration > 0).map(e => ({ id: e.id, duration: e.duration }))
-            }
-        };
-    }
-
-    // Handle single-target skills
-    const target = players.concat(enemies).find(t => t.id === action.target);
-    if (!target) {
-        return { roll: null, result: { message: 'Target not found', success: false, delay: finalDelay } };
-    }
-    // Target may have died earlier in the same round — redirect to a valid target
-    if (target.defeated) {
-        const aliveEnemies = enemies.filter(e => !e.defeated);
-        const alivePlayers = players.filter(p => !p.defeated);
-        // If actor is player redirect to alive enemy; if enemy redirect to alive player
-        const redirectPool = actor.type === 'player' ? aliveEnemies : alivePlayers;
-        if (redirectPool.length === 0) {
-            return { roll: null, result: { message: 'No valid targets remaining.', success: false, delay: finalDelay } };
+            action.target = redirectPool.reduce((min, t) => t.currentHP < min.currentHP ? t : min).id;
+            return this.resolveAction(action, actor, players, enemies);
         }
-        action.target = redirectPool.reduce((min, t) => t.currentHP < min.currentHP ? t : min).id;
-        return this.resolveAction(action, actor, players, enemies);
+        targetList = [singleTarget];
     }
 
     // ── Non-offensive skills: apply effects only, no hit roll, no damage, no procs ──
     if (!isOffensive) {
-        this.applySkillEffects(skill, actor, target);
+        targetList.forEach(t => this.applySkillEffects(skill, actor, t, null, players));
         const _snap = (c) => (c.statusEffects || []).filter(e => e.duration > 0).map(e => ({ id: e.id, duration: e.duration }));
-        const label = skill.category === 'HEALING' || skill.category === 'HEALING_AOE'
-            ? `${actor.name} uses ${skill.name}.`
-            : `${actor.name} uses ${skill.name}.`;
         return {
             roll: { hit: true, crit: false, hitCount: 1 },
             result: {
-                message: label,
-                damageDealt: 0, targetId: target.id, targetHPAfter: target.currentHP,
+                message: `${actor.name} uses ${skill.name}.`,
+                damageDealt: 0,
+                targets: targetList.map(t => ({ targetId: t.id, hpAfter: t.currentHP, targetStatuses: _snap(t) })),
                 success: true, delay: finalDelay,
-                actorId: actor.id, actorStatuses: _snap(actor),
-                targetStatuses: _snap(target)
+                actorId: actor.id, actorStatuses: _snap(actor)
             }
         };
     }
 
-    const hitChance = this.calculateHitChance(actor, skill, target, skillLevel);
+    // ── Offensive skills: hit roll → damage loop → procs ──
+    const hitChance = this.calculateHitChance(actor, skill, targetList[0], skillLevel);
     const rolled = Math.random();
     const hit = rolled <= hitChance;
 
     if (!hit) {
+        const missMsg = targetList.length > 1
+            ? `${actor.name}'s ${skill.name} misses all targets!`
+            : `${actor.name}'s ${skill.name} misses ${targetList[0].name}!`;
         return {
             roll: { hitChance, rolled, hit: false, crit: false },
-            result: { message: `${actor.name}'s ${skill.name} misses ${target.name}!`, damageDealt: 0, targetId: target.id, targetHPAfter: target.currentHP, success: false, delay: finalDelay }
+            result: { message: missMsg, damageDealt: 0, targets: [], success: false, delay: finalDelay }
         };
     }
 
     const isCrit = Math.random() <= this.calculateCritChance(actor, skill);
     let totalDamage = 0;
-    for (let i = 0; i < hitCount; i++) {
-        const damage = this.calculateDamage(actor, skill, target, isCrit, skillLevel);
-        totalDamage += damage;
-    }
+    const resolvedTargets = [];
 
-    target.currentHP -= totalDamage;
-    if (target.currentHP <= 0) {
-        target.currentHP = 0;
-        target.defeated = true;
-        console.log(`[DEBUG] ${target.name} defeated! (HP: 0)`);
-    }
+    targetList.forEach(target => {
+        let hitDamage = 0;
+        for (let i = 0; i < hitCount; i++) {
+            hitDamage += this.calculateDamage(actor, skill, target, isCrit, skillLevel);
+        }
+        totalDamage += hitDamage;
 
-    // Sleep breaks on damage received
-    if (totalDamage > 0 && target.statusEffects?.some(e => e.id === 'sleep' && e.duration > 0)) {
-        this.statusEngine.removeStatus(target, 'sleep');
-        console.log(`[STATUS] ${target.name} woke up from damage!`);
-    }
+        target.currentHP -= hitDamage;
+        if (target.currentHP <= 0) {
+            target.currentHP = 0;
+            target.defeated = true;
+            console.log(`[DEBUG] ${target.name} defeated! (HP: 0)`);
+        }
 
-    // Counter-ready: if target has counter_ready, fire their counter proc back at the actor
-    if (totalDamage > 0) {
-        const counterStatus = target.statusEffects?.find(e => e.id === 'counter_ready' && e.duration > 0);
-        if (counterStatus) {
-            const statusDef = this.statusEngine.statusMap['counter_ready'];
-            if (statusDef?.counterProc) {
-                const { skillId, chance } = statusDef.counterProc;
-                const rolled = Math.random() * 100;
-                if (rolled <= chance) {
-                    const counterSkill = this.skills.find(s => s.id === skillId);
-                    if (counterSkill) {
-                        console.log(`[COUNTER] ${target.name} counters ${actor.name} with ${counterSkill.name}!`);
-                        this.applySkillEffects(counterSkill, target, actor);
-                        if (counterSkill.effects?.some(e => e.type === 'damage')) {
-                            const counterDamage = this.calculateDamage(target, counterSkill, actor, false, 1);
-                            actor.currentHP -= counterDamage;
-                            if (actor.currentHP <= 0) { actor.currentHP = 0; actor.defeated = true; }
-                            console.log(`[COUNTER] ${counterSkill.name} dealt ${counterDamage} to ${actor.name}`);
+        if (hitDamage > 0 && target.statusEffects?.some(e => e.id === 'sleep' && e.duration > 0)) {
+            this.statusEngine.removeStatus(target, 'sleep');
+            console.log(`[STATUS] ${target.name} woke up from damage!`);
+        }
+
+        // Counter-ready (single-target hits only)
+        if (hitDamage > 0 && !hasAOEEffect) {
+            const counterStatus = target.statusEffects?.find(e => e.id === 'counter_ready' && e.duration > 0);
+            if (counterStatus) {
+                const statusDef = this.statusEngine.statusMap['counter_ready'];
+                if (statusDef?.counterProc) {
+                    const { skillId, chance } = statusDef.counterProc;
+                    if (Math.random() * 100 <= chance) {
+                        const counterSkill = this.skills.find(s => s.id === skillId);
+                        if (counterSkill) {
+                            console.log(`[COUNTER] ${target.name} counters ${actor.name} with ${counterSkill.name}!`);
+                            this.applySkillEffects(counterSkill, target, actor);
+                            if (counterSkill.effects?.some(e => e.type === 'damage')) {
+                                const counterDamage = this.calculateDamage(target, counterSkill, actor, false, 1);
+                                actor.currentHP -= counterDamage;
+                                if (actor.currentHP <= 0) { actor.currentHP = 0; actor.defeated = true; }
+                                console.log(`[COUNTER] ${counterSkill.name} dealt ${counterDamage} to ${actor.name}`);
+                            }
+                            this.statusEngine.removeStatus(target, 'counter_ready');
                         }
-                        this.statusEngine.removeStatus(target, 'counter_ready');
                     }
                 }
             }
         }
-    }
 
-    this.applySkillEffects(skill, actor, target);
-    this.triggerWeaponProcs(actor, target, skillLevel);
-    this.triggerStatusProcs(actor, target, skillLevel);
+        this.applySkillEffects(skill, actor, target, null, players);
+        this.triggerWeaponProcs(actor, target, skillLevel);
+        this.triggerStatusProcs(actor, target, skillLevel);
 
-    // Build status snapshots for frontend display
+        resolvedTargets.push({
+            targetId: target.id,
+            targetName: target.name,
+            damage: hitDamage,
+            hpAfter: Math.max(0, target.currentHP),
+            targetStatuses: (target.statusEffects || []).filter(e => e.duration > 0).map(e => ({ id: e.id, duration: e.duration }))
+        });
+    });
+
     const _statusSnapshot = (combatant) =>
-        (combatant.statusEffects || [])
-            .filter(e => e.duration > 0)
-            .map(e => ({ id: e.id, duration: e.duration }));
+        (combatant.statusEffects || []).filter(e => e.duration > 0).map(e => ({ id: e.id, duration: e.duration }));
+
+    const hitMsg = targetList.length > 1
+        ? (isCrit
+            ? `${actor.name} critically strikes all targets with ${skill.name} for ${totalDamage} total damage!`
+            : `${actor.name} hits ${targetList.length} targets with ${skill.name} for ${totalDamage} total damage.`)
+        : (isCrit
+            ? `${actor.name} critically hits ${targetList[0].name} with ${skill.name} for ${totalDamage} damage!`
+            : `${actor.name} hits ${targetList[0].name} with ${skill.name} for ${totalDamage} damage.`);
 
     return {
         roll: { hitChance, rolled, hit: true, crit: isCrit, hitCount },
         result: {
-            message: isCrit ? `${actor.name} critically hits ${target.name} with ${skill.name} for ${totalDamage} damage!` : `${actor.name} hits ${target.name} with ${skill.name} for ${totalDamage} damage.`,
-            damageDealt: totalDamage, targetId: target.id, targetHPAfter: Math.max(0, target.currentHP), success: true, delay: finalDelay,
-            actorId: actor.id, actorStatuses: _statusSnapshot(actor),
-            targetStatuses: _statusSnapshot(target)
+            message: hitMsg,
+            damageDealt: totalDamage,
+            targets: resolvedTargets,
+            success: true, delay: finalDelay,
+            actorId: actor.id, actorStatuses: _statusSnapshot(actor)
         }
     };
   }
+
 
   /**
    * Calculate damage with full stat scaling, weapon integration, and dynamic variance.
@@ -1930,7 +1894,7 @@ class CombatEngine {
     return flooredDamage;
   }
 
-  applySkillEffects(skill, actor, target, healTarget = null) {
+  applySkillEffects(skill, actor, target, healTarget = null, allPlayers = null) {
     if (!skill.effects || skill.effects.length === 0) return;
     skill.effects.forEach(effect => {
         const applyChance = effect.chance !== undefined ? effect.chance : 1.0;
@@ -2009,8 +1973,15 @@ class CombatEngine {
         } else if (effect.type === 'apply_buff' && effect.buff) {
             let buffTarget = actor;
             if (effect.targets === 'single_ally' && target && target.type === 'player') buffTarget = target;
-            if (effect.targets === 'all_allies') {
-                console.log(`[EFFECT] ${skill.name}: AOE buff ${effect.buff} (Single target resolution)`);
+            if (effect.targets === 'all_allies' && allPlayers) {
+                const allies = allPlayers.filter(p => !p.defeated);
+                allies.forEach(ally => {
+                    this.statusEngine.applyStatus(ally, effect.buff, effect.duration, effect.magnitude || 1);
+                });
+                console.log(`[EFFECT] ${skill.name}: ${effect.buff} applied by ${actor.name} to all allies (${allies.map(a => a.name).join(', ')})`);
+                return;
+            } else if (effect.targets === 'all_allies') {
+                console.log(`[EFFECT] ${skill.name}: AOE buff ${effect.buff} (no allPlayers context — self only)`);
             }
             this.statusEngine.applyStatus(buffTarget, effect.buff, effect.duration, effect.magnitude || 1);
             console.log(`[EFFECT] ${skill.name}: ${effect.buff} applied to ${buffTarget.name}`);
@@ -2110,8 +2081,16 @@ class CombatEngine {
         staminaMultiplier = statusResult.staminaRegenMultiplier || 1.0;
         manaMultiplier   = statusResult.manaRegenMultiplier    || 1.0;
     }
-    const staminaRegen = Math.floor(combatant.maxStamina * 0.02 * staminaMultiplier);
-    const manaRegen    = Math.floor(combatant.maxMana    * 0.02 * manaMultiplier);
+
+    // Base regen: 3% of max pool per round, scaled by the governing stat.
+    // Harmony drives mana regen — high harmony casters recover faster.
+    // Endurance drives stamina regen — tough fighters sustain longer.
+    const harmonyScale   = 1 + ((combatant.stats?.harmony   || 0) / 200);
+    const enduranceScale = 1 + ((combatant.stats?.endurance || 0) / 200);
+
+    const staminaRegen = Math.floor(combatant.maxStamina * 0.03 * enduranceScale * staminaMultiplier);
+    const manaRegen    = Math.floor(combatant.maxMana    * 0.03 * harmonyScale   * manaMultiplier);
+
     combatant.currentStamina = Math.min(combatant.maxStamina, combatant.currentStamina + staminaRegen);
     combatant.currentMana    = Math.min(combatant.maxMana,    combatant.currentMana    + manaRegen);
   }
@@ -2318,24 +2297,31 @@ class CombatEngine {
     combatResult.turns.forEach(turn => {
         if (turn.actorName === character.name && turn.result?.damageDealt > 0) damageDealt += turn.result.damageDealt;
         
-        if (turn.result?.damageDealt > 0) {
-            if (turn.result?.targetName === character.name) damageTaken += turn.result.damageDealt;
-            else if (Array.isArray(turn.result?.targets)) {
-                const targetEntry = turn.result.targets.find(t => t.targetName === character.name);
-                if (targetEntry?.damage) damageTaken += targetEntry.damage;
-            } else if (turn.result?.targetId && (turn.result.targetId.startsWith('char_') || turn.result.targetId.startsWith('import_'))) {
-                damageTaken += turn.result.damageDealt;
-            }
+        // Damage taken — find entries in targets[] where this character is the target
+        if (turn.result?.damageDealt > 0 && Array.isArray(turn.result?.targets)) {
+            turn.result.targets.forEach(t => {
+                const tid = t.targetId || '';
+                if (t.targetName === character.name ||
+                    tid === character.id ||
+                    tid.startsWith('char_') && tid === character.id ||
+                    tid.startsWith('import_') && tid === character.id) {
+                    damageTaken += (t.damage || 0);
+                }
+            });
         }
         
         if (turn.actorName === character.name && turn.result?.healingDone > 0) healingDone += turn.result.healingDone;
         if (turn.actorName === character.name && turn.roll?.crit === true) stats.totalCriticalHits = stats.totalCriticalHits + 1;
         
+        // Kill tracking — credit all defeated enemies in targets[], not just the first
         if (turn.actorName === character.name && turn.result?.success && turn.result?.damageDealt > 0) {
-            const targetId = turn.result.targetId || (turn.result.targets?.[0]?.targetId);
-            if (targetId && targetId.startsWith('enemy_')) {
-                const enemyType = targetId.split('_').slice(1, -1).join('_');
-                enemyKillsThisCombat[enemyType] = (enemyKillsThisCombat[enemyType] || 0) + 1;
+            if (Array.isArray(turn.result?.targets)) {
+                turn.result.targets.forEach(t => {
+                    if (t.hpAfter === 0 && t.targetId?.startsWith('enemy_')) {
+                        const enemyType = t.targetId.split('_').slice(1, -1).join('_');
+                        enemyKillsThisCombat[enemyType] = (enemyKillsThisCombat[enemyType] || 0) + 1;
+                    }
+                });
             }
         }
         if (turn.actorName === character.name && turn.action?.type === 'skill') {

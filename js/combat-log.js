@@ -219,17 +219,13 @@ async function displayCombatLog(combatData) {
                     updateHealthBars(turn, hpMaxes, hpCurrent);
                     if (turn.playerResourceStates) updateResourceBars(turn.playerResourceStates);
 
-                    // Animate attacker lunge + target hit/defeat
+                    // Animate attacker lunge + target hit/defeat — unified targets[] format
                     if (turn.result?.damageDealt > 0 && turn.actor && turn.action?.type === 'skill') {
-                        animateAttacker(turn.actor, turn.result?.targetId);
-                        if (turn.result?.targetId) {
-                            animateHit(turn.result.targetId, turn.roll?.crit, turn.result.targetHPAfter === 0);
+                        const firstTarget = turn.result.targets?.[0];
+                        animateAttacker(turn.actor, firstTarget?.targetId || null);
+                        if (turn.result.targets?.length > 0) {
+                            turn.result.targets.forEach(t => animateHit(t.targetId, turn.roll?.crit, t.hpAfter === 0));
                         }
-                    }
-                    // AOE hits
-                    if (turn.result?.targets?.length > 0 && turn.actor) {
-                        animateAttacker(turn.actor, null);
-                        turn.result.targets.forEach(t => animateHit(t.targetId, turn.roll?.crit, t.hpAfter === 0));
                     }
 
                     await sleep(turnDelay);
@@ -515,22 +511,45 @@ function renderTurn(turn, logDisplay, hpMaxes, hpCurrent) {
         return;
     }
 
-    // Multi-target hits
+    // Multi-target hits — only render per-target breakdown for offensive skills with multiple targets
     if (turn.result?.targets && turn.result.targets.length > 0) {
-        turn.result.targets.forEach(targetInfo => {
-            const subEl  = document.createElement('div');
-            subEl.className = 'combat-turn';
+        const isMultiOffensive = turn.result.damageDealt > 0 && turn.result.targets.length > 1;
+        const isSingleOffensive = turn.result.damageDealt > 0 && turn.result.targets.length === 1;
+
+        if (isMultiOffensive) {
+            // AOE damage — one entry per target
+            turn.result.targets.forEach(targetInfo => {
+                const subEl  = document.createElement('div');
+                subEl.className = 'combat-turn';
+                const isCrit = turn.roll?.crit;
+                const name = targetInfo.targetName || 'target';
+                const msg = isCrit
+                    ? `${turn.actorName} critically hits ${name} for ${targetInfo.damage} damage!`
+                    : `${turn.actorName} hits ${name} for ${targetInfo.damage} damage.`;
+                subEl.innerHTML = `
+                    <div class="turn-header">Turn ${turn.turnNumber}: ${turn.actorName}</div>
+                    <div class="turn-message ${isCrit ? 'turn-crit' : ''}">${msg}</div>
+                    ${targetInfo.damage > 0 ? `<div class="turn-damage">Damage: ${targetInfo.damage}</div>` : ''}
+                `;
+                logDisplay.appendChild(subEl);
+            });
+        } else if (isSingleOffensive) {
+            // Single target damage — use the main message
             const isCrit = turn.roll?.crit;
-            const msg    = isCrit
-                ? `${turn.actorName} critically hits ${targetInfo.targetName} for ${targetInfo.damage} damage!`
-                : `${turn.actorName} hits ${targetInfo.targetName} for ${targetInfo.damage} damage.`;
-            subEl.innerHTML = `
+            turnEl.innerHTML = `
                 <div class="turn-header">Turn ${turn.turnNumber}: ${turn.actorName}</div>
-                <div class="turn-message ${isCrit ? 'turn-crit' : ''}">${msg}</div>
-                ${targetInfo.damage > 0 ? `<div class="turn-damage">Damage: ${targetInfo.damage}</div>` : ''}
+                <div class="turn-message ${isCrit ? 'turn-crit' : ''}">${turn.result.message || ''}</div>
+                <div class="turn-damage">Damage: ${turn.result.damageDealt}</div>
             `;
-            logDisplay.appendChild(subEl);
-        });
+            logDisplay.appendChild(turnEl);
+        } else {
+            // Non-offensive (buff, heal, restore) — single summary line
+            turnEl.innerHTML = `
+                <div class="turn-header">Turn ${turn.turnNumber}: ${turn.actorName}</div>
+                <div class="turn-message">${turn.result.message || `${turn.actorName} uses ${turn.action?.skillID || 'skill'}.`}</div>
+            `;
+            logDisplay.appendChild(turnEl);
+        }
         logDisplay.scrollTop = logDisplay.scrollHeight;
         return;
     }
@@ -603,23 +622,24 @@ function updateStatusEffects(combatantId, statuses) {
 function updateHealthBars(turn, hpMaxes, hpCurrent) {
     if (turn.result?.targets && turn.result.targets.length > 0) {
         turn.result.targets.forEach(targetInfo => {
-            updateSingleHealthBar(targetInfo.targetId, targetInfo.hpAfter, hpMaxes, hpCurrent, 'enemy');
+            // Try enemy first, then party — unified path uses targets[] for both
+            const updated = updateSingleHealthBar(targetInfo.targetId, targetInfo.hpAfter, hpMaxes, hpCurrent, 'enemy');
+            if (!updated) updateSingleHealthBar(targetInfo.targetId, targetInfo.hpAfter, hpMaxes, hpCurrent, 'party');
             if (targetInfo.targetStatuses !== undefined) {
                 updateStatusEffects(targetInfo.targetId, targetInfo.targetStatuses);
             }
         });
-        // Update actor statuses for AOE turns
         if (turn.result.actorId && turn.result.actorStatuses !== undefined) {
             updateStatusEffects(turn.result.actorId, turn.result.actorStatuses);
         }
     } else if (turn.result?.targetId) {
+        // Legacy fallback — should no longer fire with unified path
         const targetId = turn.result.targetId;
         const newHP    = turn.result.targetHPAfter;
         if (newHP !== undefined) {
             const updated = updateSingleHealthBar(targetId, newHP, hpMaxes, hpCurrent, 'enemy');
             if (!updated) updateSingleHealthBar(targetId, newHP, hpMaxes, hpCurrent, 'party');
         }
-        // Update target statuses
         if (turn.result.targetStatuses !== undefined) {
             updateStatusEffects(targetId, turn.result.targetStatuses);
         }

@@ -3670,13 +3670,15 @@
       {
         "type": "damage",
         "damageType": "fire",
-        "chance": 1.0
+        "chance": 1.0,
+        "targets": "all_enemies"
       },
       {
         "type": "apply_debuff",
         "debuff": "burn",
         "duration": 3,
-        "chance": 0.5
+        "chance": 0.5,
+        "targets": "all_enemies"
       }
     ]
   },
@@ -3703,13 +3705,15 @@
       {
         "type": "damage",
         "damageType": "cold",
-        "chance": 1.0
+        "chance": 1.0,
+        "targets": "all_enemies"
       },
       {
         "type": "apply_debuff",
         "debuff": "chilled",
         "duration": 3,
-        "chance": 0.8
+        "chance": 0.8,
+        "targets": "all_enemies"
       }
     ]
   },
@@ -3801,13 +3805,15 @@
         "type": "heal",
         "chance": 1.0,
         "scalesBy": "harmony",
-        "magnitude": 0.28
+        "magnitude": 0.28,
+        "targets": "all_allies"
       },
       {
         "type": "apply_buff",
         "buff": "protection",
         "duration": 8,
-        "chance": 0.6
+        "chance": 0.6,
+        "targets": "all_allies"
       }
     ]
   },
@@ -3868,13 +3874,15 @@
       {
         "type": "damage",
         "damageType": "poison",
-        "chance": 1.0
+        "chance": 1.0,
+        "targets": "all_enemies"
       },
       {
         "type": "apply_debuff",
         "debuff": "poison",
         "duration": 5,
-        "chance": 0.8
+        "chance": 0.8,
+        "targets": "all_enemies"
       }
     ]
   },
@@ -4152,11 +4160,12 @@
       {
         "type": "damage",
         "damageType": "electric",
-        "chance": 1.0
+        "chance": 1.0,
+        "targets": "all_enemies"
       },
       {
         "type": "apply_debuff",
-        "targets": "single_enemy",
+        "targets": "all_enemies",
         "debuff": "electrified",
         "duration": 2,
         "magnitude": 1,
@@ -4220,13 +4229,15 @@
       {
         "type": "damage",
         "damageType": "fire",
-        "chance": 1.0
+        "chance": 1.0,
+        "targets": "all_enemies"
       },
       {
         "type": "apply_debuff",
         "debuff": "burn",
         "duration": 4,
-        "chance": 0.6
+        "chance": 0.6,
+        "targets": "all_enemies"
       }
     ]
   },
@@ -4287,13 +4298,15 @@
         "type": "heal",
         "chance": 1.0,
         "scalesBy": "harmony",
-        "magnitude": 0.3
+        "magnitude": 0.3,
+        "targets": "all_allies"
       },
       {
         "type": "apply_buff",
         "buff": "protection",
         "duration": 10,
-        "chance": 0.8
+        "chance": 0.8,
+        "targets": "all_allies"
       }
     ]
   },
@@ -4503,18 +4516,21 @@
       {
         "type": "damage",
         "damageType": "electric",
-        "chance": 1.0
+        "chance": 1.0,
+        "targets": "all_enemies"
       },
       {
         "type": "damage",
         "damageType": "bludgeoning",
-        "chance": 1.0
+        "chance": 1.0,
+        "targets": "all_enemies"
       },
       {
         "type": "apply_debuff",
         "debuff": "stun",
         "duration": 3,
-        "chance": 0.35
+        "chance": 0.35,
+        "targets": "all_enemies"
       }
     ]
   },
@@ -4640,13 +4656,15 @@
       {
         "type": "damage",
         "damageType": "poison",
-        "chance": 1.0
+        "chance": 1.0,
+        "targets": "all_enemies"
       },
       {
         "type": "apply_debuff",
         "debuff": "poison",
         "duration": 8,
-        "chance": 0.9
+        "chance": 0.9,
+        "targets": "all_enemies"
       }
     ]
   },
@@ -4711,13 +4729,15 @@
       {
         "type": "damage",
         "damageType": "fire",
-        "chance": 1.0
+        "chance": 1.0,
+        "targets": "all_enemies"
       },
       {
         "type": "apply_debuff",
         "debuff": "burn",
         "duration": 4,
-        "chance": 0.6
+        "chance": 0.6,
+        "targets": "all_enemies"
       }
     ]
   },
@@ -4744,13 +4764,15 @@
       {
         "type": "damage",
         "damageType": "cold",
-        "chance": 1.0
+        "chance": 1.0,
+        "targets": "all_enemies"
       },
       {
         "type": "apply_debuff",
         "debuff": "chilled",
         "duration": 5,
-        "chance": 0.9
+        "chance": 0.9,
+        "targets": "all_enemies"
       }
     ]
   },
@@ -4842,13 +4864,15 @@
         "type": "heal",
         "chance": 1.0,
         "scalesBy": "harmony",
-        "magnitude": 0.25
+        "magnitude": 0.25,
+        "targets": "all_allies"
       },
       {
         "type": "apply_buff",
         "buff": "protection",
         "duration": 10,
-        "chance": 0.8
+        "chance": 0.8,
+        "targets": "all_allies"
       }
     ]
   },
@@ -4876,13 +4900,15 @@
         "type": "heal",
         "chance": 1.0,
         "scalesBy": "harmony",
-        "magnitude": 0.2
+        "magnitude": 0.2,
+        "targets": "all_allies"
       },
       {
         "type": "apply_debuff",
         "debuff": "slow",
         "duration": 4,
-        "chance": 0.7
+        "chance": 0.7,
+        "targets": "all_enemies"
       }
     ]
   },
@@ -4909,19 +4935,22 @@
       {
         "type": "damage",
         "damageType": "poison",
-        "chance": 1.0
+        "chance": 1.0,
+        "targets": "all_enemies"
       },
       {
         "type": "apply_debuff",
         "debuff": "poison",
         "duration": 6,
-        "chance": 0.8
+        "chance": 0.8,
+        "targets": "all_enemies"
       },
       {
         "type": "apply_buff",
         "buff": "stealth",
         "duration": 5,
-        "chance": 0.5
+        "chance": 0.5,
+        "targets": "all_allies"
       }
     ]
   },
@@ -5128,18 +5157,21 @@
       {
         "type": "damage",
         "damageType": "bludgeoning",
-        "chance": 1.0
+        "chance": 1.0,
+        "targets": "all_enemies"
       },
       {
         "type": "damage",
         "damageType": "nature",
-        "chance": 0.5
+        "chance": 0.5,
+        "targets": "all_enemies"
       },
       {
         "type": "apply_debuff",
         "debuff": "stun",
         "duration": 3,
-        "chance": 0.4
+        "chance": 0.4,
+        "targets": "all_enemies"
       }
     ]
   },
@@ -5167,11 +5199,12 @@
       {
         "type": "damage",
         "damageType": "electric",
-        "chance": 1.0
+        "chance": 1.0,
+        "targets": "all_enemies"
       },
       {
         "type": "apply_debuff",
-        "targets": "single_enemy",
+        "targets": "all_enemies",
         "debuff": "electrified",
         "duration": 2,
         "magnitude": 1,
@@ -5240,18 +5273,21 @@
       {
         "type": "damage",
         "damageType": "fire",
-        "chance": 1.0
+        "chance": 1.0,
+        "targets": "all_enemies"
       },
       {
         "type": "damage",
         "damageType": "bludgeoning",
-        "chance": 0.5
+        "chance": 0.5,
+        "targets": "all_enemies"
       },
       {
         "type": "apply_debuff",
         "debuff": "burn",
         "duration": 6,
-        "chance": 0.8
+        "chance": 0.8,
+        "targets": "all_enemies"
       }
     ]
   },
@@ -5396,13 +5432,15 @@
       {
         "type": "damage",
         "damageType": "electric",
-        "chance": 1.0
+        "chance": 1.0,
+        "targets": "all_enemies"
       },
       {
         "type": "apply_debuff",
         "debuff": "stun",
         "duration": 3,
-        "chance": 0.45
+        "chance": 0.45,
+        "targets": "all_enemies"
       }
     ]
   },
@@ -5462,13 +5500,15 @@
       {
         "type": "damage",
         "damageType": "holy",
-        "chance": 1.0
+        "chance": 1.0,
+        "targets": "all_enemies"
       },
       {
         "type": "apply_debuff",
         "debuff": "cursed",
         "duration": 10,
-        "chance": 0.8
+        "chance": 0.8,
+        "targets": "all_enemies"
       }
     ]
   },
@@ -5529,18 +5569,21 @@
       {
         "type": "damage",
         "damageType": "poison",
-        "chance": 1.0
+        "chance": 1.0,
+        "targets": "all_enemies"
       },
       {
         "type": "damage",
         "damageType": "nature",
-        "chance": 0.5
+        "chance": 0.5,
+        "targets": "all_enemies"
       },
       {
         "type": "apply_debuff",
         "debuff": "poison",
         "duration": 10,
-        "chance": 0.9
+        "chance": 0.9,
+        "targets": "all_enemies"
       }
     ]
   },
@@ -5567,18 +5610,21 @@
       {
         "type": "damage",
         "damageType": "bludgeoning",
-        "chance": 1.0
+        "chance": 1.0,
+        "targets": "all_enemies"
       },
       {
         "type": "damage",
         "damageType": "nature",
-        "chance": 0.5
+        "chance": 0.5,
+        "targets": "all_enemies"
       },
       {
         "type": "apply_debuff",
         "debuff": "stun",
         "duration": 3,
-        "chance": 0.45
+        "chance": 0.45,
+        "targets": "all_enemies"
       }
     ]
   },
@@ -5605,18 +5651,21 @@
       {
         "type": "damage",
         "damageType": "fire",
-        "chance": 1.0
+        "chance": 1.0,
+        "targets": "all_enemies"
       },
       {
         "type": "damage",
         "damageType": "shadow",
-        "chance": 0.5
+        "chance": 0.5,
+        "targets": "all_enemies"
       },
       {
         "type": "apply_debuff",
         "debuff": "burn",
         "duration": 6,
-        "chance": 0.8
+        "chance": 0.8,
+        "targets": "all_enemies"
       }
     ]
   },
@@ -5643,13 +5692,15 @@
       {
         "type": "damage",
         "damageType": "cold",
-        "chance": 1.0
+        "chance": 1.0,
+        "targets": "all_enemies"
       },
       {
         "type": "apply_debuff",
         "debuff": "chilled",
         "duration": 8,
-        "chance": 1.0
+        "chance": 1.0,
+        "targets": "all_enemies"
       }
     ]
   },
@@ -5845,18 +5896,21 @@
       {
         "type": "damage",
         "damageType": "fire",
-        "chance": 1.0
+        "chance": 1.0,
+        "targets": "all_enemies"
       },
       {
         "type": "damage",
         "damageType": "holy",
-        "chance": 0.5
+        "chance": 0.5,
+        "targets": "all_enemies"
       },
       {
         "type": "apply_debuff",
         "debuff": "burn",
         "duration": 10,
-        "chance": 1.0
+        "chance": 1.0,
+        "targets": "all_enemies"
       }
     ]
   },
@@ -5883,13 +5937,15 @@
       {
         "type": "damage",
         "damageType": "cold",
-        "chance": 1.0
+        "chance": 1.0,
+        "targets": "all_enemies"
       },
       {
         "type": "apply_debuff",
         "debuff": "freeze",
         "duration": 5,
-        "chance": 0.55
+        "chance": 0.55,
+        "targets": "all_enemies"
       }
     ]
   },
@@ -5917,13 +5973,15 @@
       {
         "type": "damage",
         "damageType": "electric",
-        "chance": 1.0
+        "chance": 1.0,
+        "targets": "all_enemies"
       },
       {
         "type": "apply_debuff",
         "debuff": "stun",
         "duration": 2,
-        "chance": 0.5
+        "chance": 0.5,
+        "targets": "all_enemies"
       }
     ]
   },
@@ -5950,13 +6008,15 @@
       {
         "type": "damage",
         "damageType": "arcane",
-        "chance": 1.0
+        "chance": 1.0,
+        "targets": "all_enemies"
       },
       {
         "type": "apply_debuff",
         "debuff": "confused",
         "duration": 4,
-        "chance": 0.7
+        "chance": 0.7,
+        "targets": "all_enemies"
       }
     ]
   },
@@ -5983,18 +6043,21 @@
       {
         "type": "damage",
         "damageType": "holy",
-        "chance": 1.0
+        "chance": 1.0,
+        "targets": "all_enemies"
       },
       {
         "type": "damage",
         "damageType": "fire",
-        "chance": 1.0
+        "chance": 1.0,
+        "targets": "all_enemies"
       },
       {
         "type": "apply_debuff",
         "debuff": "cursed",
         "duration": 10,
-        "chance": 0.9
+        "chance": 0.9,
+        "targets": "all_enemies"
       }
     ]
   },
@@ -6021,18 +6084,21 @@
       {
         "type": "damage",
         "damageType": "poison",
-        "chance": 1.0
+        "chance": 1.0,
+        "targets": "all_enemies"
       },
       {
         "type": "damage",
         "damageType": "shadow",
-        "chance": 0.5
+        "chance": 0.5,
+        "targets": "all_enemies"
       },
       {
         "type": "apply_debuff",
         "debuff": "poison",
         "duration": 12,
-        "chance": 1.0
+        "chance": 1.0,
+        "targets": "all_enemies"
       }
     ]
   },
@@ -6132,13 +6198,15 @@
         "type": "heal",
         "chance": 1.0,
         "scalesBy": "harmony",
-        "magnitude": 0.22
+        "magnitude": 0.22,
+        "targets": "all_allies"
       },
       {
         "type": "apply_buff",
         "buff": "harmony",
         "duration": 10,
-        "chance": 1.0
+        "chance": 1.0,
+        "targets": "all_allies"
       }
     ]
   },
@@ -6601,13 +6669,15 @@
         "type": "heal",
         "chance": 1.0,
         "scalesBy": "harmony",
-        "magnitude": 0.2
+        "magnitude": 0.2,
+        "targets": "all_allies"
       },
       {
         "type": "apply_debuff",
         "debuff": "slow",
         "duration": 4,
-        "chance": 0.8
+        "chance": 0.8,
+        "targets": "all_enemies"
       }
     ]
   },
@@ -6742,18 +6812,21 @@
       {
         "type": "damage",
         "damageType": "poison",
-        "chance": 1.0
+        "chance": 1.0,
+        "targets": "all_enemies"
       },
       {
         "type": "damage",
         "damageType": "shadow",
-        "chance": 0.5
+        "chance": 0.5,
+        "targets": "all_enemies"
       },
       {
         "type": "apply_debuff",
         "debuff": "silence",
         "duration": 3,
-        "chance": 0.6
+        "chance": 0.6,
+        "targets": "all_enemies"
       }
     ]
   },
@@ -6814,18 +6887,21 @@
       {
         "type": "damage",
         "damageType": "poison",
-        "chance": 1.0
+        "chance": 1.0,
+        "targets": "all_enemies"
       },
       {
         "type": "damage",
         "damageType": "nature",
-        "chance": 0.5
+        "chance": 0.5,
+        "targets": "all_enemies"
       },
       {
         "type": "apply_debuff",
         "debuff": "poison",
         "duration": 8,
-        "chance": 0.9
+        "chance": 0.9,
+        "targets": "all_enemies"
       }
     ]
   },
@@ -6853,13 +6929,15 @@
       {
         "type": "damage",
         "damageType": "electric",
-        "chance": 1.0
+        "chance": 1.0,
+        "targets": "all_enemies"
       },
       {
         "type": "apply_debuff",
         "debuff": "poison",
         "duration": 5,
-        "chance": 0.7
+        "chance": 0.7,
+        "targets": "all_enemies"
       }
     ]
   },
@@ -6920,13 +6998,15 @@
         "type": "heal",
         "chance": 1.0,
         "scalesBy": "harmony",
-        "magnitude": 0.3
+        "magnitude": 0.3,
+        "targets": "all_allies"
       },
       {
         "type": "apply_debuff",
         "debuff": "endurance_crack",
         "duration": 10,
-        "chance": 1.0
+        "chance": 1.0,
+        "targets": "all_enemies"
       }
     ]
   },
@@ -7126,12 +7206,14 @@
         "type": "heal",
         "chance": 1.0,
         "scalesBy": "harmony",
-        "magnitude": 0.22
+        "magnitude": 0.22,
+        "targets": "all_allies"
       },
       {
         "type": "damage",
         "damageType": "poison",
-        "chance": 0.5
+        "chance": 0.5,
+        "targets": "all_enemies"
       }
     ]
   },
@@ -7191,13 +7273,15 @@
       {
         "type": "damage",
         "damageType": "shadow",
-        "chance": 1.0
+        "chance": 1.0,
+        "targets": "all_enemies"
       },
       {
         "type": "apply_debuff",
         "debuff": "shadowed",
         "duration": 4,
-        "chance": 0.7
+        "chance": 0.7,
+        "targets": "all_enemies"
       }
     ]
   },
@@ -7567,13 +7651,15 @@
       {
         "type": "damage",
         "damageType": "electric",
-        "chance": 1.0
+        "chance": 1.0,
+        "targets": "all_enemies"
       },
       {
         "type": "apply_debuff",
         "debuff": "electrified",
         "duration": 1,
-        "chance": 0.4
+        "chance": 0.4,
+        "targets": "all_enemies"
       }
     ]
   },
