@@ -571,10 +571,15 @@ function updateChallengeStatusBanner() {
         if (currentState.pendingLoopExit) {
             banner.style.display = 'flex';
             banner.innerHTML = `
-                <span style="color:#ffd700;">⏳ Finishing current challenge...</span>
-                <span style="color:#aaa; font-size:0.85em; margin-left:8px;">Will return here when done.</span>
+                <div style="display:flex; align-items:center; gap:8px; flex:1; flex-wrap:wrap;">
+                    <span style="color:#ffd700;">⏳ Finishing current challenge...</span>
+                    <span style="color:#aaa; font-size:0.82em;">Will stop after this run.</span>
+                </div>
+                <div style="display:flex; gap:8px; margin-left:auto;">
+                    <button onclick="showScreen('combatlog')" class="secondary" style="font-size:0.85rem; padding:6px 14px;">▶ Watch</button>
+                    <button onclick="cancelLoopExit()" class="secondary" style="font-size:0.85rem; padding:6px 14px;">✕ Cancel Stop</button>
+                </div>
             `;
-            // returnFromChallengeBtn was replaced by innerHTML — re-hide not needed
         } else {
             banner.style.display = 'flex';
             banner.innerHTML = `
@@ -604,4 +609,15 @@ function requestLoopExit() {
     currentState.pendingLoopExit = true;
     updateChallengeStatusBanner();
     console.log('[IDLE] Loop exit requested — will stop after current combat.');
+}
+
+/**
+ * Cancel a pending loop exit — restores the active idle state.
+ * Called from the "✕ Cancel Stop" button in the banner.
+ */
+function cancelLoopExit() {
+    if (!currentState.idleActive) return;
+    currentState.pendingLoopExit = false;
+    updateChallengeStatusBanner();
+    console.log('[IDLE] Loop exit cancelled — continuing idle loop.');
 }

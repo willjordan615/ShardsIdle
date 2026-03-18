@@ -68,6 +68,7 @@ async function displayCombatLog(combatData) {
             div.className = 'combatant';
             div.id = `party-${pc.characterID}`;
             div.innerHTML = `
+                <div class="combatant-inner">
                 <div class="combatant-name">${pc.characterName}</div>
                 <div class="combatant-hp">HP: <span class="hp-value">${pc.maxHP}</span> / ${pc.maxHP}</div>
                 <div class="health-bar"><div class="health-bar-fill" style="width:100%"></div><div class="health-bar-text">100%</div></div>
@@ -75,6 +76,7 @@ async function displayCombatLog(combatData) {
                 <div class="mana-bar" style="background:#1a1a2e;border:1px solid #0f3460;height:12px;margin:2px 0;"><div class="mana-bar-fill" style="background:linear-gradient(90deg,#00d4ff,#0084d1);width:100%;height:100%;"></div></div>
                 <div class="combatant-stamina">Stamina: <span class="stamina-value">${pc.maxStamina || 0}</span> / ${pc.maxStamina || 0}</div>
                 <div class="stamina-bar" style="background:#1a1a2e;border:1px solid #0f3460;height:12px;margin:2px 0;"><div class="stamina-bar-fill" style="background:linear-gradient(90deg,#ffd700,#ff8c00);width:100%;height:100%;"></div></div>
+                </div>
             `;
             partyStatus.appendChild(div);
         });
@@ -87,9 +89,11 @@ async function displayCombatLog(combatData) {
                 div.className = 'combatant';
                 div.id = `enemy-${e.enemyID}`;
                 div.innerHTML = `
+                    <div class="combatant-inner">
                     <div class="combatant-name">${e.enemyName}</div>
                     <div class="combatant-hp">HP: <span class="hp-value">${e.maxHP}</span> / ${e.maxHP}</div>
                     <div class="health-bar"><div class="health-bar-fill" style="width:100%"></div><div class="health-bar-text">100%</div></div>
+                    </div>
                 `;
                 enemyStatus.appendChild(div);
             });
@@ -142,9 +146,11 @@ async function displayCombatLog(combatData) {
                 div.className = 'combatant';
                 div.id = `enemy-${e.enemyID}`;
                 div.innerHTML = `
+                    <div class="combatant-inner">
                     <div class="combatant-name">${e.enemyName}</div>
                     <div class="combatant-hp">HP: <span class="hp-value">${e.maxHP}</span> / ${e.maxHP}</div>
                     <div class="health-bar"><div class="health-bar-fill" style="width:100%"></div><div class="health-bar-text">100%</div></div>
+                    </div>
                 `;
                 div.classList.add('combatant-slide-in');
                 enemyStatus.appendChild(div);
@@ -299,45 +305,10 @@ async function displayCombatLog(combatData) {
             }
         }
 
-        // Populate discoveries — scan all turns for child skill procs
-        const allTurns = combatData.segments
-            ? combatData.segments.flatMap(s => s.turns)
-            : (combatData.turns || []);
-
-        const discoveries = [];
-        const seen = new Set();
-        allTurns.forEach(turn => {
-            if (turn.isChildSkillProc && turn.action?.skillID && !seen.has(turn.action.skillID)) {
-                seen.add(turn.action.skillID);
-                const skillDef = window.gameData?.skills?.find(s => s.id === turn.action.skillID);
-                discoveries.push({
-                    name: skillDef?.name || turn.action.skillID,
-                    isFirst: turn.isFirstDiscovery
-                });
-            }
-        });
-
-        // Add discoveries section to modal if any procs fired
-        const modalContent = document.querySelector('#combatResultModal > div');
-        const existingDisc = document.getElementById('discoveriesSection');
-        if (existingDisc) existingDisc.remove();
-
-        if (discoveries.length > 0 && modalContent) {
-            const discSection = document.createElement('div');
-            discSection.id = 'discoveriesSection';
-            discSection.style.cssText = 'margin-bottom:1rem;background:rgba(212,175,55,0.08);border:1px solid #d4af37;border-radius:8px;padding:1rem;';
-            discSection.innerHTML = `
-                <div style="color:#d4af37;font-weight:bold;margin-bottom:0.5rem;">🔮 Skill Discoveries</div>
-                ${discoveries.map(d =>
-                    d.isFirst
-                        ? `<div style="color:#4cd964;">✨ ${d.name} — First discovered!</div>`
-                        : `<div style="color:#d4af37;">⚡ ${d.name} — XP gained toward unlock</div>`
-                ).join('')}
-            `;
-            // Insert before the XP section
-            if (charXPListEl) charXPListEl.parentElement.before(discSection);
-            else modalContent.prepend(discSection);
-        }
+        // Skill section is populated by applyCombatRewards after XP is calculated.
+        // Clear it now so it's ready to receive content.
+        const existingSkillSection = document.getElementById('skillProgressSection');
+        if (existingSkillSection) existingSkillSection.remove();
 
         // Populate character XP
         if (charXPListEl) {
@@ -347,9 +318,9 @@ async function displayCombatLog(combatData) {
                 : '<span style="color:#666">No character XP gained.</span>';
         }
 
-        // Populate skill XP note
+        // Skill progress section populated by applyCombatRewards — leave as loading state
         if (skillXPListEl) {
-            skillXPListEl.innerHTML = '<div style="color:#aaa;font-style:italic;">Skill progress updated based on actions.</div>';
+            skillXPListEl.innerHTML = '<div style="color:#555;font-style:italic;font-size:0.8em;">Calculating...</div>';
         }
 
         // Set result title and countdown text
@@ -357,7 +328,7 @@ async function displayCombatLog(combatData) {
             if (titleEl) { titleEl.textContent = 'VICTORY!'; titleEl.style.color = '#4cd964'; }
             if (statusTextEl) {
                 statusTextEl.style.color = '#ffd700';
-                statusTextEl.innerHTML = `Auto-restarting in <span id="countdownTimer" style="font-weight:bold;font-size:1.1rem;">3</span>s...`;
+                statusTextEl.innerHTML = `Auto-restarting in <span id="countdownTimer" style="font-weight:bold;font-size:1.1rem;">7</span>s...`;
             }
         } else if (finalResult === 'defeat' || finalResult === 'loss') {
             if (titleEl) { titleEl.textContent = 'DEFEATED'; titleEl.style.color = '#d4484a'; }
@@ -377,7 +348,7 @@ async function displayCombatLog(combatData) {
         // Trigger rewards and/or countdown
         if (finalResult === 'victory') {
             await applyCombatRewards(combatData);
-            startCountdown(3, nextId);
+            startCountdown(7, nextId);
         } else if (finalResult === 'loss' || finalResult === 'defeat') {
             startCountdown(5, nextId);
         } else if (finalResult === 'retreated') {
@@ -616,17 +587,18 @@ function updateSingleHealthBar(targetId, newHP, hpMaxes, hpCurrent, type) {
 // --- COMBATANT ANIMATION HELPERS ---
 
 function triggerCombatantAnimation(id, cssClass, durationMs) {
-    // Try both party and enemy prefixes
-    const el = document.getElementById(`party-${id}`) || document.getElementById(`enemy-${id}`);
-    if (!el) return;
+    // Animate .combatant-inner so transform doesn't conflict with the outer
+    // .combatant's slide-in animation (which locks transform via fill-mode: forwards)
+    const outer = document.getElementById(`party-${id}`) || document.getElementById(`enemy-${id}`);
+    if (!outer) return;
+    const el = outer.querySelector('.combatant-inner') || outer;
     el.classList.remove(cssClass);
-    void el.offsetWidth; // force reflow so re-adding the class restarts the animation
+    void el.offsetWidth; // force reflow to restart animation
     el.classList.add(cssClass);
     setTimeout(() => el.classList.remove(cssClass), durationMs);
 }
 
 function animateAttacker(actorId, targetId) {
-    // Determine direction: party members lunge right, enemies lunge left
     const isParty = !!document.getElementById(`party-${actorId}`);
     const cls = isParty ? 'combatant-attack-right' : 'combatant-attack-left';
     triggerCombatantAnimation(actorId, cls, 250);
@@ -634,8 +606,9 @@ function animateAttacker(actorId, targetId) {
 
 function animateHit(targetId, isCrit, isDefeat) {
     if (isDefeat) {
-        const el = document.getElementById(`party-${targetId}`) || document.getElementById(`enemy-${targetId}`);
-        if (el) {
+        const outer = document.getElementById(`party-${targetId}`) || document.getElementById(`enemy-${targetId}`);
+        if (outer) {
+            const el = outer.querySelector('.combatant-inner') || outer;
             el.classList.remove('combatant-hit', 'combatant-crit');
             el.classList.add('combatant-defeated');
         }
@@ -704,6 +677,8 @@ try {
     // without a second getCharacter() call that would return a stale DB snapshot
     // and overwrite XP we just saved.
     const savedCharacters = {};
+    const newUnlocks = [];     // skills that crossed level 0→1 this combat
+    const skillXPGains = {};   // skillID → { name, before, after, level, discovered }
 
     for (const participant of combatData.participants.playerCharacters) {
         const charId = participant.characterID;
@@ -784,6 +759,7 @@ try {
 
             // Find the skill in the character's owned list (now includes injected discoveries)
             const skillRef = character.skills.find(s => s.skillID === skillID);
+            const xpBefore = skillRef ? (skillRef.skillXP || 0) : 0;
             
             if (!skillRef) {
                 // Expected for NO_RESOURCES desperation skills (last_stand, etc.) which
@@ -829,6 +805,21 @@ try {
             if (xpToAward > 0) {
                 skillRef.skillXP = (skillRef.skillXP || 0) + xpToAward;
                 skillRef.usageCount = (skillRef.usageCount || 0) + 1;
+                // Track for modal display
+                if (!skillXPGains[skillID]) {
+                    skillXPGains[skillID] = {
+                        name: skillDef?.name || skillID,
+                        before: xpBefore,
+                        after: skillRef.skillXP,
+                        level: skillRef.skillLevel,
+                        discovered: !!skillRef.discovered,
+                        xpAwarded: xpToAward
+                    };
+                } else {
+                    skillXPGains[skillID].after = skillRef.skillXP;
+                    skillXPGains[skillID].xpAwarded += xpToAward;
+                    skillXPGains[skillID].level = skillRef.skillLevel;
+                }
 
                 // Level 0 → 1: flat 120 XP discovery threshold.
                 // Level 1+: standard formula (100 * level * 1.2).
@@ -839,7 +830,12 @@ try {
                 if (skillRef.skillXP >= threshold) {
                     skillRef.skillXP -= threshold;
                     skillRef.skillLevel++;
-                    showSafeSuccess(`${turn.action.name || skillID} leveled up to ${skillRef.skillLevel}!`);
+                    // Track discovery unlocks (level 0 → 1) separately for the fanfare modal
+                    if (skillRef.skillLevel === 1 && skillRef.discovered) {
+                        newUnlocks.push({ skillID, skillDef });
+                    } else {
+                        showSafeSuccess(`${turn.action.name || skillID} leveled up to ${skillRef.skillLevel}!`);
+                    }
                     console.log(`[XP] 🎉 ${skillID} reached Level ${skillRef.skillLevel}!`);
                 } else if (skillRef.skillLevel < 1) {
                     console.log(`[XP] ✨ ${skillID} discovery XP: ${skillRef.skillXP.toFixed(0)} / ${threshold} (+${xpToAward})`);
@@ -919,6 +915,76 @@ try {
     if (typeof renderRoster === 'function') await renderRoster();
     if (window.currentState?.detailCharacterId && typeof showCharacterDetail === 'function') {
         await showCharacterDetail(window.currentState.detailCharacterId);
+    }
+
+    // --- SKILL PROGRESS SECTION (replaces placeholder in modal) ---
+    const skillXPListEl = document.getElementById('skillXPList');
+    if (skillXPListEl && Object.keys(skillXPGains).length > 0) {
+        const UNLOCK_THRESHOLD = 120;
+        skillXPListEl.innerHTML = '';
+
+        Object.entries(skillXPGains).forEach(([skillID, data]) => {
+            const row = document.createElement('div');
+            row.style.cssText = 'margin-bottom:0.6rem; padding-bottom:0.6rem; border-bottom:1px solid rgba(139,115,85,0.2);';
+
+            if (data.discovered && data.level < 1) {
+                // Discovery phase — show progress bar
+                const pct = Math.min(100, Math.floor((data.after / UNLOCK_THRESHOLD) * 100));
+                row.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; margin-bottom:3px;">
+                        <span style="color:#d4af37; font-size:0.85em;">🔮 ${data.name} <span style="color:#666; font-size:0.75em;">(discovering)</span></span>
+                        <span style="color:#aaa; font-size:0.75em;">${data.after.toFixed(0)} / ${UNLOCK_THRESHOLD} XP (+${data.xpAwarded.toFixed(0)})</span>
+                    </div>
+                    <div style="background:#0f0f1e; border-radius:3px; height:5px; overflow:hidden;">
+                        <div style="background:linear-gradient(90deg,#d4af37,#ffe066); width:${pct}%; height:100%;"></div>
+                    </div>`;
+            } else {
+                // Normal equipped skill
+                const xpLabel = data.xpAwarded > 0
+                    ? `<span style="color:#4cd964; font-size:0.75em;">+${data.xpAwarded.toFixed(1)} XP</span>`
+                    : '';
+                row.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="color:#ccc; font-size:0.85em;">${data.name} <span style="color:#8b7355; font-size:0.75em;">Lv.${data.level}</span></span>
+                        ${xpLabel}
+                    </div>`;
+            }
+            skillXPListEl.appendChild(row);
+        });
+    } else if (skillXPListEl) {
+        skillXPListEl.innerHTML = '<div style="color:#555; font-size:0.8em; font-style:italic;">No skill activity this combat.</div>';
+    }
+
+    // --- DISCOVERY UNLOCK FANFARE ---
+    if (newUnlocks.length > 0) {
+        const modal = document.getElementById('combatResultModal');
+        const modalInner = modal?.querySelector('div');
+        if (modalInner) {
+            const fanfare = document.createElement('div');
+            fanfare.id = 'discoveryUnlockFanfare';
+            fanfare.style.cssText = 'margin-bottom:1.2rem; background:linear-gradient(135deg,rgba(212,175,55,0.15),rgba(76,217,100,0.08)); border:2px solid #d4af37; border-radius:8px; padding:1rem 1.2rem; animation:bannerFadeIn 0.5s ease forwards;';
+            fanfare.innerHTML = `
+                <div style="color:#d4af37; font-weight:bold; font-size:1.05rem; margin-bottom:0.6rem; letter-spacing:1px;">
+                    ✨ SKILL UNLOCKED
+                </div>
+                ${newUnlocks.map(u => {
+                    const name = u.skillDef?.name || u.skillID;
+                    const desc = u.skillDef?.description || '';
+                    const cat  = u.skillDef?.category || '';
+                    return `<div style="margin-bottom:0.5rem;">
+                        <div style="color:#4cd964; font-weight:bold; font-size:0.95rem;">${name}</div>
+                        ${desc ? `<div style="color:#ccc; font-size:0.82rem; font-style:italic; margin-top:2px;">${desc}</div>` : ''}
+                        <div style="color:#8b7355; font-size:0.75rem; margin-top:2px;">${cat} — now equippable from your skill slots</div>
+                    </div>`;
+                }).join('')}
+            `;
+            // Insert at the top of the modal content, before loot
+            modalInner.insertBefore(fanfare, modalInner.firstChild);
+        }
+        // Toast for each unlock
+        newUnlocks.forEach(u => {
+            showSafeSuccess(`✨ ${u.skillDef?.name || u.skillID} unlocked and ready to equip!`);
+        });
     }
 
     const totalXP = Object.values(rewards.experienceGained || {}).reduce((a, b) => a + b, 0);
