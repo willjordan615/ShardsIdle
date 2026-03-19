@@ -449,12 +449,18 @@ async function displayCombatLog(combatData) {
         const existingSkillSection = document.getElementById('skillProgressSection');
         if (existingSkillSection) existingSkillSection.remove();
 
-        // Populate character XP
+        // Populate character XP — show per-character, not combined total
         if (charXPListEl) {
-            const totalCharXP = Object.values(rewards.experienceGained || {}).reduce((a, b) => a + b, 0);
-            charXPListEl.innerHTML = totalCharXP > 0
-                ? `<div>+${totalCharXP} Total Character XP</div>`
-                : '<span style="color:#666">No character XP gained.</span>';
+            const entries = Object.entries(rewards.experienceGained || {}).filter(([, xp]) => xp > 0);
+            if (entries.length > 0) {
+                charXPListEl.innerHTML = entries.map(([charId, xp]) => {
+                    const pc = combatData.participants?.playerCharacters?.find(p => p.characterID === charId);
+                    const name = pc?.characterName || charId;
+                    return `<div>+${xp} XP — ${name}</div>`;
+                }).join('');
+            } else {
+                charXPListEl.innerHTML = '<span style="color:#666">No character XP gained.</span>';
+            }
         }
 
         // Skill progress section populated by applyCombatRewards — leave as loading state
@@ -1263,8 +1269,8 @@ try {
         });
     }
 
-    const totalXP = Object.values(rewards.experienceGained || {}).reduce((a, b) => a + b, 0);
-    console.log(`[REWARDS] Total XP awarded: ${totalXP}`);
+    const xpEntries = Object.entries(rewards.experienceGained || {});
+    xpEntries.forEach(([charId, xp]) => console.log(`[REWARDS] XP awarded to ${charId}: ${xp}`));
 
 } catch (error) {
     console.error('[REWARDS] Failed to apply rewards:', error);

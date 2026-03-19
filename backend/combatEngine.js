@@ -738,8 +738,15 @@ class CombatEngine {
     // XP with diminishing returns for larger parties
     // Solo=100%, 2-person=67%, 3-person=50%, 4-person=40%
     const partyScale = 1 / (1 + 0.5 * (players.length - 1));
+
+    // Difficulty scaling — bonus for punching up, penalty for farming easy content
+    // avgLevel vs challenge.recommendedLevel; capped at 200% bonus
+    const avgPartyLevel = players.reduce((sum, p) => sum + (p.level || 1), 0) / players.length;
+    const recommendedLevel = challenge?.recommendedLevel || 1;
+    const levelDelta = avgPartyLevel - recommendedLevel;
+    const difficultyScale = Math.min(2.0, 1 / Math.max(0.1, 1 + levelDelta * 0.15));
     players.forEach(player => {
-        const xpReward = Math.floor(baseXP * partyScale * (1 + (player.stats?.harmony || 0) / 250));
+        const xpReward = Math.floor(baseXP * partyScale * difficultyScale * (1 + (player.stats?.harmony || 0) / 250));
         rewards.experienceGained[player.id] = xpReward;
     });
 
