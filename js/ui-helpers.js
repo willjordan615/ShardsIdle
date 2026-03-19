@@ -13,6 +13,12 @@ function showScreen(screenName) {
         targetScreen.classList.add('active');
         window.scrollTo(0, 0);
     }
+
+    // Hide the site header everywhere except the roster and character creation screens
+    const header = document.querySelector('header');
+    if (header) {
+        header.style.display = ['roster', 'create'].includes(screenName) ? '' : 'none';
+    }
 }
 
 /**

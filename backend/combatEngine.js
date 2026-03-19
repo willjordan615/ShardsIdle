@@ -735,9 +735,11 @@ class CombatEngine {
     const baseGold = challenge?.rewards?.baseGold || 50;
     const lootTable = challenge?.rewards?.lootTable || [];
 
-    // XP scaled by harmony
+    // XP scaled by harmony, with diminishing returns for larger parties
+    // Solo = 100%, 2-person = ~71%, 3-person = ~58%, 4-person = 50%
+    const partyScale = 1 / Math.sqrt(players.length || 1);
     players.forEach(player => {
-        const xpReward = Math.floor(baseXP * (1 + (player.stats?.harmony || 0) / 250));
+        const xpReward = Math.floor(baseXP * partyScale * (1 + (player.stats?.harmony || 0) / 250));
         rewards.experienceGained[player.id] = xpReward;
     });
 
@@ -1239,9 +1241,21 @@ class CombatEngine {
         }
     }
 
-    // ── Proc pressure bonus ──
-    if (context.lastUsedSkillId && this._hasProcOpportunity(character, skill.id, context.lastUsedSkillId)) {
-        score *= procPressureBonus;
+    // ── Proc pressure bonus — nudge toward a combo that might proc a child skill ──
+    // Only applies to damage/control skills — not DEFENSE/BUFF which would distort survival decisions
+    if (context.lastUsedSkillId &&
+        cat && !['DEFENSE','BUFF','RESTORATION'].includes(cat) &&
+        this._hasProcOpportunity(character, skill.id, context.lastUsedSkillId)) {
+        // Only boost if the child skill isn't already unlocked at level 1+
+        const childSkill = this.skills.find(child =>
+            child.parentSkills?.includes(skill.id) &&
+            child.parentSkills?.includes(context.lastUsedSkillId)
+        );
+        const childRecord = childSkill
+            ? character.skills?.find(s => s.skillID === childSkill.id)
+            : null;
+        const alreadyUnlocked = childRecord && (childRecord.skillLevel || 0) >= 1;
+        if (!alreadyUnlocked) score *= procPressureBonus;
     }
 
     // ── AOE value — scales with enemy count ──
@@ -1280,8 +1294,11 @@ class CombatEngine {
     if ((cat === 'BUFF' || cat === 'DEFENSE') &&
         character.currentHP > character.maxHP * 0.75 &&
         resourceRatio > 0.5) {
-        const enemyPressure = aliveEnemies.length > players.filter(p => !p.defeated).length;
-        score *= enemyPressure ? 0.6 : 1.15;
+        const aliveAllies = players.filter(p => !p.defeated).length;
+        const enemyPressure = aliveEnemies.length > aliveAllies;
+        // Solo — DEFENSE is nearly worthless, damage coming regardless
+        const soloMultiplier = aliveAllies <= 1 ? 0.2 : 1.0;
+        score *= soloMultiplier * (enemyPressure ? 0.6 : 1.15);
     }
 
     // ── Support profile: HEALING_AOE bonus when 2+ allies are hurt ──
@@ -1854,7 +1871,7 @@ class CombatEngine {
     }
 
     // ===== STEP 1: Calculate Base Skill Damage =====
-    const baseDamage = (skill.basePower || 1) * (1 + (skillLevel - 1) * 0.1);
+    const baseDamage = (skill.basePower ?? 1) * (1 + (skillLevel - 1) * 0.1);
     
     // Stat scaling (ADDITIVE per spec, not multiplicative)
     const scaling = skill.scalingFactors || {};

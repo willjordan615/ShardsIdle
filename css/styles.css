@@ -1191,3 +1191,160 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
 .inv-gear      { border-left: 3px solid #4a9eff; }
 .inv-empty-slot { opacity: 0.45; cursor: default; }
 .inv-empty-slot:hover { border-color: rgba(255,255,255,0.07); background: rgba(20,30,50,0.7); }
+
+/* ============================================================
+   RESPONSIVE WIDE-SCREEN LAYOUTS
+   ============================================================ */
+
+/* Default (mobile/tablet): combat screen stacks normally */
+.combat-wide-layout {
+    display: block;
+}
+.combat-col-left,
+.combat-col-center,
+.combat-col-right {
+    display: block;
+}
+/* Keep combatant-group styling consistent */
+.combat-col-left .combatant-group,
+.combat-col-right .combatant-group {
+    margin-bottom: var(--space-lg);
+}
+
+/* Medium screens (1024px+): taller log, grid-4 gets more columns */
+@media (min-width: 1024px) {
+    .combat-log { height: 600px; }
+    .grid-4 { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+}
+
+/* Wide screens (1280px+): three-column combat layout */
+@media (min-width: 1280px) {
+    .combat-wide-layout {
+        display: grid;
+        grid-template-columns: 280px 1fr 280px;
+        gap: var(--space-xl);
+        align-items: start;
+    }
+
+    .combat-col-left,
+    .combat-col-right {
+        position: sticky;
+        top: var(--space-lg);
+    }
+
+    /* Log fills available vertical space */
+    .combat-log {
+        height: calc(100vh - 280px);
+        min-height: 500px;
+        max-height: 900px;
+    }
+
+    /* Roster gets more columns */
+    .grid-4 { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+
+    /* Character detail: skills alongside stats */
+    #detail .grid-2 {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* Very wide (1600px+): even more room */
+@media (min-width: 1600px) {
+    .combat-wide-layout {
+        grid-template-columns: 320px 1fr 320px;
+    }
+    .container { max-width: 1500px; }
+}
+
+/* ============================================================
+   INLINE LOADOUT SLOTS (gear + belt on character detail)
+   ============================================================ */
+
+.loadout-slot {
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.05);
+    margin-bottom: 4px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    min-height: 32px;
+}
+.loadout-slot:hover {
+    border-color: rgba(212,175,55,0.35);
+    background: rgba(212,175,55,0.04);
+}
+.loadout-slot--filled {
+    border-color: rgba(212,175,55,0.18);
+    background: rgba(20,30,50,0.5);
+}
+.loadout-slot--empty {
+    border-color: rgba(255,255,255,0.04);
+    background: rgba(10,14,26,0.4);
+}
+.loadout-slot__label {
+    color: #555;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+}
+.loadout-slot__item {
+    color: #d4af37;
+    font-size: 0.82rem;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.loadout-slot--empty .loadout-slot__item {
+    color: #333;
+    font-style: italic;
+    font-weight: normal;
+}
+.loadout-slot__sub {
+    color: #666;
+    font-size: 0.7rem;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.loadout-slot__remove {
+    color: #8a3333;
+    cursor: pointer;
+    font-size: 0.72rem;
+    padding: 0 2px;
+    transition: color 0.1s;
+}
+.loadout-slot__remove:hover { color: #ff6b6b; }
+
+/* Belt slot — has an inline dropdown */
+.loadout-slot--belt {
+    grid-template-columns: 50px 1fr auto auto;
+    cursor: default;
+}
+.loadout-slot--belt:hover {
+    border-color: rgba(74,158,255,0.25);
+    background: rgba(74,158,255,0.03);
+}
+.loadout-belt__select {
+    background: transparent;
+    border: 1px solid #333;
+    border-radius: 3px;
+    color: #666;
+    font-size: 0.72rem;
+    padding: 2px 4px;
+    cursor: pointer;
+    max-width: 120px;
+    transition: border-color 0.15s;
+}
+.loadout-belt__select:hover,
+.loadout-belt__select:focus {
+    border-color: #4a9eff;
+    color: #aaa;
+    outline: none;
+}

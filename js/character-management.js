@@ -776,35 +776,8 @@ async function showCharacterDetail(characterId) {
         document.getElementById('xpBar').style.width = xpPercent + '%';
         document.getElementById('xpText').textContent = `${formatNumber(character.experience)}/${formatNumber(xpToNextLevel)}`;
         
-        const inventoryDisplay = document.getElementById('inventoryDisplay');
-        if (inventoryDisplay) {
-            inventoryDisplay.innerHTML = '';
-            if (character.inventory && character.inventory.length > 0) {
-                character.inventory.forEach(item => {
-                    const gear = gameData.gear.find(g => g.id === item.itemID);
-                    const rarityColor = 
-                        item.rarity === 'rare' ? '#ffd700' :
-                        item.rarity === 'uncommon' ? '#00ccff' : '#8b7355';
-                    
-                    const itemCard = document.createElement('div');
-                    itemCard.className = 'item-card';
-                    itemCard.style.borderColor = rarityColor;
-                    itemCard.innerHTML = `
-                        <div class="item-name">${gear?.name || item.itemID}</div>
-                        <div class="item-rarity" style="color: ${rarityColor};">${item.rarity}</div>
-                        ${gear?.description ? `<div class="item-desc">${gear.description}</div>` : ''}
-                        <div class="item-date">Acquired: ${new Date(item.acquiredAt).toLocaleDateString()}</div>
-                    `;
-                    inventoryDisplay.appendChild(itemCard);
-                });
-            } else {
-                inventoryDisplay.innerHTML = '<p class="empty-inventory" style="text-align: center; color: #aaa;">No items yet — defeat enemies to earn loot!</p>';
-            }
-        }
-        
-        renderEquippedGear(character);
+        if (typeof renderLoadoutSummary === 'function') renderLoadoutSummary(character);
         renderCharacterSkills(character);
-        renderConsumableBelt(character);
         renderExportButton(character); 
 renderImportBadge(character);
         renderCombatHistory(characterId);
