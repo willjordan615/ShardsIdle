@@ -439,7 +439,8 @@
       "channel",
       "rest"
     ],
-    "masteryUnlockAt": 200
+    "masteryUnlockAt": 200,
+    "isChildSkill": true
   },
   {
     "id": "climb_surface",
@@ -1379,7 +1380,8 @@
       "channel",
       "light_area"
     ],
-    "masteryUnlockAt": 200
+    "masteryUnlockAt": 200,
+    "isChildSkill": true
   },
   {
     "id": "rest",
@@ -1639,7 +1641,8 @@
       "channel",
       "shout"
     ],
-    "masteryUnlockAt": 200
+    "masteryUnlockAt": 200,
+    "isChildSkill": true
   },
   {
     "id": "shout",
@@ -2911,7 +2914,8 @@
         "chance": 0.15
       }
     ],
-    "masteryUnlockAt": 300
+    "masteryUnlockAt": 300,
+    "isChildSkill": true
   },
   {
     "id": "shadow_bolt",
@@ -2945,7 +2949,8 @@
         "chance": 0.4
       }
     ],
-    "masteryUnlockAt": 300
+    "masteryUnlockAt": 300,
+    "isChildSkill": true
   },
   {
     "id": "holy_light",
@@ -2980,7 +2985,8 @@
         "chance": 0.5
       }
     ],
-    "masteryUnlockAt": 300
+    "masteryUnlockAt": 300,
+    "isChildSkill": true
   },
   {
     "id": "nature_touch",
@@ -3014,7 +3020,8 @@
         "duration": 10,
         "chance": 1.0
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "apply_poison",
@@ -3042,7 +3049,8 @@
         "duration": 30,
         "chance": 1.0
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "smite",
@@ -3077,7 +3085,8 @@
         "magnitude": 1,
         "chance": 0.3
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "arcane_strike",
@@ -3112,7 +3121,8 @@
         "magnitude": 1,
         "chance": 0.15
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "slash",
@@ -3146,7 +3156,8 @@
         "chance": 0.4
       }
     ],
-    "masteryUnlockAt": 250
+    "masteryUnlockAt": 250,
+    "isChildSkill": true
   },
   {
     "id": "pummel",
@@ -3180,7 +3191,8 @@
         "chance": 0.5
       }
     ],
-    "masteryUnlockAt": 200
+    "masteryUnlockAt": 200,
+    "isChildSkill": true
   },
   {
     "id": "pierce",
@@ -3214,7 +3226,8 @@
         "chance": 0.3
       }
     ],
-    "masteryUnlockAt": 250
+    "masteryUnlockAt": 250,
+    "isChildSkill": true
   },
   {
     "id": "stone_skin",
@@ -3242,7 +3255,8 @@
         "duration": 10,
         "chance": 1.0
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "blood_letting",
@@ -3275,7 +3289,8 @@
         "duration": 5,
         "chance": 0.8
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "mind_spike",
@@ -3308,7 +3323,8 @@
         "duration": 2,
         "chance": 0.4
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "shadow_step",
@@ -3343,7 +3359,8 @@
         "chance": 1.0
       }
     ],
-    "masteryUnlockAt": 350
+    "masteryUnlockAt": 350,
+    "isChildSkill": true
   },
   {
     "id": "vitality_boost",
@@ -3371,7 +3388,8 @@
         "duration": 30,
         "chance": 1.0
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "flaming_edge",
@@ -3409,7 +3427,8 @@
         "duration": 4,
         "chance": 0.7
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "ice_pierce",
@@ -3447,7 +3466,8 @@
         "duration": 4,
         "chance": 0.8
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "shocking_blow",
@@ -3485,7 +3505,8 @@
         "duration": 2,
         "chance": 0.5
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "arcane_lunge",
@@ -3517,7 +3538,8 @@
         "damageType": "physical",
         "chance": 0.5
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "holy_smite",
@@ -3550,7 +3572,8 @@
         "duration": 5,
         "chance": 0.5
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "shadow_strike",
@@ -3583,7 +3606,8 @@
         "duration": 4,
         "chance": 0.6
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "venomous_slash",
@@ -3616,7 +3640,8 @@
         "duration": 6,
         "chance": 0.8
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "nature_wrap",
@@ -3649,7 +3674,8 @@
         "duration": 2,
         "chance": 0.4
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "burning_aura",
@@ -3684,7 +3710,8 @@
         "chance": 0.5,
         "targets": "all_enemies"
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "frost_nova",
@@ -3719,7 +3746,8 @@
         "chance": 0.8,
         "targets": "all_enemies"
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "arcane_barrier",
@@ -3755,7 +3783,8 @@
         "magnitude": 1,
         "chance": 1.0
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "shadow_veil",
@@ -3783,7 +3812,8 @@
         "duration": 8,
         "chance": 1.0
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "healing_light",
@@ -3819,7 +3849,8 @@
         "chance": 0.6,
         "targets": "all_allies"
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "regrowth",
@@ -3853,7 +3884,8 @@
         "duration": 15,
         "chance": 1.0
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "poison_cloud",
@@ -3888,7 +3920,8 @@
         "chance": 0.8,
         "targets": "all_enemies"
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "counter_strike",
@@ -3923,7 +3956,8 @@
         "magnitude": 1,
         "chance": 0.6
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "riposte",
@@ -3964,7 +3998,8 @@
         "magnitude": 1,
         "chance": 0.7
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "blood_fury",
@@ -3998,7 +4033,8 @@
         "duration": 10,
         "chance": 1.0
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "mental_fortitude",
@@ -4026,7 +4062,8 @@
         "duration": 15,
         "chance": 1.0
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "assassinate",
@@ -4066,7 +4103,8 @@
         "magnitude": 1,
         "chance": 0.5
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "vitality_surge",
@@ -4100,7 +4138,8 @@
         "scalesBy": "endurance",
         "magnitude": 0.18
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "stone_fist",
@@ -4138,7 +4177,8 @@
         "duration": 2,
         "chance": 0.35
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "lightning_chain",
@@ -4175,7 +4215,8 @@
         "magnitude": 1,
         "chance": 0.35
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "ice_shard",
@@ -4208,7 +4249,8 @@
         "duration": 3,
         "chance": 0.7
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "fireball",
@@ -4243,7 +4285,8 @@
         "chance": 0.6,
         "targets": "all_enemies"
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "shadow_tendril",
@@ -4276,7 +4319,8 @@
         "duration": 2,
         "chance": 0.35
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "holy_word",
@@ -4312,7 +4356,8 @@
         "chance": 0.8,
         "targets": "all_allies"
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "entangle",
@@ -4345,7 +4390,8 @@
         "duration": 4,
         "chance": 0.9
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "acid_splash",
@@ -4383,7 +4429,8 @@
         "duration": 4,
         "chance": 0.6
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "mana_shield",
@@ -4419,7 +4466,8 @@
         "magnitude": 1,
         "chance": 1.0
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "inferno_slice",
@@ -4457,7 +4505,8 @@
         "duration": 5,
         "chance": 0.8
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "glacial_javelin",
@@ -4495,7 +4544,8 @@
         "duration": 5,
         "chance": 0.9
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "storm_hammer",
@@ -4536,7 +4586,8 @@
         "chance": 0.35,
         "targets": "all_enemies"
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "arcane_dash",
@@ -4569,7 +4620,8 @@
         "duration": 3,
         "chance": 1.0
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "divine_judgment",
@@ -4602,7 +4654,8 @@
         "duration": 8,
         "chance": 0.7
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "void_rend",
@@ -4635,7 +4688,8 @@
         "duration": 6,
         "chance": 0.7
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "plague_carrier",
@@ -4670,7 +4724,8 @@
         "chance": 0.9,
         "targets": "all_enemies"
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "primal_crush",
@@ -4708,7 +4763,8 @@
         "duration": 3,
         "chance": 0.4
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "ring_of_fire",
@@ -4743,7 +4799,8 @@
         "chance": 0.6,
         "targets": "all_enemies"
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "blizzard",
@@ -4778,7 +4835,8 @@
         "chance": 0.9,
         "targets": "all_enemies"
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "spell_reflection",
@@ -4814,7 +4872,8 @@
         "duration": 5,
         "chance": 0.5
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "shadow_clone",
@@ -4842,7 +4901,8 @@
         "duration": 10,
         "chance": 1.0
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "mass_heal",
@@ -4878,7 +4938,8 @@
         "chance": 0.8,
         "targets": "all_allies"
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "forest_embrace",
@@ -4914,7 +4975,8 @@
         "chance": 0.7,
         "targets": "all_enemies"
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "toxic_fog",
@@ -4956,7 +5018,8 @@
         "chance": 0.5,
         "targets": "all_allies"
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "shield_bash",
@@ -4989,7 +5052,8 @@
         "duration": 2,
         "chance": 0.4
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "bleed_out",
@@ -5022,7 +5086,8 @@
         "duration": 6,
         "chance": 0.9
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "psychic_barrier",
@@ -5056,7 +5121,8 @@
         "duration": 10,
         "chance": 0.5
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "silent_death",
@@ -5096,7 +5162,8 @@
         "magnitude": 1,
         "chance": 0.6
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "berserker_rage",
@@ -5136,7 +5203,8 @@
         "duration": 20,
         "chance": 1.0
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "earthquake",
@@ -5177,7 +5245,8 @@
         "chance": 0.4,
         "targets": "all_enemies"
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "chain_lightning",
@@ -5214,7 +5283,8 @@
         "magnitude": 1,
         "chance": 0.4
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "ice_lance",
@@ -5252,7 +5322,8 @@
         "duration": 5,
         "chance": 0.8
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "meteor",
@@ -5293,7 +5364,8 @@
         "chance": 0.8,
         "targets": "all_enemies"
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "shadow_grasp",
@@ -5332,7 +5404,8 @@
         "duration": 3,
         "chance": 0.35
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "phoenix_strike",
@@ -5378,7 +5451,8 @@
         "magnitude": 1,
         "chance": 0.4
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "absolute_zero",
@@ -5411,7 +5485,8 @@
         "duration": 4,
         "chance": 0.5
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "thunder_god",
@@ -5446,7 +5521,8 @@
         "chance": 0.45,
         "targets": "all_enemies"
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "blink_strike",
@@ -5479,7 +5555,8 @@
         "duration": 5,
         "chance": 1.0
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "heavens_fury",
@@ -5514,7 +5591,8 @@
         "chance": 0.8,
         "targets": "all_enemies"
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "demon_form",
@@ -5548,7 +5626,8 @@
         "duration": 5,
         "chance": 1.0
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "bio_hazard",
@@ -5589,7 +5668,8 @@
         "chance": 0.9,
         "targets": "all_enemies"
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "titan_foot",
@@ -5630,7 +5710,8 @@
         "chance": 0.45,
         "targets": "all_enemies"
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "hellfire",
@@ -5671,7 +5752,8 @@
         "chance": 0.8,
         "targets": "all_enemies"
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "permafrost",
@@ -5706,7 +5788,8 @@
         "chance": 1.0,
         "targets": "all_enemies"
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "mirror_image",
@@ -5740,7 +5823,8 @@
         "duration": 5,
         "chance": 0.5
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "necromancy",
@@ -5773,7 +5857,8 @@
         "scalesBy": "conviction",
         "magnitude": 0.25
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "executioner",
@@ -5813,7 +5898,8 @@
         "magnitude": 1,
         "chance": 0.5
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "mind_control",
@@ -5841,7 +5927,8 @@
         "duration": 5,
         "chance": 0.8
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "void_walk",
@@ -5875,7 +5962,8 @@
         "duration": 10,
         "chance": 1.0
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "sunfall",
@@ -5916,7 +6004,8 @@
         "chance": 1.0,
         "targets": "all_enemies"
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "eternal_winter",
@@ -5951,7 +6040,8 @@
         "chance": 0.55,
         "targets": "all_enemies"
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "storm_of_a_thousand_storms",
@@ -5987,7 +6077,8 @@
         "chance": 0.5,
         "targets": "all_enemies"
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "reality_fracture",
@@ -6022,7 +6113,8 @@
         "chance": 0.7,
         "targets": "all_enemies"
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "apocalypse",
@@ -6063,7 +6155,8 @@
         "chance": 0.9,
         "targets": "all_enemies"
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "lord_of_decay",
@@ -6104,7 +6197,8 @@
         "chance": 1.0,
         "targets": "all_enemies"
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "omnipotence",
@@ -6138,7 +6232,8 @@
         "duration": 30,
         "chance": 1.0
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "shadow_wound",
@@ -6176,7 +6271,8 @@
         "duration": 4,
         "chance": 0.6
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "sacred_grove",
@@ -6212,7 +6308,8 @@
         "chance": 1.0,
         "targets": "all_allies"
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "volatile_venom",
@@ -6245,7 +6342,8 @@
         "duration": 5,
         "chance": 0.7
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "divine_frost",
@@ -6283,7 +6381,8 @@
         "duration": 3,
         "chance": 0.8
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "septic_flame",
@@ -6322,7 +6421,8 @@
         "duration": 4,
         "chance": 0.6
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "runic_smash",
@@ -6362,7 +6462,8 @@
         "magnitude": 1,
         "chance": 0.3
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "entropic_decay",
@@ -6400,7 +6501,8 @@
         "duration": 5,
         "chance": 0.7
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "neuro_toxin",
@@ -6439,7 +6541,8 @@
         "duration": 4,
         "chance": 0.7
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "shadow_misdirection",
@@ -6473,7 +6576,8 @@
         "duration": 6,
         "chance": 1.0
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "faith_armor",
@@ -6507,7 +6611,8 @@
         "duration": 10,
         "chance": 0.5
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "sacred_roots",
@@ -6545,7 +6650,8 @@
         "duration": 2,
         "chance": 0.45
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "mana_cycle",
@@ -6577,7 +6683,8 @@
         "duration": 10,
         "chance": 0.5
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "terror_cry",
@@ -6611,7 +6718,8 @@
         "duration": 3,
         "chance": 0.6
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "divine_barrier",
@@ -6647,7 +6755,8 @@
         "duration": 12,
         "chance": 1.0
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "rooted_healing",
@@ -6683,7 +6792,8 @@
         "chance": 0.8,
         "targets": "all_enemies"
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "shadow_riposte",
@@ -6724,7 +6834,8 @@
         "magnitude": 1,
         "chance": 0.65
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "thorned_regeneration",
@@ -6758,7 +6869,8 @@
         "duration": 10,
         "chance": 1.0
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "corrosive_wound",
@@ -6791,7 +6903,8 @@
         "duration": 6,
         "chance": 0.8
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "smothering_darkness",
@@ -6832,7 +6945,8 @@
         "chance": 0.6,
         "targets": "all_enemies"
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "bark_carapace",
@@ -6866,7 +6980,8 @@
         "duration": 10,
         "chance": 0.5
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "plague_bloom",
@@ -6907,7 +7022,8 @@
         "chance": 0.9,
         "targets": "all_enemies"
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "venom_storm",
@@ -6943,7 +7059,8 @@
         "chance": 0.7,
         "targets": "all_enemies"
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "rotting_grasp",
@@ -6976,7 +7093,8 @@
         "duration": 3,
         "chance": 0.4
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "martyrdom",
@@ -7012,7 +7130,8 @@
         "chance": 1.0,
         "targets": "all_enemies"
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "retaliatory_heal",
@@ -7046,7 +7165,8 @@
         "duration": 5,
         "chance": 0.5
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "persistent_life",
@@ -7080,7 +7200,8 @@
         "duration": 15,
         "chance": 1.0
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "resurrection_rite",
@@ -7114,7 +7235,8 @@
         "duration": 10,
         "chance": 1.0
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "life_link",
@@ -7148,7 +7270,8 @@
         "duration": 10,
         "chance": 1.0
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "sanctuary",
@@ -7184,7 +7307,8 @@
         "scalesBy": "harmony",
         "magnitude": 0.15
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "caustic_mend",
@@ -7219,7 +7343,8 @@
         "chance": 0.5,
         "targets": "all_enemies"
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "frozen_cry",
@@ -7252,7 +7377,8 @@
         "duration": 2,
         "chance": 0.4
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "decay_aura",
@@ -7287,7 +7413,8 @@
         "chance": 0.7,
         "targets": "all_enemies"
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "crystal_skin",
@@ -7321,7 +7448,8 @@
         "duration": 10,
         "chance": 0.5
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "holy_roots",
@@ -7354,7 +7482,8 @@
         "duration": 2,
         "chance": 0.45
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "phantom_lunge",
@@ -7387,7 +7516,8 @@
         "duration": 3,
         "chance": 1.0
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "alchemy_fire",
@@ -7421,7 +7551,8 @@
         "duration": 3,
         "chance": 0.5
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "storm_seed",
@@ -7454,7 +7585,8 @@
         "duration": 2,
         "chance": 0.5
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "blood_ice",
@@ -7487,7 +7619,8 @@
         "duration": 5,
         "chance": 0.8
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "echoing_prayer",
@@ -7521,7 +7654,8 @@
         "duration": 10,
         "chance": 1.0
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "arcane_pummel",
@@ -7561,7 +7695,8 @@
         "magnitude": 1,
         "chance": 0.25
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "flaming_shove",
@@ -7594,7 +7729,8 @@
         "duration": 0,
         "chance": 0.6
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "ice_block",
@@ -7630,7 +7766,8 @@
         "duration": 3,
         "chance": 0.5
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "shockwave",
@@ -7665,7 +7802,8 @@
         "chance": 0.4,
         "targets": "all_enemies"
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "shadow_block",
@@ -7701,7 +7839,8 @@
         "duration": 5,
         "chance": 0.5
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "holy_shove",
@@ -7734,7 +7873,8 @@
         "duration": 0,
         "chance": 0.6
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "nature_pierce",
@@ -7767,7 +7907,8 @@
         "duration": 4,
         "chance": 0.6
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "poison_lunge",
@@ -7800,7 +7941,8 @@
         "duration": 5,
         "chance": 0.8
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "arcane_shield_bash",
@@ -7838,7 +7980,8 @@
         "duration": 2,
         "chance": 0.35
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "fire_wall",
@@ -7873,7 +8016,8 @@
         "damageType": "fire",
         "chance": 0.5
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "wind_cut",
@@ -7906,7 +8050,8 @@
         "duration": 3,
         "chance": 0.5
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "grounded_strike",
@@ -7939,7 +8084,8 @@
         "duration": 5,
         "chance": 0.5
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "silent_prayer",
@@ -7967,7 +8113,8 @@
         "duration": 8,
         "chance": 1.0
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "focused_rest",
@@ -7999,7 +8146,8 @@
         "duration": 5,
         "chance": 0.5
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "hunter_mark",
@@ -8027,7 +8175,8 @@
         "duration": 10,
         "chance": 1.0
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "stalking_shadow",
@@ -8061,7 +8210,8 @@
         "duration": 5,
         "chance": 0.5
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "divine_reflection",
@@ -8097,7 +8247,8 @@
         "duration": 10,
         "chance": 0.8
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "penitent_strike",
@@ -8138,7 +8289,8 @@
         "magnitude": 1,
         "chance": 0.35
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "atonement",
@@ -8172,7 +8324,8 @@
         "duration": 8,
         "chance": 0.5
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "judgment_field",
@@ -8205,7 +8358,8 @@
         "duration": 5,
         "chance": 0.7
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "spirit_walk",
@@ -8239,7 +8393,8 @@
         "duration": 15,
         "chance": 1.0
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "proc_poison_weak",
@@ -8664,7 +8819,8 @@
         "targets": "single_enemy",
         "chance": 0.75
       }
-    ]
+    ],
+    "isChildSkill": true
   },
   {
     "id": "bloodlust",

@@ -111,6 +111,32 @@ app.post('/api/admin/data/enemies', (req, res) => {
         res.status(500).json({ error: 'Failed to save enemies: ' + error.message });
     }
 });
+
+app.get('/api/admin/data/skills', (req, res) => {
+    try {
+        const filePath = getDataFilePath('skills.json');
+        const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+        res.json(data);
+    } catch (error) {
+        console.error('[EDITOR] Error reading skills:', error);
+        res.status(500).json({ error: 'Failed to read skills: ' + error.message });
+    }
+});
+
+app.post('/api/admin/data/skills', (req, res) => {
+    try {
+        const newData = req.body;
+        const filePath = getDataFilePath('skills.json');
+        fs.writeFileSync(filePath, JSON.stringify(newData, null, 2), 'utf8');
+        console.log('[EDITOR] ✅ Skills saved successfully.');
+        if (typeof loadGameData === 'function') loadGameData();
+        if (typeof resetCombatEngine === 'function') resetCombatEngine();
+        res.json({ success: true, message: 'Skills saved!' });
+    } catch (error) {
+        console.error('[EDITOR] Error saving skills:', error);
+        res.status(500).json({ error: 'Failed to save skills: ' + error.message });
+    }
+});
 // ==========================================
 
 // --- EXISTING ROUTES (Restored) ---
@@ -158,6 +184,8 @@ async function start() {
             console.log(`POST /api/admin/data/challenges - Save challenges JSON`);
             console.log(`GET  /api/admin/data/enemies - Get enemy types JSON`);
             console.log(`POST /api/admin/data/enemies - Save enemy types JSON`);
+            console.log(`GET  /api/admin/data/skills - Get skills JSON`);
+            console.log(`POST /api/admin/data/skills - Save skills JSON`);
             
             console.log(`\n--- STATIC FILES ---`);
             console.log(`Serving ROOT directory.`);

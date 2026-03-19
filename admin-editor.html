@@ -88,21 +88,23 @@
      SKILL EFFECT MODAL
      ═══════════════════════════════════════════════════════════ -->
 <div id="effectModal" class="modal">
-    <div class="modal-content">
+    <div class="modal-content" style="max-width:680px;">
         <span class="close-modal" onclick="closeModal('effectModal')">&times;</span>
         <h3>Edit Skill Effect</h3>
         <input type="hidden" id="effect-idx">
         <div class="form-row">
             <div>
                 <label>Effect Type</label>
-                <select id="eff-type">
+                <select id="eff-type" onchange="updateEffectFieldVisibility()">
                     <option value="damage">Damage</option>
                     <option value="heal">Heal</option>
                     <option value="apply_buff">Apply Buff</option>
                     <option value="apply_debuff">Apply Debuff</option>
-                    <option value="apply_status">Apply Status</option>
                     <option value="restore_resource">Restore Resource</option>
-                    <option value="defense">Defense</option>
+                    <option value="lifetap">Lifetap</option>
+                    <option value="dispel">Dispel</option>
+                    <option value="cleanse">Cleanse</option>
+                    <option value="utility">Utility</option>
                 </select>
             </div>
             <div>
@@ -115,41 +117,91 @@
                     <option value="all_allies">All Allies</option>
                 </select>
             </div>
+            <div>
+                <label>Chance (0–1)</label>
+                <select id="eff-chance">
+                    <option value="1.0">1.0 (Always)</option>
+                    <option value="0.9">0.9 (90%)</option>
+                    <option value="0.85">0.85 (85%)</option>
+                    <option value="0.8">0.8 (80%)</option>
+                    <option value="0.75">0.75 (75%)</option>
+                    <option value="0.7">0.7 (70%)</option>
+                    <option value="0.65">0.65 (65%)</option>
+                    <option value="0.6">0.6 (60%)</option>
+                    <option value="0.55">0.55 (55%)</option>
+                    <option value="0.5">0.5 (50%)</option>
+                    <option value="0.45">0.45 (45%)</option>
+                    <option value="0.4">0.4 (40%)</option>
+                    <option value="0.35">0.35 (35%)</option>
+                    <option value="0.3">0.3 (30%)</option>
+                    <option value="0.25">0.25 (25%)</option>
+                    <option value="0.15">0.15 (15%)</option>
+                    <option value="0.1">0.1 (10%)</option>
+                </select>
+            </div>
         </div>
-        <div class="form-row">
+
+        <!-- Damage fields -->
+        <div id="eff-damage-fields" class="form-row">
             <div>
                 <label>Damage Type</label>
                 <select id="eff-dmgtype">
                     <option value="physical">Physical</option>
-                    <option value="magic">Magic</option>
+                    <option value="slashing">Slashing</option>
+                    <option value="piercing">Piercing</option>
+                    <option value="bludgeoning">Bludgeoning</option>
                     <option value="fire">Fire</option>
-                    <option value="ice">Ice</option>
-                    <option value="lightning">Lightning</option>
+                    <option value="cold">Cold</option>
+                    <option value="electric">Electric</option>
                     <option value="poison">Poison</option>
+                    <option value="shadow">Shadow</option>
+                    <option value="arcane">Arcane</option>
                     <option value="holy">Holy</option>
+                    <option value="nature">Nature</option>
                     <option value="">N/A</option>
                 </select>
             </div>
-            <div><label>Magnitude</label><input type="number" step="0.1" id="eff-magnitude" value="1.0"></div>
-            <div><label>Duration (turns)</label><input type="number" id="eff-duration" value="0" placeholder="0 = instant"></div>
+            <div><label>Ignore Armor (0–1)</label><input type="number" id="eff-ignorearmor" step="0.1" min="0" max="1" value="0" placeholder="0 = full armor applies"></div>
         </div>
-        <div class="form-row">
-            <div>
-                <label>Buff / Debuff / Status ID</label>
-                <input type="text" id="eff-buff" placeholder="e.g., poison_weapon">
+
+        <!-- Buff/Debuff fields -->
+        <div id="eff-buff-fields" class="form-row" style="display:none;">
+            <div style="grid-column:span 2;">
+                <label>Status ID</label>
+                <div style="display:flex;gap:8px;">
+                    <input type="text" id="eff-buff-search" placeholder="Search statuses..." oninput="filterStatusDropdown()" style="flex:1;">
+                    <select id="eff-buff" size="6" style="flex:2; font-family:monospace; font-size:0.82rem;"></select>
+                </div>
             </div>
+            <div><label>Duration (turns)</label><input type="number" id="eff-duration" value="2" min="0"></div>
+        </div>
+
+        <!-- Resource fields -->
+        <div id="eff-resource-fields" class="form-row" style="display:none;">
             <div>
-                <label>Scales By</label>
-                <select id="eff-scalesby">
-                    <option value="basePower">Base Power</option>
-                    <option value="conviction">Conviction</option>
-                    <option value="endurance">Endurance</option>
-                    <option value="ambition">Ambition</option>
-                    <option value="harmony">Harmony</option>
-                    <option value="">None</option>
+                <label>Resource</label>
+                <select id="eff-resource">
+                    <option value="stamina">Stamina</option>
+                    <option value="mana">Mana</option>
                 </select>
             </div>
         </div>
+
+        <!-- Magnitude + Scales By — shown for heal, damage (magnitude), restore, lifetap -->
+        <div id="eff-magnitude-fields" class="form-row">
+            <div><label>Magnitude</label><input type="number" step="0.05" id="eff-magnitude" value="1.0"></div>
+            <div>
+                <label>Scales By</label>
+                <select id="eff-scalesby">
+                    <option value="harmony">Harmony</option>
+                    <option value="conviction">Conviction</option>
+                    <option value="endurance">Endurance</option>
+                    <option value="ambition">Ambition</option>
+                    <option value="basePower">Base Power</option>
+                </select>
+            </div>
+        </div>
+
         <button class="btn btn-success" style="width:100%;margin-top:20px;" onclick="confirmSaveEffect()">Save Effect</button>
     </div>
 </div>
@@ -243,7 +295,32 @@
                 <h2>Select Skill</h2>
                 <button class="btn btn-primary" onclick="createNewSkill()">+ New Skill</button>
             </div>
-            <select id="skill-select" onchange="loadSkill()" style="margin-top:10px;"></select>
+            <div class="form-row" style="margin-top:10px;">
+                <div><label>Search</label><input type="text" id="skill-search" placeholder="Name or ID..." oninput="filterSkillDropdown()"></div>
+                <div><label>Category</label>
+                    <select id="skill-cat-filter" onchange="filterSkillDropdown()">
+                        <option value="">All Categories</option>
+                        <option>DAMAGE_SINGLE</option><option>DAMAGE_MAGIC</option><option>DAMAGE_AOE</option>
+                        <option>HEALING</option><option>HEALING_AOE</option><option>BUFF</option>
+                        <option>DEFENSE</option><option>CONTROL</option><option>RESTORATION</option>
+                        <option>UTILITY</option><option>NO_RESOURCES</option><option>CONSUMABLE_HEALING</option>
+                        <option>CONSUMABLE_DAMAGE</option><option>CONSUMABLE_RESTORATION</option>
+                        <option>CONSUMABLE_ESCAPE</option><option>WEAPON_SKILL</option><option>TRAP</option>
+                        <option>DAMAGE_PROC</option><option>CONTROL_PROC</option><option>DEFENSE_PROC</option>
+                        <option>HEALING_PROC</option><option>UTILITY_PROC</option><option>PROGRESSION</option>
+                    </select>
+                </div>
+                <div><label>Type</label>
+                    <select id="skill-type-filter" onchange="filterSkillDropdown()">
+                        <option value="">All</option>
+                        <option value="starter">⭐ Starter</option>
+                        <option value="child">🔮 Child</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+            </div>
+            <select id="skill-select" onchange="loadSkill()" size="12" style="margin-top:8px; width:100%; font-family:monospace; font-size:0.85rem;"></select>
+            <div id="skill-count" style="color:#888; font-size:0.78rem; margin-top:4px;"></div>
         </div>
 
         <div id="skill-editor" style="display:none;">
@@ -260,17 +337,24 @@
                             <option value="DAMAGE_AOE">Damage AOE</option>
                             <option value="DAMAGE_PROC">Damage Proc</option>
                             <option value="HEALING">Healing</option>
+                            <option value="HEALING_AOE">Healing AOE</option>
+                            <option value="HEALING_PROC">Healing Proc</option>
                             <option value="RESTORATION">Restoration</option>
                             <option value="BUFF">Buff</option>
                             <option value="DEFENSE">Defense</option>
-                            <option value="UTILITY">Utility</option>
+                            <option value="DEFENSE_PROC">Defense Proc</option>
+                            <option value="CONTROL">Control</option>
                             <option value="CONTROL_PROC">Control Proc</option>
+                            <option value="UTILITY">Utility</option>
+                            <option value="UTILITY_PROC">Utility Proc</option>
+                            <option value="TRAP">Trap</option>
                             <option value="CONSUMABLE_HEALING">Consumable Healing</option>
                             <option value="CONSUMABLE_DAMAGE">Consumable Damage</option>
                             <option value="CONSUMABLE_RESTORATION">Consumable Restoration</option>
                             <option value="CONSUMABLE_ESCAPE">Consumable Escape</option>
                             <option value="NO_RESOURCES">No Resources</option>
                             <option value="WEAPON_SKILL">Weapon Skill</option>
+                            <option value="PROGRESSION">Progression</option>
                         </select>
                     </div>
                 </div>
@@ -295,13 +379,15 @@
                     <div class="form-row">
                         <div>
                             <label>Parent Skill 1</label>
-                            <select id="sk-parent1">
+                            <input type="text" id="sk-parent1-search" placeholder="Search..." oninput="filterParentDropdown('sk-parent1','sk-parent1-search')" style="margin-bottom:4px;">
+                            <select id="sk-parent1" size="5" style="font-family:monospace;font-size:0.82rem;">
                                 <option value="">-- Select --</option>
                             </select>
                         </div>
                         <div>
                             <label>Parent Skill 2</label>
-                            <select id="sk-parent2">
+                            <input type="text" id="sk-parent2-search" placeholder="Search..." oninput="filterParentDropdown('sk-parent2','sk-parent2-search')" style="margin-bottom:4px;">
+                            <select id="sk-parent2" size="5" style="font-family:monospace;font-size:0.82rem;">
                                 <option value="">-- Select --</option>
                             </select>
                         </div>
@@ -325,8 +411,21 @@
                     <div><label>Cost Amount</label><input type="number" id="sk-costamt" value="5"></div>
                     <div><label>Hit Chance (0–1)</label><input type="number" id="sk-hitchance" step="0.01" value="0.95"></div>
                     <div><label>Crit Chance (0–1)</label><input type="number" id="sk-critchance" step="0.01" value="0.05"></div>
+                    <div><label>Crit Multiplier</label><input type="number" id="sk-critmult" step="0.1" value="1.5"></div>
                     <div><label>Delay (ms)</label><input type="number" id="sk-delay" value="1000"></div>
-                    <div><label>Hit Count</label><input type="number" id="sk-hitcount" value="1"></div>
+                    <div><label>Mastery Unlock At</label><input type="number" id="sk-masteryunlock" value="0"></div>
+                </div>
+                <div class="form-row" style="margin-top:8px;">
+                    <div>
+                        <label>Hit Count Type</label>
+                        <select id="sk-hitcount-type" onchange="toggleHitCountFields()">
+                            <option value="fixed">Fixed</option>
+                            <option value="range">Range</option>
+                        </select>
+                    </div>
+                    <div id="hitcount-fixed-wrap"><label>Hits</label><input type="number" id="sk-hitcount" value="1" min="1"></div>
+                    <div id="hitcount-min-wrap" style="display:none"><label>Min Hits</label><input type="number" id="sk-hitcount-min" value="1" min="1"></div>
+                    <div id="hitcount-max-wrap" style="display:none"><label>Max Hits</label><input type="number" id="sk-hitcount-max" value="3" min="1"></div>
                 </div>
 
                 <h3>Scaling Factors</h3>
@@ -563,16 +662,81 @@ function populateDropdowns() {
     enemiesData.forEach((e,i) => eSelect.innerHTML += `<option value="${i}">${e.name} (${e.id})</option>`);
 }
 
-function populateSkillDropdown() {
-    const sel = document.getElementById('skill-select');
-    sel.innerHTML = '<option value="">-- Select --</option>';
+function populateSkillDropdown() { filterSkillDropdown(); }
+
+function filterSkillDropdown() {
+    const search  = (document.getElementById('skill-search')?.value || '').toLowerCase();
+    const catF    = document.getElementById('skill-cat-filter')?.value || '';
+    const typeF   = document.getElementById('skill-type-filter')?.value || '';
+    const sel     = document.getElementById('skill-select');
+    sel.innerHTML = '';
+    let count = 0;
     [...skillsData]
-        .sort((a,b) => a.name.localeCompare(b.name))
-        .forEach((s,i) => {
-            const realIdx = skillsData.indexOf(s);
+        .map((s, i) => ({ s, i }))
+        .sort((a, b) => a.s.name.localeCompare(b.s.name))
+        .forEach(({ s, i }) => {
+            if (catF  && s.category !== catF) return;
+            if (typeF === 'starter' && !s.isStarterSkill) return;
+            if (typeF === 'child'   && !s.isChildSkill)   return;
+            if (typeF === 'other'   && (s.isStarterSkill || s.isChildSkill)) return;
+            if (search && !s.name.toLowerCase().includes(search) && !s.id.toLowerCase().includes(search)) return;
             const tag = s.isStarterSkill ? '⭐ ' : s.isChildSkill ? '🔮 ' : '';
-            sel.innerHTML += `<option value="${realIdx}">${tag}${s.name} (${s.id})</option>`;
+            const opt = document.createElement('option');
+            opt.value = i;
+            opt.textContent = `${tag}${s.name} (${s.id})`;
+            sel.appendChild(opt);
+            count++;
         });
+    const countEl = document.getElementById('skill-count');
+    if (countEl) countEl.textContent = `${count} skill${count !== 1 ? 's' : ''} shown`;
+}
+
+let _statusDataCache = null;
+function _getAllStatuses() {
+    if (_statusDataCache) return _statusDataCache;
+    // Build from skills data buff/debuff values as fallback
+    return [];
+}
+
+function populateStatusDropdown(selectedValue) {
+    const sel = document.getElementById('eff-buff');
+    if (!sel) return;
+    // We'll populate from a known list since we have it
+    const ALL_STATUSES = ["all_stats","ambition_edge","ambition_falter","amplify","arcane_burn","armor_break","attack_boost","barrier","berserker_stance_buff","bleed","blind","bloodlust_buff","burn","chilled","confused","conviction_drain","conviction_surge","counter_ready","cursed","cursed_blood","dazed","deep_wound","defense","echo","electrified","endurance_crack","endurance_shield","evasion_boost","exhaustion","focus","fortify_buff","fortitude","freeze","harmony","harmony_bond","harmony_discord","haste","knockback","life_leech","loot_luck","mana_burn","marked","poison","poison_deadly","poison_strong","poison_weak","poison_weapon","protection","provoked","regen","shadowed","silence","siphon_ward","sleep","slow","speed_boost","spell_amplification","stealth","strength","stun","stun_weapon","taunt","unity","weaken"];
+    const search = (document.getElementById('eff-buff-search')?.value || '').toLowerCase();
+    sel.innerHTML = '';
+    ALL_STATUSES.filter(s => !search || s.includes(search)).forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s;
+        opt.textContent = s;
+        if (s === selectedValue) opt.selected = true;
+        sel.appendChild(opt);
+    });
+}
+
+function filterStatusDropdown() {
+    const current = document.getElementById('eff-buff')?.value;
+    populateStatusDropdown(current);
+}
+
+function updateEffectFieldVisibility() {
+    const type = document.getElementById('eff-type').value;
+    const showDamage   = ['damage'].includes(type);
+    const showBuff     = ['apply_buff','apply_debuff'].includes(type);
+    const showResource = ['restore_resource'].includes(type);
+    const showMagnitude = !['dispel','cleanse','utility'].includes(type);
+    document.getElementById('eff-damage-fields').style.display  = showDamage   ? '' : 'none';
+    document.getElementById('eff-buff-fields').style.display    = showBuff     ? '' : 'none';
+    document.getElementById('eff-resource-fields').style.display = showResource ? '' : 'none';
+    document.getElementById('eff-magnitude-fields').style.display = showMagnitude ? '' : 'none';
+    if (showBuff) populateStatusDropdown(document.getElementById('eff-buff')?.value || '');
+}
+
+function toggleHitCountFields() {
+    const type = document.getElementById('sk-hitcount-type').value;
+    document.getElementById('hitcount-fixed-wrap').style.display = type === 'fixed' ? '' : 'none';
+    document.getElementById('hitcount-min-wrap').style.display   = type === 'range' ? '' : 'none';
+    document.getElementById('hitcount-max-wrap').style.display   = type === 'range' ? '' : 'none';
 }
 
 function populateItemDropdown() {
@@ -873,16 +1037,36 @@ function toggleChildFields() {
     document.getElementById('child-skill-fields').style.display = isChild ? 'block' : 'none';
 }
 
-function populateParentSkillDropdowns() {
-    ['sk-parent1','sk-parent2'].forEach(id => {
+function populateParentSkillDropdowns(search1, search2) {
+    ['sk-parent1','sk-parent2'].forEach((id, i) => {
         const sel = document.getElementById(id);
         const current = sel.value;
+        const search = (i === 0 ? search1 : search2) || '';
         sel.innerHTML = '<option value="">-- None --</option>';
-        skillsData.forEach(s => {
-            sel.innerHTML += `<option value="${s.id}">${s.name} (${s.id})</option>`;
-        });
+        [...skillsData]
+            .sort((a,b) => a.name.localeCompare(b.name))
+            .filter(s => !search || s.name.toLowerCase().includes(search.toLowerCase()) || s.id.toLowerCase().includes(search.toLowerCase()))
+            .forEach(s => {
+                const tag = s.isStarterSkill ? '⭐ ' : s.isChildSkill ? '🔮 ' : '';
+                sel.innerHTML += `<option value="${s.id}">${tag}${s.name} (${s.id})</option>`;
+            });
         sel.value = current;
     });
+}
+
+function filterParentDropdown(selectId, searchId) {
+    const search = document.getElementById(searchId)?.value || '';
+    const sel = document.getElementById(selectId);
+    const current = sel.value;
+    sel.innerHTML = '<option value="">-- None --</option>';
+    [...skillsData]
+        .sort((a,b) => a.name.localeCompare(b.name))
+        .filter(s => !search || s.name.toLowerCase().includes(search.toLowerCase()) || s.id.toLowerCase().includes(search.toLowerCase()))
+        .forEach(s => {
+            const tag = s.isStarterSkill ? '⭐ ' : s.isChildSkill ? '🔮 ' : '';
+            sel.innerHTML += `<option value="${s.id}">${tag}${s.name} (${s.id})</option>`;
+        });
+    sel.value = current;
 }
 
 function createNewSkill() {
@@ -900,8 +1084,14 @@ function createNewSkill() {
     document.getElementById('sk-costamt').value = '5';
     document.getElementById('sk-hitchance').value = '0.95';
     document.getElementById('sk-critchance').value = '0.05';
+    document.getElementById('sk-critmult').value = '1.5';
     document.getElementById('sk-delay').value = '1000';
+    document.getElementById('sk-masteryunlock').value = '0';
+    document.getElementById('sk-hitcount-type').value = 'fixed';
     document.getElementById('sk-hitcount').value = '1';
+    document.getElementById('sk-hitcount-min').value = '1';
+    document.getElementById('sk-hitcount-max').value = '3';
+    toggleHitCountFields();
     document.getElementById('sk-sc-conviction').value = '0';
     document.getElementById('sk-sc-endurance').value = '0';
     document.getElementById('sk-sc-ambition').value = '0';
@@ -932,8 +1122,19 @@ function loadSkill() {
     document.getElementById('sk-costamt').value = s.costAmount ?? 5;
     document.getElementById('sk-hitchance').value = s.baseHitChance ?? 0.95;
     document.getElementById('sk-critchance').value = s.critChance ?? 0.05;
+    document.getElementById('sk-critmult').value = s.critMultiplier ?? 1.5;
     document.getElementById('sk-delay').value = s.delay ?? 1000;
-    document.getElementById('sk-hitcount').value = s.hitCount?.fixed ?? 1;
+    document.getElementById('sk-masteryunlock').value = s.masteryUnlockAt ?? 0;
+    // hitCount — fixed or range
+    if (s.hitCount?.min !== undefined) {
+        document.getElementById('sk-hitcount-type').value = 'range';
+        document.getElementById('sk-hitcount-min').value = s.hitCount.min;
+        document.getElementById('sk-hitcount-max').value = s.hitCount.max;
+    } else {
+        document.getElementById('sk-hitcount-type').value = 'fixed';
+        document.getElementById('sk-hitcount').value = s.hitCount?.fixed ?? 1;
+    }
+    toggleHitCountFields();
     document.getElementById('sk-sc-conviction').value = s.scalingFactors?.conviction ?? 0;
     document.getElementById('sk-sc-endurance').value = s.scalingFactors?.endurance ?? 0;
     document.getElementById('sk-sc-ambition').value = s.scalingFactors?.ambition ?? 0;
@@ -955,12 +1156,22 @@ function renderEffectsList() {
     const list = document.getElementById('sk-effects-list');
     list.innerHTML = '';
     currentSkillEffects.forEach((eff, i) => {
+        const statusId = eff.buff || eff.debuff || '';
+        const extras = [
+            eff.damageType ? eff.damageType : '',
+            statusId ? statusId : '',
+            eff.resource ? eff.resource : '',
+            eff.magnitude !== undefined ? `mag:${eff.magnitude}` : '',
+            eff.duration  ? `${eff.duration}t` : '',
+            eff.chance !== undefined && eff.chance < 1 ? `${Math.round(eff.chance*100)}%` : '',
+            eff.ignoreArmor ? `ignore:${eff.ignoreArmor}` : '',
+        ].filter(Boolean).join(' ');
         list.innerHTML += `
             <li class="list-item">
-                <span><strong>${eff.type}</strong> → ${eff.targets} ${eff.damageType ? '('+eff.damageType+')' : ''} mag:${eff.magnitude||0} dur:${eff.duration||0}</span>
+                <span><strong>${eff.type}</strong> → <em>${eff.targets}</em> ${extras}</span>
                 <div>
                     <button class="btn btn-primary btn-sm" onclick="openEffectModal(${i})">Edit</button>
-                    <button class="btn btn-danger btn-sm" onclick="removeEffect(${i})">X</button>
+                    <button class="btn btn-danger btn-sm" onclick="removeEffect(${i})">✕</button>
                 </div>
             </li>`;
     });
@@ -968,24 +1179,19 @@ function renderEffectsList() {
 
 function openEffectModal(idx) {
     document.getElementById('effect-idx').value = idx === null ? '' : idx;
-    if (idx !== null && currentSkillEffects[idx]) {
-        const eff = currentSkillEffects[idx];
-        document.getElementById('eff-type').value      = eff.type || 'damage';
-        document.getElementById('eff-targets').value   = eff.targets || 'single_enemy';
-        document.getElementById('eff-dmgtype').value   = eff.damageType || '';
-        document.getElementById('eff-magnitude').value = eff.magnitude ?? 1.0;
-        document.getElementById('eff-duration').value  = eff.duration ?? 0;
-        document.getElementById('eff-buff').value      = eff.buff || eff.debuff || eff.status || '';
-        document.getElementById('eff-scalesby').value  = eff.scalesBy || 'basePower';
-    } else {
-        document.getElementById('eff-type').value      = 'damage';
-        document.getElementById('eff-targets').value   = 'single_enemy';
-        document.getElementById('eff-dmgtype').value   = 'physical';
-        document.getElementById('eff-magnitude').value = '1.0';
-        document.getElementById('eff-duration').value  = '0';
-        document.getElementById('eff-buff').value      = '';
-        document.getElementById('eff-scalesby').value  = 'basePower';
-    }
+    const eff = (idx !== null && currentSkillEffects[idx]) ? currentSkillEffects[idx] : {};
+    document.getElementById('eff-type').value       = eff.type     || 'damage';
+    document.getElementById('eff-targets').value    = eff.targets  || 'single_enemy';
+    document.getElementById('eff-chance').value     = String(eff.chance ?? 1.0);
+    document.getElementById('eff-dmgtype').value    = eff.damageType || 'physical';
+    document.getElementById('eff-ignorearmor').value = eff.ignoreArmor ?? 0;
+    document.getElementById('eff-magnitude').value  = eff.magnitude  ?? 1.0;
+    document.getElementById('eff-duration').value   = eff.duration   ?? 2;
+    document.getElementById('eff-resource').value   = eff.resource   || 'stamina';
+    document.getElementById('eff-scalesby').value   = eff.scalesBy   || 'harmony';
+    // Populate status dropdown and select current value
+    populateStatusDropdown(eff.buff || eff.debuff || '');
+    updateEffectFieldVisibility();
     openModal('effectModal');
 }
 
@@ -993,23 +1199,44 @@ function confirmSaveEffect() {
     const idxVal = document.getElementById('effect-idx').value;
     const idx    = idxVal === '' ? null : parseInt(idxVal);
     const type   = document.getElementById('eff-type').value;
+
     const eff = {
         type,
-        targets:    document.getElementById('eff-targets').value,
-        magnitude:  parseFloat(document.getElementById('eff-magnitude').value) || 0,
+        targets:  document.getElementById('eff-targets').value,
+        chance:   parseFloat(document.getElementById('eff-chance').value) || 1.0,
     };
-    const dmgtype = document.getElementById('eff-dmgtype').value;
-    if (dmgtype) eff.damageType = dmgtype;
-    const duration = parseInt(document.getElementById('eff-duration').value) || 0;
-    if (duration > 0) eff.duration = duration;
-    const buffVal = document.getElementById('eff-buff').value.trim();
-    if (buffVal) {
-        if (type === 'apply_buff')   eff.buff   = buffVal;
-        if (type === 'apply_debuff') eff.debuff = buffVal;
-        if (type === 'apply_status') eff.status = buffVal;
+
+    // Magnitude + scalesBy — most types
+    if (!['dispel','cleanse','utility'].includes(type)) {
+        const mag = parseFloat(document.getElementById('eff-magnitude').value);
+        if (!isNaN(mag)) eff.magnitude = mag;
+        const sb = document.getElementById('eff-scalesby').value;
+        if (sb) eff.scalesBy = sb;
     }
-    const scalesBy = document.getElementById('eff-scalesby').value;
-    if (scalesBy) eff.scalesBy = scalesBy;
+
+    // Damage-specific
+    if (type === 'damage') {
+        const dt = document.getElementById('eff-dmgtype').value;
+        if (dt) eff.damageType = dt;
+        const ia = parseFloat(document.getElementById('eff-ignorearmor').value);
+        if (ia > 0) eff.ignoreArmor = ia;
+    }
+
+    // Buff/debuff
+    if (type === 'apply_buff' || type === 'apply_debuff') {
+        const statusId = document.getElementById('eff-buff').value;
+        if (statusId) {
+            if (type === 'apply_buff')   eff.buff   = statusId;
+            if (type === 'apply_debuff') eff.debuff = statusId;
+        }
+        const dur = parseInt(document.getElementById('eff-duration').value);
+        if (!isNaN(dur)) eff.duration = dur;
+    }
+
+    // Resource restore
+    if (type === 'restore_resource') {
+        eff.resource = document.getElementById('eff-resource').value;
+    }
 
     if (idx !== null) currentSkillEffects[idx] = eff;
     else currentSkillEffects.push(eff);
@@ -1050,10 +1277,16 @@ function buildSkillFromForm() {
         },
         baseHitChance: parseFloat(document.getElementById('sk-hitchance').value)  || 0.95,
         critChance:    parseFloat(document.getElementById('sk-critchance').value) || 0.05,
+        critMultiplier: parseFloat(document.getElementById('sk-critmult').value) || 1.5,
         delay:         parseInt(document.getElementById('sk-delay').value)        || 1000,
-        hitCount:      { fixed: parseInt(document.getElementById('sk-hitcount').value) || 1 },
+        hitCount:      document.getElementById('sk-hitcount-type').value === 'range'
+            ? { min: parseInt(document.getElementById('sk-hitcount-min').value) || 1,
+                max: parseInt(document.getElementById('sk-hitcount-max').value) || 3 }
+            : { fixed: parseInt(document.getElementById('sk-hitcount').value) || 1 },
         effects:       currentSkillEffects,
     };
+    const masteryUnlock = parseInt(document.getElementById('sk-masteryunlock').value) || 0;
+    if (masteryUnlock > 0) skill.masteryUnlockAt = masteryUnlock;
 
     if (document.getElementById('sk-isStarter').checked) skill.isStarterSkill = true;
     if (isChild) {
