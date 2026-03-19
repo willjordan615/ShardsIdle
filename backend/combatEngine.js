@@ -735,9 +735,9 @@ class CombatEngine {
     const baseGold = challenge?.rewards?.baseGold || 50;
     const lootTable = challenge?.rewards?.lootTable || [];
 
-    // XP scaled by harmony, with diminishing returns for larger parties
-    // Solo = 100%, 2-person = ~71%, 3-person = ~58%, 4-person = 50%
-    const partyScale = 1 / Math.sqrt(players.length || 1);
+    // XP with diminishing returns for larger parties
+    // Solo=100%, 2-person=67%, 3-person=50%, 4-person=40%
+    const partyScale = 1 / (1 + 0.5 * (players.length - 1));
     players.forEach(player => {
         const xpReward = Math.floor(baseXP * partyScale * (1 + (player.stats?.harmony || 0) / 250));
         rewards.experienceGained[player.id] = xpReward;
@@ -1458,8 +1458,15 @@ class CombatEngine {
         if (childSkill.category === 'HEALING' || childSkill.category === 'RESTORATION') {
             const lowHPAlly = players.find(p => !p.defeated && p.currentHP < p.maxHP);
             target = lowHPAlly ? lowHPAlly.id : character.id;
-        } else if (!target && aliveEnemies.length > 0) {
-            target = aliveEnemies.reduce((min, e) => e.currentHP < min.currentHP ? e : min).id;
+        } else if (childSkill.category === 'BUFF' || childSkill.category === 'DEFENSE') {
+            // Buff/defense skills always target self
+            target = character.id;
+        } else if (aliveEnemies.length > 0) {
+            // Damage/control skills — always target an enemy, never inherit a self-target
+            const isDamageCat = childSkill.category && (childSkill.category.includes('DAMAGE') || childSkill.category.includes('CONTROL'));
+            if (isDamageCat || !target || target === character.id) {
+                target = aliveEnemies.reduce((min, e) => e.currentHP < min.currentHP ? e : min).id;
+            }
         }
 
         // Consumable logic (unchanged)

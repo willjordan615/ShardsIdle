@@ -132,10 +132,11 @@
                     <button onclick="openCombatHistoryModal()" class="secondary" style="font-size:0.8rem; padding:4px 12px;">📜 Combat History</button>
                 </div>
             </div>
-            <p id="detailRace" style="color: #8b7355; margin-bottom: 2rem;">Race</p>
+            <p id="detailRace" style="color: #8b7355; margin-bottom: 1rem;">Race</p>
 
-            <div class="grid-2">
-                <div>
+            <div class="detail-layout">
+                <!-- Column 1: Stats + Progression -->
+                <div class="detail-col-stats">
                     <div class="section derived-stats-section">
                         <div class="derived-grid">
                             <div class="derived-item">
@@ -189,8 +190,8 @@
                     </div>
                 </div>
 
-                <div>
-                    <!-- Inline Gear Slots -->
+                <!-- Column 2: Gear + Belt -->
+                <div class="detail-col-gear">
                     <div class="section" style="margin-top:1rem;">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                             <h3 style="margin:0;">Gear</h3>
@@ -198,46 +199,45 @@
                         </div>
                         <div id="gearSlotDisplay"></div>
                     </div>
-
-                    <!-- Inline Belt Slots -->
                     <div class="section" style="margin-top:1rem;">
                         <h3 style="margin-bottom:10px;">Belt</h3>
                         <div id="beltSlotDisplay"></div>
                     </div>
                 </div>
-            </div>
 
-<!-- Inside the Character Details Screen -->
-<div class="section-title">Skills</div>
-<div id="skillDisplay" style="display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;">
-    <!-- Skills rendered here by JS -->
-</div>
-<!-- NEW: Container for the Confirm Button -->
-<div id="skillActionContainer" style="margin-bottom: 1rem; min-height: 40px;"></div>
+                <!-- Column 3: Skills + Combat Style -->
+                <div class="detail-col-skills">
+                    <div class="section-title">Skills</div>
+                    <div id="skillDisplay" style="display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;"></div>
+                    <div id="skillActionContainer" style="margin-bottom: 1rem; min-height: 40px;"></div>
 
-            <div class="section" style="margin-top: 1.5rem;">
-                <h3>Combat Style</h3>
-                <p style="color: #8b7355; margin-bottom: 1rem; font-size: 0.9rem;">How this character approaches combat decisions.</p>
-                <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
-                    <span id="aiProfileBadge" style="font-size: 1.1rem; font-weight: 600;"></span>
-                    <select id="aiProfileDetailSelect" style="flex: 1; min-width: 200px;">
-                        <option value="balanced">⚖️ Balanced — Adapts to the situation</option>
-                        <option value="aggressive">⚔️ Aggressive — Always pushes for the kill</option>
-                        <option value="cautious">🛡️ Cautious — Prioritises survival and defense</option>
-                        <option value="support">💚 Support — Heals and buffs allies first</option>
-                        <option value="disruptor">🌀 Disruptor — Focuses on debuffs and control</option>
-                        <option value="opportunist">🗡️ Opportunist — Exploits weaknesses and procs</option>
-                    </select>
-                    <button onclick="saveAiProfile()" class="secondary">Save Style</button>
+                    <div style="margin-top: 1rem;">
+                        <div class="loadout-slot loadout-slot--filled" style="cursor:pointer; position:relative; gap:12px;">
+                            <span class="loadout-slot__label" style="min-width:90px; flex-shrink:0;">Combat Style</span>
+                            <span class="loadout-slot__item" id="aiProfileBadge"></span>
+                            <select id="aiProfileDetailSelect"
+                                    onchange="saveAiProfile()"
+                                    style="position:absolute; inset:0; width:100%; height:100%; opacity:0; cursor:pointer; z-index:1; font-size:16px;">
+                                <option value="balanced">⚖️ Balanced — Adapts to the situation</option>
+                                <option value="aggressive">⚔️ Aggressive — Always pushes for the kill</option>
+                                <option value="cautious">🛡️ Cautious — Prioritises survival and defense</option>
+                                <option value="support">💚 Support — Heals and buffs allies first</option>
+                                <option value="disruptor">🌀 Disruptor — Focuses on debuffs and control</option>
+                                <option value="opportunist">🗡️ Opportunist — Exploits weaknesses and procs</option>
+                            </select>
+                        </div>
+                        <p id="aiProfileSaveMsg" style="color:#4cd964; font-size:0.75rem; min-height:1em; text-align:right; margin:2px 4px 0;"></p>
+                    </div>
                 </div>
-                <p id="aiProfileSaveMsg" style="color: #4cd964; margin-top: 0.5rem; font-size: 0.85rem; min-height: 1.2em;"></p>
             </div>
-            <div style="text-align: center; margin-top: 2rem;">
-                <button onclick="deleteCharacter(currentState.detailCharacterId)" class="danger">Delete Character</button>
-                <!-- ADDED: Share Character Button -->
-                <button onclick="openShareModal(currentState.detailCharacterId)" class="secondary" style="margin-left: 1rem;">📤 Share Character</button>
+
+            <!-- Character footer — always full width, outside column layout -->
+            <div class="detail-footer">
+                <button onclick="deleteCharacter(currentState.detailCharacterId)" class="danger">🗑 Delete Character</button>
+                <button onclick="openShareModal(currentState.detailCharacterId)" class="secondary">📤 Share Character</button>
             </div>
-        </div>
+
+        </div><!-- end #detail screen -->
 
         <!-- COMBAT HISTORY MODAL -->
         <div id="combatHistoryModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:2000; justify-content:center; align-items:center;">

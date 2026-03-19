@@ -670,26 +670,44 @@ async function renderRoster() {
             const characterClass = getCharacterClass(character, gameData.skills);
             
             const card = document.createElement('div');
-            card.className = 'card';
+            card.className = 'card roster-card';
             card.onclick = async () => await showCharacterDetail(character.id);
-            
+
+            // Top 3 non-intrinsic skills
             const skillNames = character.skills
+                .filter(s => !s.intrinsic)
                 .slice(0, 3)
                 .map(s => {
                     const skill = gameData.skills.find(sk => sk.id === s.skillID);
-                    return skill ? skill.name : 'Unknown';
+                    return skill ? skill.name : null;
                 })
-                .join(', ');
-            
+                .filter(Boolean);
+
+            // Equipped weapon
+            const weaponId = character.equipment?.mainHand;
+            const weaponDef = weaponId ? gameData.gear?.find(g => g.id === weaponId) : null;
+
+            // AI profile label
+            const profileLabels = {
+                balanced:'⚖️ Balanced', aggressive:'⚔️ Aggressive', cautious:'🛡️ Cautious',
+                support:'💚 Support', disruptor:'🌀 Disruptor', opportunist:'🗡️ Opportunist'
+            };
+            const profileLabel = profileLabels[character.aiProfile] || '⚖️ Balanced';
+
             card.innerHTML = `
-                <div class="card-title">
-                    <h3>${character.name}</h3>
-                    <div class="card-description" style="margin-bottom: 0.75rem; color: #d4af37; font-size: 0.8rem;">
-                        <strong>Skills:</strong> ${skillNames || 'None yet'}
-                    </div>
+                <div class="roster-card__header">
+                    <h3 class="roster-card__name">${character.name}</h3>
+                    <span class="roster-card__race">${race?.name || 'Unknown'}</span>
                 </div>
-                <div class="card-subtitle">Level ${character.level} • ${mentality} ${characterClass}</div>
-                <div class="card-description" style="margin-bottom: 1rem; color: #8b7355; font-style: italic;">${race ? race.name : 'Unknown'}</div>
+                <div class="roster-card__level">Level ${character.level} · ${characterClass}</div>
+                ${skillNames.length ? `
+                <div class="roster-card__skills">
+                    ${skillNames.map(n => `<span class="roster-card__skill-tag">${n}</span>`).join('')}
+                </div>` : ''}
+                <div class="roster-card__footer">
+                    <span class="roster-card__weapon">${weaponDef ? '⚔ ' + weaponDef.name : '⚔ Unarmed'}</span>
+                    <span class="roster-card__profile">${profileLabel}</span>
+                </div>
             `;
             container.appendChild(card);
         });
