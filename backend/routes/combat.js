@@ -172,14 +172,20 @@ router.post('/start', async (req, res) => {
                                 ...incoming,
                                 skillXP:    dbSkill.skillXP    ?? incoming.skillXP,
                                 skillLevel: dbSkill.skillLevel ?? incoming.skillLevel,
+                                // Always preserve intrinsic flag from DB — engine result may not include it
+                                ...(dbSkill.intrinsic ? { intrinsic: true } : {})
                             });
                         } else {
-                            // Level 1+ skills: engine result is authoritative
-                            finalSkills.push({ ...dbSkill, ...incoming });
+                            // Level 1+ skills: engine result is authoritative, but preserve intrinsic flag
+                            finalSkills.push({
+                                ...dbSkill,
+                                ...incoming,
+                                ...(dbSkill.intrinsic ? { intrinsic: true } : {})
+                            });
                         }
                         processedSkillIDs.add(dbSkill.skillID);
                     } else {
-                        // Skill exists in DB but NOT in result — keep exactly as-is
+                        // Skill exists in DB but NOT in result — keep exactly as-is (includes intrinsics)
                         finalSkills.push(dbSkill);
                         processedSkillIDs.add(dbSkill.skillID);
                     }

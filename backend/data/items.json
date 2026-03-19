@@ -16692,5 +16692,18 @@
     "extra_cost": null,
     "description": "A crude shamanic focus carved from bone.",
     "tier": -1
+  },
+  {
+    "id": "strange_mushrooms",
+    "name": "Strange Mushrooms",
+    "type": "consumable",
+    "slot_id1": "consumable",
+    "consumable": true,
+    "stackable": true,
+    "skillID": "bloodlust",
+    "effect_skillid": "bloodlust",
+    "description": "Pungent fungi favoured by Orc berserkers. Effects are unpredictable but undeniably powerful.",
+    "goldValue": 15,
+    "tier": 1
   }
 ]

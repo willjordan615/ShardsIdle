@@ -58,7 +58,10 @@ function createTables() {
                     equipment TEXT NOT NULL DEFAULT '{}',
                     skills TEXT NOT NULL DEFAULT '[]',
                     consumables TEXT NOT NULL DEFAULT '{}',
+                    consumableStash TEXT NOT NULL DEFAULT '{}',
                     inventory TEXT NOT NULL DEFAULT '[]',
+                    gold REAL NOT NULL DEFAULT 0,
+                    arcaneDust REAL NOT NULL DEFAULT 0,
                     unlockedCombos TEXT DEFAULT '[]',
                     combatStats TEXT DEFAULT '{}',
                     partyStats TEXT DEFAULT '{}',
@@ -185,10 +188,26 @@ async function initializeCharacterSnapshotsTable() {
                 if (err && !err.message.includes('duplicate column')) {
                     console.warn('[DATABASE] Migration note:', err.message);
                 }
-                resolve(); // always resolve — column may already exist
+                resolve();
             }
         );
     });
+
+    // Migration: add consumableStash, gold, arcaneDust columns
+    for (const [col, def] of [
+        ['consumableStash', "TEXT NOT NULL DEFAULT '{}'"],
+        ['gold',            'REAL NOT NULL DEFAULT 0'],
+        ['arcaneDust',      'REAL NOT NULL DEFAULT 0']
+    ]) {
+        await new Promise((resolve) => {
+            db.run(`ALTER TABLE characters ADD COLUMN ${col} ${def}`, (err) => {
+                if (err && !err.message.includes('duplicate column')) {
+                    console.warn(`[DATABASE] Migration note (${col}):`, err.message);
+                }
+                resolve();
+            });
+        });
+    }
 }
 
 function saveCombatLog(logData) {
@@ -309,17 +328,19 @@ function saveCharacter(character) {
             `INSERT INTO characters (
                 id, name, race, level, experience,
                 conviction, endurance, ambition, harmony,
-                equipment, skills, consumables, inventory,
+                equipment, skills, consumables, consumableStash, inventory,
+                gold, arcaneDust,
                 unlockedCombos, combatStats, partyStats,
                 ownerUserId, isPublic, shareCode, buildName, buildDescription,
                 importCount, lastSharedAt,
                 avatarId, avatarColor, avatarFrame, title, lastActiveAt,
                 createdAt, lastModified, lastSuccessfulChallengeId, aiProfile
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(id) DO UPDATE SET
                 name = ?, race = ?, level = ?, experience = ?,
                 conviction = ?, endurance = ?, ambition = ?, harmony = ?,
-                equipment = ?, skills = ?, consumables = ?, inventory = ?,
+                equipment = ?, skills = ?, consumables = ?, consumableStash = ?, inventory = ?,
+                gold = ?, arcaneDust = ?,
                 unlockedCombos = ?, combatStats = ?, partyStats = ?,
                 ownerUserId = ?, isPublic = ?, shareCode = ?, buildName = ?, buildDescription = ?,
                 importCount = ?, lastSharedAt = ?,
@@ -332,7 +353,10 @@ function saveCharacter(character) {
                 JSON.stringify(character.equipment || {}),
                 JSON.stringify(character.skills || []),
                 JSON.stringify(character.consumables || {}),
+                JSON.stringify(character.consumableStash || {}),
                 JSON.stringify(character.inventory || []),
+                character.gold || 0,
+                character.arcaneDust || 0,
                 JSON.stringify(character.unlockedCombos || []),
                 JSON.stringify(character.combatStats || {}),
                 JSON.stringify(character.partyStats || {}),
@@ -352,7 +376,10 @@ function saveCharacter(character) {
                 JSON.stringify(character.equipment || {}),
                 JSON.stringify(character.skills || []),
                 JSON.stringify(character.consumables || {}),
+                JSON.stringify(character.consumableStash || {}),
                 JSON.stringify(character.inventory || []),
+                character.gold || 0,
+                character.arcaneDust || 0,
                 JSON.stringify(character.unlockedCombos || []),
                 JSON.stringify(character.combatStats || {}),
                 JSON.stringify(character.partyStats || {}),
@@ -393,7 +420,10 @@ function getCharacter(characterId) {
                     equipment: JSON.parse(row.equipment || '{}'),
                     skills: JSON.parse(row.skills || '[]'),
                     consumables: JSON.parse(row.consumables || '{}'),
+                    consumableStash: JSON.parse(row.consumableStash || '{}'),
                     inventory: JSON.parse(row.inventory || '[]'),
+                    gold: row.gold || 0,
+                    arcaneDust: row.arcaneDust || 0,
                     unlockedCombos: JSON.parse(row.unlockedCombos || '[]'),
                     combatStats: JSON.parse(row.combatStats || '{}'),
                     partyStats: JSON.parse(row.partyStats || '{}'),
@@ -441,7 +471,10 @@ function getAllCharacters() {
                     equipment: JSON.parse(row.equipment || '{}'),
                     skills: JSON.parse(row.skills || '[]'),
                     consumables: JSON.parse(row.consumables || '{}'),
+                    consumableStash: JSON.parse(row.consumableStash || '{}'),
                     inventory: JSON.parse(row.inventory || '[]'),
+                    gold: row.gold || 0,
+                    arcaneDust: row.arcaneDust || 0,
                     unlockedCombos: JSON.parse(row.unlockedCombos || '[]'),
                     combatStats: JSON.parse(row.combatStats || '{}'),
                     partyStats: JSON.parse(row.partyStats || '{}'),

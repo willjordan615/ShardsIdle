@@ -22,7 +22,8 @@
         "chance": 1.0
       }
     ],
-    "masteryUnlockAt": 150
+    "masteryUnlockAt": 150,
+    "isStarterSkill": true
   },
   {
     "id": "prayer",
@@ -74,7 +75,8 @@
         "chance": 1.0
       }
     ],
-    "masteryUnlockAt": 150
+    "masteryUnlockAt": 150,
+    "isStarterSkill": true
   },
   {
     "id": "stalk",
@@ -8661,6 +8663,226 @@
         "magnitude": 1,
         "targets": "single_enemy",
         "chance": 0.75
+      }
+    ]
+  },
+  {
+    "id": "bloodlust",
+    "name": "Bloodlust",
+    "category": "BUFF",
+    "isStarterSkill": false,
+    "isChildSkill": false,
+    "description": "A primal surge of violent energy. Temporarily heightens conviction and aggression.",
+    "costType": "stamina",
+    "costAmount": 8,
+    "delay": 800,
+    "basePower": 1.0,
+    "baseHitChance": 1.0,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "targets": "self",
+        "buff": "bloodlust_buff",
+        "chance": 1.0,
+        "duration": 3,
+        "magnitude": 1
+      }
+    ]
+  },
+  {
+    "id": "blood_rage",
+    "name": "Blood Rage",
+    "category": "BUFF",
+    "isChildSkill": true,
+    "procChance": 0.1,
+    "parentSkills": [
+      "bloodlust",
+      "shout"
+    ],
+    "description": "The Orc's battle cry becomes supernaturally empowering. All allies gain a surge of conviction.",
+    "costType": "stamina",
+    "costAmount": 14,
+    "delay": 900,
+    "basePower": 1.0,
+    "baseHitChance": 1.0,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "targets": "all_allies",
+        "buff": "strength",
+        "chance": 1.0,
+        "duration": 3,
+        "magnitude": 1
+      }
+    ]
+  },
+  {
+    "id": "frenzy",
+    "name": "Frenzy",
+    "category": "DAMAGE_SINGLE",
+    "isChildSkill": true,
+    "procChance": 0.08,
+    "parentSkills": [
+      "bloodlust",
+      "basic_attack"
+    ],
+    "description": "A frenzied multi-strike fuelled by bloodlust. Low accuracy, devastating if it lands.",
+    "costType": "stamina",
+    "costAmount": 16,
+    "delay": 1100,
+    "basePower": 1.4,
+    "baseHitChance": 0.7,
+    "critChance": 0.15,
+    "hitCount": {
+      "min": 2,
+      "max": 4
+    },
+    "scalingFactors": {
+      "conviction": 0.6
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "targets": "single_enemy",
+        "dmg_type_1": "physical",
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "berserker_stance",
+    "name": "Berserker Stance",
+    "category": "BUFF",
+    "isChildSkill": true,
+    "procChance": 0.08,
+    "parentSkills": [
+      "bloodlust",
+      "block"
+    ],
+    "description": "Pain becomes power. Each hit received feeds the rage, stacking conviction until the fight ends.",
+    "costType": "stamina",
+    "costAmount": 10,
+    "delay": 700,
+    "basePower": 1.0,
+    "baseHitChance": 1.0,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "targets": "self",
+        "buff": "berserker_stance_buff",
+        "chance": 1.0,
+        "duration": 99,
+        "magnitude": 1
+      }
+    ]
+  },
+  {
+    "id": "fortify",
+    "name": "Fortify",
+    "category": "DEFENSE",
+    "isChildSkill": true,
+    "procChance": 0.1,
+    "parentSkills": [
+      "restore_stam_minor",
+      "block"
+    ],
+    "description": "The Dwarf digs in, becoming nearly immovable. Massively reduces incoming damage for several turns.",
+    "costType": "stamina",
+    "costAmount": 12,
+    "delay": 600,
+    "basePower": 1.0,
+    "baseHitChance": 1.0,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "targets": "self",
+        "buff": "fortify_buff",
+        "chance": 1.0,
+        "duration": 3,
+        "magnitude": 2
+      }
+    ]
+  },
+  {
+    "id": "iron_will",
+    "name": "Iron Will",
+    "category": "RESTORATION",
+    "isChildSkill": true,
+    "procChance": 0.08,
+    "parentSkills": [
+      "restore_stam_minor",
+      "shout"
+    ],
+    "description": "The Dwarf's legendary endurance inspires the entire party, restoring stamina to all allies.",
+    "costType": "stamina",
+    "costAmount": 18,
+    "delay": 1000,
+    "basePower": 1.0,
+    "baseHitChance": 1.0,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "restore_resource",
+        "targets": "all_allies",
+        "resource": "stamina",
+        "scalesBy": "endurance",
+        "magnitude": 0.3,
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "second_wind",
+    "name": "Second Wind",
+    "category": "HEALING",
+    "isChildSkill": true,
+    "procChance": 0.08,
+    "parentSkills": [
+      "restore_stam_minor",
+      "first_aid"
+    ],
+    "description": "The Dwarf refuses to fall. A surge of resilience restores both stamina and health simultaneously.",
+    "costType": "stamina",
+    "costAmount": 20,
+    "delay": 1000,
+    "basePower": 0,
+    "baseHitChance": 1.0,
+    "hitCount": {
+      "fixed": 1
+    },
+    "scalingFactors": {
+      "endurance": 0.4
+    },
+    "effects": [
+      {
+        "type": "restore_resource",
+        "targets": "self",
+        "resource": "stamina",
+        "scalesBy": "endurance",
+        "magnitude": 0.4,
+        "chance": 1.0
+      },
+      {
+        "type": "heal",
+        "targets": "self",
+        "scalesBy": "harmony",
+        "basePower": 0,
+        "magnitude": 0.25,
+        "chance": 1.0
       }
     ]
   }

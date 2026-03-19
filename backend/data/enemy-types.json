@@ -141,7 +141,14 @@
     "armorValue": 4,
     "physEvasion": 0,
     "magEvasion": 0,
-    "aiProfile": "berserker"
+    "aiProfile": "berserker",
+    "lootTable": [
+      {
+        "itemID": "strange_mushrooms",
+        "dropChance": 0.08,
+        "rarity": "uncommon"
+      }
+    ]
   },
   {
     "id": "orc_shaman",
@@ -172,7 +179,14 @@
     "armorValue": 1,
     "physEvasion": 1,
     "magEvasion": 3,
-    "aiProfile": "support"
+    "aiProfile": "support",
+    "lootTable": [
+      {
+        "itemID": "strange_mushrooms",
+        "dropChance": 0.08,
+        "rarity": "uncommon"
+      }
+    ]
   },
   {
     "id": "dragon_ancient",

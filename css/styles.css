@@ -1174,3 +1174,20 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
 .status-pip:hover::after {
     opacity: 1;
 }
+
+/* ── Inventory Panel Cards ─────────────────────────────────────── */
+.inv-card {
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    background: rgba(20,30,50,0.7);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+}
+.inv-card:hover { border-color: var(--gold-border); background: rgba(30,45,70,0.8); }
+.inv-equipped  { border-left: 3px solid #4eff7f; }
+.inv-equipped:hover { border-left-color: #ff6b6b; }
+.inv-gear      { border-left: 3px solid #4a9eff; }
+.inv-empty-slot { opacity: 0.45; cursor: default; }
+.inv-empty-slot:hover { border-color: rgba(255,255,255,0.07); background: rgba(20,30,50,0.7); }

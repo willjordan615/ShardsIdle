@@ -274,3 +274,78 @@
     }
 
 })();
+
+// ── Skill Tree Tab ────────────────────────────────────────────────────────────
+
+window.switchAdminTab = function(tab) {
+    document.getElementById('adminTabContentItems').style.display = tab === 'items' ? 'block' : 'none';
+    document.getElementById('adminTabContentSkills').style.display = tab === 'skills' ? 'block' : 'none';
+    document.getElementById('adminTabItems').style.background = tab === 'items' ? '' : '#2a3a2a';
+    document.getElementById('adminTabSkills').style.background = tab === 'skills' ? '' : '#2a3a2a';
+    if (tab === 'skills') renderAdminSkillTree();
+};
+
+window.renderAdminSkillTree = function() {
+    const container = document.getElementById('adminSkillTreeContent');
+    if (!container) return;
+    const skills = window.gameData?.skills;
+    if (!skills) { container.innerHTML = '<p style="color:#888;">Game data not loaded.</p>'; return; }
+
+    const skillMap = {};
+    skills.forEach(s => skillMap[s.id] = s);
+
+    const children = skills.filter(s => s.parentSkills && s.parentSkills.length === 2);
+
+    const catLabels = {
+        DAMAGE_SINGLE:'Physical Damage', DAMAGE_MAGIC:'Magic Damage',
+        DAMAGE_AOE:'Area of Effect', HEALING:'Healing', HEALING_AOE:'Area Healing',
+        BUFF:'Buffs', CONTROL:'Control', DEFENSE:'Defense',
+        RESTORATION:'Restoration', UTILITY:'Utility'
+    };
+    const catOrder = ['DAMAGE_SINGLE','DAMAGE_MAGIC','DAMAGE_AOE','HEALING','HEALING_AOE','BUFF','CONTROL','DEFENSE','RESTORATION','UTILITY'];
+
+    const byCat = {};
+    children.forEach(c => {
+        const cat = c.category || 'OTHER';
+        if (!byCat[cat]) byCat[cat] = [];
+        byCat[cat].push(c);
+    });
+
+    const searchBar = `<div style="margin-bottom:10px;">
+        <input id="skillTreeSearch" type="text" placeholder="Filter skills..." oninput="filterSkillTree(this.value)"
+            style="width:100%; padding:6px 10px; background:#0f1923; color:#d4af37; border:1px solid #333; border-radius:4px; font-size:0.85rem;">
+    </div>`;
+
+    const sections = catOrder.filter(c => byCat[c]).map(cat => {
+        const rows = [...byCat[cat]].sort((a,b) => a.name.localeCompare(b.name)).map(c => {
+            const p1 = skillMap[c.parentSkills[0]]?.name || c.parentSkills[0];
+            const p2 = skillMap[c.parentSkills[1]]?.name || c.parentSkills[1];
+            const proc = c.procChance ? `<span style="color:#888; font-size:0.75rem;"> ${Math.round(c.procChance*100)}%</span>` : '';
+            return `<tr class="skill-tree-row" style="border-bottom:1px solid #1a2a3a;">
+                <td style="padding:4px 8px; color:#aaa;">${p1}</td>
+                <td style="padding:4px 8px; color:#555;">+</td>
+                <td style="padding:4px 8px; color:#aaa;">${p2}</td>
+                <td style="padding:4px 8px; color:#555;">→</td>
+                <td style="padding:4px 8px; color:#d4af37; font-weight:500;">${c.name}${proc}</td>
+            </tr>`;
+        }).join('');
+        return `<div class="skill-tree-section" style="margin-bottom:16px;">
+            <div style="color:#4a9eff; font-size:0.75rem; letter-spacing:1px; text-transform:uppercase; padding:4px 0; border-bottom:1px solid #1a2a3a; margin-bottom:4px;">${catLabels[cat] || cat} (${byCat[cat].length})</div>
+            <table style="width:100%; border-collapse:collapse; font-size:0.82rem;">${rows}</table>
+        </div>`;
+    }).join('');
+
+    container.innerHTML = searchBar + `<div id="skillTreeBody">${sections}</div>
+        <div style="color:#555; font-size:0.75rem; margin-top:8px; text-align:right;">${children.length} combinations total</div>`;
+};
+
+window.filterSkillTree = function(query) {
+    const q = query.toLowerCase();
+    document.querySelectorAll('.skill-tree-row').forEach(row => {
+        row.style.display = !q || row.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+    document.querySelectorAll('.skill-tree-section').forEach(sec => {
+        const visible = [...sec.querySelectorAll('.skill-tree-row')].some(r => r.style.display !== 'none');
+        sec.style.display = visible ? '' : 'none';
+    });
+};

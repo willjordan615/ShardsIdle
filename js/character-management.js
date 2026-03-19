@@ -539,16 +539,36 @@ async function createCharacter() {
             accessory1: null,
             accessory2: null
         },
-        skills: currentState.selectedSkills.map(skillId => ({
-            skillID: skillId,
-            learned: true,
-            usageCount: 0,
-            skillXP: 0,
-            skillLevel: 1,
-            lastUsed: null
-        })),
+        skills: (() => {
+            const equipped = currentState.selectedSkills.map(skillId => ({
+                skillID: skillId,
+                learned: true,
+                usageCount: 0,
+                skillXP: 0,
+                skillLevel: 1,
+                lastUsed: null
+            }));
+            // Inject racial intrinsic skill
+            const raceDef = window.gameData?.races?.find(r => r.id === currentState.selectedRace?.id);
+            const intrinsicId = raceDef?.intrinsicSkills?.[0] || raceDef?.bonusSkills?.[0];
+            if (intrinsicId && !equipped.some(s => s.skillID === intrinsicId)) {
+                equipped.push({
+                    skillID: intrinsicId,
+                    learned: true,
+                    intrinsic: true,
+                    usageCount: 0,
+                    skillXP: 0,
+                    skillLevel: 0,
+                    lastUsed: null
+                });
+            }
+            return equipped;
+        })(),
         consumables: {},
+        consumableStash: {},
         inventory: [],
+        gold: 0,
+        arcaneDust: 0.0,
         
         // ===== SAVESTATE SHARING FIELDS (THESE WERE MISSING!) =====
         unlockedCombos: [],
@@ -682,6 +702,36 @@ async function renderRoster() {
 /**
  * Show character detail screen
  */
+/**
+ * Ensure a character has their racial intrinsic skill.
+ * Migrates existing characters that predate the intrinsic system.
+ */
+async function ensureIntrinsicSkill(character) {
+    const raceDef = window.gameData?.races?.find(r => r.id === character.race);
+    const intrinsicId = raceDef?.intrinsicSkills?.[0] || raceDef?.bonusSkills?.[0];
+    if (!intrinsicId) return false;
+
+    // Already has it
+    if ((character.skills || []).some(s => s.skillID === intrinsicId)) return false;
+
+    // Inject it
+    if (!character.skills) character.skills = [];
+    character.skills.push({
+        skillID: intrinsicId,
+        learned: true,
+        intrinsic: true,
+        usageCount: 0,
+        skillXP: 0,
+        skillLevel: 0,
+        lastUsed: null
+    });
+
+    await saveCharacterToServer(character);
+    console.log(`[MIGRATION] Injected intrinsic skill ${intrinsicId} for ${character.name}`);
+    return true;
+}
+
+
 async function showCharacterDetail(characterId) {
     try {
         const character = await getCharacter(characterId);
@@ -689,7 +739,10 @@ async function showCharacterDetail(characterId) {
             showError('Character not found');
             return;
         }
-        
+
+        // Migrate existing characters that predate the intrinsic skill system
+        await ensureIntrinsicSkill(character);
+
         currentState.detailCharacterId = characterId;
         const race = getRace(character.race);
         const xpToNextLevel = getXPToNextLevel(character.level);
@@ -697,6 +750,12 @@ async function showCharacterDetail(characterId) {
         
         document.getElementById('detailName').textContent = character.name;
         document.getElementById('detailRace').textContent = race ? race.name : 'Unknown';
+
+        // Currency display
+        const goldEl = document.getElementById('detailGold');
+        const dustEl = document.getElementById('detailDust');
+        if (goldEl) goldEl.textContent = `💰 ${(character.gold || 0).toFixed(0)}g`;
+        if (dustEl) dustEl.textContent = `✨ ${(character.arcaneDust || 0).toFixed(2)} dust`;
         document.getElementById('detailLevel').textContent = character.level;
         
         const totalStats = calculateTotalStats(character);
@@ -836,10 +895,13 @@ async function renderCharacterSkills(character) {
     const TOTAL_SLOTS = 2;
     
     // Render the 2 Equipment Slots
+    // Build non-intrinsic skill list for slot rendering
+    const nonIntrinsicSkills = (character.skills || []).filter(s => !s.intrinsic);
+
     for (let i = 0; i < TOTAL_SLOTS; i++) {
         const slotIndex = i;
-        // Get the skill currently in this slot (if any)
-        const skillRecord = character.skills[slotIndex] || null;
+        // Get the skill currently in this slot (if any) — intrinsics are excluded
+        const skillRecord = nonIntrinsicSkills[slotIndex] || null;
         
         const card = document.createElement('div');
         card.className = 'card';
@@ -889,9 +951,9 @@ async function renderCharacterSkills(character) {
 
     // --- DISCOVERED SKILLS (level 0 — not yet equippable) ---
     // Skills that have been discovered via child skill proc but haven't reached level 1 yet.
-    // They live at index 2+ in character.skills. Show XP progress toward the 120 unlock threshold.
-    const discoveredLocked = character.skills.slice(2).filter(
-        rec => rec.discovered && (rec.skillLevel || 0) < 1
+    // Intrinsic skills are excluded — they're invisible until naturally unlocked.
+    const discoveredLocked = character.skills.filter(
+        rec => rec.discovered && (rec.skillLevel || 0) < 1 && !rec.intrinsic
     );
 
     if (discoveredLocked.length > 0) {
@@ -930,6 +992,33 @@ async function renderCharacterSkills(character) {
 
         container.appendChild(section);
     }
+
+    // Racial bonus skill — always shown, marked as innate
+    const raceDef = window.gameData?.races?.find(r => r.id === character.race);
+    if (raceDef?.bonusSkills?.length) {
+        const racialSection = document.createElement('div');
+        racialSection.style.cssText = 'margin-top:1rem;';
+        racialSection.innerHTML = `<div style="color:#888; font-size:0.75rem; letter-spacing:1px; text-transform:uppercase; margin-bottom:6px;">Racial Ability</div>`;
+
+        raceDef.bonusSkills.forEach(skillId => {
+            const skillDef = window.gameData?.skills?.find(s => s.id === skillId);
+            if (!skillDef) return;
+            const card = document.createElement('div');
+            card.style.cssText = 'background:rgba(138,100,255,0.08); border:1px solid rgba(138,100,255,0.3); border-radius:6px; padding:8px 10px;';
+            card.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="color:#aa88ff; font-weight:bold; font-size:0.9em;">⭐ ${skillDef.name}</span>
+                    <span style="color:#666; font-size:0.72em;">Innate · ${raceDef.name}</span>
+                </div>
+                <div style="color:#888; font-size:0.78em; margin-top:3px;">${skillDef.description || ''}</div>
+                ${skillDef.costType && skillDef.costType !== 'none' ? `<div style="color:#555; font-size:0.72em; margin-top:2px;">Cost: ${skillDef.costAmount} ${skillDef.costType}</div>` : ''}
+            `;
+            addSkillTooltip(card, skillDef, 500);
+            racialSection.appendChild(card);
+        });
+
+        container.appendChild(racialSection);
+    }
 }
 
 /**
@@ -953,19 +1042,26 @@ async function openSkillSwapModal(character, slotIndex) {
     modalList.innerHTML = '<div style="text-align:center; color:#aaa;">Loading skills...</div>';
     modal.style.display = 'flex';
 
-    // Identify the skill in the OTHER slot to prevent duplicates
+    // Use non-intrinsic skills for slot indexing
+    const nonIntrinsic = (character.skills || []).filter(s => !s.intrinsic);
     const otherSlotIndex = slotIndex === 0 ? 1 : 0;
-    const otherSlotSkillID = character.skills[otherSlotIndex]?.skillID;
-    const currentSlotSkillID = character.skills[slotIndex]?.skillID;
+    const otherSlotSkillID = nonIntrinsic[otherSlotIndex]?.skillID;
+    const currentSlotSkillID = nonIntrinsic[slotIndex]?.skillID;
+
+    // Collect intrinsic skill IDs for this character's race
+    const raceDef = window.gameData?.races?.find(r => r.id === character.race);
+    const intrinsicIds = new Set(
+        (character.skills || []).filter(s => s.intrinsic).map(s => s.skillID)
+    );
 
     // Filter equippable skills:
     // - Must be a starter skill OR owned at level 1+
     // - Must not be the skill already in THIS slot (no-op swap)
     // - CONSUMABLE skills are excluded
-    // Note: the skill in the OTHER slot IS included — swapping the two equipped
-    // skills is valid and should always be available.
+    // - INTRINSIC skills are excluded (they're always active, never need equipping)
     const equippableSkills = window.gameData.skills.filter(s => {
         if (s.category && s.category.includes('CONSUMABLE')) return false;
+        if (intrinsicIds.has(s.id)) return false; // intrinsic — always active
 
         const isStarter = s.isStarterSkill === true;
         const ownedRecord = character.skills.find(rec => rec.skillID === s.id);
@@ -1015,13 +1111,15 @@ async function confirmSkillSwap(character, slotIndex, newSkillID) {
     const modal = document.getElementById('skillSwapModal');
     if (modal) modal.style.display = 'none';
 
-    const oldSkillRecord = character.skills[slotIndex];
-    
-    // 1. Find the record for the NEW skill in the full array
-    let newSkillRecordIndex = character.skills.findIndex(s => s.skillID === newSkillID);
-    let newSkillRecord = null;
+    // Separate intrinsic and non-intrinsic skills — intrinsics are never moved
+    const intrinsicSkills   = character.skills.filter(s => s.intrinsic);
+    const nonIntrinsicSkills = character.skills.filter(s => !s.intrinsic);
 
-    if (newSkillRecordIndex === -1) {
+    const oldSkillRecord = nonIntrinsicSkills[slotIndex];
+
+    // 1. Find the record for the NEW skill
+    let newSkillRecord = nonIntrinsicSkills.find(s => s.skillID === newSkillID) || null;
+    if (!newSkillRecord) {
         // New starter skill not yet in array
         newSkillRecord = {
             skillID: newSkillID,
@@ -1030,70 +1128,52 @@ async function confirmSkillSwap(character, slotIndex, newSkillID) {
             usageCount: 0,
             learned: true
         };
-    } else {
-        // Grab the existing record
-        newSkillRecord = character.skills[newSkillRecordIndex];
-        
-        // ⚠️ CRITICAL FIX: If the new skill is currently sitting in the "unequipped" pool (index 2+),
-        // we must remove it from there first so we don't duplicate it when we place it in the slot.
-        if (newSkillRecordIndex !== slotIndex) {
-             // We will handle the removal after we secure the old skill, 
-             // to avoid index shifting issues.
-        }
     }
 
     // 2. Secure the OLD skill (the one being kicked out of the slot)
-    // We only keep it if it's not the same as the new skill (swapping A for A does nothing)
     let skillToUnequip = null;
     if (oldSkillRecord && oldSkillRecord.skillID !== newSkillID) {
         skillToUnequip = oldSkillRecord;
     }
 
-    // 3. Rebuild the skills array cleanly, respecting slotIndex.
+    // 3. Rebuild non-intrinsic skills array cleanly
     const otherSlotIndex   = slotIndex === 0 ? 1 : 0;
-    const otherSlotID      = character.skills[otherSlotIndex]?.skillID;
-    const otherSkillRecord = character.skills.find(s => s.skillID === otherSlotID);
-
-    // Determine what goes into the OTHER slot after this swap:
-    // - If the player picked the skill that's currently in the other slot,
-    //   the old skill from THIS slot should move there (a clean slot-swap).
-    // - Otherwise the other slot stays as-is and the old skill moves to unequipped.
-    const isSlotSwap = (newSkillID === otherSlotID);
+    const otherSlotID      = nonIntrinsicSkills[otherSlotIndex]?.skillID;
+    const otherSkillRecord = nonIntrinsicSkills.find(s => s.skillID === otherSlotID);
+    const isSlotSwap       = (newSkillID === otherSlotID);
 
     let newOtherSlotRecord;
     if (isSlotSwap) {
-        // The old skill from the current slot takes the other slot's place
         newOtherSlotRecord = oldSkillRecord || null;
     } else {
         newOtherSlotRecord = otherSkillRecord || null;
     }
 
-    // Skills beyond index 1 that are not being moved into either slot
-    const unequippedSkills = character.skills.filter((s, idx) => {
-        if (idx === 0 || idx === 1) return false;       // skip current equipped pair
-        if (s.skillID === newSkillID) return false;     // moving to this slot
-        if (isSlotSwap && s.skillID === otherSlotID) return false; // moving to other slot
+    // Skills beyond the two equipped slots that aren't being moved
+    const unequippedSkills = nonIntrinsicSkills.filter(s => {
+        if (s.skillID === nonIntrinsicSkills[0]?.skillID || s.skillID === nonIntrinsicSkills[1]?.skillID) return false;
+        if (s.skillID === newSkillID) return false;
+        if (isSlotSwap && s.skillID === otherSlotID) return false;
         return true;
     });
 
-    // If we're not doing a slot-swap, the kicked-out old skill goes to unequipped
     if (!isSlotSwap && skillToUnequip && !unequippedSkills.some(s => s.skillID === skillToUnequip.skillID)) {
         unequippedSkills.push(skillToUnequip);
     }
 
-    // Build [slot0, slot1, ...rest] in the correct order
-    const finalSkills = [];
+    // Build [slot0, slot1, ...rest] then append intrinsics at the end
+    const finalNonIntrinsic = [];
     if (slotIndex === 0) {
-        finalSkills.push(newSkillRecord);
-        if (newOtherSlotRecord) finalSkills.push(newOtherSlotRecord);
+        finalNonIntrinsic.push(newSkillRecord);
+        if (newOtherSlotRecord) finalNonIntrinsic.push(newOtherSlotRecord);
     } else {
-        if (newOtherSlotRecord) finalSkills.push(newOtherSlotRecord);
-        finalSkills.push(newSkillRecord);
+        if (newOtherSlotRecord) finalNonIntrinsic.push(newOtherSlotRecord);
+        finalNonIntrinsic.push(newSkillRecord);
     }
-    finalSkills.push(...unequippedSkills);
+    finalNonIntrinsic.push(...unequippedSkills);
 
-    // 4. Apply and Save
-    character.skills = finalSkills;
+    // 4. Apply and Save — intrinsics always preserved at the end
+    character.skills = [...finalNonIntrinsic, ...intrinsicSkills];
 
     try {
         await saveCharacterToServer(character);

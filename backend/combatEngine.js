@@ -1359,15 +1359,26 @@ class CombatEngine {
 
   /**
    * Build the full set of skill IDs available to a character this turn.
-   * Includes equipped skills + consumable belt skills (while qty > 0).
+   * Includes equipped skills + consumable belt skills (while qty > 0) + racial bonus skill.
    * Consumable items live in this.gear — identified by skillID or effect_skillid field.
+   * Racial bonus skill is always available, never decrements, no cost check bypass
+   * (cost is still paid normally — the race just always has access to it).
    */
   getAugmentedSkillPool(character) {
     const pool = new Set();
 
-    // Equipped skill slots (indices 0 and 1 only)
+    // Equipped skill slots (first two non-intrinsic skills)
+    // Intrinsic skills are also always added regardless of position
     if (character.skills) {
-        character.skills.slice(0, 2).forEach(s => pool.add(s.skillID));
+        let equippedCount = 0;
+        character.skills.forEach(s => {
+            if (s.intrinsic) {
+                pool.add(s.skillID); // intrinsic always in pool
+            } else if (equippedCount < 2) {
+                pool.add(s.skillID);
+                equippedCount++;
+            }
+        });
     }
 
     // Consumable belt — add the skill linked to each consumable with qty > 0
@@ -1404,7 +1415,7 @@ class CombatEngine {
     const eligibleChildSkills = this.skills.filter(s => {
         if (!s.isChildSkill) return false;
         if (!s.parentSkills || s.parentSkills.length !== 2) return false;
-        if (s.category !== selectedCategory) return false;
+        // Category filter removed — parent availability is the correct gate
         return s.parentSkills.every(parentId => availablePool.has(parentId));
     });
 

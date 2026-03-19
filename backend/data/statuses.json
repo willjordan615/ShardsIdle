@@ -968,5 +968,46 @@
       "chance": 35,
       "fraction": 0.25
     }
+  },
+  {
+    "id": "bloodlust_buff",
+    "name": "Bloodlust",
+    "type": "buff",
+    "emoji": "\ud83e\ude78",
+    "tooltip": "Conviction surging \u2014 dealing increased damage",
+    "description": "Primal aggression heightens conviction.",
+    "effects": {
+      "statBoost": {
+        "conviction": 0.25
+      }
+    }
+  },
+  {
+    "id": "berserker_stance_buff",
+    "name": "Berserker Stance",
+    "type": "buff",
+    "emoji": "\ud83d\ude24",
+    "tooltip": "Pain feeds rage \u2014 conviction grows with each hit",
+    "description": "Each blow received fuels increasingly dangerous aggression.",
+    "effects": {
+      "statBoost": {
+        "conviction": 0.15
+      },
+      "onHitProc": {
+        "skillId": "bloodlust",
+        "chance": 0.4
+      }
+    }
+  },
+  {
+    "id": "fortify_buff",
+    "name": "Fortified",
+    "type": "buff",
+    "emoji": "\ud83c\udff0",
+    "tooltip": "Damage greatly reduced \u2014 holding the line",
+    "description": "The Dwarf has dug in, nearly immovable.",
+    "effects": {
+      "incomingDamageMultiplier": 0.45
+    }
   }
 ]

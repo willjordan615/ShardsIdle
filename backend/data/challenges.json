@@ -21,6 +21,28 @@
             ],
             "level": 1
           }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion_minor",
+            "dropChance": 0.35,
+            "rarity": "common"
+          },
+          {
+            "itemID": "dagger_rusty_tier0",
+            "dropChance": 0.2,
+            "rarity": "common"
+          },
+          {
+            "itemID": "head_cloth_cap_tier0",
+            "dropChance": 0.15,
+            "rarity": "common"
+          },
+          {
+            "itemID": "consumable_bomb_smoke",
+            "dropChance": 0.1,
+            "rarity": "common"
+          }
         ]
       },
       {
@@ -70,6 +92,33 @@
               "statScale": "maxHP",
               "narrative": "Lacking the Footwork skill to evade, the party is forced to sprint across open ground. Arrows rain down, striking home before they can reach cover!"
             }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion_minor",
+            "dropChance": 0.4,
+            "rarity": "common"
+          },
+          {
+            "itemID": "health_potion",
+            "dropChance": 0.15,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "crossbow_wood_tier0",
+            "dropChance": 0.18,
+            "rarity": "common"
+          },
+          {
+            "itemID": "head_cloth_cap_tier0",
+            "dropChance": 0.12,
+            "rarity": "common"
+          },
+          {
+            "itemID": "consumable_potion_speed_buff",
+            "dropChance": 0.08,
+            "rarity": "uncommon"
           }
         ]
       }

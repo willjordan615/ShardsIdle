@@ -1083,42 +1083,105 @@ try {
 
             if (firstParticipant) {
                 const firstCharId = firstParticipant.characterID;
-                // Use the already-saved in-memory copy if available — avoids re-fetching
-                // a stale DB snapshot that would overwrite XP we just saved.
                 const character = savedCharacters[firstCharId] || await getCharacter(firstCharId);
-                
-                if (character) {
-                    if (!character.inventory) character.inventory = [];
-                    if (!character.consumables) character.consumables = {};
 
-                    const consumableDrops = [];
-                    const inventoryDrops  = [];
+                if (character) {
+                    // Null-safe field initialisation
+                    if (!character.inventory)        character.inventory        = [];
+                    if (!character.consumables)      character.consumables      = {};
+                    if (!character.consumableStash)  character.consumableStash  = {};
+                    if (character.gold == null)      character.gold             = 0;
+                    if (character.arcaneDust == null) character.arcaneDust      = 0;
+
+                    // One-time migration: move old consumables{} into stash if stash was empty
+                    // (old drops went straight to belt; player never chose to equip them)
+                    const hadOldConsumables = Object.keys(character.consumables).length > 0;
+                    const stashWasEmpty = Object.keys(character.consumableStash).length === 0;
+                    if (hadOldConsumables && stashWasEmpty) {
+                        Object.assign(character.consumableStash, character.consumables);
+                        character.consumables = {};
+                        console.log(`[MIGRATION] Moved belt consumables to stash for ${character.name}`);
+                    }
+
+                    // Helper: gold value of an item
+                    function _goldValue(itemDef, rarity) {
+                        if (!itemDef) return 5;
+                        const base = itemDef.goldValue || ((itemDef.tier || 0) * 8 + 5);
+                        const rarityMult = { common:1, uncommon:1.5, rare:3, legendary:8 }[rarity] || 1;
+                        return Math.round(base * rarityMult);
+                    }
+
+                    // Helper: dust yield from sale
+                    function _dustYield(goldGained) {
+                        return parseFloat((goldGained * 0.01).toFixed(4));
+                    }
+
+                    // Helper: is item a duplicate (equipped or already in inventory)?
+                    function _isDuplicate(itemId) {
+                        const equippedIds = Object.values(character.equipment || {}).filter(Boolean);
+                        if (equippedIds.includes(itemId)) return true;
+                        return (character.inventory || []).some(i => i && i.itemID === itemId);
+                    }
+
+                    const lootLines   = [];
+                    const soldLines   = [];
+                    let goldGained    = 0;
+                    let dustGained    = 0;
 
                     rewards.lootDropped.forEach(loot => {
-                        const itemDef = window.gameData?.gear?.find(g => g.id === loot.itemID);
-                        if (itemDef?.slot_id1 === 'consumable' || itemDef?.slot === 'consumable') {
-                            character.consumables[loot.itemID] = (character.consumables[loot.itemID] || 0) + 1;
-                            consumableDrops.push(itemDef?.name || loot.itemID);
+                        if (!loot || !loot.itemID) return;
+                        const itemDef = window.gameData?.gear?.find(g => g.id === loot.itemID)
+                                     || window.gameData?.consumables?.find(g => g.id === loot.itemID);
+                        const itemName = itemDef?.name || loot.itemID;
+                        const slot = itemDef?.slot_id1 || itemDef?.slot || '';
+
+                        if (slot === 'consumable' || itemDef?.consumable === true) {
+                            // Consumables → stash
+                            character.consumableStash[loot.itemID] = (character.consumableStash[loot.itemID] || 0) + 1;
+                            lootLines.push(`${itemName} → stash`);
+
+                        } else if (slot && ['mainHand','offHand','head','chest','accessory1','accessory2'].includes(slot)) {
+                            // Gear — check for duplicate
+                            if (_isDuplicate(loot.itemID)) {
+                                const g = _goldValue(itemDef, loot.rarity);
+                                const d = _dustYield(g);
+                                character.gold      = parseFloat(((character.gold || 0) + g).toFixed(2));
+                                character.arcaneDust = parseFloat(((character.arcaneDust || 0) + d).toFixed(4));
+                                goldGained += g;
+                                dustGained += d;
+                                soldLines.push(`${itemName} (dupe) → ${g}g`);
+                            } else {
+                                character.inventory.push({ itemID: loot.itemID, rarity: loot.rarity || 'common', acquiredAt: Date.now() });
+                                lootLines.push(itemName);
+                            }
+
                         } else {
-                            character.inventory.push({ itemID: loot.itemID, rarity: loot.rarity, acquiredAt: Date.now() });
-                            inventoryDrops.push(itemDef?.name || loot.itemID);
+                            // Quest items / misc — always add to inventory, never sell
+                            character.inventory.push({ itemID: loot.itemID, rarity: loot.rarity || 'common', acquiredAt: Date.now() });
+                            lootLines.push(itemName);
                         }
                     });
 
-                    const allDropNames = [
-                        ...consumableDrops.map(n => `${n} (belt)`),
-                        ...inventoryDrops
-                    ];
-                    showSafeSuccess(`Loot obtained: ${allDropNames.join(', ')}`);
+                    // Build result message
+                    const parts = [];
+                    if (lootLines.length)  parts.push(lootLines.join(', '));
+                    if (soldLines.length)  parts.push(`Auto-sold: ${soldLines.join(', ')} (+${goldGained}g, +${dustGained.toFixed(2)} dust)`);
+                    if (parts.length) showSafeSuccess(parts.join(' | '));
+
                     await saveCharacterToServer(character);
 
-                    if (window.currentState && window.currentState.currentParty) {
-                        const partyIndex = window.currentState.currentParty.findIndex(
+                    // Sync currentState
+                    if (window.currentState?.currentParty) {
+                        const idx = window.currentState.currentParty.findIndex(
                             m => m.characterID === firstCharId || m.id === firstCharId
                         );
-                        if (partyIndex !== -1) {
-                            window.currentState.currentParty[partyIndex].inventory = character.inventory;
-                            console.log(`[STATE SYNC] Updated inventory in currentState for ${character.name}`);
+                        if (idx !== -1) {
+                            const p = window.currentState.currentParty[idx];
+                            p.inventory        = character.inventory;
+                            p.consumableStash  = character.consumableStash;
+                            p.consumables      = character.consumables;
+                            p.gold             = character.gold;
+                            p.arcaneDust       = character.arcaneDust;
                         }
                     }
                 }
