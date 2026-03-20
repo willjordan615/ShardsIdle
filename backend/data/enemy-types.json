@@ -220,5 +220,436 @@
     "physEvasion": 2,
     "magEvasion": 5,
     "aiProfile": "tactical"
+  },
+  {
+    "id": "ironvein_conscript",
+    "name": "Ironvein Conscript",
+    "description": "Pressed dwarven soldier who fights in shield-bashing pairs, driven by a belief that dying in the pass honors the mountain.",
+    "stats": {
+      "conviction": 50,
+      "endurance": 70,
+      "ambition": 40,
+      "harmony": 10
+    },
+    "armorValue": 8,
+    "aiProfile": "aggressive",
+    "equipment": {
+      "mainHand": "hammer_iron_tier0",
+      "offHand": "shield_iron_tier0"
+    },
+    "skillSelectionCount": 2,
+    "lootTable": [
+      {
+        "itemID": "hammer_iron_tier0",
+        "dropChance": 0.2,
+        "rarity": "common"
+      },
+      {
+        "itemID": "shield_iron_tier0",
+        "dropChance": 0.15,
+        "rarity": "common"
+      },
+      {
+        "itemID": "health_potion_minor",
+        "dropChance": 0.25,
+        "rarity": "common"
+      }
+    ],
+    "availableSkills": [
+      "basic_attack",
+      "shove",
+      "block"
+    ]
+  },
+  {
+    "id": "goldcrown_scout",
+    "name": "Goldcrown Scout",
+    "description": "Paranoid Usurper skirmisher who picks off isolated targets with thrown axes and signals reinforcements at the first sign of trouble.",
+    "stats": {
+      "conviction": 60,
+      "endurance": 40,
+      "ambition": 90,
+      "harmony": 0
+    },
+    "armorValue": 2,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "handaxe_throwing_tier0"
+    },
+    "skillSelectionCount": 2,
+    "lootTable": [
+      {
+        "itemID": "handaxe_throwing_tier0",
+        "dropChance": 0.25,
+        "rarity": "common"
+      },
+      {
+        "itemID": "stamina_potion_minor",
+        "dropChance": 0.2,
+        "rarity": "common"
+      },
+      {
+        "itemID": "head_leather_hood_tier0",
+        "dropChance": 0.12,
+        "rarity": "common"
+      }
+    ],
+    "availableSkills": [
+      "aim",
+      "footwork",
+      "misdirect"
+    ]
+  },
+  {
+    "id": "consortium_desperado",
+    "name": "Consortium Desperado",
+    "description": "Stranded civilian who has survived two years in the pass by knowing the terrain better than either army and trusting no one.",
+    "stats": {
+      "conviction": 55,
+      "endurance": 55,
+      "ambition": 60,
+      "harmony": 0
+    },
+    "armorValue": 4,
+    "aiProfile": "aggressive",
+    "equipment": {
+      "mainHand": "dagger_scout_tier0"
+    },
+    "skillSelectionCount": 2,
+    "lootTable": [
+      {
+        "itemID": "dagger_scout_tier0",
+        "dropChance": 0.2,
+        "rarity": "common"
+      },
+      {
+        "itemID": "health_potion_minor",
+        "dropChance": 0.3,
+        "rarity": "common"
+      },
+      {
+        "itemID": "chest_leather_tunic_tier0",
+        "dropChance": 0.1,
+        "rarity": "common"
+      }
+    ],
+    "availableSkills": [
+      "basic_attack",
+      "misdirect",
+      "footwork"
+    ]
+  },
+  {
+    "id": "stone_guard_veteran",
+    "name": "Stone-Guard Veteran",
+    "description": "Ironvein elite who has held the same tunnel section for three years, anchoring the shield wall while others fall around him.",
+    "stats": {
+      "conviction": 80,
+      "endurance": 130,
+      "ambition": 30,
+      "harmony": 0
+    },
+    "armorValue": 20,
+    "aiProfile": "berserker",
+    "equipment": {
+      "mainHand": "hammer_steel_tier1",
+      "offHand": "shield_steel_tier1"
+    },
+    "skillSelectionCount": 3,
+    "lootTable": [
+      {
+        "itemID": "hammer_steel_tier1",
+        "dropChance": 0.25,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "shield_steel_tier1",
+        "dropChance": 0.2,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "chest_chain_shirt_tier0",
+        "dropChance": 0.15,
+        "rarity": "common"
+      },
+      {
+        "itemID": "health_potion",
+        "dropChance": 0.2,
+        "rarity": "uncommon"
+      }
+    ],
+    "availableSkills": [
+      "block",
+      "shove",
+      "shield_bash",
+      "shout"
+    ]
+  },
+  {
+    "id": "warlord_thorin_ironvein",
+    "name": "Warlord Thorin Ironvein",
+    "description": "The Loyalist warlord who has not left the pass in four years, carrying his dead brother's unfinished warhammer and the belief that the mountain itself will judge who is worthy.",
+    "stats": {
+      "conviction": 150,
+      "endurance": 200,
+      "ambition": 70,
+      "harmony": 20
+    },
+    "armorValue": 28,
+    "aiProfile": "berserker",
+    "equipment": {
+      "mainHand": "hammer_steel_tier1"
+    },
+    "skillSelectionCount": 5,
+    "lootTable": [
+      {
+        "itemID": "hammer_steel_tier1",
+        "dropChance": 0.6,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "shield_steel_tier1",
+        "dropChance": 0.4,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "chest_chain_shirt_tier0",
+        "dropChance": 0.5,
+        "rarity": "common"
+      },
+      {
+        "itemID": "health_potion",
+        "dropChance": 0.5,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "axe_steel_tier1",
+        "dropChance": 0.25,
+        "rarity": "uncommon"
+      }
+    ],
+    "availableSkills": [
+      "basic_attack",
+      "shove",
+      "shout",
+      "shield_bash",
+      "earthquake",
+      "berserker_rage"
+    ]
+  },
+  {
+    "id": "drowned_scavenger",
+    "name": "Drowned Scavenger",
+    "description": "A former Tidebound Initiate whose mind broke under three centuries of pressure and isolation, now a swarming predator that drags intruders into the deep.",
+    "stats": {
+      "conviction": 40,
+      "endurance": 40,
+      "ambition": 80,
+      "harmony": 0
+    },
+    "armorValue": 0,
+    "aiProfile": "aggressive",
+    "equipment": {
+      "mainHand": "dagger_iron_tier0"
+    },
+    "skillSelectionCount": 2,
+    "lootTable": [
+      {
+        "itemID": "dagger_iron_tier0",
+        "dropChance": 0.15,
+        "rarity": "common"
+      },
+      {
+        "itemID": "health_potion_minor",
+        "dropChance": 0.2,
+        "rarity": "common"
+      }
+    ],
+    "availableSkills": [
+      "basic_attack",
+      "shove",
+      "proc_deep_wound"
+    ]
+  },
+  {
+    "id": "tide_lasher",
+    "name": "Tide Lasher",
+    "description": "The enforcers of the Tidebound Penitents, who wield hooked chains to drag isolated fighters out of formation and into the depths.",
+    "stats": {
+      "conviction": 70,
+      "endurance": 70,
+      "ambition": 50,
+      "harmony": 0
+    },
+    "armorValue": 6,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "mace_spiked_tier1"
+    },
+    "skillSelectionCount": 3,
+    "lootTable": [
+      {
+        "itemID": "mace_spiked_tier1",
+        "dropChance": 0.2,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "chest_chain_shirt_tier0",
+        "dropChance": 0.15,
+        "rarity": "common"
+      },
+      {
+        "itemID": "health_potion_minor",
+        "dropChance": 0.25,
+        "rarity": "common"
+      }
+    ],
+    "availableSkills": [
+      "basic_attack",
+      "shove",
+      "proc_marked",
+      "proc_deep_wound"
+    ]
+  },
+  {
+    "id": "deep_chanter",
+    "name": "Deep Chanter",
+    "description": "A robed ward-keeper whose hymns reinforce the armor of allies and sap the will of intruders \u2014 never attacking directly, but turning every fight in the Penitents' favor.",
+    "stats": {
+      "conviction": 25,
+      "endurance": 35,
+      "ambition": 30,
+      "harmony": 110
+    },
+    "armorValue": 0,
+    "aiProfile": "support",
+    "equipment": {
+      "mainHand": null
+    },
+    "skillSelectionCount": 3,
+    "lootTable": [
+      {
+        "itemID": "acc_amulet_silver_tier1",
+        "dropChance": 0.2,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "health_potion",
+        "dropChance": 0.25,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "acc_ring_steel_tier1",
+        "dropChance": 0.15,
+        "rarity": "uncommon"
+      }
+    ],
+    "availableSkills": [
+      "buff_defense",
+      "buff_strength",
+      "first_aid",
+      "rest",
+      "shout"
+    ]
+  },
+  {
+    "id": "barnacle_guard",
+    "name": "Barnacle Guard",
+    "description": "A massive Penitent warrior encased in living crustacean shell that has fused to their body over decades, an immovable wall that absorbs punishment while Chanters work behind them.",
+    "stats": {
+      "conviction": 55,
+      "endurance": 200,
+      "ambition": 20,
+      "harmony": 10
+    },
+    "armorValue": 38,
+    "aiProfile": "berserker",
+    "equipment": {
+      "mainHand": "hammer_steel_tier1",
+      "offHand": "shield_steel_tier1"
+    },
+    "skillSelectionCount": 2,
+    "lootTable": [
+      {
+        "itemID": "chest_chain_hauberk_tier1",
+        "dropChance": 0.25,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "hammer_steel_tier1",
+        "dropChance": 0.2,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "health_potion",
+        "dropChance": 0.3,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "shield_steel_tier1",
+        "dropChance": 0.2,
+        "rarity": "uncommon"
+      }
+    ],
+    "availableSkills": [
+      "basic_attack",
+      "block",
+      "shove",
+      "stone_skin"
+    ]
+  },
+  {
+    "id": "archbishop_valerius",
+    "name": "Archbishop Valerius",
+    "description": "The three-hundred-year-old leader of the Tidebound Penitents, who has meditated so long in communion with the trapped water spirit that the boundary between them has dissolved \u2014 neither fully human nor fully spirit.",
+    "stats": {
+      "conviction": 130,
+      "endurance": 160,
+      "ambition": 80,
+      "harmony": 180
+    },
+    "armorValue": 14,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "sword_bronze_tier1"
+    },
+    "skillSelectionCount": 6,
+    "lootTable": [
+      {
+        "itemID": "sword_bronze_tier1",
+        "dropChance": 0.6,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "acc_amulet_silver_tier1",
+        "dropChance": 0.5,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "chest_chain_hauberk_tier1",
+        "dropChance": 0.4,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "head_chain_hood_tier1",
+        "dropChance": 0.35,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "health_potion",
+        "dropChance": 0.6,
+        "rarity": "uncommon"
+      }
+    ],
+    "availableSkills": [
+      "chill",
+      "frost_nova",
+      "ice_block",
+      "blizzard",
+      "shadow_tendril",
+      "heal_major",
+      "buff_defense",
+      "frozen_cry"
+    ]
   }
 ]

@@ -31,16 +31,40 @@
 </div>
 
 <div id="oppModal" class="modal">
-    <div class="modal-content">
+    <div class="modal-content" style="max-width:600px;">
         <span class="close-modal" onclick="closeModal('oppModal')">&times;</span>
         <h3>Pre-Combat Opportunity</h3>
         <input type="hidden" id="modal-opp-stage-idx">
         <input type="hidden" id="modal-opp-idx">
-        <label>Name</label>
-        <input type="text" id="modal-opp-name" placeholder="e.g., Serpentine Approach">
-        <label>Required Skill</label>
-        <select id="modal-opp-skill"></select>
-        <div class="form-row" style="margin-top:15px;">
+
+        <div class="form-row">
+            <div style="grid-column:span 2">
+                <label>Name</label>
+                <input type="text" id="modal-opp-name" placeholder="e.g., Serpentine Approach">
+            </div>
+            <div>
+                <label>Spawn Chance (0–1)</label>
+                <input type="number" step="0.05" min="0" max="1" id="modal-opp-spawn" value="1.0">
+            </div>
+        </div>
+
+        <div class="form-row" style="margin-top:10px;">
+            <div>
+                <label>Check Type</label>
+                <select id="modal-opp-checktype" onchange="updateOppCheckFields()">
+                    <option value="skill">Skill (requires skill + stat)</option>
+                    <option value="stat">Stat Only (no skill needed)</option>
+                    <option value="random">Random (pure chance)</option>
+                    <option value="none">None (always fires)</option>
+                </select>
+            </div>
+            <div id="opp-skill-wrap">
+                <label>Required Skill</label>
+                <select id="modal-opp-skill"></select>
+            </div>
+        </div>
+
+        <div class="form-row" id="opp-stat-wrap" style="margin-top:8px;">
             <div>
                 <label>Primary Stat</label>
                 <select id="modal-opp-stat">
@@ -50,36 +74,70 @@
                     <option value="harmony">Harmony</option>
                 </select>
             </div>
-            <div><label>Difficulty Threshold</label><input type="number" id="modal-opp-thresh" value="40"></div>
+            <div>
+                <label>Secondary Stat</label>
+                <select id="modal-opp-secondarystat">
+                    <option value="endurance">Endurance</option>
+                    <option value="ambition">Ambition</option>
+                    <option value="conviction">Conviction</option>
+                    <option value="harmony">Harmony</option>
+                </select>
+            </div>
+            <div><label>Difficulty Threshold</label><input type="number" id="modal-opp-thresh" value="50"></div>
         </div>
+
+        <div id="opp-random-wrap" style="display:none; margin-top:8px;">
+            <label>Success Chance (0–1)</label>
+            <input type="number" step="0.05" min="0" max="1" id="modal-opp-successchance" value="0.5">
+        </div>
+
         <hr style="border-color:var(--gold-dim);margin:15px 0;">
         <h4>Effects</h4>
-        <label>Success Narrative</label>
-        <textarea id="modal-opp-success-narr" rows="2">Success!</textarea>
-        <label>Success Effect</label>
-        <select id="modal-opp-success-type">
-            <option value="narrative_only">Narrative Only</option>
-            <option value="remove_enemy">Remove Enemy</option>
-            <option value="apply_status">Apply Status</option>
-        </select>
-        <label style="margin-top:10px;">Failure Narrative</label>
-        <textarea id="modal-opp-fail-narr" rows="2">Failed!</textarea>
-        <label>Failure Effect</label>
-        <select id="modal-opp-fail-type">
-            <option value="apply_direct_damage">Direct Damage (%)</option>
-            <option value="apply_status">Apply Status</option>
-        </select>
-        <label>Failure Magnitude (0.2 = 20%)</label>
-        <input type="number" step="0.1" id="modal-opp-fail-mag" value="0.2">
-        <label style="margin-top:10px;">Fallback Narrative (No Skill)</label>
-        <textarea id="modal-opp-fb-narr" rows="2">No skill!</textarea>
-        <label>Fallback Effect</label>
-        <select id="modal-opp-fb-type">
-            <option value="apply_direct_damage">Direct Damage (%)</option>
-            <option value="apply_status">Apply Status</option>
-        </select>
-        <label>Fallback Magnitude</label>
-        <input type="number" step="0.1" id="modal-opp-fb-mag" value="0.3">
+        <div class="form-row">
+            <div style="grid-column:span 2"><label>Success Narrative</label><textarea id="modal-opp-success-narr" rows="2">Success!</textarea></div>
+            <div>
+                <label>Success Effect</label>
+                <select id="modal-opp-success-type" onchange="updateOppSuccessFields()">
+                    <option value="narrative_only">Narrative Only</option>
+                    <option value="remove_enemy">Remove Enemy</option>
+                    <option value="apply_buff">Apply Buff</option>
+                    <option value="apply_status">Apply Status</option>
+                </select>
+                <div id="opp-success-enemy-wrap" style="display:none;margin-top:4px;">
+                    <label style="font-size:0.75rem;">Enemy Type ID to Remove</label>
+                    <input type="text" id="modal-opp-success-enemytype" placeholder="e.g., ironvein_conscript">
+                    <label style="font-size:0.75rem;">Count</label>
+                    <input type="number" id="modal-opp-success-count" value="1" min="1">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-row" style="margin-top:8px;">
+            <div style="grid-column:span 2"><label>Failure Narrative</label><textarea id="modal-opp-fail-narr" rows="2">Failed!</textarea></div>
+            <div>
+                <label>Failure Effect</label>
+                <select id="modal-opp-fail-type">
+                    <option value="apply_direct_damage">Direct Damage (%)</option>
+                    <option value="apply_status">Apply Status</option>
+                    <option value="narrative_only">Narrative Only</option>
+                </select>
+                <input type="number" step="0.05" id="modal-opp-fail-mag" value="0.15" style="margin-top:4px;" placeholder="Magnitude">
+            </div>
+        </div>
+
+        <div class="form-row" style="margin-top:8px;" id="opp-fallback-section">
+            <div style="grid-column:span 2"><label>Fallback Narrative (No Skill)</label><textarea id="modal-opp-fb-narr" rows="2">No skill!</textarea></div>
+            <div>
+                <label>Fallback Effect</label>
+                <select id="modal-opp-fb-type">
+                    <option value="apply_direct_damage">Direct Damage (%)</option>
+                    <option value="apply_status">Apply Status</option>
+                    <option value="narrative_only">Narrative Only</option>
+                </select>
+                <input type="number" step="0.05" id="modal-opp-fb-mag" value="0.20" style="margin-top:4px;" placeholder="Magnitude">
+            </div>
+        </div>
+
         <button class="btn btn-success" style="width:100%;margin-top:20px;" onclick="confirmAddOpp()">Save Opportunity</button>
     </div>
 </div>
@@ -847,7 +905,9 @@ function renderStages(stages) {
         });
         const oppList = document.getElementById(`stage-${sIdx}-opp`);
         (stage.preCombatOpportunities||[]).forEach((o,oIdx) => {
-            oppList.innerHTML += `<li class="list-item"><span><strong>${o.name}</strong> (Req: ${o.requiredSkillID})</span><div><button class="btn btn-primary btn-sm" onclick="openOppModal(${sIdx},${oIdx})">Edit</button><button class="btn btn-danger btn-sm" onclick="removeStageOpp(${sIdx},${oIdx})">X</button></div></li>`;
+            const ct = o.checkType || (o.requiredSkillID ? 'skill' : 'none');
+            const spawn = o.spawnChance !== undefined ? ` ${Math.round(o.spawnChance*100)}%` : '';
+            oppList.innerHTML += `<li class="list-item"><span><strong>${o.name}</strong> (${ct}${spawn})</span><div><button class="btn btn-primary btn-sm" onclick="openOppModal(${sIdx},${oIdx})">Edit</button><button class="btn btn-danger btn-sm" onclick="removeStageOpp(${sIdx},${oIdx})">X</button></div></li>`;
         });
         const branchList = document.getElementById(`stage-${sIdx}-branch`);
         (stage.stageBranches||[]).forEach((b,bIdx) => {
@@ -889,56 +949,123 @@ function confirmAddEnemy() {
 }
 function removeStageEnemy(sIdx,eIdx){challengesData[currentChallengeIdx].stages[sIdx].enemies.splice(eIdx,1);renderStages(challengesData[currentChallengeIdx].stages);}
 
+function updateOppCheckFields() {
+    const ct = document.getElementById('modal-opp-checktype').value;
+    document.getElementById('opp-skill-wrap').style.display     = ct === 'skill' ? '' : 'none';
+    document.getElementById('opp-stat-wrap').style.display      = (ct === 'skill' || ct === 'stat') ? '' : 'none';
+    document.getElementById('opp-random-wrap').style.display    = ct === 'random' ? '' : 'none';
+    document.getElementById('opp-fallback-section').style.display = ct === 'skill' ? '' : 'none';
+}
+function updateOppSuccessFields() {
+    const type = document.getElementById('modal-opp-success-type').value;
+    document.getElementById('opp-success-enemy-wrap').style.display = type === 'remove_enemy' ? '' : 'none';
+}
+
 function openOppModal(sIdx, oIdx=null) {
     document.getElementById('modal-opp-stage-idx').value = sIdx;
     const skillSelect = document.getElementById('modal-opp-skill');
-    skillSelect.innerHTML = '';
+    skillSelect.innerHTML = '<option value="">-- None --</option>';
     skillsData.forEach(s => skillSelect.innerHTML += `<option value="${s.id}">${s.name} (${s.id})</option>`);
+
     if (oIdx !== null) {
         document.getElementById('modal-opp-idx').value = oIdx;
         const opp = challengesData[currentChallengeIdx].stages[sIdx].preCombatOpportunities[oIdx];
-        document.getElementById('modal-opp-name').value = opp.name;
-        skillSelect.value = opp.requiredSkillID;
-        document.getElementById('modal-opp-stat').value = opp.checkStat;
-        document.getElementById('modal-opp-thresh').value = opp.difficultyThreshold;
-        document.getElementById('modal-opp-success-narr').value = opp.successEffect.narrative;
-        document.getElementById('modal-opp-success-type').value = opp.successEffect.type;
-        document.getElementById('modal-opp-fail-narr').value = opp.failureEffect.narrative;
-        document.getElementById('modal-opp-fail-type').value = opp.failureEffect.type;
-        document.getElementById('modal-opp-fail-mag').value = opp.failureEffect.magnitude||0.2;
-        document.getElementById('modal-opp-fb-narr').value = opp.fallbackEffect.narrative;
-        document.getElementById('modal-opp-fb-type').value = opp.fallbackEffect.type;
-        document.getElementById('modal-opp-fb-mag').value = opp.fallbackEffect.magnitude||0.3;
+        document.getElementById('modal-opp-name').value        = opp.name || '';
+        document.getElementById('modal-opp-spawn').value       = opp.spawnChance !== undefined ? opp.spawnChance : 1.0;
+        document.getElementById('modal-opp-checktype').value   = opp.checkType || (opp.requiredSkillID ? 'skill' : 'none');
+        skillSelect.value = opp.requiredSkillID || '';
+        document.getElementById('modal-opp-stat').value           = opp.checkStat || 'ambition';
+        document.getElementById('modal-opp-secondarystat').value  = opp.secondaryStat || 'endurance';
+        document.getElementById('modal-opp-thresh').value         = opp.difficultyThreshold || 50;
+        document.getElementById('modal-opp-successchance').value  = opp.successChance !== undefined ? opp.successChance : 0.5;
+        document.getElementById('modal-opp-success-narr').value   = opp.successEffect?.narrative || '';
+        document.getElementById('modal-opp-success-type').value   = opp.successEffect?.type || 'narrative_only';
+        document.getElementById('modal-opp-success-enemytype').value = opp.successEffect?.enemyTypeID || '';
+        document.getElementById('modal-opp-success-count').value   = opp.successEffect?.count || 1;
+        document.getElementById('modal-opp-fail-narr').value       = opp.failureEffect?.narrative || '';
+        document.getElementById('modal-opp-fail-type').value       = opp.failureEffect?.type || 'apply_direct_damage';
+        document.getElementById('modal-opp-fail-mag').value        = opp.failureEffect?.magnitude || 0.15;
+        document.getElementById('modal-opp-fb-narr').value         = opp.fallbackEffect?.narrative || '';
+        document.getElementById('modal-opp-fb-type').value         = opp.fallbackEffect?.type || 'apply_direct_damage';
+        document.getElementById('modal-opp-fb-mag').value          = opp.fallbackEffect?.magnitude || 0.20;
     } else {
-        document.getElementById('modal-opp-idx').value='';
-        document.getElementById('modal-opp-name').value='';
-        document.getElementById('modal-opp-thresh').value=40;
-        document.getElementById('modal-opp-success-narr').value='Success!';
-        document.getElementById('modal-opp-fail-narr').value='Failed!';
-        document.getElementById('modal-opp-fb-narr').value='No skill!';
+        document.getElementById('modal-opp-idx').value = '';
+        document.getElementById('modal-opp-name').value = '';
+        document.getElementById('modal-opp-spawn').value = 1.0;
+        document.getElementById('modal-opp-checktype').value = 'skill';
+        document.getElementById('modal-opp-thresh').value = 50;
+        document.getElementById('modal-opp-successchance').value = 0.5;
+        document.getElementById('modal-opp-success-narr').value = 'Success!';
+        document.getElementById('modal-opp-fail-narr').value = 'Failed!';
+        document.getElementById('modal-opp-fb-narr').value = 'No skill!';
     }
+    updateOppCheckFields();
+    updateOppSuccessFields();
     openModal('oppModal');
 }
+
 function confirmAddOpp() {
-    const sIdx=parseInt(document.getElementById('modal-opp-stage-idx').value);
-    const oIdxVal=document.getElementById('modal-opp-idx').value;
-    const oIdx=oIdxVal===''?null:parseInt(oIdxVal);
-    const opp={
-        id:oIdx!==null?challengesData[currentChallengeIdx].stages[sIdx].preCombatOpportunities[oIdx].id:`opp_${Date.now()}`,
-        name:document.getElementById('modal-opp-name').value,
-        requiredSkillID:document.getElementById('modal-opp-skill').value,
-        checkStat:document.getElementById('modal-opp-stat').value,
-        secondaryStat:'endurance',
-        difficultyThreshold:parseInt(document.getElementById('modal-opp-thresh').value),
-        successEffect:{type:document.getElementById('modal-opp-success-type').value,magnitude:0,narrative:document.getElementById('modal-opp-success-narr').value},
-        failureEffect:{type:document.getElementById('modal-opp-fail-type').value,magnitude:parseFloat(document.getElementById('modal-opp-fail-mag').value),statScale:'maxHP',narrative:document.getElementById('modal-opp-fail-narr').value},
-        fallbackEffect:{type:document.getElementById('modal-opp-fb-type').value,magnitude:parseFloat(document.getElementById('modal-opp-fb-mag').value),statScale:'maxHP',narrative:document.getElementById('modal-opp-fb-narr').value}
+    const sIdx    = parseInt(document.getElementById('modal-opp-stage-idx').value);
+    const oIdxVal = document.getElementById('modal-opp-idx').value;
+    const oIdx    = oIdxVal === '' ? null : parseInt(oIdxVal);
+    const checkType = document.getElementById('modal-opp-checktype').value;
+
+    const successType = document.getElementById('modal-opp-success-type').value;
+    const successEffect = { type: successType, narrative: document.getElementById('modal-opp-success-narr').value };
+    if (successType === 'remove_enemy') {
+        successEffect.enemyTypeID = document.getElementById('modal-opp-success-enemytype').value;
+        successEffect.count = parseInt(document.getElementById('modal-opp-success-count').value) || 1;
+    }
+
+    const failEffect = {
+        type: document.getElementById('modal-opp-fail-type').value,
+        magnitude: parseFloat(document.getElementById('modal-opp-fail-mag').value) || 0.15,
+        statScale: 'maxHP',
+        narrative: document.getElementById('modal-opp-fail-narr').value
     };
-    if(oIdx!==null){challengesData[currentChallengeIdx].stages[sIdx].preCombatOpportunities[oIdx]=opp;}
-    else{if(!challengesData[currentChallengeIdx].stages[sIdx].preCombatOpportunities)challengesData[currentChallengeIdx].stages[sIdx].preCombatOpportunities=[];challengesData[currentChallengeIdx].stages[sIdx].preCombatOpportunities.push(opp);}
+    const fbEffect = {
+        type: document.getElementById('modal-opp-fb-type').value,
+        magnitude: parseFloat(document.getElementById('modal-opp-fb-mag').value) || 0.20,
+        statScale: 'maxHP',
+        narrative: document.getElementById('modal-opp-fb-narr').value
+    };
+
+    const opp = {
+        id: oIdx !== null
+            ? challengesData[currentChallengeIdx].stages[sIdx].preCombatOpportunities[oIdx].id
+            : `opp_${Date.now()}`,
+        name:        document.getElementById('modal-opp-name').value,
+        spawnChance: parseFloat(document.getElementById('modal-opp-spawn').value),
+        checkType,
+        successEffect,
+        failureEffect: failEffect,
+    };
+
+    if (checkType === 'skill') {
+        opp.requiredSkillID = document.getElementById('modal-opp-skill').value;
+        opp.checkStat       = document.getElementById('modal-opp-stat').value;
+        opp.secondaryStat   = document.getElementById('modal-opp-secondarystat').value;
+        opp.difficultyThreshold = parseInt(document.getElementById('modal-opp-thresh').value);
+        opp.fallbackEffect  = fbEffect;
+    } else if (checkType === 'stat') {
+        opp.checkStat     = document.getElementById('modal-opp-stat').value;
+        opp.secondaryStat = document.getElementById('modal-opp-secondarystat').value;
+        opp.difficultyThreshold = parseInt(document.getElementById('modal-opp-thresh').value);
+    } else if (checkType === 'random') {
+        opp.successChance = parseFloat(document.getElementById('modal-opp-successchance').value);
+    }
+
+    if (oIdx !== null) {
+        challengesData[currentChallengeIdx].stages[sIdx].preCombatOpportunities[oIdx] = opp;
+    } else {
+        if (!challengesData[currentChallengeIdx].stages[sIdx].preCombatOpportunities)
+            challengesData[currentChallengeIdx].stages[sIdx].preCombatOpportunities = [];
+        challengesData[currentChallengeIdx].stages[sIdx].preCombatOpportunities.push(opp);
+    }
     closeModal('oppModal');
     renderStages(challengesData[currentChallengeIdx].stages);
 }
+
 function removeStageOpp(sIdx,oIdx){challengesData[currentChallengeIdx].stages[sIdx].preCombatOpportunities.splice(oIdx,1);renderStages(challengesData[currentChallengeIdx].stages);}
 function addBranchToStage(sIdx){
     const hasCond=confirm('Does this branch have a condition?');

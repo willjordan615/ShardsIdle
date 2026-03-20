@@ -125,178 +125,143 @@ class CombatEngine {
     const preCombatTurns = [];
     let currentTurnCount = globalTurnCount;
 
-    // 1. Find all valid opportunities (player has the required skill)
-    const validOptions = opportunities.filter(op => {
-      return playerCharacters.some(p => 
-        !p.defeated && p.skills && p.skills.some(s => s.skillID === op.requiredSkillID)
-      );
+    // ── Step 1: Filter by spawn chance ──────────────────────────────────
+    // Each opportunity has an optional `spawnChance` (0–1, default 1.0).
+    // Roll for each — only opportunities that pass are eligible this run.
+    const eligible = opportunities.filter(op => {
+      const roll = Math.random();
+      const passes = roll < (op.spawnChance !== undefined ? op.spawnChance : 1.0);
+      if (!passes) console.log(`[PRE-COMBAT] Opportunity "${op.name}" skipped (spawnChance roll failed)`);
+      return passes;
     });
 
-    let bestOption = null;
-    let highestChance = -1;
-    let bestActor = null;
-    let bestStatValue = -1;
-    let isFallbackScenario = false;
-
-    // SCENARIO A: Player HAS the skill
-    if (validOptions.length > 0) {
-      validOptions.forEach(op => {
-        let candidateBestStat = -1;
-        let candidateActor = null;
-
-        playerCharacters.forEach(p => {
-          if (p.defeated) return;
-          const hasSkill = p.skills && p.skills.some(s => s.skillID === op.requiredSkillID);
-          if (!hasSkill) return;
-
-          const primaryVal = p.stats[op.checkStat] || 0;
-          const secondaryVal = p.stats[op.secondaryStat] || 0;
-          const statValue = primaryVal + (secondaryVal * 0.5);
-
-          if (statValue > candidateBestStat) {
-            candidateBestStat = statValue;
-            candidateActor = p;
-          }
-        });
-
-        if (!candidateActor) return;
-
-        const margin = candidateBestStat - op.difficultyThreshold;
-        const chance = 0.5 + (margin / CONSTANTS.STAT_SCALE);
-        const clampedChance = Math.max(0.05, Math.min(0.95, chance));
-
-        if (clampedChance > highestChance) {
-          highestChance = clampedChance;
-          bestOption = op;
-          bestActor = candidateActor;
-          bestStatValue = candidateBestStat;
-        }
-      });
-    } 
-    // SCENARIO B: Player LACKS the skill (FALLBACK)
-    else {
-      const fallbackOpportunity = opportunities.find(op => op.fallbackEffect);
-      
-      if (fallbackOpportunity) {
-        isFallbackScenario = true;
-        bestOption = fallbackOpportunity;
-        let candidateBestStat = -1;
-        let candidateActor = playerCharacters[0]; 
-        
-        playerCharacters.forEach(p => {
-          if (p.defeated) return;
-          const primaryVal = p.stats[bestOption.checkStat] || 0;
-          if (primaryVal > candidateBestStat) {
-            candidateBestStat = primaryVal;
-            candidateActor = p;
-          }
-        });
-        
-        bestActor = candidateActor;
-        bestStatValue = candidateBestStat;
-        highestChance = 0;
-      }
-    }
-
-    if (!bestOption) {
+    if (eligible.length === 0) {
       return { turns: [], turnCount: currentTurnCount };
     }
 
-    // 3. Execute the Option
-    currentTurnCount++;
-    
-    let isSuccess = false;
-    let rolled = 0;
-    let effect = null;
+    // ── Step 2: Pick one opportunity at random from eligible pool ────────
+    const op = eligible[Math.floor(Math.random() * eligible.length)];
 
-    if (isFallbackScenario) {
-      rolled = 1.0; 
-      isSuccess = false;
-      effect = bestOption.fallbackEffect;
-      
-      console.log(`\n[PRE-COMBAT] === Opportunity Detected (FALLBACK) ===`);
-      console.log(`[PRE-COMBAT] Skill Required: ${bestOption.name} (ID: ${bestOption.requiredSkillID})`);
-      console.log(`[PRE-COMBAT] Status: ❌ NO PARTY MEMBER HAS THIS SKILL`);
-      console.log(`[PRE-COMBAT] Result: AUTOMATIC FAILURE (Fallback Triggered)`);
-      console.log(`[PRE-COMBAT] Narrative: "${effect.narrative}"\n`);
+    // ── Step 3: Resolve the check type ───────────────────────────────────
+    // check types: 'skill' | 'stat' | 'party_size' | 'random' | none (always fires success/failure)
+    const checkType = op.checkType || (op.requiredSkillID ? 'skill' : 'none');
+
+    let bestActor = playerCharacters.find(p => !p.defeated) || playerCharacters[0];
+    let bestStatValue = 0;
+    let highestChance = 0.5;
+    let conditionMet = false;  // does the party even qualify to attempt this?
+    let isFallback = false;
+
+    if (checkType === 'skill') {
+      // Party must have the skill to attempt — otherwise fallback fires
+      const qualifiedActors = playerCharacters.filter(p =>
+        !p.defeated && p.skills && p.skills.some(s => s.skillID === op.requiredSkillID)
+      );
+      if (qualifiedActors.length === 0) {
+        isFallback = true;
+        conditionMet = false;
+      } else {
+        conditionMet = true;
+        // Best actor = highest stat value among qualified
+        qualifiedActors.forEach(p => {
+          const val = (p.stats?.[op.checkStat] || 0) + (p.stats?.[op.secondaryStat] || 0) * 0.5;
+          if (val > bestStatValue) { bestStatValue = val; bestActor = p; }
+        });
+        const margin = bestStatValue - (op.difficultyThreshold || 50);
+        highestChance = Math.max(0.05, Math.min(0.95, 0.5 + margin / CONSTANTS.STAT_SCALE));
+      }
+    } else if (checkType === 'stat') {
+      // No skill required — any party member can attempt via stats alone
+      conditionMet = true;
+      playerCharacters.filter(p => !p.defeated).forEach(p => {
+        const val = (p.stats?.[op.checkStat] || 0) + (p.stats?.[op.secondaryStat] || 0) * 0.5;
+        if (val > bestStatValue) { bestStatValue = val; bestActor = p; }
+      });
+      const margin = bestStatValue - (op.difficultyThreshold || 50);
+      highestChance = Math.max(0.05, Math.min(0.95, 0.5 + margin / CONSTANTS.STAT_SCALE));
+    } else if (checkType === 'party_size') {
+      const alive = playerCharacters.filter(p => !p.defeated).length;
+      conditionMet = true;
+      const minOk = op.minPartySize === undefined || alive >= op.minPartySize;
+      const maxOk = op.maxPartySize === undefined || alive <= op.maxPartySize;
+      highestChance = (minOk && maxOk) ? 1.0 : 0.0;
+    } else if (checkType === 'random') {
+      conditionMet = true;
+      highestChance = op.successChance !== undefined ? op.successChance : 0.5;
     } else {
-      rolled = Math.random();
-      isSuccess = rolled <= highestChance;
-      effect = isSuccess ? bestOption.successEffect : bestOption.failureEffect;
-
-      const primaryStatVal = bestActor.stats[bestOption.checkStat] || 0;
-      const secondaryStatVal = bestActor.stats[bestOption.secondaryStat] || 0;
-      
-      console.log(`\n[PRE-COMBAT] === Opportunity Detected ===`);
-      console.log(`[PRE-COMBAT] Skill: ${bestOption.name} (ID: ${bestOption.requiredSkillID})`);
-      console.log(`[PRE-COMBAT] Actor: ${bestActor.name}`);
-      console.log(`[PRE-COMBAT] Stats Check: ${bestOption.checkStat}(${primaryStatVal}) + ${bestOption.secondaryStat}(${secondaryStatVal})*0.5 = ${bestStatValue.toFixed(1)}`);
-      console.log(`[PRE-COMBAT] Threshold: ${bestOption.difficultyThreshold} | Margin: ${(bestStatValue - bestOption.difficultyThreshold).toFixed(1)}`);
-      console.log(`[PRE-COMBAT] Calculated Chance: ${(highestChance * 100).toFixed(1)}%`);
-      console.log(`[PRE-COMBAT] RNG Roll: ${rolled.toFixed(3)} vs Required: ${highestChance.toFixed(3)}`);
-      console.log(`[PRE-COMBAT] Result: ${isSuccess ? '✅ SUCCESS' : '❌ FAILURE'}`);
-      console.log(`[PRE-COMBAT] Narrative: "${effect.narrative}"\n`);
+      // 'none' — narrative only, always fires, no check
+      conditionMet = true;
+      highestChance = 1.0;
     }
+
+    // ── Step 4: Roll outcome ─────────────────────────────────────────────
+    currentTurnCount++;
+    let rolled = Math.random();
+    let isSuccess = !isFallback && (rolled <= highestChance);
+    let effect = isFallback
+      ? (op.fallbackEffect || op.failureEffect)
+      : (isSuccess ? op.successEffect : op.failureEffect);
+
+    if (!effect) {
+      console.warn(`[PRE-COMBAT] No effect found for "${op.name}" (isFallback=${isFallback} isSuccess=${isSuccess})`);
+      return { turns: [], turnCount: currentTurnCount };
+    }
+
+    // ── Step 5: Log ──────────────────────────────────────────────────────
+    console.log(`\n[PRE-COMBAT] === ${op.name} ===`);
+    console.log(`[PRE-COMBAT] checkType: ${checkType} | conditionMet: ${conditionMet} | isFallback: ${isFallback}`);
+    if (checkType !== 'none' && checkType !== 'random') {
+      console.log(`[PRE-COMBAT] Best actor: ${bestActor?.name} | statValue: ${bestStatValue.toFixed(1)} | chance: ${(highestChance*100).toFixed(1)}%`);
+    }
+    console.log(`[PRE-COMBAT] Roll: ${rolled.toFixed(3)} | Result: ${isFallback ? 'FALLBACK' : isSuccess ? '✅ SUCCESS' : '❌ FAILURE'}`);
+    console.log(`[PRE-COMBAT] Narrative: "${effect.narrative}"\n`);
 
     const narrativeTurn = {
       turnNumber: currentTurnCount,
       stageTurnNumber: 0,
-      actor: bestActor.id,
-      actorName: bestActor.name,
-      action: { 
-        type: isFallbackScenario ? 'pre_combat_fallback' : 'pre_combat_skill', 
-        skillID: bestOption.requiredSkillID, 
-        name: isFallbackScenario ? `No Countermeasure (${bestOption.name})` : bestOption.name 
+      actor: bestActor?.id,
+      actorName: bestActor?.name || 'Party',
+      action: {
+        type: isFallback ? 'pre_combat_fallback' : 'pre_combat_skill',
+        skillID: op.requiredSkillID || null,
+        name: op.name
       },
-      roll: { 
-        hitChance: isFallbackScenario ? 0 : highestChance, 
-        rolled: rolled, 
-        hit: isSuccess 
-      },
-      result: {
-        message: effect.narrative,
-        success: isSuccess,
-        delay: 1000
-      }
+      roll: { hitChance: highestChance, rolled, hit: isSuccess },
+      result: { message: effect.narrative, success: isSuccess, delay: 1000 }
     };
 
-    // 4. Apply Effects
+    // ── Step 6: Apply effects ────────────────────────────────────────────
     if (effect.type === 'apply_direct_damage') {
       playerCharacters.forEach(p => {
         if (p.defeated) return;
-        const maxHP = p.maxHP;
-        const damage = Math.floor(maxHP * effect.magnitude);
+        const damage = Math.floor(p.maxHP * (effect.magnitude || 0.1));
         p.currentHP = Math.max(0, p.currentHP - damage);
-        if (p.currentHP <= 0) {
-          p.defeated = true;
-          narrativeTurn.result.message += ` ${p.name} falls immediately!`;
-        }
+        if (p.currentHP <= 0) { p.defeated = true; narrativeTurn.result.message += ` ${p.name} falls!`; }
       });
     } else if (effect.type === 'apply_status') {
-       // Apply status to all players for simplicity in pre-combat
-       playerCharacters.forEach(p => {
-         if (!p.defeated) {
-           this.statusEngine.applyStatus(p, effect.status, effect.duration, effect.magnitude || 1);
-         }
-       });
+      playerCharacters.forEach(p => {
+        if (!p.defeated) this.statusEngine.applyStatus(p, effect.status, effect.duration, effect.magnitude || 1);
+      });
     } else if (effect.type === 'remove_enemy') {
-       // Remove X enemies of the first type found in the stage
-       const countToRemove = effect.magnitude || 1;
-       const targetType = stage.enemies[0]?.enemyTypeID; // Simplified for demo
-       if (targetType) {
-         let removed = 0;
-         for (let i = enemies.length - 1; i >= 0; i--) {
-           if (enemies[i].name.includes(targetType.split('_').pop()) || enemies[i].id.includes(targetType)) {
-              enemies.splice(i, 1);
-              removed++;
-              if (removed >= countToRemove) break;
-           }
-         }
-       }
+      // effect.enemyTypeID — which enemy type to remove. Falls back to first enemy type in stage.
+      const targetTypeID = effect.enemyTypeID || stage.enemies?.[0]?.enemyTypeID;
+      const countToRemove = effect.count || effect.magnitude || 1;
+      if (targetTypeID) {
+        let removed = 0;
+        for (let i = enemies.length - 1; i >= 0 && removed < countToRemove; i--) {
+          if (enemies[i].id.includes(targetTypeID)) { enemies.splice(i, 1); removed++; }
+        }
+        console.log(`[PRE-COMBAT] Removed ${removed}x ${targetTypeID} from combat`);
+      }
+    } else if (effect.type === 'apply_buff') {
+      // Apply a status buff to all alive party members
+      playerCharacters.forEach(p => {
+        if (!p.defeated) this.statusEngine.applyStatus(p, effect.status, effect.duration || 3, effect.magnitude || 1);
+      });
     }
+    // 'narrative_only' — no mechanical effect, just the text
 
     preCombatTurns.push(narrativeTurn);
-
     return { turns: preCombatTurns, turnCount: currentTurnCount };
   }
 
@@ -403,10 +368,25 @@ class CombatEngine {
 
           // Evaluate Condition
           let conditionMet = false;
-          if (branch.condition.type === 'has_skill') {
-            conditionMet = playerCharacters.some(p => 
-              !p.defeated && p.skills && p.skills.some(s => s.skillID === branch.condition.value)
+          const cond = branch.condition;
+          if (cond.type === 'has_skill') {
+            conditionMet = playerCharacters.some(p =>
+              !p.defeated && p.skills && p.skills.some(s => s.skillID === cond.value)
             );
+          } else if (cond.type === 'stat_check') {
+            // cond.stat, cond.threshold — true if any alive player meets it
+            conditionMet = playerCharacters.some(p =>
+              !p.defeated && (p.stats?.[cond.stat] || 0) >= cond.threshold
+            );
+          } else if (cond.type === 'party_size') {
+            // cond.min / cond.max
+            const alive = playerCharacters.filter(p => !p.defeated).length;
+            const minOk = cond.min === undefined || alive >= cond.min;
+            const maxOk = cond.max === undefined || alive <= cond.max;
+            conditionMet = minOk && maxOk;
+          } else if (cond.type === 'random') {
+            // cond.chance — fires randomly
+            conditionMet = Math.random() < (cond.chance || 0.5);
           }
           
           if (conditionMet) {

@@ -453,5 +453,686 @@
         }
       ]
     }
+  },
+  {
+    "id": "challenge_stone_tooth_pass",
+    "name": "Stone Tooth Pass",
+    "description": "A narrow mountain defile locked in a four-year dwarven succession war. Two degraded armies and a band of stranded merchants fight over the only safe route through the Godspine range. The party must choose a path through the pass \u2014 and deal with whoever controls it.",
+    "difficulty": 3,
+    "recommendedLevel": 5,
+    "minPartySize": 1,
+    "maxPartySize": 4,
+    "stages": [
+      {
+        "stageId": 1,
+        "title": "The Scree Approach",
+        "description": "The approach to the pass is littered with abandoned supply wagons and skirmishing soldiers. Both factions are too busy bleeding each other to notice the party \u2014 until they do.",
+        "enemies": [
+          {
+            "enemyTypeID": "ironvein_conscript",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 4
+          },
+          {
+            "enemyTypeID": "goldcrown_scout",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 4
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "spot_the_ambush",
+            "name": "Read the Terrain",
+            "spawnChance": 0.6,
+            "checkType": "skill",
+            "requiredSkillID": "sense",
+            "checkStat": "ambition",
+            "secondaryStat": "endurance",
+            "difficultyThreshold": 40,
+            "successEffect": {
+              "type": "narrative_only",
+              "narrative": "Your party spots the caltrop fields and loose-rock triggers before stepping into them, skirting the ambush entirely and entering the fight from a flanking position."
+            },
+            "failureEffect": {
+              "type": "apply_direct_damage",
+              "magnitude": 0.12,
+              "narrative": "A loose-rock trigger catches the party off guard. Stones cascade from the ridge, wounding everyone before the fighting even begins."
+            },
+            "fallbackEffect": {
+              "type": "apply_direct_damage",
+              "magnitude": 0.18,
+              "narrative": "Without anyone skilled in reading terrain, the party walks straight into the caltrop fields. The Scouts are already laughing when the real fight starts."
+            }
+          },
+          {
+            "id": "consortium_warning",
+            "name": "A Merchant's Warning",
+            "spawnChance": 0.5,
+            "checkType": "stat",
+            "checkStat": "harmony",
+            "secondaryStat": "ambition",
+            "difficultyThreshold": 55,
+            "successEffect": {
+              "type": "narrative_only",
+              "narrative": "A stranded merchant waves the party down before they enter the killing ground. She sketches the patrol routes in the dirt \u2014 the party enters the fight knowing exactly where everyone is."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "A merchant calls out a warning, but the party can't parse her frantic gesturing in time. They nod politely and walk straight into the skirmish line."
+            }
+          },
+          {
+            "id": "bad_luck",
+            "name": "Poorly Timed Arrival",
+            "spawnChance": 0.3,
+            "checkType": "random",
+            "successChance": 0.0,
+            "successEffect": {
+              "type": "narrative_only",
+              "narrative": "The timing is perfect \u2014 the soldiers are distracted."
+            },
+            "failureEffect": {
+              "type": "apply_direct_damage",
+              "magnitude": 0.1,
+              "narrative": "The party crests the rise just as a stray boulder from a rockslide rolls through the approach. Nobody is seriously hurt, but everyone is shaken."
+            }
+          }
+        ],
+        "stageBranches": [
+          {
+            "condition": {
+              "type": "random",
+              "chance": 0.5
+            },
+            "nextStageId": 2,
+            "overrideDescription": "The lower tunnels are accessible \u2014 the Ironvein hold this ground."
+          },
+          {
+            "nextStageId": 3
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion_minor",
+            "dropChance": 0.4,
+            "rarity": "common"
+          },
+          {
+            "itemID": "stamina_potion_minor",
+            "dropChance": 0.3,
+            "rarity": "common"
+          },
+          {
+            "itemID": "handaxe_throwing_tier0",
+            "dropChance": 0.2,
+            "rarity": "common"
+          }
+        ]
+      },
+      {
+        "stageId": 2,
+        "title": "The Lower Tunnels",
+        "description": "The Ironvein Loyalists hold the cave system beneath the pass \u2014 their shield walls fill every chokepoint and they fight with the grim endurance of men who have not retreated in four years.",
+        "enemies": [
+          {
+            "enemyTypeID": "stone_guard_veteran",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 5
+          },
+          {
+            "enemyTypeID": "ironvein_conscript",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 5
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "tunnel_knowledge",
+            "name": "Knowledge of the Deep Roads",
+            "spawnChance": 0.7,
+            "checkType": "skill",
+            "requiredSkillID": "footwork",
+            "checkStat": "ambition",
+            "secondaryStat": "endurance",
+            "difficultyThreshold": 50,
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "ironvein_conscript",
+              "count": 1,
+              "narrative": "The party finds a secondary passage behind the shield wall and collapses it, cutting off reinforcements. One fewer Conscript joins the fight."
+            },
+            "failureEffect": {
+              "type": "apply_direct_damage",
+              "magnitude": 0.14,
+              "narrative": "The party attempts to flank through a side tunnel and finds it occupied. They fight their way back to the main passage, bloodied."
+            },
+            "fallbackEffect": {
+              "type": "apply_direct_damage",
+              "magnitude": 0.18,
+              "narrative": "The tunnels are a maze to those who don't know them. The Loyalists hear the party coming from three corridors away."
+            }
+          },
+          {
+            "id": "conviction_check",
+            "name": "The Weight of Their Cause",
+            "spawnChance": 0.5,
+            "checkType": "stat",
+            "checkStat": "conviction",
+            "secondaryStat": "endurance",
+            "difficultyThreshold": 80,
+            "successEffect": {
+              "type": "narrative_only",
+              "narrative": "Your party's bearing gives the Loyalists pause. For a moment, the Stone-Guards hesitate \u2014 these are not the soft merchants they usually ambush. They readjust their formation, buying the party a breath."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "The Loyalists take one look at the party and tighten their shields. They've seen enough desperation to recognize it."
+            }
+          }
+        ],
+        "stageBranches": [
+          {
+            "nextStageId": 4
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion",
+            "dropChance": 0.25,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "shield_iron_tier0",
+            "dropChance": 0.2,
+            "rarity": "common"
+          },
+          {
+            "itemID": "hammer_iron_tier0",
+            "dropChance": 0.2,
+            "rarity": "common"
+          },
+          {
+            "itemID": "head_chain_coif_tier0",
+            "dropChance": 0.15,
+            "rarity": "common"
+          }
+        ]
+      },
+      {
+        "stageId": 3,
+        "title": "The High Ledges",
+        "description": "The Goldcrown Usurpers command the watchtowers and cliffside positions above the pass \u2014 a paranoid, rain-soaked garrison that shoots first and never asks questions.",
+        "enemies": [
+          {
+            "enemyTypeID": "goldcrown_scout",
+            "countRange": [
+              2,
+              4
+            ],
+            "level": 5
+          },
+          {
+            "enemyTypeID": "consortium_desperado",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 4
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "approach_the_watchtower",
+            "name": "The Long Approach",
+            "spawnChance": 0.65,
+            "checkType": "skill",
+            "requiredSkillID": "misdirect",
+            "checkStat": "ambition",
+            "secondaryStat": "harmony",
+            "difficultyThreshold": 45,
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "goldcrown_scout",
+              "count": 1,
+              "narrative": "One party member doubles back and approaches the tower from the blind side, putting a Scout out of the fight before the alarm is raised."
+            },
+            "failureEffect": {
+              "type": "apply_direct_damage",
+              "magnitude": 0.12,
+              "narrative": "The deception is almost convincing. Almost. The Scout's horn sounds while the party is still in the open."
+            },
+            "fallbackEffect": {
+              "type": "apply_direct_damage",
+              "magnitude": 0.2,
+              "narrative": "The party has no way to approach without being seen. The Scouts loose two volleys before the party can close the distance."
+            }
+          },
+          {
+            "id": "ambition_gambit",
+            "name": "A Bold Advance",
+            "spawnChance": 0.45,
+            "checkType": "stat",
+            "checkStat": "ambition",
+            "secondaryStat": "conviction",
+            "difficultyThreshold": 70,
+            "successEffect": {
+              "type": "narrative_only",
+              "narrative": "The party charges the ledge position without breaking stride. The Scouts, accustomed to prey that runs, hesitate just long enough to lose their best shot."
+            },
+            "failureEffect": {
+              "type": "apply_direct_damage",
+              "magnitude": 0.14,
+              "narrative": "The bold advance telegraphs itself too clearly. The Scouts adjust their aim and the first volley finds its mark."
+            }
+          }
+        ],
+        "stageBranches": [
+          {
+            "nextStageId": 4
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion",
+            "dropChance": 0.25,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "handaxe_throwing_tier0",
+            "dropChance": 0.25,
+            "rarity": "common"
+          },
+          {
+            "itemID": "axe_iron_tier0",
+            "dropChance": 0.2,
+            "rarity": "common"
+          },
+          {
+            "itemID": "head_leather_hood_tier0",
+            "dropChance": 0.15,
+            "rarity": "common"
+          }
+        ]
+      },
+      {
+        "stageId": 4,
+        "title": "The War Council Cavern",
+        "description": "At the heart of the pass, Warlord Thorin Ironvein has cornered a Goldcrown delegation in the cavern shrine of the mountain ancestors. Both factions turn on the intruders without hesitation.",
+        "enemies": [
+          {
+            "enemyTypeID": "ironvein_conscript",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 6
+          },
+          {
+            "enemyTypeID": "goldcrown_scout",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 6
+          },
+          {
+            "enemyTypeID": "warlord_thorin_ironvein",
+            "countRange": [
+              1,
+              1
+            ],
+            "level": 7
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "thorin_grief",
+            "name": "The Unfinished Hammer",
+            "spawnChance": 0.55,
+            "checkType": "stat",
+            "checkStat": "harmony",
+            "secondaryStat": "conviction",
+            "difficultyThreshold": 85,
+            "successEffect": {
+              "type": "narrative_only",
+              "narrative": "Someone in the party notices the unfinished warhammer at Thorin's belt \u2014 half-crafted, clearly not his. For a moment the Warlord's eyes go somewhere else. The fight begins a breath slower."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "Thorin takes one look at the party and raises his hammer. Whatever he sees, it isn't reason enough to pause."
+            }
+          },
+          {
+            "id": "already_bloodied",
+            "name": "Coming in Wounded",
+            "spawnChance": 0.4,
+            "checkType": "random",
+            "successChance": 0.0,
+            "successEffect": {
+              "type": "narrative_only",
+              "narrative": "The party arrives in better shape than expected."
+            },
+            "failureEffect": {
+              "type": "apply_direct_damage",
+              "magnitude": 0.08,
+              "narrative": "The last tunnel collapses a section of ceiling as the party enters the cavern. Dust and rock \u2014 not enough to stop anyone, but enough to remind them the mountain is not neutral."
+            }
+          }
+        ],
+        "stageBranches": [],
+        "lootTable": [
+          {
+            "itemID": "hammer_steel_tier1",
+            "dropChance": 0.3,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "health_potion",
+            "dropChance": 0.35,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "chest_chain_shirt_tier0",
+            "dropChance": 0.2,
+            "rarity": "common"
+          }
+        ]
+      }
+    ],
+    "rewards": {
+      "baseXP": 750,
+      "baseGold": 275,
+      "lootTable": [
+        {
+          "itemID": "hammer_steel_tier1",
+          "dropChance": 0.35,
+          "rarity": "uncommon"
+        },
+        {
+          "itemID": "axe_steel_tier1",
+          "dropChance": 0.3,
+          "rarity": "uncommon"
+        },
+        {
+          "itemID": "shield_steel_tier1",
+          "dropChance": 0.25,
+          "rarity": "uncommon"
+        },
+        {
+          "itemID": "chest_chain_shirt_tier0",
+          "dropChance": 0.3,
+          "rarity": "common"
+        },
+        {
+          "itemID": "head_chain_coif_tier0",
+          "dropChance": 0.25,
+          "rarity": "common"
+        },
+        {
+          "itemID": "health_potion",
+          "dropChance": 0.45,
+          "rarity": "uncommon"
+        },
+        {
+          "itemID": "stamina_potion_minor",
+          "dropChance": 0.35,
+          "rarity": "common"
+        }
+      ]
+    }
+  },
+  {
+    "id": "challenge_sunken_sanctum",
+    "name": "Sunken Sanctum of Aethelgard",
+    "description": "Three hundred years ago the city of Aethelgard sank in a single night, cursed by a ritual meant to bind a water spirit to human will. The survivors made a religion of the disaster. They still live beneath the lake, breathing through ancient wards, and they mean to drown the rest of the world.",
+    "difficulty": 7,
+    "recommendedLevel": 9,
+    "minPartySize": 1,
+    "maxPartySize": 4,
+    "stages": [
+      {
+        "stageId": 1,
+        "title": "The Sunken Shore",
+        "description": "Broken bridges and half-submerged islands mark the approach to the Sanctum \u2014 and something moves beneath the dark water.",
+        "enemies": [
+          {
+            "enemyTypeID": "drowned_scavenger",
+            "countRange": [
+              3,
+              5
+            ],
+            "level": 7
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "surface_approach",
+            "name": "Read the Water",
+            "requiredSkillID": "sense",
+            "checkStat": "ambition",
+            "secondaryStat": "harmony",
+            "difficultyThreshold": 45,
+            "successEffect": {
+              "type": "narrative_only",
+              "magnitude": 0,
+              "narrative": "The subtle displacement of bioluminescent moss reveals where the Scavengers wait beneath the surface. The party is ready when they breach."
+            },
+            "failureEffect": {
+              "type": "apply_direct_damage",
+              "magnitude": 0.12,
+              "statScale": "maxHP",
+              "narrative": "The first sign of the ambush is claws closing on ankles. The Scavengers drag two party members half into the water before they can react."
+            },
+            "fallbackEffect": {
+              "type": "apply_direct_damage",
+              "magnitude": 0.18,
+              "statScale": "maxHP",
+              "narrative": "The dark water reveals nothing to those who do not know how to look. The party is already fighting when the Scavengers surface."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion_minor",
+            "dropChance": 0.35,
+            "rarity": "common"
+          },
+          {
+            "itemID": "dagger_iron_tier0",
+            "dropChance": 0.2,
+            "rarity": "common"
+          },
+          {
+            "itemID": "stamina_potion_minor",
+            "dropChance": 0.25,
+            "rarity": "common"
+          }
+        ]
+      },
+      {
+        "stageId": 2,
+        "title": "The Flooded Cathedral",
+        "description": "The nave of Aethelgard's great cathedral stands half-submerged, its pillars draped in coral and its shadows full of soldiers who have never known dry land.",
+        "enemies": [
+          {
+            "enemyTypeID": "tide_lasher",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 8
+          },
+          {
+            "enemyTypeID": "barnacle_guard",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 8
+          },
+          {
+            "enemyTypeID": "deep_chanter",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 8
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "silence_the_chanters",
+            "name": "Slip Past the Wards",
+            "requiredSkillID": "misdirect",
+            "checkStat": "ambition",
+            "secondaryStat": "endurance",
+            "difficultyThreshold": 55,
+            "successEffect": {
+              "type": "remove_enemy",
+              "magnitude": 1,
+              "narrative": "Moving through the cathedral's side passages, your party flanks the Deep Chanters before they can begin their hymns. One falls silently. The Guards are already weaker for it."
+            },
+            "failureEffect": {
+              "type": "apply_direct_damage",
+              "magnitude": 0.15,
+              "statScale": "maxHP",
+              "narrative": "A misplaced step disturbs the silt. The Chanters' hymns swell to fill the cathedral before the party can close, and the Guards' shells seem to thicken in response."
+            },
+            "fallbackEffect": {
+              "type": "apply_direct_damage",
+              "magnitude": 0.2,
+              "statScale": "maxHP",
+              "narrative": "The party walks into the cathedral openly. The Chanters begin singing immediately, and by the time the first blow lands, every Guard in the hall has been blessed."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "chest_chain_shirt_tier0",
+            "dropChance": 0.25,
+            "rarity": "common"
+          },
+          {
+            "itemID": "health_potion",
+            "dropChance": 0.3,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "mace_spiked_tier1",
+            "dropChance": 0.2,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "acc_ring_steel_tier1",
+            "dropChance": 0.15,
+            "rarity": "uncommon"
+          }
+        ]
+      },
+      {
+        "stageId": 3,
+        "title": "The Altar of the Spirit",
+        "description": "At the heart of the Sanctum stands the altar where Aethelgard's founders attempted their ritual \u2014 and where Archbishop Valerius has spent three centuries completing it.",
+        "enemies": [
+          {
+            "enemyTypeID": "tide_lasher",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 9
+          },
+          {
+            "enemyTypeID": "archbishop_valerius",
+            "countRange": [
+              1,
+              1
+            ],
+            "level": 9
+          }
+        ],
+        "preCombatOpportunities": [],
+        "lootTable": [
+          {
+            "itemID": "sword_bronze_tier1",
+            "dropChance": 0.3,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "chest_chain_hauberk_tier1",
+            "dropChance": 0.25,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "head_chain_hood_tier1",
+            "dropChance": 0.2,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "health_potion",
+            "dropChance": 0.4,
+            "rarity": "uncommon"
+          }
+        ]
+      }
+    ],
+    "rewards": {
+      "baseXP": 1800,
+      "baseGold": 560,
+      "lootTable": [
+        {
+          "itemID": "sword_bronze_tier1",
+          "dropChance": 0.35,
+          "rarity": "uncommon"
+        },
+        {
+          "itemID": "dagger_warden_tier1",
+          "dropChance": 0.25,
+          "rarity": "uncommon"
+        },
+        {
+          "itemID": "chest_chain_hauberk_tier1",
+          "dropChance": 0.3,
+          "rarity": "uncommon"
+        },
+        {
+          "itemID": "head_chain_hood_tier1",
+          "dropChance": 0.25,
+          "rarity": "uncommon"
+        },
+        {
+          "itemID": "acc_amulet_silver_tier1",
+          "dropChance": 0.2,
+          "rarity": "uncommon"
+        },
+        {
+          "itemID": "acc_ring_steel_tier1",
+          "dropChance": 0.2,
+          "rarity": "uncommon"
+        },
+        {
+          "itemID": "health_potion",
+          "dropChance": 0.5,
+          "rarity": "uncommon"
+        },
+        {
+          "itemID": "consumable_potion_speed_buff",
+          "dropChance": 0.15,
+          "rarity": "uncommon"
+        }
+      ]
+    }
   }
 ]
