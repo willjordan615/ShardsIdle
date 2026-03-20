@@ -103,7 +103,7 @@
         "lastUsed": null
       },
       {
-        "skillID": "dodge",
+        "skillID": "misdirect",
         "learned": true,
         "usageCount": 18,
         "skillXP": 280,

@@ -153,10 +153,31 @@ class CombatEngine {
     let isFallback = false;
 
     if (checkType === 'skill') {
-      // Party must have the skill to attempt — otherwise fallback fires
-      const qualifiedActors = playerCharacters.filter(p =>
-        !p.defeated && p.skills && p.skills.some(s => s.skillID === op.requiredSkillID && (s.skillLevel || 0) >= 1)
-      );
+      // Support both requiredSkillID (string), requiredSkillIDs (array), and requiredSkillTag (element tag)
+      // Checks against EQUIPPED skills only (intrinsics + 2 slots) — not the full discovered list.
+      // A character must have the skill equipped to use it in pre-combat opportunities.
+      let requiredSkills = [];
+      if (op.requiredSkillTag) {
+        requiredSkills = this.skills
+          .filter(s => s.tags && s.tags.includes(op.requiredSkillTag))
+          .map(s => s.id);
+      } else {
+        requiredSkills = op.requiredSkillIDs
+          ? op.requiredSkillIDs
+          : op.requiredSkillID ? [op.requiredSkillID] : [];
+      }
+      const qualifiedActors = playerCharacters.filter(p => {
+        if (p.defeated) return false;
+        const equippedPool = this.getAugmentedSkillPool(p); // Set of equipped + intrinsic skill IDs
+        return requiredSkills.some(id => {
+          if (!equippedPool.has(id)) return false;
+          const skillRecord = p.skills?.find(s => s.skillID === id);
+          // Skills with a character record require skillLevel >= 1
+          // Consumable-belt skills have no record but are valid if equipped
+          if (skillRecord) return (skillRecord.skillLevel || 0) >= 1;
+          return true; // consumable-linked skill — belt presence is enough
+        });
+      });
       if (qualifiedActors.length === 0) {
         isFallback = true;
         conditionMet = false;
@@ -179,12 +200,84 @@ class CombatEngine {
       });
       const margin = bestStatValue - (op.difficultyThreshold || 50);
       highestChance = Math.max(0.05, Math.min(0.95, 0.5 + margin / CONSTANTS.STAT_SCALE));
+    } else if (checkType === 'combo') {
+      // Requires BOTH an item AND a stat threshold.
+      // Item acts as the gate (no item = fallback); stat determines success chance.
+      // op.requiredItemID — item that must be present on any alive party member
+      // op.checkStat / op.difficultyThreshold — stat roll on best actor
+      const comboItemID = op.requiredItemID;
+      const itemHolders = playerCharacters.filter(p =>
+        !p.defeated && (
+          (p.consumables && p.consumables[comboItemID] > 0) ||
+          (p.consumableStash && p.consumableStash[comboItemID] > 0)
+        )
+      );
+      if (itemHolders.length === 0) {
+        isFallback = true;
+        conditionMet = false;
+      } else {
+        conditionMet = true;
+        // Best actor for stat = highest among all alive (item opens door, party impression matters)
+        playerCharacters.filter(p => !p.defeated).forEach(p => {
+          const val = (p.stats?.[op.checkStat] || 0) + (p.stats?.[op.secondaryStat] || 0) * 0.5;
+          if (val > bestStatValue) { bestStatValue = val; bestActor = p; }
+        });
+        const margin = bestStatValue - (op.difficultyThreshold || 50);
+        highestChance = Math.max(0.05, Math.min(0.95, 0.5 + margin / CONSTANTS.STAT_SCALE));
+      }
     } else if (checkType === 'party_size') {
       const alive = playerCharacters.filter(p => !p.defeated).length;
       conditionMet = true;
       const minOk = op.minPartySize === undefined || alive >= op.minPartySize;
       const maxOk = op.maxPartySize === undefined || alive <= op.maxPartySize;
       highestChance = (minOk && maxOk) ? 1.0 : 0.0;
+    } else if (checkType === 'item') {
+      // Check if any alive party member has the required item in consumables or consumableStash
+      const itemID = op.requiredItemID;
+      conditionMet = playerCharacters.some(p =>
+        !p.defeated && (
+          (p.consumables && p.consumables[itemID] > 0) ||
+          (p.consumableStash && p.consumableStash[itemID] > 0)
+        )
+      );
+      highestChance = conditionMet ? 1.0 : 0.0;
+      if (conditionMet) {
+        // Consume one of the item from whoever has it
+        const owner = playerCharacters.find(p =>
+          !p.defeated && (
+            (p.consumables && p.consumables[itemID] > 0) ||
+            (p.consumableStash && p.consumableStash[itemID] > 0)
+          )
+        );
+        if (owner) {
+          if (owner.consumables?.[itemID] > 0) owner.consumables[itemID]--;
+          else if (owner.consumableStash?.[itemID] > 0) owner.consumableStash[itemID]--;
+          console.log(`[PRE-COMBAT] ${owner.name} used ${itemID} as offering`);
+        }
+      }
+    } else if (checkType === 'item_and_stat') {
+      // Hard gate: item must be present. If present, stat roll determines success vs failure.
+      // If item absent, falls back. requiredItemID + checkStat + difficultyThreshold all required.
+      const itemID = op.requiredItemID;
+      const hasItem = playerCharacters.some(p =>
+        !p.defeated && (
+          (p.consumables && p.consumables[itemID] > 0) ||
+          (p.consumableStash && p.consumableStash[itemID] > 0)
+        )
+      );
+      if (!hasItem) {
+        isFallback = true;
+        conditionMet = false;
+      } else {
+        conditionMet = true;
+        // Stat roll among all non-defeated party members
+        playerCharacters.filter(p => !p.defeated).forEach(p => {
+          const val = (p.stats?.[op.checkStat] || 0) + (p.stats?.[op.secondaryStat] || 0) * 0.5;
+          if (val > bestStatValue) { bestStatValue = val; bestActor = p; }
+        });
+        const margin = bestStatValue - (op.difficultyThreshold || 50);
+        highestChance = Math.max(0.05, Math.min(0.95, 0.5 + margin / CONSTANTS.STAT_SCALE));
+      }
     } else if (checkType === 'random') {
       conditionMet = true;
       highestChance = op.successChance !== undefined ? op.successChance : 0.5;
@@ -223,7 +316,7 @@ class CombatEngine {
       actorName: bestActor?.name || 'Party',
       action: {
         type: isFallback ? 'pre_combat_fallback' : 'pre_combat_skill',
-        skillID: op.requiredSkillID || null,
+        skillID: checkType === 'item_and_stat' ? `[item:${op.requiredItemID}+stat:${op.checkStat}]` : op.requiredSkillTag ? `[tag:${op.requiredSkillTag}]` : op.requiredSkillIDs ? op.requiredSkillIDs.join('/') : (op.requiredSkillID || null),
         name: op.name
       },
       roll: { hitChance: highestChance, rolled, hit: isSuccess },
@@ -373,6 +466,29 @@ class CombatEngine {
             conditionMet = playerCharacters.some(p =>
               !p.defeated && p.skills && p.skills.some(s =>
                 s.skillID === cond.value && (s.skillLevel || 0) >= 1
+              )
+            );
+          } else if (cond.type === 'has_skill_tag') {
+            // Any equipped skill with the given tag at level >= 1
+            const taggedSkillIds = this.skills
+              .filter(s => s.tags && s.tags.includes(cond.value))
+              .map(s => s.id);
+            conditionMet = playerCharacters.some(p => {
+              if (p.defeated) return false;
+              const equippedPool = this.getAugmentedSkillPool(p);
+              return taggedSkillIds.some(id => {
+                if (!equippedPool.has(id)) return false;
+                const rec = p.skills?.find(s => s.skillID === id);
+                if (rec) return (rec.skillLevel || 0) >= 1;
+                return true; // consumable-linked
+              });
+            });
+          } else if (cond.type === 'has_item') {
+            // Check if any alive player has the item in consumables or consumableStash
+            conditionMet = playerCharacters.some(p =>
+              !p.defeated && (
+                (p.consumables && p.consumables[cond.value] > 0) ||
+                (p.consumableStash && p.consumableStash[cond.value] > 0)
               )
             );
           } else if (cond.type === 'stat_check') {

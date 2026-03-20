@@ -751,6 +751,8 @@ async function ensureIntrinsicSkill(character) {
 
 
 async function showCharacterDetail(characterId) {
+    // Clear any stale merchant offer when navigating to detail manually
+    if (typeof dismissMerchant === 'function') dismissMerchant();
     try {
         const character = await getCharacter(characterId);
         if (!character) {

@@ -231,6 +231,9 @@
                 </div>
             </div>
 
+            <!-- Traveling merchant — appears after challenge completion -->
+            <div id="merchantSlot" style="display:none; grid-column:1/-1; padding:0 1rem;"></div>
+
             <!-- Character footer — always full width, outside column layout -->
             <div class="detail-footer">
                 <button onclick="deleteCharacter(currentState.detailCharacterId)" class="danger">🗑 Delete Character</button>
@@ -511,6 +514,7 @@
     </div>
 
     <!-- MODULAR JAVASCRIPT LOADING -->
+    <script src="js/merchant.js?v=1"></script>
     <script src="js/game-data.js?v=4"></script>
     <script src="js/ui-helpers.js?v=4"></script>
     <script src="js/character-management.js?v=4"></script>

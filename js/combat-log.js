@@ -1221,6 +1221,15 @@ try {
     if (typeof renderRoster === 'function') await renderRoster();
     if (window.currentState?.detailCharacterId && typeof showCharacterDetail === 'function') {
         await showCharacterDetail(window.currentState.detailCharacterId);
+
+        // Roll for traveling merchant on victory runs
+        if (finalResult === 'victory' && typeof rollMerchantAppearance === 'function') {
+            const appeared = rollMerchantAppearance();
+            if (appeared) {
+                const char = await getCharacter(window.currentState.detailCharacterId);
+                if (char && typeof renderMerchant === 'function') renderMerchant(char);
+            }
+        }
     }
 
     // --- SKILL PROGRESS SECTION (replaces placeholder in modal) ---

@@ -9,12 +9,6 @@
       "ambition": 75,
       "harmony": 75
     },
-    "startingSkills": [
-      "slash"
-    ],
-    "bonusSkills": [
-      "prayer"
-    ],
     "intrinsicSkills": [
       "prayer"
     ]
@@ -29,13 +23,6 @@
       "ambition": 50,
       "harmony": 80
     },
-    "startingSkills": [
-      "slash",
-      "shield_bash"
-    ],
-    "bonusSkills": [
-      "restore_stam_minor"
-    ],
     "intrinsicSkills": [
       "restore_stam_minor"
     ]
@@ -50,13 +37,6 @@
       "ambition": 80,
       "harmony": 95
     },
-    "startingSkills": [
-      "arcane_bolt",
-      "evasion"
-    ],
-    "bonusSkills": [
-      "sense"
-    ],
     "intrinsicSkills": [
       "sense"
     ]
@@ -71,13 +51,6 @@
       "ambition": 70,
       "harmony": 50
     },
-    "startingSkills": [
-      "cleave",
-      "roar"
-    ],
-    "bonusSkills": [
-      "bloodlust"
-    ],
     "intrinsicSkills": [
       "bloodlust"
     ]
@@ -92,13 +65,6 @@
       "ambition": 100,
       "harmony": 85
     },
-    "startingSkills": [
-      "backstab",
-      "dodge"
-    ],
-    "bonusSkills": [
-      "stalk"
-    ],
     "intrinsicSkills": [
       "stalk"
     ]

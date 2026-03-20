@@ -16705,5 +16705,232 @@
     "description": "Pungent fungi favoured by Orc berserkers. Effects are unpredictable but undeniably powerful.",
     "goldValue": 15,
     "tier": 1
+  },
+  {
+    "id": "silver_halfling_coin",
+    "name": "Halfling Silver Coin",
+    "description": "Old currency, stamped with a river-knot on one face and a halfling hearth on the other. Someone kept this for a reason.",
+    "slot_id1": "consumable",
+    "tier": 1,
+    "skillID": "use_stamina_potion_minor",
+    "rarity": "common",
+    "value": 12
+  },
+  {
+    "id": "vulture_company_ledger",
+    "name": "Vulture Company Ledger",
+    "description": "A detailed record of every caravan the Vulture Company has raided, who they paid for advance information, and what the garrison at this tower actually found before they disappeared. Several pages are water-damaged. The ones that aren't are worse.",
+    "slot_id1": "consumable",
+    "tier": 1,
+    "skillID": "use_stamina_potion_minor",
+    "rarity": "common",
+    "value": 18
+  },
+  {
+    "id": "moon_touched_apple",
+    "name": "Moon-Touched Apple",
+    "description": "The blight has not entirely destroyed what the Order made. These still glow faintly at night. The ones grown before Sister Maren's ritual taste of cold water and old prayers. They are used as offerings at Verdant Word sites where the old faith still holds.",
+    "slot_id1": "consumable",
+    "tier": 1,
+    "skillID": "use_health_potion_minor",
+    "rarity": "uncommon",
+    "value": 15
+  },
+  {
+    "id": "loyalist_seal",
+    "name": "Ironvein Loyalist Seal",
+    "description": "An official seal of the Ironvein Loyalists, authorizing the bearer to move supplies through Loyalist-held territory. To the Goldcrown Usurpers, it is evidence. To the Loyalists, it is a passport. To anyone at the Broken Axle Crossing, it is a liability.",
+    "slot_id1": "consumable",
+    "tier": 2,
+    "skillID": "use_stamina_potion_minor",
+    "rarity": "uncommon",
+    "value": 22
+  },
+  {
+    "id": "royal_guard_insignia",
+    "name": "Royal Guard Insignia",
+    "description": "Melted at the edges but still readable. The garrison number is scorched off but the crest is intact. In some parts of the Vale, presenting this to the right person opens doors. In others, it marks you as someone who has been somewhere they should not have been.",
+    "slot_id1": "consumable",
+    "tier": 1,
+    "skillID": "use_stamina_potion_minor",
+    "rarity": "common",
+    "value": 14
+  },
+  {
+    "id": "verdant_word_seal",
+    "name": "Verdant Word Seal",
+    "description": "A seal used by the Order of the Verdant Word to mark sites under their protection. Still functional \u2014 the ward magic bound into it recognizes other Order sites and responds to them. At locations where the Order once worked, presenting this changes how the remaining spirits behave.",
+    "slot_id1": "consumable",
+    "tier": 2,
+    "skillID": "use_mana_potion_minor",
+    "rarity": "uncommon",
+    "value": 25
+  },
+  {
+    "id": "guild_seal",
+    "name": "Merchant Guild Seal",
+    "description": "The Merchant Guild's official seal of authorization. In the Capital it opens certain doors. At the Bastion of the Fractured Ward, the Guild-funded guards still recognize it. Guildmaster Vane's personal seal carries additional weight \u2014 evidence of his family's involvement in the Verdant Word coup that someone with the right connections might find very useful.",
+    "slot_id1": "consumable",
+    "tier": 2,
+    "skillID": "use_stamina_potion_minor",
+    "rarity": "uncommon",
+    "value": 28
+  },
+  {
+    "id": "oath_stone",
+    "name": "Oath Stone",
+    "description": "A pact-rune stone from the Shrine of the First Oath, still holding a fragment of the original binding frequency between the halfling elders and Lyra. At sites where the pact is actively breaking \u2014 the Marsh of Broken Oaths, the Salt-Wept Beacon \u2014 presenting this temporarily stabilizes the ward. It does not fix anything. It buys time.",
+    "slot_id1": "consumable",
+    "tier": 2,
+    "skillID": "use_mana_potion_minor",
+    "rarity": "uncommon",
+    "value": 30
+  },
+  {
+    "id": "ironvein_signet",
+    "name": "Ironvein Ancestral Signet",
+    "description": "A signet ring bearing the mark of the Ironvein Forge-Kings \u2014 not the current Loyalist faction, but the original line that the ancestors served. At the Hall of Ancestral Echoes, the spirits recognize it. It does not grant safe passage. It grants acknowledgment, which is different and more useful.",
+    "slot_id1": "consumable",
+    "tier": 3,
+    "skillID": "use_stamina_potion_minor",
+    "rarity": "rare",
+    "value": 45
+  },
+  {
+    "id": "monitoring_crystal",
+    "name": "Monitoring Crystal",
+    "description": "A calibrated crystal from the joint dwarven watchtower above the Sunken Sanctum. It was designed to track the water spirit's resonance frequency. At the Sanctum itself, it still works \u2014 revealing patterns in Archbishop Malacor's movements that a party without it cannot see.",
+    "slot_id1": "consumable",
+    "tier": 3,
+    "skillID": "use_mana_potion_minor",
+    "rarity": "rare",
+    "value": 50
+  },
+  {
+    "id": "athenaeum_scroll",
+    "name": "Athenaeum Sealed Scroll",
+    "description": "A scroll from the Whispering Athenaeum's restricted archive. The wax seal bears the mark of the High Council of the Verdant Word \u2014 the same council whose disappearance the Capital sealed the Spire of Silent Conviction to contain. The scroll is addressed to someone by name. The name has been redacted.",
+    "slot_id1": "consumable",
+    "tier": 2,
+    "skillID": "use_mana_potion_minor",
+    "rarity": "uncommon",
+    "value": 32
+  },
+  {
+    "id": "ancestral_verdict",
+    "name": "Ancestral Verdict",
+    "description": "A sealed record from the Hall of Ancestral Echoes bearing the High Judge's mark \u2014 the formal outcome of Thorgrim's assessment of the succession claimants. Both factions know this document exists. Neither faction wants it read publicly. In the right hands at the right location, it is the most dangerous piece of paper in Khaz-Morad.",
+    "slot_id1": "consumable",
+    "tier": 3,
+    "skillID": "use_stamina_potion_minor",
+    "rarity": "uncommon",
+    "value": 55
+  },
+  {
+    "id": "unpaid_ledger",
+    "name": "The Unpaid Ledger",
+    "description": "The Stone-Tusk Clan's record of services rendered to the Goldcrown Usurpers and payment not received. Every raid, every deployment, every casualty, itemized and dated. The final entry is a running total that has been updated weekly for five years. In the Guildhall of Silent Trade, this document is more damaging than anything the Verdant Auditors have managed to produce. The Merchant Guild helped structure the original contract. They knew it would not be honored.",
+    "slot_id1": "consumable",
+    "tier": 3,
+    "skillID": "use_stamina_potion_minor",
+    "rarity": "uncommon",
+    "value": 50
+  },
+  {
+    "id": "unpaid_ledger",
+    "name": "The Unpaid Ledger",
+    "description": "The Stone-Tusk Clan's copy of the original Goldcrown contract, annotated by Krog across five years with every payment missed, every deadline passed, and every messenger who arrived with excuses instead of coin. The annotations are precise and damning. At the Guildhall of Silent Trade, this document is evidence of Merchant Guild collusion in the Usurpers' decision to default. Guildmaster Vane's name appears in the margin of the final page.",
+    "slot_id1": "consumable",
+    "tier": 3,
+    "skillID": "use_stamina_potion_minor",
+    "rarity": "uncommon",
+    "value": 50
+  },
+  {
+    "id": "seed_of_first_tree",
+    "name": "Seed of the First Tree",
+    "description": "A seed from the First Tree of the Silverbough, given by the Preservation Core or taken from the Fragment's Reckoning. It carries the oldest nature magic in the Vale \u2014 pre-Verdant Word, pre-pact, pre-Fraying. At the Sunken Sanctum of Aethelgard, it can purify a portion of the water corruption permanently, reducing the Archbishop's power in the final encounter. The elves made this possible fifty years ago by choosing not to use it.",
+    "slot_id1": "consumable",
+    "tier": 3,
+    "skillID": "use_mana_potion_minor",
+    "rarity": "rare",
+    "value": 65
+  },
+  {
+    "id": "weapon_lyra_current",
+    "name": "Lyra's Current",
+    "description": "Not a weapon \u2014 the force of a river spirit's attention made physical. Contact with it carries the cold weight of deep water.",
+    "slot_id1": "mainHand",
+    "tier": 2,
+    "rarity": "unique",
+    "value": 0,
+    "onhit_skillid_1": "proc_chilled",
+    "onhit_skillchance_1": 20
+  },
+  {
+    "id": "weapon_tidebound_harpoon",
+    "name": "Tidebound Harpoon",
+    "description": "A harpoon forged from salvaged ship metal, treated with the water spirit's blessing until it conducts lightning through salt water. The Tidebound use it to pin and shock simultaneously.",
+    "slot_id1": "mainHand",
+    "tier": 2,
+    "rarity": "unique",
+    "value": 0,
+    "onhit_skillid_1": "proc_electrified",
+    "onhit_skillchance_1": 25
+  },
+  {
+    "id": "weapon_fraying_natural",
+    "name": "Fraying Touch",
+    "description": "The hands of the Fraying-Touched carry residue that transfers on contact. They cannot help it. Some of them have stopped touching things they care about.",
+    "slot_id1": "mainHand",
+    "tier": 2,
+    "rarity": "unique",
+    "value": 0,
+    "onhit_skillid_1": "proc_shadowed",
+    "onhit_skillchance_1": 18
+  },
+  {
+    "id": "weapon_ashen_fist",
+    "name": "Ashen Fist",
+    "description": "Their armor fused to their skin in the explosion. Their fists conduct the residual fire magic permanently. Every hit transfers a trace of it.",
+    "slot_id1": "mainHand",
+    "tier": 1,
+    "rarity": "unique",
+    "value": 0,
+    "onhit_skillid_1": "proc_burn",
+    "onhit_skillchance_1": 12
+  },
+  {
+    "id": "weapon_alpha_bite",
+    "name": "Corrupted Bite",
+    "description": "The Alpha's jaw has been reshaping for five years under exposure to the Whispering Woods' residual magic. What its bite transfers now is not venom \u2014 it is a low-grade nature confusion that the woods have been perfecting for centuries.",
+    "slot_id1": "mainHand",
+    "tier": 2,
+    "rarity": "unique",
+    "value": 0,
+    "onhit_skillid_1": "proc_disorient",
+    "onhit_skillchance_1": 15
+  },
+  {
+    "id": "weapon_ancestral_hammer",
+    "name": "Ancestral Verdict",
+    "description": "The hammer Thorgrim carried when he presided over the first coronation, four hundred years ago. A blow from it carries the weight of four centuries of accumulated judgment. Recipients report a brief, total cessation of will.",
+    "slot_id1": "mainHand",
+    "tier": 3,
+    "rarity": "unique",
+    "value": 0,
+    "onhit_skillid_1": "proc_stun",
+    "onhit_skillchance_1": 20
+  },
+  {
+    "id": "weapon_purifying_touch",
+    "name": "Purifying Touch",
+    "description": "Elara's hands carry fifty years of the First Tree's magic. Contact with them applies the Gallery's purification protocol directly \u2014 stripping mana access the way a surgeon strips infected tissue. She does not experience this as violence.",
+    "slot_id1": "mainHand",
+    "tier": 3,
+    "rarity": "unique",
+    "value": 0,
+    "onhit_skillid_1": "proc_silence",
+    "onhit_skillchance_1": 30
   }
 ]

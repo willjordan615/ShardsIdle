@@ -1,262 +1,5 @@
 [
   {
-    "id": "goblin_scout",
-    "name": "Goblin Scout",
-    "description": "Quick and nimble goblin skirmisher",
-    "stats": {
-      "conviction": 30,
-      "endurance": 25,
-      "ambition": 40,
-      "harmony": 10
-    },
-    "baseDefense": 5,
-    "availableSkills": [
-      "basic_attack",
-      "footwork",
-      "shove",
-      "misdirect"
-    ],
-    "skillSelectionCount": 2,
-    "equipment": {
-      "mainHand": "goblin_dagger",
-      "offHand": null,
-      "head": null,
-      "chest": null,
-      "accessory1": null,
-      "accessory2": null
-    },
-    "armorValue": 1,
-    "physEvasion": 2,
-    "magEvasion": 0,
-    "aiProfile": "aggressive",
-    "tags": [
-      "goblin",
-      "scout",
-      "melee"
-    ]
-  },
-  {
-    "id": "goblin_archer",
-    "name": "Goblin Archer",
-    "description": "Goblin marksman with precision aim",
-    "stats": {
-      "conviction": 35,
-      "endurance": 20,
-      "ambition": 50,
-      "harmony": 5
-    },
-    "baseDefense": 0,
-    "availableSkills": [
-      "basic_attack",
-      "aim",
-      "footwork",
-      "shove"
-    ],
-    "skillSelectionCount": 2,
-    "equipment": {
-      "mainHand": "goblin_bow",
-      "offHand": null,
-      "head": null,
-      "chest": null,
-      "accessory1": null,
-      "accessory2": null
-    },
-    "armorValue": 0,
-    "physEvasion": 3,
-    "magEvasion": 0,
-    "aiProfile": "tactical",
-    "tags": [
-      "goblin",
-      "archer",
-      "ranged"
-    ]
-  },
-  {
-    "id": "spider_small",
-    "name": "Giant Spider",
-    "description": "Venomous spider with web attack",
-    "stats": {
-      "conviction": 35,
-      "endurance": 40,
-      "ambition": 25,
-      "harmony": 10
-    },
-    "baseDefense": 5,
-    "availableSkills": [
-      "basic_attack",
-      "block",
-      "sense"
-    ],
-    "skillSelectionCount": 2,
-    "equipment": [
-      "fangs_tiny"
-    ],
-    "armorValue": 1,
-    "physEvasion": 2,
-    "magEvasion": 0,
-    "aiProfile": "aggressive",
-    "tags": [
-      "beast",
-      "spider",
-      "melee"
-    ]
-  },
-  {
-    "id": "spider_large",
-    "name": "Large Spider",
-    "description": "Ancient spider of fearsome size",
-    "stats": {
-      "conviction": 50,
-      "endurance": 60,
-      "ambition": 30,
-      "harmony": 15
-    },
-    "baseDefense": 10,
-    "availableSkills": [
-      "basic_attack",
-      "block",
-      "shove",
-      "sense"
-    ],
-    "skillSelectionCount": 2,
-    "equipment": [
-      "fangs_small"
-    ],
-    "armorValue": 2,
-    "physEvasion": 1,
-    "magEvasion": 0,
-    "aiProfile": "berserker",
-    "tags": [
-      "beast",
-      "spider",
-      "tank"
-    ]
-  },
-  {
-    "id": "orc_warrior",
-    "name": "Orc Warrior",
-    "description": "Mighty orc with brutal strength",
-    "stats": {
-      "conviction": 70,
-      "endurance": 80,
-      "ambition": 50,
-      "harmony": 20
-    },
-    "baseDefense": 8,
-    "availableSkills": [
-      "basic_attack",
-      "shove",
-      "block",
-      "misdirect"
-    ],
-    "skillSelectionCount": 2,
-    "equipment": {
-      "mainHand": "dogchopper",
-      "offHand": null,
-      "head": null,
-      "chest": null,
-      "accessory1": null,
-      "accessory2": null
-    },
-    "armorValue": 4,
-    "physEvasion": 0,
-    "magEvasion": 0,
-    "aiProfile": "berserker",
-    "lootTable": [
-      {
-        "itemID": "strange_mushrooms",
-        "dropChance": 0.08,
-        "rarity": "uncommon"
-      }
-    ],
-    "tags": [
-      "orc",
-      "soldier",
-      "melee"
-    ]
-  },
-  {
-    "id": "orc_shaman",
-    "name": "Orc Shaman",
-    "description": "Orc spellcaster and healer",
-    "stats": {
-      "conviction": 60,
-      "endurance": 50,
-      "ambition": 40,
-      "harmony": 70
-    },
-    "baseDefense": 3,
-    "availableSkills": [
-      "produce_flame",
-      "first_aid",
-      "rest",
-      "shout"
-    ],
-    "skillSelectionCount": 2,
-    "equipment": {
-      "mainHand": "shaman_totem",
-      "offHand": null,
-      "head": null,
-      "chest": null,
-      "accessory1": null,
-      "accessory2": null
-    },
-    "armorValue": 1,
-    "physEvasion": 1,
-    "magEvasion": 3,
-    "aiProfile": "support",
-    "lootTable": [
-      {
-        "itemID": "strange_mushrooms",
-        "dropChance": 0.08,
-        "rarity": "uncommon"
-      }
-    ],
-    "tags": [
-      "orc",
-      "shaman",
-      "caster"
-    ]
-  },
-  {
-    "id": "dragon_ancient",
-    "name": "Ancient Red Dragon",
-    "description": "Legendary dragon of immense power",
-    "stats": {
-      "conviction": 150,
-      "endurance": 180,
-      "ambition": 100,
-      "harmony": 50
-    },
-    "baseDefense": 25,
-    "availableSkills": [
-      "basic_attack",
-      "shove",
-      "block",
-      "produce_flame",
-      "shout",
-      "sense"
-    ],
-    "skillSelectionCount": 2,
-    "equipment": {
-      "mainHand": "fangs_great",
-      "offHand": null,
-      "head": null,
-      "chest": null,
-      "accessory1": null,
-      "accessory2": null
-    },
-    "armorValue": 12,
-    "physEvasion": 2,
-    "magEvasion": 5,
-    "aiProfile": "tactical",
-    "tags": [
-      "dragon",
-      "boss",
-      "melee"
-    ]
-  },
-  {
     "id": "ironvein_conscript",
     "name": "Ironvein Conscript",
     "description": "Pressed dwarven soldier who fights in shield-bashing pairs, driven by a belief that dying in the pass honors the mountain.",
@@ -481,6 +224,11 @@
         "itemID": "axe_steel_tier1",
         "dropChance": 0.25,
         "rarity": "uncommon"
+      },
+      {
+        "itemID": "ironvein_signet",
+        "dropChance": 0.3,
+        "rarity": "rare"
       }
     ],
     "availableSkills": [
@@ -677,8 +425,8 @@
     ]
   },
   {
-    "id": "archbishop_valerius",
-    "name": "Archbishop Valerius",
+    "id": "archbishop_malacor",
+    "name": "Archbishop Malacor",
     "description": "The three-hundred-year-old leader of the Tidebound Penitents, who has meditated so long in communion with the trapped water spirit that the boundary between them has dissolved \u2014 neither fully human nor fully spirit.",
     "stats": {
       "conviction": 130,
@@ -1138,6 +886,3511 @@
       {
         "itemID": "wand_holy_tier1",
         "dropChance": 0.3,
+        "rarity": "uncommon"
+      }
+    ]
+  },
+  {
+    "id": "ferry_deckhand",
+    "name": "Deckhand",
+    "description": "A traveler who never paid the toll. Now they collect it endlessly, unable to remember why.",
+    "stats": {
+      "conviction": 30,
+      "endurance": 40,
+      "ambition": 70,
+      "harmony": 20
+    },
+    "armorValue": 0,
+    "aiProfile": "aggressive",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "misdirect",
+      "shove"
+    ],
+    "skillSelectionCount": 2,
+    "tags": [
+      "spirit",
+      "undead"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "ferry_oar_specter",
+    "name": "Oar-Specter",
+    "description": "The crossing's enforcers. They move like the current \u2014 patient, inevitable, cold.",
+    "stats": {
+      "conviction": 60,
+      "endurance": 70,
+      "ambition": 50,
+      "harmony": 30
+    },
+    "armorValue": 2,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "entangle",
+      "shove",
+      "footwork"
+    ],
+    "skillSelectionCount": 3,
+    "tags": [
+      "spirit",
+      "undead"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "ferry_toll_collector",
+    "name": "Toll-Collector",
+    "description": "Demands something of everyone who passes. What it demands from you will not be coin.",
+    "stats": {
+      "conviction": 50,
+      "endurance": 55,
+      "ambition": 60,
+      "harmony": 80
+    },
+    "armorValue": 0,
+    "aiProfile": "support",
+    "equipment": {},
+    "availableSkills": [
+      "sleet",
+      "shout",
+      "misdirect",
+      "footwork"
+    ],
+    "skillSelectionCount": 3,
+    "tags": [
+      "spirit",
+      "caster"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "ferrymans_echo",
+    "name": "Ferryman's Echo",
+    "description": "Old Bram, or what is left of him. He does not remember your face but he remembers the rules.",
+    "stats": {
+      "conviction": 120,
+      "endurance": 140,
+      "ambition": 80,
+      "harmony": 160
+    },
+    "armorValue": 5,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "entangle",
+      "sleet",
+      "shout",
+      "first_aid",
+      "misdirect"
+    ],
+    "skillSelectionCount": 4,
+    "tags": [
+      "spirit",
+      "boss"
+    ],
+    "lootTable": [
+      {
+        "itemID": "acc_amulet_silver_tier1",
+        "dropChance": 0.3,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "bell_silver_tier1",
+        "dropChance": 0.25,
+        "rarity": "uncommon"
+      }
+    ]
+  },
+  {
+    "id": "river_spirit_lyra",
+    "name": "Lyra",
+    "description": "The river's voice, before the halflings forgot the words to speak to her. She has not forgotten them. She is simply no longer interested in patience.",
+    "stats": {
+      "conviction": 100,
+      "endurance": 120,
+      "ambition": 60,
+      "harmony": 200
+    },
+    "armorValue": 3,
+    "aiProfile": "support",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "sacred_roots",
+      "forest_embrace",
+      "sleet",
+      "first_aid",
+      "shout"
+    ],
+    "skillSelectionCount": 5,
+    "tags": [
+      "spirit",
+      "boss",
+      "nature"
+    ],
+    "lootTable": [
+      {
+        "itemID": "flute_silver_tier1",
+        "dropChance": 0.5,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "acc_amulet_silver_tier1",
+        "dropChance": 0.35,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "silver_halfling_coin",
+        "dropChance": 0.6,
+        "rarity": "common"
+      }
+    ]
+  },
+  {
+    "id": "vulture_scrapper",
+    "name": "Vulture Scrapper",
+    "description": "Former laborers, drifters, and minor criminals who found the Vulture Company before starvation found them first. They fight with the recklessness of people with nothing to lose.",
+    "stats": {
+      "conviction": 50,
+      "endurance": 50,
+      "ambition": 80,
+      "harmony": 30
+    },
+    "armorValue": 0,
+    "aiProfile": "aggressive",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "shove",
+      "misdirect",
+      "slash"
+    ],
+    "skillSelectionCount": 2,
+    "tags": [
+      "human",
+      "bandit"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "vulture_roadwarden",
+    "name": "Roadwarden",
+    "description": "Ex-soldiers who know exactly how the Royal Guard operates and use that knowledge to stay one step ahead of them. They are the ones who actually run the ambushes.",
+    "stats": {
+      "conviction": 60,
+      "endurance": 65,
+      "ambition": 75,
+      "harmony": 40
+    },
+    "armorValue": 1,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "aim",
+      "pierce",
+      "footwork",
+      "weak_point"
+    ],
+    "skillSelectionCount": 3,
+    "tags": [
+      "human",
+      "bandit"
+    ],
+    "lootTable": [
+      {
+        "itemID": "crossbow_steel_tier1",
+        "dropChance": 0.15,
+        "rarity": "uncommon"
+      }
+    ]
+  },
+  {
+    "id": "vulture_wolf",
+    "name": "Feral Warhound",
+    "description": "Trained for war, abandoned with the garrison, feral for forty years. They still respond to whistles. Just not to commands to stop.",
+    "stats": {
+      "conviction": 40,
+      "endurance": 60,
+      "ambition": 90,
+      "harmony": 20
+    },
+    "armorValue": 0,
+    "aiProfile": "aggressive",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "shove",
+      "venomous_slash"
+    ],
+    "skillSelectionCount": 2,
+    "tags": [
+      "beast",
+      "canine"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "vulture_beast_handler",
+    "name": "Beast Handler",
+    "description": "The handlers figured out that the old garrison's warhounds respond to the old garrison's whistles. They didn't figure out that the warhounds respond to everyone's blood equally.",
+    "stats": {
+      "conviction": 55,
+      "endurance": 60,
+      "ambition": 70,
+      "harmony": 50
+    },
+    "armorValue": 1,
+    "aiProfile": "support",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "shout",
+      "misdirect",
+      "footwork",
+      "blood_letting"
+    ],
+    "skillSelectionCount": 3,
+    "tags": [
+      "human",
+      "bandit"
+    ],
+    "lootTable": [
+      {
+        "itemID": "consumable_tool_rope",
+        "dropChance": 0.25,
+        "rarity": "common"
+      }
+    ]
+  },
+  {
+    "id": "vulture_veteran",
+    "name": "Ironbound Veteran",
+    "description": "What the Royal Guard used to look like. They carry salvaged plate and genuine military discipline, which makes them considerably more dangerous than the rabble around them.",
+    "stats": {
+      "conviction": 100,
+      "endurance": 110,
+      "ambition": 50,
+      "harmony": 40
+    },
+    "armorValue": 8,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "block",
+      "shield_bash",
+      "shove",
+      "counter_strike"
+    ],
+    "skillSelectionCount": 4,
+    "tags": [
+      "human",
+      "soldier"
+    ],
+    "lootTable": [
+      {
+        "itemID": "chest_chain_hauberk_tier1",
+        "dropChance": 0.2,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "sword_bronze_tier1",
+        "dropChance": 0.15,
+        "rarity": "uncommon"
+      }
+    ]
+  },
+  {
+    "id": "captain_vane",
+    "name": "Captain Vane",
+    "description": "He was a real officer once. The commission, the rank, the posting \u2014 all legitimate. He will tell you this if you give him a moment before the fight starts. He tells everyone.",
+    "stats": {
+      "conviction": 130,
+      "endurance": 140,
+      "ambition": 90,
+      "harmony": 80
+    },
+    "armorValue": 6,
+    "aiProfile": "aggressive",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "slash",
+      "warcry",
+      "blood_letting",
+      "counter_strike",
+      "shout"
+    ],
+    "skillSelectionCount": 4,
+    "tags": [
+      "human",
+      "boss",
+      "soldier"
+    ],
+    "lootTable": [
+      {
+        "itemID": "sword_iron_great_tier1",
+        "dropChance": 0.35,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "vulture_company_ledger",
+        "dropChance": 0.6,
+        "rarity": "common"
+      },
+      {
+        "itemID": "acc_cloak_hunter_tier1",
+        "dropChance": 0.2,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "guild_seal",
+        "dropChance": 0.3,
+        "rarity": "uncommon"
+      }
+    ]
+  },
+  {
+    "id": "captain_vane_vault",
+    "name": "Captain Vane",
+    "description": "Below the tower, in the vault where the old garrison kept their records, Vane is a different person. Whatever the garrison found here changed them. He found the same records. He is not telling anyone what they say.",
+    "stats": {
+      "conviction": 150,
+      "endurance": 170,
+      "ambition": 110,
+      "harmony": 90
+    },
+    "armorValue": 8,
+    "aiProfile": "aggressive",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "slash",
+      "warcry",
+      "blood_letting",
+      "counter_strike",
+      "weak_point",
+      "shout"
+    ],
+    "skillSelectionCount": 5,
+    "tags": [
+      "human",
+      "boss",
+      "soldier"
+    ],
+    "lootTable": [
+      {
+        "itemID": "sword_iron_great_tier1",
+        "dropChance": 0.5,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "vulture_company_ledger",
+        "dropChance": 0.8,
+        "rarity": "common"
+      },
+      {
+        "itemID": "chest_chain_hauberk_tier1",
+        "dropChance": 0.3,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "acc_cloak_traveler_tier2",
+        "dropChance": 0.25,
+        "rarity": "rare"
+      }
+    ]
+  },
+  {
+    "id": "orchard_sproutling",
+    "name": "Sproutling",
+    "description": "They were tending the orchard when the blight took them. They are still tending it. The difference is that now the orchard tends back.",
+    "stats": {
+      "conviction": 20,
+      "endurance": 30,
+      "ambition": 60,
+      "harmony": 40
+    },
+    "armorValue": 0,
+    "aiProfile": "aggressive",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "entangle",
+      "venomous_slash"
+    ],
+    "skillSelectionCount": 2,
+    "tags": [
+      "plant",
+      "blight",
+      "humanoid"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "orchard_thorn_weaver",
+    "name": "Thorn-Weaver",
+    "description": "The integration has gone further in these ones. The thorns are theirs now, not the tree's. They have stopped being able to tell the difference.",
+    "stats": {
+      "conviction": 40,
+      "endurance": 50,
+      "ambition": 70,
+      "harmony": 60
+    },
+    "armorValue": 0,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "venomous_slash",
+      "poison_cloud",
+      "entangle",
+      "nature_wrap"
+    ],
+    "skillSelectionCount": 3,
+    "tags": [
+      "plant",
+      "blight",
+      "caster"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "orchard_root_shambler",
+    "name": "Root-Shambler",
+    "description": "The oldest gardeners. The roots grew through them rather than around them. They move slowly and do not feel pain in any way that matters to them anymore.",
+    "stats": {
+      "conviction": 80,
+      "endurance": 120,
+      "ambition": 30,
+      "harmony": 50
+    },
+    "armorValue": 4,
+    "aiProfile": "aggressive",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "shove",
+      "nature_wrap",
+      "regrowth",
+      "forest_embrace"
+    ],
+    "skillSelectionCount": 3,
+    "tags": [
+      "plant",
+      "blight",
+      "beast"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "sister_maren",
+    "name": "Sister Maren",
+    "description": "She remembers the words of the ritual. She does not remember that she was the one who said them wrong. The Choir does not correct her. The Choir agrees with everything she says.",
+    "stats": {
+      "conviction": 100,
+      "endurance": 130,
+      "ambition": 60,
+      "harmony": 180
+    },
+    "armorValue": 2,
+    "aiProfile": "support",
+    "equipment": {},
+    "availableSkills": [
+      "sacred_roots",
+      "forest_embrace",
+      "first_aid",
+      "shout",
+      "toxic_fog",
+      "regrowth"
+    ],
+    "skillSelectionCount": 5,
+    "tags": [
+      "plant",
+      "blight",
+      "boss",
+      "caster"
+    ],
+    "lootTable": [
+      {
+        "itemID": "moon_touched_apple",
+        "dropChance": 0.7,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "scepter_nature_tier1",
+        "dropChance": 0.2,
+        "rarity": "uncommon"
+      }
+    ]
+  },
+  {
+    "id": "elder_spring_spirit",
+    "name": "The Elder Spring",
+    "description": "The well was not just a well. The Order knew what lived in the water and built the blessing around it, not over it. Sister Maren's ritual did not corrupt the spirit \u2014 it woke it up angry.",
+    "stats": {
+      "conviction": 90,
+      "endurance": 120,
+      "ambition": 50,
+      "harmony": 250
+    },
+    "armorValue": 0,
+    "aiProfile": "support",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "sacred_roots",
+      "regrowth",
+      "mass_heal",
+      "forest_embrace",
+      "poison_cloud",
+      "shout"
+    ],
+    "skillSelectionCount": 5,
+    "tags": [
+      "spirit",
+      "nature",
+      "boss"
+    ],
+    "lootTable": [
+      {
+        "itemID": "moon_touched_apple",
+        "dropChance": 0.9,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "scepter_nature_tier1",
+        "dropChance": 0.3,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "totem_life_tier1",
+        "dropChance": 0.25,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "acc_amulet_crystal_tier2",
+        "dropChance": 0.2,
+        "rarity": "rare"
+      }
+    ]
+  },
+  {
+    "id": "crossing_pike_brother",
+    "name": "Pike-Brother",
+    "description": "They hold the bridge in formation and they do not break. The Goldcrown Usurpers found that mercenaries with pikes and nothing to go home to are cheaper than real soldiers and nearly as effective.",
+    "stats": {
+      "conviction": 90,
+      "endurance": 100,
+      "ambition": 50,
+      "harmony": 40
+    },
+    "armorValue": 6,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "block",
+      "shield_bash",
+      "shove",
+      "shout"
+    ],
+    "skillSelectionCount": 3,
+    "tags": [
+      "human",
+      "soldier",
+      "dwarven_conflict"
+    ],
+    "lootTable": [
+      {
+        "itemID": "mace_spiked_tier1",
+        "dropChance": 0.15,
+        "rarity": "uncommon"
+      }
+    ]
+  },
+  {
+    "id": "crossing_xbow_veteran",
+    "name": "Crossbow Veteran",
+    "description": "They stand behind the pike wall and they do not miss. They have had four years of practice on travelers who thought the bridge was unguarded.",
+    "stats": {
+      "conviction": 70,
+      "endurance": 75,
+      "ambition": 85,
+      "harmony": 50
+    },
+    "armorValue": 3,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "aim",
+      "pierce",
+      "footwork",
+      "weak_point",
+      "blood_letting"
+    ],
+    "skillSelectionCount": 3,
+    "tags": [
+      "human",
+      "soldier",
+      "dwarven_conflict"
+    ],
+    "lootTable": [
+      {
+        "itemID": "crossbow_heavy_tier1",
+        "dropChance": 0.18,
+        "rarity": "uncommon"
+      }
+    ]
+  },
+  {
+    "id": "banner_captain_kaelen",
+    "name": "Banner-Captain Kaelen",
+    "description": "She is not cruel. She is thorough. The checkpoint runs exactly as ordered, the ledgers are accurate to the coin, and she has not lost a single engagement at this bridge. She considers all three facts equally important.",
+    "stats": {
+      "conviction": 140,
+      "endurance": 160,
+      "ambition": 80,
+      "harmony": 90
+    },
+    "armorValue": 8,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "shield_bash",
+      "shout",
+      "warcry",
+      "counter_strike",
+      "block",
+      "pummel"
+    ],
+    "skillSelectionCount": 5,
+    "tags": [
+      "human",
+      "boss",
+      "soldier",
+      "dwarven_conflict"
+    ],
+    "lootTable": [
+      {
+        "itemID": "shield_warden_tier2",
+        "dropChance": 0.25,
+        "rarity": "rare"
+      },
+      {
+        "itemID": "loyalist_seal",
+        "dropChance": 0.4,
+        "rarity": "common"
+      },
+      {
+        "itemID": "chest_chain_hauberk_tier1",
+        "dropChance": 0.2,
+        "rarity": "uncommon"
+      }
+    ]
+  },
+  {
+    "id": "goldcrown_interceptor_elite",
+    "name": "Goldcrown Interceptor",
+    "description": "The response team Kaelen sends when the checkpoint flags a Loyalist sympathizer. They are faster than the Pike-Brothers and significantly less interested in taking prisoners.",
+    "stats": {
+      "conviction": 110,
+      "endurance": 120,
+      "ambition": 100,
+      "harmony": 60
+    },
+    "armorValue": 5,
+    "aiProfile": "aggressive",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "slash",
+      "shield_bash",
+      "counter_strike",
+      "blood_letting",
+      "weak_point"
+    ],
+    "skillSelectionCount": 4,
+    "tags": [
+      "human",
+      "soldier",
+      "dwarven_conflict"
+    ],
+    "lootTable": [
+      {
+        "itemID": "loyalist_seal",
+        "dropChance": 0.3,
+        "rarity": "common"
+      }
+    ]
+  },
+  {
+    "id": "banner_captain_kaelen_elite",
+    "name": "Banner-Captain Kaelen",
+    "description": "When she comes herself, the checkpoint is no longer a checkpoint. It is a statement. She wants to know who sent you and why they thought a Loyalist seal would be enough.",
+    "stats": {
+      "conviction": 170,
+      "endurance": 190,
+      "ambition": 100,
+      "harmony": 110
+    },
+    "armorValue": 10,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "shield_bash",
+      "shout",
+      "warcry",
+      "counter_strike",
+      "block",
+      "pummel",
+      "blood_letting"
+    ],
+    "skillSelectionCount": 6,
+    "tags": [
+      "human",
+      "boss",
+      "soldier",
+      "dwarven_conflict"
+    ],
+    "lootTable": [
+      {
+        "itemID": "shield_warden_tier2",
+        "dropChance": 0.4,
+        "rarity": "rare"
+      },
+      {
+        "itemID": "chest_chain_hauberk_tier1",
+        "dropChance": 0.3,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "crossbow_heavy_tier1",
+        "dropChance": 0.25,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "loyalist_seal",
+        "dropChance": 0.6,
+        "rarity": "common"
+      }
+    ]
+  },
+  {
+    "id": "ashen_ember",
+    "name": "Ember",
+    "description": "They were the ones furthest from the explosion. Enough survived that they could still swing a sword. Not enough survived that they remember why they would want to.",
+    "stats": {
+      "conviction": 50,
+      "endurance": 60,
+      "ambition": 80,
+      "harmony": 30
+    },
+    "armorValue": 1,
+    "aiProfile": "aggressive",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "slash",
+      "singe",
+      "shove"
+    ],
+    "skillSelectionCount": 2,
+    "tags": [
+      "human",
+      "fire",
+      "ashen_remnant"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "ashen_flamekeeper",
+    "name": "Flamekeeper",
+    "description": "The mage's students, or the ones who watched him work closely enough to pick up the theory. The fire in them burns hotter than in the Embers. They are also further from human than the Embers are.",
+    "stats": {
+      "conviction": 60,
+      "endurance": 65,
+      "ambition": 75,
+      "harmony": 80
+    },
+    "armorValue": 0,
+    "aiProfile": "support",
+    "equipment": {},
+    "availableSkills": [
+      "produce_flame",
+      "burning_aura",
+      "shout",
+      "fireball",
+      "singe"
+    ],
+    "skillSelectionCount": 3,
+    "tags": [
+      "human",
+      "fire",
+      "caster",
+      "ashen_remnant"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "ashen_brute",
+    "name": "Ash Brute",
+    "description": "The explosion fused their armor to them. They stopped noticing the weight around the same time they stopped noticing pain. They stand in front of the Flamekeepers because that is what they did before and habit is the last thing to burn away.",
+    "stats": {
+      "conviction": 110,
+      "endurance": 130,
+      "ambition": 40,
+      "harmony": 30
+    },
+    "armorValue": 10,
+    "aiProfile": "aggressive",
+    "equipment": {
+      "mainHand": "weapon_ashen_fist"
+    },
+    "availableSkills": [
+      "basic_attack",
+      "block",
+      "shove",
+      "shield_bash",
+      "stone_skin"
+    ],
+    "skillSelectionCount": 3,
+    "tags": [
+      "human",
+      "fire",
+      "ashen_remnant"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "captain_ignis",
+    "name": "Captain Ignis",
+    "description": "He was the mage. The explosion did not kill him because the fire spirit recognized something in him \u2014 an affinity, or a usefulness, or perhaps just the fact that he had opened the door. He has been burning from the inside for five years. He does not sleep. He does not need to.",
+    "stats": {
+      "conviction": 140,
+      "endurance": 160,
+      "ambition": 90,
+      "harmony": 120
+    },
+    "armorValue": 5,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "weapon_ashen_fist"
+    },
+    "availableSkills": [
+      "fireball",
+      "burning_aura",
+      "shout",
+      "warcry",
+      "produce_flame",
+      "ring_of_fire",
+      "first_aid"
+    ],
+    "skillSelectionCount": 5,
+    "tags": [
+      "human",
+      "fire",
+      "boss",
+      "ashen_remnant"
+    ],
+    "lootTable": [
+      {
+        "itemID": "wand_flame_tier1",
+        "dropChance": 0.3,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "tome_flame_tier1",
+        "dropChance": 0.2,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "royal_guard_insignia",
+        "dropChance": 0.55,
+        "rarity": "common"
+      }
+    ]
+  },
+  {
+    "id": "fire_spirit_remnant",
+    "name": "The Bound Flame",
+    "description": "It was not meant to be bound here. The mage's ritual was supposed to be a partnership \u2014 warmth for service. Instead it became a cage. Five years of burning inside a broken hearth with no way out and no one to talk to. It is not angry at the party. It is angry at everything. The party is simply present.",
+    "stats": {
+      "conviction": 80,
+      "endurance": 100,
+      "ambition": 70,
+      "harmony": 150
+    },
+    "armorValue": 0,
+    "aiProfile": "aggressive",
+    "equipment": {},
+    "availableSkills": [
+      "fireball",
+      "ring_of_fire",
+      "burning_aura",
+      "produce_flame",
+      "scorched_shot",
+      "warcry"
+    ],
+    "skillSelectionCount": 5,
+    "tags": [
+      "spirit",
+      "fire",
+      "boss"
+    ],
+    "lootTable": [
+      {
+        "itemID": "wand_flame_tier1",
+        "dropChance": 0.45,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "tome_flame_tier1",
+        "dropChance": 0.3,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "royal_guard_insignia",
+        "dropChance": 0.7,
+        "rarity": "common"
+      },
+      {
+        "itemID": "consumable_scroll_fireball",
+        "dropChance": 0.35,
+        "rarity": "uncommon"
+      }
+    ]
+  },
+  {
+    "id": "kennel_runt",
+    "name": "Kennel Runt",
+    "description": "The pack's youngest. They were born here after the garrison left, which means they have never been trained, only shaped by the older dogs. They are fast and they bite first and ask nothing afterward.",
+    "stats": {
+      "conviction": 20,
+      "endurance": 35,
+      "ambition": 95,
+      "harmony": 10
+    },
+    "armorValue": 0,
+    "aiProfile": "aggressive",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "shove",
+      "blood_letting"
+    ],
+    "skillSelectionCount": 2,
+    "tags": [
+      "beast",
+      "canine",
+      "wolves_head"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "kennel_blooded_hunter",
+    "name": "Blooded Hunter",
+    "description": "These were trained. The garrison's methods are still visible in how they move \u2014 coordinated flanking, waiting for the signal. The signal used to come from the handlers. Now it comes from the Alpha.",
+    "stats": {
+      "conviction": 50,
+      "endurance": 70,
+      "ambition": 100,
+      "harmony": 20
+    },
+    "armorValue": 0,
+    "aiProfile": "aggressive",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "venomous_slash",
+      "slash",
+      "terror_cry",
+      "shove"
+    ],
+    "skillSelectionCount": 3,
+    "tags": [
+      "beast",
+      "canine",
+      "wolves_head"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "kennel_mad_keeper",
+    "name": "Mad Keeper",
+    "description": "They did not leave when the garrison was recalled. The official reason was that someone had to feed the dogs. The real reason was that they had nowhere else to go. Five years later they have traded ranks for hierarchy and orders for instinct. They are not entirely wrong to think the pack respects them.",
+    "stats": {
+      "conviction": 60,
+      "endurance": 65,
+      "ambition": 70,
+      "harmony": 40
+    },
+    "armorValue": 2,
+    "aiProfile": "support",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "misdirect",
+      "shout",
+      "entangle",
+      "footwork"
+    ],
+    "skillSelectionCount": 3,
+    "tags": [
+      "human",
+      "wolves_head"
+    ],
+    "lootTable": [
+      {
+        "itemID": "royal_guard_insignia",
+        "dropChance": 0.2,
+        "rarity": "common"
+      },
+      {
+        "itemID": "consumable_tool_rope",
+        "dropChance": 0.25,
+        "rarity": "common"
+      }
+    ]
+  },
+  {
+    "id": "kennel_master",
+    "name": "Kennel Master",
+    "description": "The last one who still wears the rank insignia. He has been a Kennel Master for thirty years, which means he was a Kennel Master before the garrison arrived and will be one after the pack is gone. He considers this a perfectly reasonable position.",
+    "stats": {
+      "conviction": 80,
+      "endurance": 90,
+      "ambition": 65,
+      "harmony": 50
+    },
+    "armorValue": 5,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "shout",
+      "warcry",
+      "block",
+      "counter_strike",
+      "misdirect"
+    ],
+    "skillSelectionCount": 4,
+    "tags": [
+      "human",
+      "wolves_head"
+    ],
+    "lootTable": [
+      {
+        "itemID": "royal_guard_insignia",
+        "dropChance": 0.35,
+        "rarity": "common"
+      },
+      {
+        "itemID": "chest_studded_leather_tier1",
+        "dropChance": 0.2,
+        "rarity": "uncommon"
+      }
+    ]
+  },
+  {
+    "id": "the_alpha",
+    "name": "The Alpha",
+    "description": "It was the garrison's prize breeding animal before the explosion, before the recall, before all of it. Thirty years of training followed by five years of freedom and residual magic from the Whispering Woods bleeding through the northern fence. It is enormous. It is also, in some technical sense, still responding to the old signals. It just no longer feels obligated to obey them.",
+    "stats": {
+      "conviction": 150,
+      "endurance": 180,
+      "ambition": 110,
+      "harmony": 40
+    },
+    "armorValue": 3,
+    "aiProfile": "aggressive",
+    "equipment": {
+      "mainHand": "weapon_alpha_bite"
+    },
+    "availableSkills": [
+      "basic_attack",
+      "venomous_slash",
+      "blood_letting",
+      "terror_cry",
+      "warcry",
+      "shove"
+    ],
+    "skillSelectionCount": 5,
+    "tags": [
+      "beast",
+      "canine",
+      "boss",
+      "wolves_head"
+    ],
+    "lootTable": [
+      {
+        "itemID": "royal_guard_insignia",
+        "dropChance": 0.6,
+        "rarity": "common"
+      },
+      {
+        "itemID": "acc_cloak_hunter_tier1",
+        "dropChance": 0.25,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "dagger_hunter_tier1",
+        "dropChance": 0.2,
+        "rarity": "uncommon"
+      }
+    ]
+  },
+  {
+    "id": "excavation_delver",
+    "name": "Scavenger Delver",
+    "description": "They came here for crystals and they are still here because the crystals are still growing. The ward breach has made the work more dangerous. They have decided this is the ward's problem, not theirs.",
+    "stats": {
+      "conviction": 60,
+      "endurance": 75,
+      "ambition": 80,
+      "harmony": 30
+    },
+    "armorValue": 3,
+    "aiProfile": "aggressive",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "slash",
+      "pummel",
+      "shove"
+    ],
+    "skillSelectionCount": 2,
+    "tags": [
+      "dwarf",
+      "dwarven_conflict",
+      "excavation"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "excavation_wardbreaker",
+    "name": "Ward-Breaker",
+    "description": "Specialists in dismantling magical seals. The Goldcrown Usurpers brought them here specifically, which means someone in the Goldcrown command knew the ward existed before the excavation began.",
+    "stats": {
+      "conviction": 80,
+      "endurance": 90,
+      "ambition": 70,
+      "harmony": 50
+    },
+    "armorValue": 5,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "pummel",
+      "shield_bash",
+      "shout",
+      "stone_fist",
+      "thunderclap",
+      "ward_break"
+    ],
+    "skillSelectionCount": 3,
+    "tags": [
+      "dwarf",
+      "dwarven_conflict",
+      "excavation"
+    ],
+    "lootTable": [
+      {
+        "itemID": "hammer_mithril_tier2",
+        "dropChance": 0.15,
+        "rarity": "uncommon"
+      }
+    ]
+  },
+  {
+    "id": "excavation_construct",
+    "name": "Captured Construct",
+    "description": "Ward spirits pressed into labor by the Ward-Breakers. They retain enough of the original ward's purpose to be useful and enough of their own will to be dangerous. The Delvers give them wide berth. The Ward-Breakers carry the control rods and prefer not to discuss what happens when they lose one.",
+    "stats": {
+      "conviction": 70,
+      "endurance": 80,
+      "ambition": 60,
+      "harmony": 100
+    },
+    "armorValue": 0,
+    "aiProfile": "aggressive",
+    "equipment": {},
+    "availableSkills": [
+      "produce_flame",
+      "shock",
+      "shove",
+      "thunderclap",
+      "stone_fist"
+    ],
+    "skillSelectionCount": 3,
+    "tags": [
+      "construct",
+      "spirit",
+      "excavation"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "crystal_sentinel",
+    "name": "Crystal Sentinel",
+    "description": "The ward spirits that have not been captured. They are older than the excavation, older than the Goldcrown faction, older than the succession crisis. They remember what the ward was protecting and they are protecting it still, against anyone who enters \u2014 miners, constructs, or otherwise.",
+    "stats": {
+      "conviction": 100,
+      "endurance": 110,
+      "ambition": 80,
+      "harmony": 120
+    },
+    "armorValue": 8,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "shock",
+      "earthquake",
+      "stone_skin",
+      "stone_fist",
+      "shout",
+      "entangle"
+    ],
+    "skillSelectionCount": 4,
+    "tags": [
+      "construct",
+      "spirit",
+      "excavation",
+      "earth"
+    ],
+    "lootTable": [
+      {
+        "itemID": "verdant_word_seal",
+        "dropChance": 0.25,
+        "rarity": "uncommon"
+      }
+    ]
+  },
+  {
+    "id": "foreman_kael",
+    "name": "Foreman Kael",
+    "description": "He has been in this shaft for ten years. The crystal growth has reached him \u2014 there are formations along his left arm that he cannot remove and has stopped trying to. He considers this an acceptable cost of operations. He has not reported it to command. He is not sure command would consider it acceptable.",
+    "stats": {
+      "conviction": 160,
+      "endurance": 190,
+      "ambition": 90,
+      "harmony": 110
+    },
+    "armorValue": 12,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "pummel",
+      "block",
+      "shout",
+      "warcry",
+      "stone_skin",
+      "shield_bash",
+      "earthquake"
+    ],
+    "skillSelectionCount": 5,
+    "tags": [
+      "dwarf",
+      "boss",
+      "dwarven_conflict",
+      "excavation"
+    ],
+    "lootTable": [
+      {
+        "itemID": "chest_knight_plate_tier2",
+        "dropChance": 0.25,
+        "rarity": "rare"
+      },
+      {
+        "itemID": "hammer_mithril_tier2",
+        "dropChance": 0.3,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "verdant_word_seal",
+        "dropChance": 0.5,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "loyalist_seal",
+        "dropChance": 0.3,
+        "rarity": "uncommon"
+      }
+    ]
+  },
+  {
+    "id": "ward_core_spirit",
+    "name": "The Ward-Core",
+    "description": "The thing at the center of the breach. Not a spirit in the sense of the Willow Wisps or Lyra \u2014 something older and less individual than that. The Verdant Word did not create it. They found it, named it, and built the ward around its preferences. It has not spoken to anyone in the two centuries since. It speaks now because someone finally asked it the right question.",
+    "stats": {
+      "conviction": 120,
+      "endurance": 140,
+      "ambition": 70,
+      "harmony": 200
+    },
+    "armorValue": 0,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "earthquake",
+      "entangle",
+      "stone_fist",
+      "forest_embrace",
+      "sacred_roots",
+      "shout",
+      "stone_skin",
+      "regrowth"
+    ],
+    "skillSelectionCount": 6,
+    "tags": [
+      "spirit",
+      "boss",
+      "earth",
+      "nature"
+    ],
+    "lootTable": [
+      {
+        "itemID": "verdant_word_seal",
+        "dropChance": 0.9,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "moon_touched_apple",
+        "dropChance": 0.6,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "scepter_nature_tier1",
+        "dropChance": 0.35,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "acc_amulet_crystal_tier2",
+        "dropChance": 0.3,
+        "rarity": "rare"
+      },
+      {
+        "itemID": "chest_knight_plate_tier2",
+        "dropChance": 0.2,
+        "rarity": "rare"
+      }
+    ]
+  },
+  {
+    "id": "guild_debt_collector",
+    "name": "Debt Collector",
+    "description": "The Guild does not call them enforcers. They are called Debt Collectors, which is accurate. They collect whatever the Guild decides is owed, from whoever the Guild decides owes it.",
+    "stats": {
+      "conviction": 60,
+      "endurance": 70,
+      "ambition": 85,
+      "harmony": 40
+    },
+    "armorValue": 2,
+    "aiProfile": "aggressive",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "slash",
+      "shove",
+      "misdirect",
+      "footwork"
+    ],
+    "skillSelectionCount": 3,
+    "tags": [
+      "human",
+      "guild"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "guild_vault_warden",
+    "name": "Vault Warden",
+    "description": "They guard the inner stores. They are paid very well. They have not been paid recently. They are guarding the stores anyway because the alternative is the street, and the street is worse.",
+    "stats": {
+      "conviction": 90,
+      "endurance": 100,
+      "ambition": 55,
+      "harmony": 50
+    },
+    "armorValue": 8,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "block",
+      "shield_bash",
+      "shove",
+      "counter_strike"
+    ],
+    "skillSelectionCount": 4,
+    "tags": [
+      "human",
+      "guild"
+    ],
+    "lootTable": [
+      {
+        "itemID": "chest_knight_plate_tier2",
+        "dropChance": 0.15,
+        "rarity": "rare"
+      }
+    ]
+  },
+  {
+    "id": "guild_verdant_auditor",
+    "name": "Verdant Auditor",
+    "description": "Sent by what remains of the Verdant Word's administrative body to seize goods for public redistribution. They have legal authority, no soldiers, and the Guild's complete contempt. They have been in the courtyard for six weeks.",
+    "stats": {
+      "conviction": 70,
+      "endurance": 75,
+      "ambition": 70,
+      "harmony": 90
+    },
+    "armorValue": 1,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "shock",
+      "thunderclap",
+      "misdirect",
+      "shout",
+      "first_aid"
+    ],
+    "skillSelectionCount": 3,
+    "tags": [
+      "human",
+      "verdant"
+    ],
+    "lootTable": [
+      {
+        "itemID": "verdant_word_seal",
+        "dropChance": 0.25,
+        "rarity": "uncommon"
+      }
+    ]
+  },
+  {
+    "id": "guildmaster_vane",
+    "name": "Guildmaster Vane",
+    "description": "He funded his son's commission with Guild money and considered it a reasonable investment \u2014 a Royal Guard officer in the family is useful. He did not consider what would happen to that investment when the Royal Guard collapsed. He has not spoken to his son in four years. He tells himself this is because the roads are unsafe.",
+    "stats": {
+      "conviction": 160,
+      "endurance": 180,
+      "ambition": 95,
+      "harmony": 110
+    },
+    "armorValue": 8,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "pierce",
+      "weak_point",
+      "shout",
+      "warcry",
+      "counter_strike",
+      "block",
+      "pummel"
+    ],
+    "skillSelectionCount": 5,
+    "tags": [
+      "human",
+      "boss",
+      "guild"
+    ],
+    "lootTable": [
+      {
+        "itemID": "guild_seal",
+        "dropChance": 0.8,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "chest_knight_plate_tier2",
+        "dropChance": 0.25,
+        "rarity": "rare"
+      },
+      {
+        "itemID": "sword_mithril_tier2",
+        "dropChance": 0.2,
+        "rarity": "uncommon"
+      }
+    ]
+  },
+  {
+    "id": "shrine_rune_scrubber",
+    "name": "Rune Scrubber",
+    "description": "They remember being people. They remember the shrine. They do not remember that what they are doing to the runes is making things worse.",
+    "stats": {
+      "conviction": 30,
+      "endurance": 40,
+      "ambition": 65,
+      "harmony": 50
+    },
+    "armorValue": 0,
+    "aiProfile": "aggressive",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "entangle",
+      "shove",
+      "water_bolt"
+    ],
+    "skillSelectionCount": 2,
+    "tags": [
+      "spirit",
+      "water",
+      "pact"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "shrine_oath_warden",
+    "name": "Oath Warden",
+    "description": "These spirits remember the pact clearly enough to know it is being broken. They do not understand that they are the ones breaking it.",
+    "stats": {
+      "conviction": 70,
+      "endurance": 80,
+      "ambition": 60,
+      "harmony": 90
+    },
+    "armorValue": 2,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "water_bolt",
+      "entangle",
+      "forest_embrace",
+      "shout",
+      "footwork",
+      "tidal_grasp"
+    ],
+    "skillSelectionCount": 3,
+    "tags": [
+      "spirit",
+      "water",
+      "pact"
+    ],
+    "lootTable": [
+      {
+        "itemID": "silver_halfling_coin",
+        "dropChance": 0.3,
+        "rarity": "common"
+      }
+    ]
+  },
+  {
+    "id": "shrine_pact_breaker",
+    "name": "Pact Breaker",
+    "description": "The ones who have gone furthest from what they were. They still call themselves Pact Keepers. The name no longer fits what they do.",
+    "stats": {
+      "conviction": 60,
+      "endurance": 65,
+      "ambition": 75,
+      "harmony": 110
+    },
+    "armorValue": 0,
+    "aiProfile": "support",
+    "equipment": {},
+    "availableSkills": [
+      "water_bolt",
+      "shock",
+      "misdirect",
+      "shout",
+      "first_aid",
+      "sacred_roots"
+    ],
+    "skillSelectionCount": 4,
+    "tags": [
+      "spirit",
+      "water",
+      "caster",
+      "pact"
+    ],
+    "lootTable": [
+      {
+        "itemID": "silver_halfling_coin",
+        "dropChance": 0.25,
+        "rarity": "common"
+      }
+    ]
+  },
+  {
+    "id": "high_keeper_elara",
+    "name": "High Keeper Elara",
+    "description": "She signed the original agreement three hundred years ago. She remembers every word of it. She remembers the song the halflings sang and the look on Lyra's face when the pact was sealed. She is trying to repair it with blood because she has tried everything else and the runes keep fading and she is running out of time and she knows it.",
+    "stats": {
+      "conviction": 110,
+      "endurance": 130,
+      "ambition": 60,
+      "harmony": 200
+    },
+    "armorValue": 0,
+    "aiProfile": "support",
+    "equipment": {},
+    "availableSkills": [
+      "tidal_grasp",
+      "sacred_roots",
+      "forest_embrace",
+      "shout",
+      "first_aid",
+      "mass_heal",
+      "regrowth",
+      "cleanse"
+    ],
+    "skillSelectionCount": 5,
+    "tags": [
+      "spirit",
+      "water",
+      "boss",
+      "pact"
+    ],
+    "lootTable": [
+      {
+        "itemID": "oath_stone",
+        "dropChance": 0.8,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "silver_halfling_coin",
+        "dropChance": 0.6,
+        "rarity": "common"
+      },
+      {
+        "itemID": "acc_amulet_silver_tier1",
+        "dropChance": 0.3,
+        "rarity": "uncommon"
+      }
+    ]
+  },
+  {
+    "id": "forge_awakened_foreman",
+    "name": "The Awakened Foreman",
+    "description": "The spirit of the head smith of the first Forge-Kings, bound into the central anvil for four centuries. He has had four hundred years to think about quality standards and two weeks to think about the factions that broke his vault open. His assessment of both is negative.",
+    "stats": {
+      "conviction": 200,
+      "endurance": 230,
+      "ambition": 80,
+      "harmony": 100
+    },
+    "armorValue": 20,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "pummel",
+      "block",
+      "shout",
+      "warcry",
+      "stone_skin",
+      "shield_bash",
+      "earthquake",
+      "stone_fist"
+    ],
+    "skillSelectionCount": 6,
+    "tags": [
+      "construct",
+      "spirit",
+      "boss",
+      "dwarven_conflict"
+    ],
+    "lootTable": [
+      {
+        "itemID": "ironvein_signet",
+        "dropChance": 0.8,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "hammer_mithril_tier2",
+        "dropChance": 0.35,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "chest_warrior_plate_tier3",
+        "dropChance": 0.2,
+        "rarity": "rare"
+      }
+    ]
+  },
+  {
+    "id": "watch_frostbite_conscript",
+    "name": "Frostbite Conscript",
+    "description": "They were Ironvein and Goldcrown soldiers who agreed to staff a joint monitoring post because both factions feared the Sanctum equally. The Tidebound Penitents arrived five years ago. The truce ended. The soldiers did not.",
+    "stats": {
+      "conviction": 70,
+      "endurance": 85,
+      "ambition": 60,
+      "harmony": 40
+    },
+    "armorValue": 5,
+    "aiProfile": "aggressive",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "shove",
+      "sleet",
+      "block"
+    ],
+    "skillSelectionCount": 3,
+    "tags": [
+      "undead",
+      "dwarf",
+      "tidebound"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "watch_tide_warden",
+    "name": "Tide Warden",
+    "description": "Tidebound Penitents who use the tower as a forward base. They are further from the Sanctum than any of their order has operated before. They consider this a sign of holy confidence.",
+    "stats": {
+      "conviction": 80,
+      "endurance": 90,
+      "ambition": 65,
+      "harmony": 100
+    },
+    "armorValue": 2,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "water_bolt",
+      "entangle",
+      "shout",
+      "first_aid",
+      "sacred_roots"
+    ],
+    "skillSelectionCount": 3,
+    "tags": [
+      "tidebound",
+      "caster"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "watch_storm_caller",
+    "name": "Storm Caller",
+    "description": "Something between a Tidebound spirit and the elemental residue of the curse. They formed around the watchtower's monitoring crystals when the Penitents arrived. They are not Tidebound exactly. They are what the Tidebound become when they stay somewhere long enough.",
+    "stats": {
+      "conviction": 70,
+      "endurance": 75,
+      "ambition": 80,
+      "harmony": 110
+    },
+    "armorValue": 0,
+    "aiProfile": "support",
+    "equipment": {},
+    "availableSkills": [
+      "shock",
+      "sleet",
+      "thunderclap",
+      "shout",
+      "misdirect"
+    ],
+    "skillSelectionCount": 3,
+    "tags": [
+      "spirit",
+      "tidebound",
+      "lightning",
+      "cold"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "watch_commander_thrain",
+    "name": "Watch Commander Thrain",
+    "description": "He was the Goldcrown officer who volunteered to command the joint monitoring post. He thought it would be a quiet posting. He sent a warning to the Capital when the Penitents appeared on the lake. The Capital did not respond. That was five years ago. He has had time to think about what the silence meant.",
+    "stats": {
+      "conviction": 170,
+      "endurance": 200,
+      "ambition": 85,
+      "harmony": 130
+    },
+    "armorValue": 10,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "weapon_tidebound_harpoon"
+    },
+    "availableSkills": [
+      "basic_attack",
+      "sleet",
+      "shock",
+      "shout",
+      "warcry",
+      "block",
+      "shield_bash",
+      "entangle"
+    ],
+    "skillSelectionCount": 6,
+    "tags": [
+      "undead",
+      "dwarf",
+      "boss",
+      "tidebound"
+    ],
+    "lootTable": [
+      {
+        "itemID": "monitoring_crystal",
+        "dropChance": 0.8,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "chest_warrior_plate_tier3",
+        "dropChance": 0.2,
+        "rarity": "rare"
+      },
+      {
+        "itemID": "hammer_mithril_tier2",
+        "dropChance": 0.25,
+        "rarity": "uncommon"
+      }
+    ]
+  },
+  {
+    "id": "beacon_tide_caller",
+    "name": "Tide-Caller",
+    "description": "Fishermen who performed the forbidden binding ritual five years ago. They are not entirely what they were. The village elder who led the ritual told them it would save the catches. He was right. The catches improved immediately. He did not mention the rest.",
+    "stats": {
+      "conviction": 40,
+      "endurance": 50,
+      "ambition": 75,
+      "harmony": 50
+    },
+    "armorValue": 0,
+    "aiProfile": "aggressive",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "water_bolt",
+      "shove",
+      "entangle"
+    ],
+    "skillSelectionCount": 2,
+    "tags": [
+      "human",
+      "salt_wept",
+      "water"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "beacon_salt_singer",
+    "name": "Salt-Singer",
+    "description": "The ones who can channel Lyra's fractured power directly. They sing constantly. The song is recognizably the old halfling offering hymn, but wrong in ways that are hard to identify and impossible to unhear.",
+    "stats": {
+      "conviction": 60,
+      "endurance": 70,
+      "ambition": 65,
+      "harmony": 100
+    },
+    "armorValue": 0,
+    "aiProfile": "support",
+    "equipment": {},
+    "availableSkills": [
+      "water_bolt",
+      "shout",
+      "misdirect",
+      "first_aid",
+      "forest_embrace"
+    ],
+    "skillSelectionCount": 3,
+    "tags": [
+      "human",
+      "salt_wept",
+      "water",
+      "caster"
+    ],
+    "lootTable": [
+      {
+        "itemID": "silver_halfling_coin",
+        "dropChance": 0.25,
+        "rarity": "common"
+      }
+    ]
+  },
+  {
+    "id": "beacon_fog_weaver",
+    "name": "Fog-Weaver",
+    "description": "They stand in the lantern room and weave the light into something that looks like a safe harbor from the sea. They believe they are guiding ships home. The ships that follow the light do not arrive at a harbor.",
+    "stats": {
+      "conviction": 50,
+      "endurance": 55,
+      "ambition": 70,
+      "harmony": 110
+    },
+    "armorValue": 0,
+    "aiProfile": "support",
+    "equipment": {},
+    "availableSkills": [
+      "shock",
+      "sleet",
+      "misdirect",
+      "shout",
+      "sacred_roots"
+    ],
+    "skillSelectionCount": 3,
+    "tags": [
+      "human",
+      "salt_wept",
+      "water",
+      "caster"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "beacon_the_keeper",
+    "name": "The Keeper",
+    "description": "The village elder who led the ritual. He merged with the fragment of Lyra's power that the binding pulled into him. He remembers the pact at the Shrine of the First Oath \u2014 not correctly, but partially. Enough to know that something about what he did was wrong. Not enough to know what.",
+    "stats": {
+      "conviction": 130,
+      "endurance": 150,
+      "ambition": 70,
+      "harmony": 180
+    },
+    "armorValue": 3,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "water_bolt",
+      "shock",
+      "shout",
+      "sacred_roots",
+      "first_aid",
+      "forest_embrace",
+      "entangle",
+      "tidal_grasp"
+    ],
+    "skillSelectionCount": 5,
+    "tags": [
+      "human",
+      "boss",
+      "salt_wept",
+      "water"
+    ],
+    "lootTable": [
+      {
+        "itemID": "silver_halfling_coin",
+        "dropChance": 0.55,
+        "rarity": "common"
+      },
+      {
+        "itemID": "oath_stone",
+        "dropChance": 0.3,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "flute_silver_tier1",
+        "dropChance": 0.2,
+        "rarity": "uncommon"
+      }
+    ]
+  },
+  {
+    "id": "beacon_lyra_fragment",
+    "name": "Lyra Fragment",
+    "description": "What was pulled out of Lyra when the fishermen performed the binding \u2014 not the whole spirit, not even a large piece, but a fragment with enough coherence to be angry. It has been trapped in the lighthouse for five years. The anger has not diminished. The coherence has.",
+    "stats": {
+      "conviction": 100,
+      "endurance": 120,
+      "ambition": 60,
+      "harmony": 220
+    },
+    "armorValue": 0,
+    "aiProfile": "aggressive",
+    "equipment": {
+      "mainHand": "weapon_lyra_current"
+    },
+    "availableSkills": [
+      "tidal_grasp",
+      "sacred_roots",
+      "forest_embrace",
+      "shock",
+      "entangle",
+      "shout",
+      "first_aid"
+    ],
+    "skillSelectionCount": 5,
+    "tags": [
+      "spirit",
+      "water",
+      "boss",
+      "nature"
+    ],
+    "lootTable": [
+      {
+        "itemID": "oath_stone",
+        "dropChance": 0.9,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "silver_halfling_coin",
+        "dropChance": 0.7,
+        "rarity": "common"
+      },
+      {
+        "itemID": "flute_silver_tier1",
+        "dropChance": 0.4,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "acc_amulet_silver_tier1",
+        "dropChance": 0.3,
+        "rarity": "uncommon"
+      }
+    ]
+  },
+  {
+    "id": "athenaeum_scrivener",
+    "name": "Scrivener",
+    "description": "They were copying texts when the cursed ink took them. They are still copying. The texts they produce are no longer legible. They do not notice.",
+    "stats": {
+      "conviction": 30,
+      "endurance": 40,
+      "ambition": 70,
+      "harmony": 60
+    },
+    "armorValue": 0,
+    "aiProfile": "aggressive",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "misdirect",
+      "shove"
+    ],
+    "skillSelectionCount": 2,
+    "tags": [
+      "spirit",
+      "inkbound",
+      "verdant"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "athenaeum_editor",
+    "name": "Editor",
+    "description": "They review the Scriveners' work and mark corrections. The corrections are as illegible as the text. They enforce standards that no longer correspond to anything readable. They are very thorough.",
+    "stats": {
+      "conviction": 50,
+      "endurance": 60,
+      "ambition": 60,
+      "harmony": 90
+    },
+    "armorValue": 0,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "shock",
+      "misdirect",
+      "shout",
+      "entangle",
+      "footwork"
+    ],
+    "skillSelectionCount": 3,
+    "tags": [
+      "spirit",
+      "inkbound",
+      "verdant"
+    ],
+    "lootTable": [
+      {
+        "itemID": "verdant_word_seal",
+        "dropChance": 0.2,
+        "rarity": "uncommon"
+      }
+    ]
+  },
+  {
+    "id": "athenaeum_silencer",
+    "name": "Silencer",
+    "description": "The archive's enforcement arm. They silence intruders the way a librarian shushes a loud patron \u2014 with complete conviction that the rules are correct and complete indifference to the intruder's perspective.",
+    "stats": {
+      "conviction": 45,
+      "endurance": 55,
+      "ambition": 65,
+      "harmony": 110
+    },
+    "armorValue": 0,
+    "aiProfile": "support",
+    "equipment": {},
+    "availableSkills": [
+      "shock",
+      "sleet",
+      "misdirect",
+      "shout",
+      "mental_fog"
+    ],
+    "skillSelectionCount": 3,
+    "tags": [
+      "spirit",
+      "inkbound",
+      "caster",
+      "verdant"
+    ],
+    "lootTable": [
+      {
+        "itemID": "verdant_word_seal",
+        "dropChance": 0.25,
+        "rarity": "uncommon"
+      }
+    ]
+  },
+  {
+    "id": "grand_archivist",
+    "name": "The Grand Archivist",
+    "description": "He merged with the central catalog when the cursed ink reached it. He knows the location of every text in the archive, including the ones that were never meant to be found and the ones the Order removed from official records before the dissolution. He will not let anyone read them.",
+    "stats": {
+      "conviction": 110,
+      "endurance": 130,
+      "ambition": 60,
+      "harmony": 200
+    },
+    "armorValue": 0,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "shock",
+      "sleet",
+      "misdirect",
+      "shout",
+      "mental_fog",
+      "shadow_bolt",
+      "first_aid"
+    ],
+    "skillSelectionCount": 5,
+    "tags": [
+      "spirit",
+      "inkbound",
+      "boss",
+      "verdant"
+    ],
+    "lootTable": [
+      {
+        "itemID": "athenaeum_scroll",
+        "dropChance": 0.8,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "verdant_word_seal",
+        "dropChance": 0.45,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "tome_mithril_tier2",
+        "dropChance": 0.2,
+        "rarity": "uncommon"
+      }
+    ]
+  },
+  {
+    "id": "athenaeum_true_record",
+    "name": "The True Record",
+    "description": "Behind the official catalog there is a second archive \u2014 the texts the Grand Archivist removed from the official record before the dissolution, at the instruction of the High Council. He moved them to a sealed section and locked it with his own name. He is the lock. He fights because he was told to protect these texts from everyone, including people who might have a legitimate reason to read them. He was not given discretion.",
+    "stats": {
+      "conviction": 80,
+      "endurance": 100,
+      "ambition": 50,
+      "harmony": 180
+    },
+    "armorValue": 0,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "shadow_bolt",
+      "shock",
+      "sleet",
+      "misdirect",
+      "shout",
+      "mental_fog",
+      "shadow_tendril"
+    ],
+    "skillSelectionCount": 5,
+    "tags": [
+      "spirit",
+      "inkbound",
+      "boss",
+      "verdant",
+      "shadow"
+    ],
+    "lootTable": [
+      {
+        "itemID": "athenaeum_scroll",
+        "dropChance": 0.95,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "verdant_word_seal",
+        "dropChance": 0.6,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "tome_mithril_tier2",
+        "dropChance": 0.3,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "moon_touched_apple",
+        "dropChance": 0.4,
+        "rarity": "uncommon"
+      }
+    ]
+  },
+  {
+    "id": "bastion_ghost_conscript",
+    "name": "Ghost Conscript",
+    "description": "They were guarding the Bastion when the Verdant priests abandoned the mid-ritual ward. The ward fractured. The conscripts did not survive. They are still at their posts.",
+    "stats": {
+      "conviction": 50,
+      "endurance": 60,
+      "ambition": 70,
+      "harmony": 40
+    },
+    "armorValue": 0,
+    "aiProfile": "aggressive",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "slash",
+      "shove",
+      "misdirect"
+    ],
+    "skillSelectionCount": 2,
+    "tags": [
+      "spirit",
+      "undead",
+      "royal_guard"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "bastion_spectral_veteran",
+    "name": "Spectral Veteran",
+    "description": "The senior guards. They remember their orders clearly \u2014 protect the capital from magical threat. The fractured ward is a magical threat. They are protecting the capital from it by standing inside it. The logic has not been examined.",
+    "stats": {
+      "conviction": 80,
+      "endurance": 90,
+      "ambition": 65,
+      "harmony": 50
+    },
+    "armorValue": 5,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "block",
+      "shield_bash",
+      "shout",
+      "counter_strike",
+      "slash"
+    ],
+    "skillSelectionCount": 4,
+    "tags": [
+      "spirit",
+      "undead",
+      "royal_guard"
+    ],
+    "lootTable": [
+      {
+        "itemID": "royal_guard_insignia",
+        "dropChance": 0.3,
+        "rarity": "common"
+      }
+    ]
+  },
+  {
+    "id": "bastion_ward_breaker",
+    "name": "Ward-Breaker Cultist",
+    "description": "Human cultists who arrived after the ward fractured, drawn by the unstable magic. They believe the fractured ward is a resource. They have been extracting from it for years. They have not noticed that the ward is what is keeping the spirits here rather than somewhere worse.",
+    "stats": {
+      "conviction": 70,
+      "endurance": 75,
+      "ambition": 75,
+      "harmony": 80
+    },
+    "armorValue": 2,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "shock",
+      "thunderclap",
+      "pummel",
+      "shout",
+      "misdirect",
+      "ward_break"
+    ],
+    "skillSelectionCount": 3,
+    "tags": [
+      "human",
+      "cult",
+      "ward"
+    ],
+    "lootTable": [
+      {
+        "itemID": "verdant_word_seal",
+        "dropChance": 0.2,
+        "rarity": "uncommon"
+      }
+    ]
+  },
+  {
+    "id": "bastion_ward_captain",
+    "name": "Ward Captain",
+    "description": "He commanded the defense when the priests fled. He understands what happened to him and to his men. He does not accept it as a reason to stop. His orders were to hold the Bastion. He is holding the Bastion.",
+    "stats": {
+      "conviction": 150,
+      "endurance": 170,
+      "ambition": 80,
+      "harmony": 110
+    },
+    "armorValue": 8,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "block",
+      "shield_bash",
+      "shout",
+      "warcry",
+      "counter_strike",
+      "slash",
+      "pummel"
+    ],
+    "skillSelectionCount": 5,
+    "tags": [
+      "spirit",
+      "undead",
+      "boss",
+      "royal_guard"
+    ],
+    "lootTable": [
+      {
+        "itemID": "royal_guard_insignia",
+        "dropChance": 0.65,
+        "rarity": "common"
+      },
+      {
+        "itemID": "guild_seal",
+        "dropChance": 0.3,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "chest_warrior_plate_tier3",
+        "dropChance": 0.18,
+        "rarity": "rare"
+      }
+    ]
+  },
+  {
+    "id": "bastion_fractured_ward",
+    "name": "The Fractured Ward",
+    "description": "What the ward became when the priests left mid-ritual. Not a spirit \u2014 the ritual's intent, given form by the incompletion. It is still trying to finish what it started. It attacks because the original ritual was designed to purify incoming threats. Everything that enters the Bastion is an incoming threat. Including the party.",
+    "stats": {
+      "conviction": 90,
+      "endurance": 110,
+      "ambition": 60,
+      "harmony": 160
+    },
+    "armorValue": 0,
+    "aiProfile": "aggressive",
+    "equipment": {},
+    "availableSkills": [
+      "shock",
+      "thunderclap",
+      "sacred_roots",
+      "shout",
+      "entangle",
+      "sleet",
+      "stone_fist"
+    ],
+    "skillSelectionCount": 5,
+    "tags": [
+      "spirit",
+      "ward",
+      "boss",
+      "nature"
+    ],
+    "lootTable": [
+      {
+        "itemID": "verdant_word_seal",
+        "dropChance": 0.85,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "royal_guard_insignia",
+        "dropChance": 0.55,
+        "rarity": "common"
+      },
+      {
+        "itemID": "chest_warrior_plate_tier3",
+        "dropChance": 0.22,
+        "rarity": "rare"
+      }
+    ]
+  },
+  {
+    "id": "marsh_drowned_scout",
+    "name": "Drowned Scout",
+    "description": "Tidebound Vanguard who have been in the marsh long enough that the marsh has started to be in them. They move through the water like they were born to it. They were not born to it. This happened five years ago.",
+    "stats": {
+      "conviction": 50,
+      "endurance": 65,
+      "ambition": 75,
+      "harmony": 40
+    },
+    "armorValue": 0,
+    "aiProfile": "aggressive",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "water_bolt",
+      "shove",
+      "slash",
+      "entangle"
+    ],
+    "skillSelectionCount": 3,
+    "tags": [
+      "tidebound",
+      "water",
+      "human"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "marsh_mist_weaver",
+    "name": "Mist Weaver",
+    "description": "They stand on submerged ruins and weave the marsh fog into something that impairs vision and judgment simultaneously. They do not need to see through it. They know where everything is. They have been here for five years.",
+    "stats": {
+      "conviction": 60,
+      "endurance": 65,
+      "ambition": 70,
+      "harmony": 110
+    },
+    "armorValue": 0,
+    "aiProfile": "support",
+    "equipment": {},
+    "availableSkills": [
+      "shock",
+      "water_bolt",
+      "misdirect",
+      "shout",
+      "entangle",
+      "mental_fog",
+      "tidal_grasp"
+    ],
+    "skillSelectionCount": 4,
+    "tags": [
+      "tidebound",
+      "water",
+      "caster",
+      "spirit"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "marsh_barnacle_brute",
+    "name": "Barnacle Brute",
+    "description": "The marsh has been growing things on them. The barnacle growth is not decorative. It is functional \u2014 additional armor that the brute did not put there and cannot remove. The brute has stopped trying to remove it.",
+    "stats": {
+      "conviction": 100,
+      "endurance": 120,
+      "ambition": 50,
+      "harmony": 50
+    },
+    "armorValue": 8,
+    "aiProfile": "aggressive",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "block",
+      "shove",
+      "shield_bash",
+      "stone_skin"
+    ],
+    "skillSelectionCount": 3,
+    "tags": [
+      "tidebound",
+      "water",
+      "human"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "high_chanter_malacor",
+    "name": "High Chanter Malacor",
+    "description": "He maintains the connection to the Sanctum from here. He has been here for five years with one purpose: keep the marsh available for the flood's advance. He is very good at his purpose. He is not good at anything else anymore.",
+    "stats": {
+      "conviction": 160,
+      "endurance": 180,
+      "ambition": 80,
+      "harmony": 160
+    },
+    "armorValue": 4,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "weapon_tidebound_harpoon"
+    },
+    "availableSkills": [
+      "shock",
+      "water_bolt",
+      "shout",
+      "sacred_roots",
+      "entangle",
+      "forest_embrace",
+      "first_aid",
+      "undertow",
+      "tidal_grasp"
+    ],
+    "skillSelectionCount": 6,
+    "tags": [
+      "tidebound",
+      "water",
+      "boss",
+      "caster"
+    ],
+    "lootTable": [
+      {
+        "itemID": "oath_stone",
+        "dropChance": 0.5,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "verdant_word_seal",
+        "dropChance": 0.35,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "monitoring_crystal",
+        "dropChance": 0.25,
+        "rarity": "rare"
+      }
+    ]
+  },
+  {
+    "id": "marsh_sealkeeper",
+    "name": "Sealkeeper",
+    "description": "The remnants of the Verdant Word who have been fighting the Tidebound advance in the marsh for five years. There are three of them left. They are losing. They have been losing for five years. They have not stopped.",
+    "stats": {
+      "conviction": 80,
+      "endurance": 90,
+      "ambition": 60,
+      "harmony": 130
+    },
+    "armorValue": 0,
+    "aiProfile": "support",
+    "equipment": {},
+    "availableSkills": [
+      "sacred_roots",
+      "nature_touch",
+      "regrowth",
+      "shout",
+      "entangle",
+      "first_aid"
+    ],
+    "skillSelectionCount": 4,
+    "tags": [
+      "human",
+      "verdant",
+      "spirit"
+    ],
+    "lootTable": [
+      {
+        "itemID": "verdant_word_seal",
+        "dropChance": 0.45,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "moon_touched_apple",
+        "dropChance": 0.35,
+        "rarity": "uncommon"
+      }
+    ]
+  },
+  {
+    "id": "spire_silent_acolyte",
+    "name": "Silent Acolyte",
+    "description": "They were the support staff \u2014 the ones who maintained the Spire's daily operations. The dissolution caught them mid-task. They are still completing those tasks. In absolute silence. In a building the Capital sealed fifty years ago.",
+    "stats": {
+      "conviction": 50,
+      "endurance": 60,
+      "ambition": 70,
+      "harmony": 60
+    },
+    "armorValue": 0,
+    "aiProfile": "aggressive",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "slash",
+      "misdirect",
+      "shove"
+    ],
+    "skillSelectionCount": 2,
+    "tags": [
+      "spirit",
+      "echo_council",
+      "verdant"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "spire_muted_judge",
+    "name": "Muted Judge",
+    "description": "Council members who lost their voices during the dissolution. They enforce the silence now because they embody it. They apply it to others the way the dissolution applied it to them \u2014 completely and without explanation.",
+    "stats": {
+      "conviction": 80,
+      "endurance": 90,
+      "ambition": 65,
+      "harmony": 100
+    },
+    "armorValue": 3,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "shock",
+      "misdirect",
+      "shout",
+      "mental_fog",
+      "sleet"
+    ],
+    "skillSelectionCount": 3,
+    "tags": [
+      "spirit",
+      "echo_council",
+      "verdant",
+      "caster"
+    ],
+    "lootTable": [
+      {
+        "itemID": "athenaeum_scroll",
+        "dropChance": 0.2,
+        "rarity": "uncommon"
+      }
+    ]
+  },
+  {
+    "id": "spire_ward_keeper",
+    "name": "Ward Keeper",
+    "description": "The Capital's mages assigned to maintain the seal on the Spire from outside. Some of them went in to verify the seal was holding. The seal was holding. They did not come back out. They are maintaining the seal from inside now.",
+    "stats": {
+      "conviction": 100,
+      "endurance": 115,
+      "ambition": 55,
+      "harmony": 70
+    },
+    "armorValue": 8,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "block",
+      "shield_bash",
+      "shock",
+      "shout",
+      "counter_strike",
+      "stone_skin"
+    ],
+    "skillSelectionCount": 4,
+    "tags": [
+      "spirit",
+      "echo_council",
+      "ward"
+    ],
+    "lootTable": [
+      {
+        "itemID": "royal_guard_insignia",
+        "dropChance": 0.25,
+        "rarity": "common"
+      }
+    ]
+  },
+  {
+    "id": "high_speaker_valerius",
+    "name": "High Speaker Valerius",
+    "description": "The last voice of the High Council. He lost it at the moment of dissolution and has been trying to recover it since. The irony \u2014 the High Speaker with nothing to say \u2014 has not escaped him. He has had fifty years to think about it. He fights because the alternative is finishing the conversation he was having when the dissolution happened, and he does not know how that conversation ends.",
+    "stats": {
+      "conviction": 180,
+      "endurance": 200,
+      "ambition": 85,
+      "harmony": 180
+    },
+    "armorValue": 8,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "shock",
+      "sleet",
+      "shout",
+      "warcry",
+      "mental_fog",
+      "misdirect",
+      "block",
+      "sacred_roots",
+      "channel"
+    ],
+    "skillSelectionCount": 6,
+    "tags": [
+      "spirit",
+      "echo_council",
+      "boss",
+      "verdant"
+    ],
+    "lootTable": [
+      {
+        "itemID": "athenaeum_scroll",
+        "dropChance": 0.7,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "verdant_word_seal",
+        "dropChance": 0.55,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "tome_mithril_tier2",
+        "dropChance": 0.25,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "chest_warrior_plate_tier3",
+        "dropChance": 0.18,
+        "rarity": "rare"
+      }
+    ]
+  },
+  {
+    "id": "spire_true_record",
+    "name": "The Unfinished Debate",
+    "description": "The High Council was mid-vote when the dissolution happened. The motion on the table was whether to expose the three entities who had infiltrated the Order. The vote was three to two in favor of exposure. The dissolution interrupted before it could be recorded. What inhabits the Spire's sealed vault is the unresolved motion itself \u2014 the consequence of a decision that was made but never enacted. It fights because it has been waiting for fifty years to be completed.",
+    "stats": {
+      "conviction": 90,
+      "endurance": 110,
+      "ambition": 60,
+      "harmony": 200
+    },
+    "armorValue": 0,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "shock",
+      "sacred_roots",
+      "shout",
+      "channel",
+      "sleet",
+      "mental_fog",
+      "entangle",
+      "shadow_bolt"
+    ],
+    "skillSelectionCount": 6,
+    "tags": [
+      "spirit",
+      "echo_council",
+      "boss",
+      "verdant",
+      "shadow"
+    ],
+    "lootTable": [
+      {
+        "itemID": "athenaeum_scroll",
+        "dropChance": 0.95,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "verdant_word_seal",
+        "dropChance": 0.8,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "monitoring_crystal",
+        "dropChance": 0.6,
+        "rarity": "rare"
+      },
+      {
+        "itemID": "tome_mithril_tier2",
+        "dropChance": 0.4,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "chest_warrior_plate_tier3",
+        "dropChance": 0.25,
+        "rarity": "rare"
+      }
+    ]
+  },
+  {
+    "id": "hall_echo_conscript",
+    "name": "Echo Conscript",
+    "description": "Dead soldiers from both factions, recent enough to still remember which side they fought for. They fight each other reflexively and the party incidentally. The Hall has not resolved their factional loyalties. It has simply given them an eternity to continue them.",
+    "stats": {
+      "conviction": 60,
+      "endurance": 75,
+      "ambition": 70,
+      "harmony": 40
+    },
+    "armorValue": 3,
+    "aiProfile": "aggressive",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "slash",
+      "shove",
+      "shield_bash",
+      "blood_letting"
+    ],
+    "skillSelectionCount": 3,
+    "tags": [
+      "spirit",
+      "undead",
+      "dwarf",
+      "dwarven_conflict"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "hall_ancestor_shade",
+    "name": "Ancestor Shade",
+    "description": "The older dead \u2014 pre-crisis, some of them pre-Order. They watched the succession war from the Hall's memory-stones and found it contemptible. They do not fight with factional heat. They fight with the cold disappointment of people who built something and watched their descendants break it.",
+    "stats": {
+      "conviction": 80,
+      "endurance": 90,
+      "ambition": 60,
+      "harmony": 80
+    },
+    "armorValue": 5,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "block",
+      "pummel",
+      "shout",
+      "counter_strike",
+      "warcry"
+    ],
+    "skillSelectionCount": 4,
+    "tags": [
+      "spirit",
+      "undead",
+      "dwarf",
+      "ancestor"
+    ],
+    "lootTable": [
+      {
+        "itemID": "ironvein_signet",
+        "dropChance": 0.2,
+        "rarity": "rare"
+      }
+    ]
+  },
+  {
+    "id": "hall_stone_juror",
+    "name": "Stone Juror",
+    "description": "The coronation ceremony required witnesses who could not be bribed or threatened. The Forge-Kings built them from mountain stone and bound them with oaths they could not break. They have been voting on every claimant who entered the Hall for four years. Their verdict has not changed.",
+    "stats": {
+      "conviction": 110,
+      "endurance": 130,
+      "ambition": 40,
+      "harmony": 60
+    },
+    "armorValue": 12,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "block",
+      "stone_skin",
+      "shield_bash",
+      "shove",
+      "earthquake"
+    ],
+    "skillSelectionCount": 4,
+    "tags": [
+      "construct",
+      "ancestor",
+      "stone"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "hall_the_disowned",
+    "name": "The Disowned",
+    "description": "Ancestors who were stripped of their lineage recognition by one or both of the current factions \u2014 inconvenient predecessors whose deeds contradicted the factional narrative. They rose angrier than the others. The Hall considers their testimony relevant. The factions did not consider them at all.",
+    "stats": {
+      "conviction": 90,
+      "endurance": 110,
+      "ambition": 75,
+      "harmony": 70
+    },
+    "armorValue": 4,
+    "aiProfile": "aggressive",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "warcry",
+      "blood_letting",
+      "slash",
+      "pummel",
+      "terror_cry",
+      "berserker_rage"
+    ],
+    "skillSelectionCount": 4,
+    "tags": [
+      "spirit",
+      "undead",
+      "dwarf",
+      "ancestor"
+    ],
+    "lootTable": [
+      {
+        "itemID": "ironvein_signet",
+        "dropChance": 0.25,
+        "rarity": "rare"
+      },
+      {
+        "itemID": "ancestral_verdict",
+        "dropChance": 0.3,
+        "rarity": "uncommon"
+      }
+    ]
+  },
+  {
+    "id": "high_judge_thorgrim",
+    "name": "High Judge Thorgrim",
+    "description": "He presided over the first coronation. He knows exactly what legitimate succession requires because he wrote the criteria. Neither faction meets them. He has evaluated every claimant who entered the Hall for four years with the thoroughness of someone who has nothing else to do and standards that do not bend. He fights because the trial is not over. The party entering the Hall is now part of the proceedings.",
+    "stats": {
+      "conviction": 180,
+      "endurance": 210,
+      "ambition": 85,
+      "harmony": 120
+    },
+    "armorValue": 15,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "weapon_ancestral_hammer"
+    },
+    "availableSkills": [
+      "basic_attack",
+      "block",
+      "shield_bash",
+      "pummel",
+      "shout",
+      "warcry",
+      "earthquake",
+      "stone_skin",
+      "counter_strike",
+      "stone_fist"
+    ],
+    "skillSelectionCount": 6,
+    "tags": [
+      "spirit",
+      "undead",
+      "boss",
+      "dwarf",
+      "ancestor"
+    ],
+    "lootTable": [
+      {
+        "itemID": "ancestral_verdict",
+        "dropChance": 0.8,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "ironvein_signet",
+        "dropChance": 0.5,
+        "rarity": "rare"
+      },
+      {
+        "itemID": "head_knight_greathelm_tier3",
+        "dropChance": 0.25,
+        "rarity": "rare"
+      },
+      {
+        "itemID": "hammer_mithril_tier2",
+        "dropChance": 0.3,
+        "rarity": "uncommon"
+      }
+    ]
+  },
+  {
+    "id": "orc_plain_runner",
+    "name": "Plain-Runner",
+    "description": "The young ones, fast enough to cover the Red Plains in a day. They scout and they raid and they report back. They have been doing this for five years without being paid and without complaining about it because complaining would mean admitting the contract is not going to be honored, and they are not ready to admit that yet.",
+    "stats": {
+      "conviction": 50,
+      "endurance": 65,
+      "ambition": 95,
+      "harmony": 30
+    },
+    "armorValue": 1,
+    "aiProfile": "aggressive",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "slash",
+      "shove",
+      "footwork",
+      "blood_letting"
+    ],
+    "skillSelectionCount": 3,
+    "tags": [
+      "orc",
+      "wolves_head"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "orc_tusk_brother",
+    "name": "Tusk-Brother",
+    "description": "Veterans of three contracts before this one, all of which were honored. They have opinions about the Goldcrown Usurpers that they express through targeted infrastructure damage. They are very good at targeted infrastructure damage.",
+    "stats": {
+      "conviction": 90,
+      "endurance": 110,
+      "ambition": 85,
+      "harmony": 40
+    },
+    "armorValue": 5,
+    "aiProfile": "aggressive",
+    "equipment": {},
+    "availableSkills": [
+      "slash",
+      "blood_letting",
+      "shove",
+      "warcry",
+      "frenzy",
+      "berserker_rage"
+    ],
+    "skillSelectionCount": 4,
+    "tags": [
+      "orc",
+      "wolves_head"
+    ],
+    "lootTable": [
+      {
+        "itemID": "axe_mithril_tier2",
+        "dropChance": 0.18,
+        "rarity": "uncommon"
+      }
+    ]
+  },
+  {
+    "id": "orc_blood_shaman",
+    "name": "Blood-Shaman",
+    "description": "The Shaman does not worship anything. She reads the state of a battle the way a physician reads a wound \u2014 looking for where the pressure is, where the weakness is, where to apply force. Her magic is diagnostic and directive. She tells the Tusk-Brothers where to hit and the Plain-Runners where to run. She has not been wrong in five years.",
+    "stats": {
+      "conviction": 70,
+      "endurance": 75,
+      "ambition": 65,
+      "harmony": 100
+    },
+    "armorValue": 0,
+    "aiProfile": "support",
+    "equipment": {},
+    "availableSkills": [
+      "hunter_mark",
+      "weak_point",
+      "terror_cry",
+      "shout",
+      "warcry",
+      "first_aid"
+    ],
+    "skillSelectionCount": 4,
+    "tags": [
+      "orc",
+      "wolves_head",
+      "caster"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "orc_bone_guard",
+    "name": "Bone-Guard",
+    "description": "The oldest fighters in the clan. They wear the bones of enemies from previous contracts as armor \u2014 not as trophies, as records. Each piece is labeled. They can tell you exactly which campaign it came from, who was paid, and whether the terms were honored. None of the Goldcrown bones they are currently wearing are labeled yet.",
+    "stats": {
+      "conviction": 110,
+      "endurance": 130,
+      "ambition": 50,
+      "harmony": 40
+    },
+    "armorValue": 12,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "block",
+      "shove",
+      "shield_bash",
+      "pummel",
+      "stone_skin",
+      "terror_cry"
+    ],
+    "skillSelectionCount": 4,
+    "tags": [
+      "orc",
+      "wolves_head"
+    ],
+    "lootTable": [
+      {
+        "itemID": "chest_warrior_plate_tier3",
+        "dropChance": 0.15,
+        "rarity": "rare"
+      }
+    ]
+  },
+  {
+    "id": "chieftain_krog",
+    "name": "Chieftain Krog",
+    "description": "He has fought in eleven contracts. Every single one was honored because he made it more expensive not to honor it than to pay. He has been working on making this one expensive for five years. He has made it very expensive. He is still waiting for the Goldcrown Usurpers to do the math.",
+    "stats": {
+      "conviction": 180,
+      "endurance": 210,
+      "ambition": 90,
+      "harmony": 100
+    },
+    "armorValue": 10,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "slash",
+      "blood_letting",
+      "pummel",
+      "warcry",
+      "shout",
+      "berserker_rage",
+      "frenzy",
+      "terror_cry",
+      "block",
+      "shove",
+      "bloodlust",
+      "blood_fury"
+    ],
+    "skillSelectionCount": 6,
+    "tags": [
+      "orc",
+      "boss",
+      "stonetusk"
+    ],
+    "lootTable": [
+      {
+        "itemID": "unpaid_ledger",
+        "dropChance": 0.8,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "axe_mithril_tier2",
+        "dropChance": 0.3,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "chest_warrior_plate_tier3",
+        "dropChance": 0.2,
+        "rarity": "rare"
+      }
+    ]
+  },
+  {
+    "id": "stonetusk_plain_runner",
+    "name": "Plain-Runner",
+    "description": "The youngest members of the clan \u2014 fast, aggressive, and still trying to prove themselves. They were promised their first real contract payment from the Goldcrown job. They have been waiting five years. The wait has not improved their temperament.",
+    "stats": {
+      "conviction": 60,
+      "endurance": 75,
+      "ambition": 85,
+      "harmony": 30
+    },
+    "armorValue": 1,
+    "aiProfile": "aggressive",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "slash",
+      "shove",
+      "blood_letting",
+      "footwork"
+    ],
+    "skillSelectionCount": 2,
+    "tags": [
+      "orc",
+      "stonetusk"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "stonetusk_tusk_brother",
+    "name": "Tusk-Brother",
+    "description": "Veteran mercenaries who have been on contract in the Vale longer than they have been home. They are not angry \u2014 they are professional. The distinction matters. Angry fighters make mistakes. Professionals make the other side make mistakes.",
+    "stats": {
+      "conviction": 90,
+      "endurance": 110,
+      "ambition": 80,
+      "harmony": 40
+    },
+    "armorValue": 4,
+    "aiProfile": "aggressive",
+    "equipment": {},
+    "availableSkills": [
+      "slash",
+      "blood_letting",
+      "pummel",
+      "warcry",
+      "blood_fury",
+      "berserker_rage"
+    ],
+    "skillSelectionCount": 4,
+    "tags": [
+      "orc",
+      "stonetusk"
+    ],
+    "lootTable": [
+      {
+        "itemID": "axe_mithril_tier2",
+        "dropChance": 0.15,
+        "rarity": "uncommon"
+      }
+    ]
+  },
+  {
+    "id": "stonetusk_blood_shaman",
+    "name": "Blood-Shaman",
+    "description": "The Stone-Tusk shamans do not call on spirits or elements. They read the blood \u2014 their own, their enemies', the land's. The Red Plains run with iron-rich clay that bleeds when you cut it. The shamans learned their craft there, and they brought it with them. They know when a wound is going to kill and when it is not, and they adjust accordingly.",
+    "stats": {
+      "conviction": 70,
+      "endurance": 75,
+      "ambition": 65,
+      "harmony": 90
+    },
+    "armorValue": 0,
+    "aiProfile": "support",
+    "equipment": {},
+    "availableSkills": [
+      "bloodlust",
+      "blood_fury",
+      "frenzy",
+      "shout",
+      "terror_cry",
+      "first_aid"
+    ],
+    "skillSelectionCount": 4,
+    "tags": [
+      "orc",
+      "stonetusk",
+      "caster"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "stonetusk_bone_guard",
+    "name": "Bone-Guard",
+    "description": "The Stone-Tusk's heaviest fighters, armored in plate taken from Ironvein and Goldcrown soldiers over five years of supply-line raiding. They wear both sides' armor without irony. A contract is a contract. A pauldron is a pauldron.",
+    "stats": {
+      "conviction": 110,
+      "endurance": 130,
+      "ambition": 55,
+      "harmony": 50
+    },
+    "armorValue": 10,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "block",
+      "shield_bash",
+      "shove",
+      "pummel",
+      "stone_skin",
+      "counter_strike"
+    ],
+    "skillSelectionCount": 4,
+    "tags": [
+      "orc",
+      "stonetusk"
+    ],
+    "lootTable": [
+      {
+        "itemID": "chest_warrior_plate_tier3",
+        "dropChance": 0.15,
+        "rarity": "rare"
+      }
+    ]
+  },
+  {
+    "id": "gallery_canopy_pruner",
+    "name": "Canopy Pruner",
+    "description": "They patrol the outer bridges and strip what they find. Not weapons \u2014 buffs. Enchantments. The residue of human magic that clings to anyone who has spent time in the Vale. They do not experience this as violence. They experience it as sanitation.",
+    "stats": {
+      "conviction": 70,
+      "endurance": 80,
+      "ambition": 95,
+      "harmony": 60
+    },
+    "armorValue": 0,
+    "aiProfile": "aggressive",
+    "equipment": {},
+    "availableSkills": [
+      "dispel",
+      "misdirect",
+      "aim",
+      "footwork",
+      "nature_touch",
+      "entangle"
+    ],
+    "skillSelectionCount": 3,
+    "tags": [
+      "elf",
+      "luminary",
+      "nature"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "gallery_silence_weaver",
+    "name": "Silence-Weaver",
+    "description": "Their understanding of silence is surgical rather than punitive. Human magic is loud \u2014 it leaks, it resonates, it Frays at the edges. The Silence-Weavers cut those edges off. The fact that this renders the affected person unable to function is, to them, a secondary consideration.",
+    "stats": {
+      "conviction": 60,
+      "endurance": 65,
+      "ambition": 80,
+      "harmony": 110
+    },
+    "armorValue": 0,
+    "aiProfile": "support",
+    "equipment": {},
+    "availableSkills": [
+      "silence",
+      "shadow_step",
+      "entangle",
+      "nature_touch",
+      "sacred_roots",
+      "misdirect",
+      "shout"
+    ],
+    "skillSelectionCount": 4,
+    "tags": [
+      "elf",
+      "luminary",
+      "nature",
+      "shadow"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "gallery_mirror_warden",
+    "name": "Mirror-Warden",
+    "description": "The Gallery's defenders. They carry shields of living glass that reflect spells back at their origin \u2014 not as a weapon, as a demonstration. If your magic harms you when reflected, they consider that diagnostic evidence. They are very thorough diagnosticians.",
+    "stats": {
+      "conviction": 90,
+      "endurance": 110,
+      "ambition": 60,
+      "harmony": 80
+    },
+    "armorValue": 10,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "block",
+      "pierce",
+      "shield_bash",
+      "counter_strike",
+      "nature_touch",
+      "entangle",
+      "stone_ward"
+    ],
+    "skillSelectionCount": 4,
+    "tags": [
+      "elf",
+      "luminary",
+      "nature"
+    ],
+    "lootTable": [
+      {
+        "itemID": "moon_touched_apple",
+        "dropChance": 0.2,
+        "rarity": "uncommon"
+      }
+    ]
+  },
+  {
+    "id": "gallery_fraying_touched",
+    "name": "Fraying-Touched",
+    "description": "Elves who were exposed to the outside world before the bridges were sealed \u2014 who brought traces of the Fraying back with them. They are kept in the Gallery's lower chambers, neither imprisoned nor free. The Canopy Pruners check on them daily. The checks have become less about treatment and more about containment. The Fraying-Touched know this. Some of them are grateful anyway.",
+    "stats": {
+      "conviction": 50,
+      "endurance": 60,
+      "ambition": 70,
+      "harmony": 40
+    },
+    "armorValue": 0,
+    "aiProfile": "aggressive",
+    "equipment": {
+      "mainHand": "weapon_fraying_natural"
+    },
+    "availableSkills": [
+      "shadow_bolt",
+      "shadow_tendril",
+      "void_rend",
+      "shadow_strike",
+      "fraying_touch"
+    ],
+    "skillSelectionCount": 3,
+    "tags": [
+      "elf",
+      "luminary",
+      "shadow",
+      "fraying"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "elara_preservation_core",
+    "name": "High Keeper Elara (Preservation Core)",
+    "description": "This is what she became after fifty years inside the First Tree \u2014 the majority of her spirit, the part that chose survival. She has watched the Fraying spread from within the canopy and told herself each year that the decision was correct. She has had fifty years to make that argument to herself. She is very good at it. She fights because engagement accelerates the Fraying. She heals her allies because their survival is the only evidence she has that the decision was right. When the Oath Stone manifests the Fragment, she does not look at it. She knows it is there.",
+    "stats": {
+      "conviction": 140,
+      "endurance": 160,
+      "ambition": 70,
+      "harmony": 220
+    },
+    "armorValue": 0,
+    "aiProfile": "support",
+    "equipment": {
+      "mainHand": "weapon_purifying_touch"
+    },
+    "availableSkills": [
+      "holy_word",
+      "mass_heal",
+      "sacred_roots",
+      "forest_embrace",
+      "regrowth",
+      "nature_touch",
+      "entangle",
+      "cleanse",
+      "shout",
+      "sacred_grove"
+    ],
+    "skillSelectionCount": 6,
+    "tags": [
+      "elf",
+      "luminary",
+      "boss",
+      "nature",
+      "holy"
+    ],
+    "lootTable": [
+      {
+        "itemID": "seed_of_first_tree",
+        "dropChance": 0.7,
+        "rarity": "rare"
+      },
+      {
+        "itemID": "moon_touched_apple",
+        "dropChance": 0.5,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "verdant_word_seal",
+        "dropChance": 0.4,
         "rarity": "uncommon"
       }
     ]
