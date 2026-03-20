@@ -102,11 +102,6 @@
             "itemID": "consumable_food_ration",
             "dropChance": 0.36,
             "rarity": "common"
-          },
-          {
-            "itemID": "crossbow_wood_tier0",
-            "dropChance": 0.18,
-            "rarity": "common"
           }
         ]
       },
@@ -192,21 +187,6 @@
             "itemID": "health_potion_minor",
             "dropChance": 0.48,
             "rarity": "common"
-          },
-          {
-            "itemID": "mace_iron_tier0",
-            "dropChance": 0.18,
-            "rarity": "common"
-          },
-          {
-            "itemID": "chest_leather_tunic_tier0",
-            "dropChance": 0.15,
-            "rarity": "common"
-          },
-          {
-            "itemID": "head_leather_hood_tier0",
-            "dropChance": 0.12,
-            "rarity": "common"
           }
         ]
       },
@@ -270,52 +250,17 @@
         ],
         "lootTable": [
           {
-            "itemID": "axe_iron_tier0",
-            "dropChance": 0.35,
-            "rarity": "uncommon"
-          },
-          {
             "itemID": "health_potion",
             "dropChance": 0.36,
             "rarity": "uncommon"
-          },
-          {
-            "itemID": "chest_leather_tunic_tier0",
-            "dropChance": 0.2,
-            "rarity": "common"
           }
         ]
       }
     ],
     "rewards": {
-      "baseXP": 300,
+      "baseXP": 6000,
       "baseGold": 100,
       "lootTable": [
-        {
-          "itemID": "axe_iron_tier0",
-          "dropChance": 0.25,
-          "rarity": "common"
-        },
-        {
-          "itemID": "dagger_iron_tier0",
-          "dropChance": 0.25,
-          "rarity": "common"
-        },
-        {
-          "itemID": "crossbow_wood_tier0",
-          "dropChance": 0.2,
-          "rarity": "common"
-        },
-        {
-          "itemID": "chest_leather_tunic_tier0",
-          "dropChance": 0.25,
-          "rarity": "common"
-        },
-        {
-          "itemID": "head_leather_hood_tier0",
-          "dropChance": 0.2,
-          "rarity": "common"
-        },
         {
           "itemID": "health_potion_minor",
           "dropChance": 0.6,
@@ -468,7 +413,7 @@
             "rarity": "common"
           },
           {
-            "itemID": "handaxe_throwing_tier0",
+            "itemID": "totem_iron_tier1",
             "dropChance": 0.2,
             "rarity": "common"
           }
@@ -553,17 +498,17 @@
             "rarity": "uncommon"
           },
           {
-            "itemID": "shield_iron_tier0",
+            "itemID": "shield_steel_tier1",
             "dropChance": 0.2,
             "rarity": "common"
           },
           {
-            "itemID": "hammer_iron_tier0",
+            "itemID": "hammer_steel_tier1",
             "dropChance": 0.2,
             "rarity": "common"
           },
           {
-            "itemID": "head_chain_coif_tier0",
+            "itemID": "head_leather_cap_tier1",
             "dropChance": 0.15,
             "rarity": "common"
           }
@@ -649,17 +594,17 @@
             "rarity": "uncommon"
           },
           {
-            "itemID": "handaxe_throwing_tier0",
+            "itemID": "totem_iron_tier1",
             "dropChance": 0.25,
             "rarity": "common"
           },
           {
-            "itemID": "axe_iron_tier0",
+            "itemID": "pistol_steel_tier1",
             "dropChance": 0.2,
             "rarity": "common"
           },
           {
-            "itemID": "head_leather_hood_tier0",
+            "itemID": "head_leather_cap_tier1",
             "dropChance": 0.15,
             "rarity": "common"
           }
@@ -743,7 +688,7 @@
             "rarity": "uncommon"
           },
           {
-            "itemID": "chest_chain_shirt_tier0",
+            "itemID": "chest_chain_hauberk_tier1",
             "dropChance": 0.2,
             "rarity": "common"
           },
@@ -761,7 +706,7 @@
       }
     ],
     "rewards": {
-      "baseXP": 750,
+      "baseXP": 15000,
       "baseGold": 275,
       "lootTable": [
         {
@@ -780,12 +725,12 @@
           "rarity": "uncommon"
         },
         {
-          "itemID": "chest_chain_shirt_tier0",
+          "itemID": "chest_chain_hauberk_tier1",
           "dropChance": 0.3,
           "rarity": "common"
         },
         {
-          "itemID": "head_chain_coif_tier0",
+          "itemID": "head_leather_cap_tier1",
           "dropChance": 0.25,
           "rarity": "common"
         },
@@ -888,7 +833,7 @@
             "rarity": "common"
           },
           {
-            "itemID": "dagger_iron_tier0",
+            "itemID": "totem_adamant_tier3",
             "dropChance": 0.2,
             "rarity": "common"
           },
@@ -958,7 +903,7 @@
         ],
         "lootTable": [
           {
-            "itemID": "chest_chain_shirt_tier0",
+            "itemID": "chest_warrior_plate_tier3",
             "dropChance": 0.25,
             "rarity": "common"
           },
@@ -968,7 +913,7 @@
             "rarity": "uncommon"
           },
           {
-            "itemID": "mace_spiked_tier1",
+            "itemID": "dagger_adamant_tier3",
             "dropChance": 0.2,
             "rarity": "uncommon"
           },
@@ -1004,17 +949,17 @@
         "preCombatOpportunities": [],
         "lootTable": [
           {
-            "itemID": "sword_bronze_tier1",
+            "itemID": "mace_adamant_tier3",
             "dropChance": 0.3,
             "rarity": "uncommon"
           },
           {
-            "itemID": "chest_chain_hauberk_tier1",
+            "itemID": "chest_warrior_plate_tier3",
             "dropChance": 0.25,
             "rarity": "uncommon"
           },
           {
-            "itemID": "head_chain_hood_tier1",
+            "itemID": "head_knight_greathelm_tier3",
             "dropChance": 0.2,
             "rarity": "uncommon"
           },
@@ -1027,26 +972,26 @@
       }
     ],
     "rewards": {
-      "baseXP": 1800,
+      "baseXP": 36000,
       "baseGold": 560,
       "lootTable": [
         {
-          "itemID": "sword_bronze_tier1",
+          "itemID": "mace_adamant_tier3",
           "dropChance": 0.35,
           "rarity": "uncommon"
         },
         {
-          "itemID": "dagger_warden_tier1",
+          "itemID": "flute_adamant_tier3",
           "dropChance": 0.25,
           "rarity": "uncommon"
         },
         {
-          "itemID": "chest_chain_hauberk_tier1",
+          "itemID": "chest_warrior_plate_tier3",
           "dropChance": 0.3,
           "rarity": "uncommon"
         },
         {
-          "itemID": "head_chain_hood_tier1",
+          "itemID": "head_knight_greathelm_tier3",
           "dropChance": 0.25,
           "rarity": "uncommon"
         },
@@ -1122,6 +1067,10 @@
         "unlocksAfter": 1,
         "requiresSecret": true,
         "text": "The altar does not mark where the monks prayed. It marks where they stopped the thing beneath from coming up. The prayer was a lock, not a gift."
+      },
+      {
+        "unlocksAfter": 15,
+        "text": "The willow circle is not Verdant Word work. The Order blessed what was already here. The original tree was planted by an elf \u2014 one of the Silverbough Elders who walked the Vale's roads before the Order existed, leaving markers at sites where the land's nature-frequency was strong enough to anchor. The monks found the marker and built around it. They never knew what they were building around. The Gallery of Fractured Light knows this place still."
       }
     ],
     "stages": [
@@ -1209,17 +1158,31 @@
               "statScale": "maxHP",
               "narrative": "The morning mist rolls in thicker than expected. Someone walks face-first into a willow branch they didn't see coming."
             }
+          },
+          {
+            "id": "shrine_watcher_in_treeline",
+            "name": "Something in the Trees",
+            "spawnChance": 0.4,
+            "checkType": "skill",
+            "requiredSkillTag": "nature",
+            "successEffect": {
+              "type": "narrative_only",
+              "narrative": "At the treeline beyond the willow circle, something is watching. Not the wisps \u2014 something still and deliberate, at a height that suggests it is standing in the lower branches rather than on the ground. It does not advance. When you look directly at it, it is gone. The absence it leaves is the specific absence of something that chose to leave rather than something that was never there."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "The treeline offers nothing to those without the right frequency."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The willow circle is quiet."
+            }
           }
         ],
         "lootTable": [
           {
             "itemID": "consumable_potion_health_minor",
             "dropChance": 0.42,
-            "rarity": "common"
-          },
-          {
-            "itemID": "acc_cloak_rag_tier0",
-            "dropChance": 0.15,
             "rarity": "common"
           }
         ]
@@ -1318,16 +1281,6 @@
         ],
         "lootTable": [
           {
-            "itemID": "acc_amulet_wood_tier0",
-            "dropChance": 0.25,
-            "rarity": "uncommon"
-          },
-          {
-            "itemID": "wand_wood_tier0",
-            "dropChance": 0.2,
-            "rarity": "uncommon"
-          },
-          {
             "itemID": "consumable_potion_health_minor",
             "dropChance": 0.48,
             "rarity": "common"
@@ -1378,16 +1331,6 @@
         "preCombatOpportunities": [],
         "lootTable": [
           {
-            "itemID": "scepter_nature_tier1",
-            "dropChance": 0.3,
-            "rarity": "uncommon"
-          },
-          {
-            "itemID": "wand_holy_tier1",
-            "dropChance": 0.25,
-            "rarity": "uncommon"
-          },
-          {
             "itemID": "health_potion",
             "dropChance": 0.6,
             "rarity": "uncommon"
@@ -1401,34 +1344,9 @@
       }
     ],
     "rewards": {
-      "baseXP": 300,
+      "baseXP": 6000,
       "baseGold": 100,
       "lootTable": [
-        {
-          "itemID": "wand_wood_tier0",
-          "dropChance": 0.25,
-          "rarity": "uncommon"
-        },
-        {
-          "itemID": "wand_apprentice_tier0",
-          "dropChance": 0.2,
-          "rarity": "uncommon"
-        },
-        {
-          "itemID": "acc_amulet_wood_tier0",
-          "dropChance": 0.3,
-          "rarity": "uncommon"
-        },
-        {
-          "itemID": "chest_acolyte_robe_tier0",
-          "dropChance": 0.2,
-          "rarity": "uncommon"
-        },
-        {
-          "itemID": "head_cloth_cap_tier0",
-          "dropChance": 0.25,
-          "rarity": "common"
-        },
         {
           "itemID": "consumable_potion_health_minor",
           "dropChance": 0.6,
@@ -1441,26 +1359,6 @@
         }
       ],
       "secretLootTable": [
-        {
-          "itemID": "totem_life_tier1",
-          "dropChance": 0.5,
-          "rarity": "uncommon"
-        },
-        {
-          "itemID": "acc_amulet_crystal_tier2",
-          "dropChance": 0.3,
-          "rarity": "rare"
-        },
-        {
-          "itemID": "scepter_nature_tier1",
-          "dropChance": 0.35,
-          "rarity": "uncommon"
-        },
-        {
-          "itemID": "wand_holy_tier1",
-          "dropChance": 0.35,
-          "rarity": "uncommon"
-        },
         {
           "itemID": "verdant_word_seal",
           "dropChance": 0.6,
@@ -1708,7 +1606,7 @@
       }
     ],
     "rewards": {
-      "baseXP": 180,
+      "baseXP": 3600,
       "baseGold": 60,
       "lootTable": [
         {
@@ -2102,7 +2000,7 @@
       }
     ],
     "rewards": {
-      "baseXP": 200,
+      "baseXP": 4000,
       "baseGold": 65,
       "lootTable": [
         {
@@ -2185,6 +2083,10 @@
         "unlocksAfter": 1,
         "requiresSecret": true,
         "text": "The Order did not build the well. They built around it. Whatever the spring spirit was, the blessing was a negotiation, not a gift. Sister Maren did not know she was breaking a contract. She only knew the trees were dying."
+      },
+      {
+        "unlocksAfter": 15,
+        "text": "The original blessing ritual that Sister Maren spent four years studying was not Verdant Word doctrine. It was a translation of an older text \u2014 elf work, from the Gallery of Fractured Light's teaching period, when the Silverbough Elders were still sharing their techniques with the Order's founders. The translation was imperfect. The elves knew it was imperfect. They did not correct it because by then they were already preparing to withdraw, and a slightly wrong blessing in a human orchard was not their problem to solve."
       }
     ],
     "stages": [
@@ -2409,7 +2311,7 @@
       }
     ],
     "rewards": {
-      "baseXP": 195,
+      "baseXP": 3900,
       "baseGold": 60,
       "lootTable": [
         {
@@ -2727,7 +2629,7 @@
             "rarity": "common"
           },
           {
-            "itemID": "shield_warden_tier2",
+            "itemID": "shield_steel_tier1",
             "dropChance": 0.2,
             "rarity": "rare"
           },
@@ -2769,7 +2671,7 @@
             "rarity": "uncommon"
           },
           {
-            "itemID": "shield_warden_tier2",
+            "itemID": "shield_steel_tier1",
             "dropChance": 0.35,
             "rarity": "rare"
           },
@@ -2792,7 +2694,7 @@
       }
     ],
     "rewards": {
-      "baseXP": 280,
+      "baseXP": 5600,
       "baseGold": 80,
       "lootTable": [
         {
@@ -2833,7 +2735,7 @@
           "rarity": "uncommon"
         },
         {
-          "itemID": "shield_warden_tier2",
+          "itemID": "shield_steel_tier1",
           "dropChance": 0.45,
           "rarity": "rare"
         },
@@ -3182,7 +3084,7 @@
       }
     ],
     "rewards": {
-      "baseXP": 290,
+      "baseXP": 5800,
       "baseGold": 80,
       "lootTable": [
         {
@@ -3561,7 +3463,7 @@
             "rarity": "uncommon"
           },
           {
-            "itemID": "head_ranger_hood_tier2",
+            "itemID": "head_leather_cap_tier1",
             "dropChance": 0.25,
             "rarity": "rare"
           },
@@ -3574,7 +3476,7 @@
       }
     ],
     "rewards": {
-      "baseXP": 285,
+      "baseXP": 5700,
       "baseGold": 80,
       "lootTable": [
         {
@@ -3615,7 +3517,7 @@
           "rarity": "common"
         },
         {
-          "itemID": "head_ranger_hood_tier2",
+          "itemID": "head_leather_cap_tier1",
           "dropChance": 0.4,
           "rarity": "rare"
         },
@@ -3657,6 +3559,10 @@
         "unlocksAfter": 1,
         "requiresSecret": true,
         "text": "The Ward-Core is not a spirit. It is a memory \u2014 specifically, the accumulated memory of every Verdant Word blessing ever performed in the Silver Vale, stored in the stone because stone keeps things better than people do. The Order did not seal it here. They built here because it was already present. Whatever is growing in the crystal breach is not corruption. It is the memory trying to reconstitute itself."
+      },
+      {
+        "unlocksAfter": 5,
+        "text": "The ward placed here two hundred years ago used a binding technique the Order learned from the Silverbough Elders. The elves called it a memory seal \u2014 not a barrier but a record, designed to store accumulated magical resonance against a time when it would be needed. The Order used it to contain a dangerous site. The elves intended it to be found by someone who could read what it had recorded. Two hundred years of accumulated memory is a great deal of information. The Ward-Core has been waiting for someone who could hear it."
       }
     ],
     "stages": [
@@ -3979,7 +3885,7 @@
       }
     ],
     "rewards": {
-      "baseXP": 420,
+      "baseXP": 8400,
       "baseGold": 110,
       "lootTable": [
         {
@@ -4408,7 +4314,7 @@
       }
     ],
     "rewards": {
-      "baseXP": 480,
+      "baseXP": 9600,
       "baseGold": 130,
       "lootTable": [
         {
@@ -4785,7 +4691,7 @@
             "rarity": "uncommon"
           },
           {
-            "itemID": "flute_silver_tier1",
+            "itemID": "crossbow_mithril_tier2",
             "dropChance": 0.35,
             "rarity": "uncommon"
           },
@@ -4798,7 +4704,7 @@
       }
     ],
     "rewards": {
-      "baseXP": 460,
+      "baseXP": 9200,
       "baseGold": 120,
       "lootTable": [
         {
@@ -4839,7 +4745,7 @@
           "rarity": "uncommon"
         },
         {
-          "itemID": "flute_silver_tier1",
+          "itemID": "crossbow_mithril_tier2",
           "dropChance": 0.45,
           "rarity": "uncommon"
         },
@@ -5188,7 +5094,7 @@
       }
     ],
     "rewards": {
-      "baseXP": 580,
+      "baseXP": 11600,
       "baseGold": 150,
       "lootTable": [
         {
@@ -5608,7 +5514,7 @@
       }
     ],
     "rewards": {
-      "baseXP": 560,
+      "baseXP": 11200,
       "baseGold": 145,
       "lootTable": [
         {
@@ -5998,7 +5904,7 @@
       }
     ],
     "rewards": {
-      "baseXP": 400,
+      "baseXP": 8000,
       "baseGold": 105,
       "lootTable": [
         {
@@ -6081,6 +5987,10 @@
         "unlocksAfter": 1,
         "requiresSecret": true,
         "text": "The restricted archive contains the correspondence between the High Council and three entities whose names do not appear in any other Order record. One is a merchant. One is a Royal Guard officer. One is unnamed but identified by a sigil that appears in the Spire of Silent Conviction's sealed vault. The restricted texts were not removed to protect the Order. They were removed to protect these three from the Order."
+      },
+      {
+        "unlocksAfter": 5,
+        "text": "The Athenaeum was built inside a sequoia because the Silverbough Elders specified it. Living wood holds knowledge differently than stone \u2014 the bark absorbs the resonance of what is written near it and the text becomes part of the tree's memory over time. The elves taught this to the Order's first archivists. The texts the Grand Archivist removed from the catalog six months before the dissolution were specifically the ones that documented that teaching \u2014 the ones that would tell anyone who found them that the Gallery of Fractured Light exists and where."
       }
     ],
     "stages": [
@@ -6145,6 +6055,25 @@
             "fallbackEffect": {
               "type": "narrative_only",
               "narrative": "The stacks reveal nothing to those without the right sight."
+            }
+          },
+          {
+            "id": "athenaeum_elf_script",
+            "name": "The Older Hand",
+            "spawnChance": 0.55,
+            "checkType": "skill",
+            "requiredSkillTag": "nature",
+            "successEffect": {
+              "type": "narrative_only",
+              "narrative": "Among the bark scrolls near the entrance there are texts written in a different hand \u2014 older than the Order's archivists, in a script that uses nature-frequency markers as punctuation. Elf work, teaching work, the kind of text written to be understood by students rather than preserved for posterity. The content is technical: how to bind nature spirits without breaking them, how to maintain a pact across generations, how to read the land's frequency for sites of power. This is what the Order learned from. The Scriveners walk past these texts without seeing them. The ink that took the scribes is human-formula. It cannot read elf script."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "The outer stacks are bark scrolls and old wood."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The archive does not reveal itself to those without the right frequency."
             }
           }
         ],
@@ -6388,7 +6317,7 @@
       }
     ],
     "rewards": {
-      "baseXP": 410,
+      "baseXP": 8200,
       "baseGold": 108,
       "lootTable": [
         {
@@ -6718,7 +6647,7 @@
             "rarity": "uncommon"
           },
           {
-            "itemID": "chest_warrior_plate_tier3",
+            "itemID": "chest_mithril_chain_tier2",
             "dropChance": 0.15,
             "rarity": "rare"
           }
@@ -6765,7 +6694,7 @@
             "rarity": "uncommon"
           },
           {
-            "itemID": "chest_warrior_plate_tier3",
+            "itemID": "chest_mithril_chain_tier2",
             "dropChance": 0.28,
             "rarity": "rare"
           },
@@ -6778,7 +6707,7 @@
       }
     ],
     "rewards": {
-      "baseXP": 490,
+      "baseXP": 9800,
       "baseGold": 130,
       "lootTable": [
         {
@@ -6829,7 +6758,7 @@
           "rarity": "uncommon"
         },
         {
-          "itemID": "chest_warrior_plate_tier3",
+          "itemID": "chest_mithril_chain_tier2",
           "dropChance": 0.35,
           "rarity": "rare"
         }
@@ -6861,6 +6790,10 @@
         "unlocksAfter": 1,
         "requiresSecret": true,
         "text": "The original binding failure was not an accident. The Verdant Word's records \u2014 the restricted ones in the Athenaeum's sealed section \u2014 describe the first attempt as deliberately sabotaged. Not by an enemy. By one of the three entities whose names appear in the restricted archive. The marsh's scar is not a failed ritual. It is the evidence of the first act in a fifty-year plan to bring the water spirit south."
+      },
+      {
+        "unlocksAfter": 5,
+        "text": "The Silverbough Elders refused to participate in the original binding attempt. The Verdant Word asked them directly \u2014 this was before the withdrawal, when the relationship was still functional \u2014 and the elves declined without explanation. The Order interpreted this as territorial disagreement. It was not. The elves had already seen the marsh's ley line and recognized that it had been redirected. They knew the attempt would fail. They did not say why they knew."
       }
     ],
     "stages": [
@@ -7201,7 +7134,7 @@
       }
     ],
     "rewards": {
-      "baseXP": 590,
+      "baseXP": 11800,
       "baseGold": 152,
       "lootTable": [
         {
@@ -7289,6 +7222,10 @@
         "unlocksAfter": 1,
         "requiresSecret": true,
         "text": "The Unfinished Debate is not a spirit. It is the vote itself \u2014 three to two, sitting in the sealed vault for fifty years, waiting to be cast. The unnamed third entity is not a person. It is the water spirit. The original binding failure in the marsh was not an accident. It was the water spirit's first attempt to reach the Capital. The Verdant Word found out. The Council voted to expose it. The dissolution was the water spirit's response. It has been completing its approach for fifty years. The Spire is the last thing standing between the vote and the outcome."
+      },
+      {
+        "unlocksAfter": 15,
+        "text": "The Silverbough Elves sealed the Gallery bridges four days after the dissolution. The dissolution happened on a Tuesday. The bridges were sealed on Saturday. The elves do not act on four days' notice unless they already knew what was coming. They had been watching the High Council's debate through the Ward-Core's memory network for months. They knew the vote would be three to two. They knew the dissolution would follow. They sealed the bridges before the world outside the Gallery understood that the Order was gone."
       }
     ],
     "stages": [
@@ -7490,7 +7427,7 @@
             "rarity": "uncommon"
           },
           {
-            "itemID": "tome_mithril_tier2",
+            "itemID": "scepter_adamant_tier3",
             "dropChance": 0.18,
             "rarity": "uncommon"
           }
@@ -7574,7 +7511,7 @@
             "rarity": "rare"
           },
           {
-            "itemID": "tome_mithril_tier2",
+            "itemID": "scepter_adamant_tier3",
             "dropChance": 0.22,
             "rarity": "uncommon"
           }
@@ -7626,7 +7563,7 @@
             "rarity": "uncommon"
           },
           {
-            "itemID": "tome_mithril_tier2",
+            "itemID": "scepter_adamant_tier3",
             "dropChance": 0.45,
             "rarity": "uncommon"
           },
@@ -7639,12 +7576,17 @@
             "itemID": "health_potion",
             "dropChance": 0.7,
             "rarity": "common"
+          },
+          {
+            "itemID": "pistol_celestial_tier4",
+            "dropChance": 0.12,
+            "rarity": "rare"
           }
         ]
       }
     ],
     "rewards": {
-      "baseXP": 750,
+      "baseXP": 15000,
       "baseGold": 200,
       "lootTable": [
         {
@@ -7678,7 +7620,7 @@
           "rarity": "rare"
         },
         {
-          "itemID": "tome_mithril_tier2",
+          "itemID": "scepter_adamant_tier3",
           "dropChance": 0.22,
           "rarity": "uncommon"
         }
@@ -7710,9 +7652,19 @@
           "rarity": "rare"
         },
         {
-          "itemID": "tome_mithril_tier2",
+          "itemID": "scepter_adamant_tier3",
           "dropChance": 0.5,
           "rarity": "uncommon"
+        },
+        {
+          "itemID": "dagger_celestial_tier4",
+          "dropChance": 0.15,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "chest_celestial_robe_tier4",
+          "dropChance": 0.1,
+          "rarity": "rare"
         }
       ]
     }
@@ -7831,7 +7783,7 @@
             "rarity": "rare"
           },
           {
-            "itemID": "hammer_mithril_tier2",
+            "itemID": "wand_adamant_tier3",
             "dropChance": 0.18,
             "rarity": "uncommon"
           }
@@ -8022,7 +7974,7 @@
             "rarity": "rare"
           },
           {
-            "itemID": "hammer_mithril_tier2",
+            "itemID": "wand_adamant_tier3",
             "dropChance": 0.3,
             "rarity": "uncommon"
           },
@@ -8074,7 +8026,7 @@
             "rarity": "rare"
           },
           {
-            "itemID": "hammer_mithril_tier2",
+            "itemID": "wand_adamant_tier3",
             "dropChance": 0.4,
             "rarity": "uncommon"
           },
@@ -8087,12 +8039,17 @@
             "itemID": "health_potion",
             "dropChance": 0.7,
             "rarity": "common"
+          },
+          {
+            "itemID": "dagger_storm_tier4",
+            "dropChance": 0.12,
+            "rarity": "rare"
           }
         ]
       }
     ],
     "rewards": {
-      "baseXP": 740,
+      "baseXP": 14800,
       "baseGold": 198,
       "lootTable": [
         {
@@ -8121,7 +8078,7 @@
           "rarity": "rare"
         },
         {
-          "itemID": "hammer_mithril_tier2",
+          "itemID": "wand_adamant_tier3",
           "dropChance": 0.28,
           "rarity": "uncommon"
         },
@@ -8153,9 +8110,19 @@
           "rarity": "rare"
         },
         {
-          "itemID": "hammer_mithril_tier2",
+          "itemID": "wand_adamant_tier3",
           "dropChance": 0.45,
           "rarity": "uncommon"
+        },
+        {
+          "itemID": "sword_shadow_tier4",
+          "dropChance": 0.15,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "chest_void_plate_tier4",
+          "dropChance": 0.1,
+          "rarity": "rare"
         }
       ]
     }
@@ -8289,7 +8256,7 @@
             "rarity": "common"
           },
           {
-            "itemID": "axe_mithril_tier2",
+            "itemID": "scepter_adamant_tier3",
             "dropChance": 0.15,
             "rarity": "uncommon"
           },
@@ -8378,7 +8345,7 @@
             "rarity": "uncommon"
           },
           {
-            "itemID": "axe_mithril_tier2",
+            "itemID": "scepter_adamant_tier3",
             "dropChance": 0.18,
             "rarity": "uncommon"
           }
@@ -8452,7 +8419,7 @@
             "rarity": "uncommon"
           },
           {
-            "itemID": "axe_mithril_tier2",
+            "itemID": "scepter_adamant_tier3",
             "dropChance": 0.22,
             "rarity": "uncommon"
           },
@@ -8494,7 +8461,7 @@
             "rarity": "uncommon"
           },
           {
-            "itemID": "axe_mithril_tier2",
+            "itemID": "scepter_adamant_tier3",
             "dropChance": 0.4,
             "rarity": "uncommon"
           },
@@ -8512,12 +8479,17 @@
             "itemID": "health_potion",
             "dropChance": 0.65,
             "rarity": "common"
+          },
+          {
+            "itemID": "crossbow_void_tier4",
+            "dropChance": 0.12,
+            "rarity": "rare"
           }
         ]
       }
     ],
     "rewards": {
-      "baseXP": 720,
+      "baseXP": 14400,
       "baseGold": 190,
       "lootTable": [
         {
@@ -8541,7 +8513,7 @@
           "rarity": "uncommon"
         },
         {
-          "itemID": "axe_mithril_tier2",
+          "itemID": "scepter_adamant_tier3",
           "dropChance": 0.25,
           "rarity": "uncommon"
         },
@@ -8558,7 +8530,7 @@
           "rarity": "uncommon"
         },
         {
-          "itemID": "axe_mithril_tier2",
+          "itemID": "scepter_adamant_tier3",
           "dropChance": 0.45,
           "rarity": "uncommon"
         },
@@ -8570,6 +8542,16 @@
         {
           "itemID": "head_knight_greathelm_tier3",
           "dropChance": 0.28,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "sword_shadow_tier4",
+          "dropChance": 0.15,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "chest_void_plate_tier4",
+          "dropChance": 0.1,
           "rarity": "rare"
         }
       ]
@@ -8926,7 +8908,7 @@
       }
     ],
     "rewards": {
-      "baseXP": 900,
+      "baseXP": 18000,
       "baseGold": 240,
       "lootTable": [
         {
@@ -8958,6 +8940,16 @@
           "itemID": "verdant_word_seal",
           "dropChance": 0.4,
           "rarity": "uncommon"
+        },
+        {
+          "itemID": "sword_celestial_tier4",
+          "dropChance": 0.12,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "chest_celestial_robe_tier4",
+          "dropChance": 0.1,
+          "rarity": "rare"
         }
       ],
       "secretLootTable": [
@@ -8980,6 +8972,11 @@
           "itemID": "oath_stone",
           "dropChance": 0.55,
           "rarity": "uncommon"
+        },
+        {
+          "itemID": "sword_wind_tier5",
+          "dropChance": 0.08,
+          "rarity": "rare"
         }
       ]
     }

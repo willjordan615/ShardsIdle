@@ -206,5 +206,11 @@ function calculateDerivedStatsWithEquipment(character) {
  * Calculate XP needed to reach the next level.
  */
 function getXPToNextLevel(level) {
-    return Math.floor(level * 1000 * 1.2);
+    // Exponential curve: 7300 * 1.15^(level-1)
+    // L1→L2 costs 7,300 XP. L92→L93 costs ~2.4 billion XP.
+    // Early levels feel fast and satisfying; late levels are a genuine wall.
+    // L92 ≈ 33% of L100 total XP — RuneScape-inspired steep late curve.
+    // Game is designed to be "beatable" around level 70-90.
+    // Level 100 requires D14-D16 endgame content over months.
+    return Math.max(1, Math.floor(7300 * Math.pow(1.15, level - 1)));
 }

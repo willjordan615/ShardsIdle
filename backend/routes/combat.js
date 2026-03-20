@@ -310,6 +310,17 @@ router.get('/history/:characterID/summary', async (req, res) => {
     }
 });
 
+// Manual prune endpoint — useful during testing to clear log buildup
+router.post('/admin/prune-logs', async (req, res) => {
+    try {
+        await db.pruneCombatLogs();
+        res.json({ success: true, message: 'Combat logs pruned' });
+    } catch (error) {
+        console.error('[COMBAT] Prune error:', error);
+        res.status(500).json({ error: 'Failed to prune combat logs' });
+    }
+});
+
 // Allow admin saves to invalidate the singleton so next combat re-reads fresh JSON data.
 function resetCombatEngine() {
     combatEngine = null;

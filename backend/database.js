@@ -578,12 +578,102 @@ function getDatabase() {
     return db;
 }
 
+// ── Combat log pruning ────────────────────────────────────────────────────────
+// Two-tier cleanup to prevent unbounded growth in an idle game context:
+//   1. Strip full turn data from logs older than 24h (keep metadata + segment summaries)
+//   2. Hard delete logs older than 7 days entirely
+// Called on server startup and periodically during runtime.
+
+function pruneCombatLogs() {
+    return new Promise((resolve, reject) => {
+        const now = Date.now();
+        const oneDayAgo  = now - 24 * 60 * 60 * 1000;
+        const sevenDaysAgo = now - 7 * 24 * 60 * 60 * 1000;
+
+        db.serialize(() => {
+            // Step 1: Hard delete logs older than 7 days
+            db.run(
+                `DELETE FROM combat_logs WHERE createdAt < ?`,
+                [sevenDaysAgo],
+                function(err) {
+                    if (err) { console.error('[PRUNE] Delete error:', err); }
+                    else if (this.changes > 0) {
+                        console.log(`[PRUNE] Deleted ${this.changes} combat logs older than 7 days`);
+                    }
+                }
+            );
+
+            // Step 2: Strip full log payload from logs older than 24h
+            // Replace log JSON with a lightweight summary preserving result metadata
+            db.all(
+                `SELECT id, log FROM combat_logs WHERE createdAt < ? AND createdAt >= ?`,
+                [oneDayAgo, sevenDaysAgo],
+                (err, rows) => {
+                    if (err) { console.error('[PRUNE] Read error:', err); return reject(err); }
+                    if (!rows || rows.length === 0) return resolve();
+
+                    let stripped = 0;
+                    const stmt = db.prepare(
+                        `UPDATE combat_logs SET log = ? WHERE id = ?`
+                    );
+
+                    rows.forEach(row => {
+                        try {
+                            const full = JSON.parse(row.log);
+                            // Already stripped if no turns field
+                            if (!full.turns && !full.segments) return;
+
+                            // Keep only the summary — no turn-by-turn data
+                            const summary = {
+                                result:      full.result,
+                                totalTurns:  full.totalTurns,
+                                combatID:    full.combatID,
+                                pruned:      true,
+                                prunedAt:    now,
+                                // Keep segment summaries (stage outcomes, loot, XP)
+                                segments: (full.segments || []).map(s => ({
+                                    stageId:      s.stageId,
+                                    result:       s.result,
+                                    lootAwarded:  s.lootAwarded,
+                                    xpAwarded:    s.xpAwarded,
+                                    secretPath:   s.secretPath,
+                                })),
+                            };
+
+                            stmt.run(JSON.stringify(summary), row.id);
+                            stripped++;
+                        } catch (e) {
+                            // Already invalid JSON or already stripped — skip
+                        }
+                    });
+
+                    stmt.finalize();
+                    if (stripped > 0) {
+                        console.log(`[PRUNE] Stripped full log data from ${stripped} combat logs (>24h old)`);
+                    }
+                    resolve();
+                }
+            );
+        });
+    });
+}
+
+// Run pruning on startup, then every 6 hours
+function scheduleCombatLogPruning() {
+    pruneCombatLogs().catch(err => console.error('[PRUNE] Startup prune failed:', err));
+    setInterval(() => {
+        pruneCombatLogs().catch(err => console.error('[PRUNE] Scheduled prune failed:', err));
+    }, 6 * 60 * 60 * 1000);
+}
+
 module.exports = {
     initializeDatabase,
     initializeCharacterSnapshotsTable,
     saveCombatLog,
     getCombatLog,
     getCombatLogs,
+    pruneCombatLogs,
+    scheduleCombatLogPruning,
     updateCharacterProgression,
     updateSkillProgression,
     addItemToInventory,

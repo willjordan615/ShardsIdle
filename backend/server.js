@@ -168,6 +168,11 @@ async function start() {
         // Initialize character snapshots table for savestate sharing
         await db.initializeCharacterSnapshotsTable();
         console.log('Character snapshots table initialized');
+
+        // Start combat log pruning schedule (runs on startup + every 6 hours)
+        // Strips full turn data from logs >24h old, deletes logs >7 days old
+        db.scheduleCombatLogPruning();
+        console.log('Combat log pruning scheduled');
         
         app.listen(PORT, () => {
             console.log(`\n🚀 Server running on http://localhost:${PORT}`);
