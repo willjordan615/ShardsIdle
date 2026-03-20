@@ -8,7 +8,7 @@
     let adminItems    = [];
     let editingItemId = null;
     let isUnlocked    = false;
-    const ADMIN_PASSWORD = 'admin123';
+    const ADMIN_PASSWORD = 'marsh540!vault';
 
     // ~ key triggers password prompt, then opens panel
     document.addEventListener('keydown', function(e) {

@@ -33,6 +33,19 @@ router.get('/:characterId', async (req, res) => {
     }
 });
 
+// ── Input sanitization ────────────────────────────────────────────────────────
+// Strip HTML tags, control characters, and enforce max length on any
+// free-text field supplied by the player. Prevents XSS in browse/public views.
+function sanitizeText(value, maxLength = 40) {
+    if (typeof value !== 'string') return '';
+    return value
+        .replace(/<[^>]*>/g, '')      // strip HTML tags
+        .replace(/[<>"'&]/g, '')      // strip remaining dangerous chars
+        .replace(/[\x00-\x1F]/g, '')  // strip control characters
+        .trim()
+        .slice(0, maxLength);
+}
+
 /**
  * POST /api/characters
  * Create a new character
@@ -54,6 +67,12 @@ router.post('/', async (req, res) => {
                 success: false, 
                 error: 'Invalid stats object' 
             });
+        }
+
+        // Sanitize free-text fields
+        character.name = sanitizeText(character.name, 30);
+        if (!character.name) {
+            return res.status(400).json({ success: false, error: 'Invalid character name' });
         }
         
         // Ensure default values
@@ -94,6 +113,14 @@ router.put('/:characterId', async (req, res) => {
         
         // Ensure ID matches
         character.id = req.params.characterId;
+
+        // Sanitize free-text fields on update
+        if (character.name) {
+            character.name = sanitizeText(character.name, 30);
+            if (!character.name) {
+                return res.status(400).json({ success: false, error: 'Invalid character name' });
+            }
+        }
         
         // Save to database
         await db.saveCharacter(character);

@@ -14,13 +14,28 @@ function generateShareCode(characterName) {
     return `${prefix}-${random}`;
 }
 
+// ── Input sanitization ────────────────────────────────────────────────────────
+function sanitizeText(value, maxLength = 40) {
+    if (typeof value !== 'string') return '';
+    return value
+        .replace(/<[^>]*>/g, '')
+        .replace(/[<>"'&]/g, '')
+        .replace(/[\x00-\x1F]/g, '')
+        .trim()
+        .slice(0, maxLength);
+}
+
 /**
  * POST /api/character/export
  * Export a character to the sharing system (only owners can export)
  */
 router.post('/export', async (req, res) => {
     try {
-        const { characterId, isPublic, buildName, buildDescription } = req.body;
+        let { characterId, isPublic, buildName, buildDescription } = req.body;
+
+        // Sanitize free-text fields
+        buildName        = sanitizeText(buildName || '', 60);
+        buildDescription = sanitizeText(buildDescription || '', 300);
 
         // Validate required fields
         if (!characterId) {
