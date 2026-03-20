@@ -39,7 +39,7 @@ function escapeHtml(str) {
 /**
  * Render available challenges
  */
-function renderChallenges() {
+async function renderChallenges() {
     const container = document.getElementById('challengeContainer');
     if (!container) return;
     
@@ -48,25 +48,55 @@ function renderChallenges() {
         return;
     }
 
-    // Get completion counts for the current character
-    const character = window.gameData.characters?.find(c => c.id === currentState.detailCharacterId);
-    const completions = character?.combatStats?.challengeCompletions || {};
+    // Fetch current character from server to get up-to-date combatStats
+    let completions = {};
+    if (currentState.detailCharacterId) {
+        try {
+            const char = await getCharacter(currentState.detailCharacterId);
+            completions = char?.combatStats?.challengeCompletions || {};
+        } catch (e) {
+            console.warn('[CHALLENGES] Could not load character stats for lore:', e);
+        }
+    }
 
     container.innerHTML = '';
-    
+
+    // Group challenges by difficulty
+    const grouped = {};
     window.gameData.challenges.forEach(challenge => {
+        const d = challenge.difficulty;
+        if (!grouped[d]) grouped[d] = [];
+        grouped[d].push(challenge);
+    });
+
+    const sortedDifficulties = Object.keys(grouped).map(Number).sort((a, b) => a - b);
+
+    for (const difficulty of sortedDifficulties) {
+        // Section header
+        const header = document.createElement('div');
+        header.style.cssText = 'grid-column:1/-1; margin:1.2rem 0 0.4rem; padding-bottom:0.4rem; border-bottom:1px solid rgba(212,175,55,0.25);';
+        header.innerHTML = `<span style="color:#d4af37; font-size:0.8rem; letter-spacing:0.1em; text-transform:uppercase; font-weight:600;">Difficulty ${difficulty}</span>`;
+        container.appendChild(header);
+
+        grouped[difficulty].forEach(challenge => {
         const card = document.createElement('div');
         card.className = 'card';
 
         const count = completions[challenge.id]?.completions || 0;
+        const secretCount = completions[challenge.id]?.secretCompletions || 0;
         const loreEntries = challenge.lore || [];
-        const unlockedLore = loreEntries.filter(e => count >= e.unlocksAfter);
-        const lockedCount  = loreEntries.filter(e => count < e.unlocksAfter).length;
+        const unlockedLore = loreEntries.filter(e => {
+            if (e.requiresSecret) return secretCount >= (e.unlocksAfter || 1);
+            return count >= e.unlocksAfter;
+        });
+        const lockedCount = loreEntries.filter(e => {
+            if (e.requiresSecret) return secretCount < (e.unlocksAfter || 1);
+            return count < e.unlocksAfter;
+        }).length;
         const hasLore = loreEntries.length > 0;
         const loreId = `lore-${challenge.id}`;
 
         card.innerHTML = `
-            <div class="challenge-difficulty">Difficulty ${challenge.difficulty}</div>
             <div class="card-title">${challenge.name}</div>
             <div class="card-description">${challenge.description}</div>
             <div class="card-description" style="margin-top: 0.75rem;">
@@ -96,7 +126,8 @@ function renderChallenges() {
 
         card.onclick = async () => await selectChallenge(challenge);
         container.appendChild(card);
-    });
+        }); // end grouped[difficulty].forEach
+    } // end for difficulty
 }
 
 function toggleLore(id) {

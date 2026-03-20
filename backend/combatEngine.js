@@ -155,7 +155,7 @@ class CombatEngine {
     if (checkType === 'skill') {
       // Party must have the skill to attempt — otherwise fallback fires
       const qualifiedActors = playerCharacters.filter(p =>
-        !p.defeated && p.skills && p.skills.some(s => s.skillID === op.requiredSkillID)
+        !p.defeated && p.skills && p.skills.some(s => s.skillID === op.requiredSkillID && (s.skillLevel || 0) >= 1)
       );
       if (qualifiedActors.length === 0) {
         isFallback = true;
@@ -371,7 +371,9 @@ class CombatEngine {
           const cond = branch.condition;
           if (cond.type === 'has_skill') {
             conditionMet = playerCharacters.some(p =>
-              !p.defeated && p.skills && p.skills.some(s => s.skillID === cond.value)
+              !p.defeated && p.skills && p.skills.some(s =>
+                s.skillID === cond.value && (s.skillLevel || 0) >= 1
+              )
             );
           } else if (cond.type === 'stat_check') {
             // cond.stat, cond.threshold — true if any alive player meets it
@@ -451,6 +453,8 @@ class CombatEngine {
       // Reset lastUsedSkillId and buffCooldowns at the start of each stage
       playerCharacters.forEach(p => { p.lastUsedSkillId = null; p.buffCooldowns = {}; });
 
+      const SUDDEN_DEATH_START = 250;   // turn within a stage where escalation begins
+      const SUDDEN_DEATH_BASE  = 0.04;  // 4% max HP per combatant at turn 250, +2% per 10 turns after
       let stageTurnCount = stageTurns.length;
       const startStageHP = playerCharacters.map(p => ({ id: p.id, hp: p.currentHP }));
 
@@ -621,6 +625,34 @@ class CombatEngine {
           }
         });
 
+        // ── Sudden death — escalating damage when fights drag on ──────────────
+        if (stageTurnCount > SUDDEN_DEATH_START) {
+          const overtime = stageTurnCount - SUDDEN_DEATH_START;
+          const pct = SUDDEN_DEATH_BASE + Math.floor(overtime / 10) * 0.02;
+          const allCombatants = [...playerCharacters, ...enemies].filter(c => !c.defeated);
+          if (allCombatants.length > 0) {
+            console.warn(`[SUDDEN DEATH] Turn ${stageTurnCount}: dealing ${(pct*100).toFixed(0)}% max HP to all combatants`);
+            allCombatants.forEach(c => {
+              const dmg = Math.max(1, Math.floor(c.maxHP * pct));
+              c.currentHP = Math.max(0, c.currentHP - dmg);
+              if (c.currentHP <= 0) c.defeated = true;
+            });
+            stageTurns.push({
+              turnNumber: globalTurnCount + 0.5,
+              stageTurnNumber: stageTurnCount,
+              actor: null,
+              actorName: 'The Field',
+              action: { type: 'sudden_death' },
+              roll: null,
+              result: {
+                message: `The battle has gone on too long. All combatants take ${(pct*100).toFixed(0)}% of their maximum HP in damage.`,
+                success: false,
+                delay: 800
+              }
+            });
+          }
+        }
+
         // Regen fires AFTER status effects so debuffs apply to the pre-regen pool
         playerCharacters.forEach(p => this.regenerateResources(p));
         enemies.forEach(e => this.regenerateResources(e));
@@ -671,7 +703,7 @@ class CombatEngine {
     }
 
     const allStagesWon = segments.every(s => s.status === 'victory');
-    const rewards = (allStagesWon && combatResult === 'victory') ? this.calculateRewards(playerCharacters, challenge) : null;
+    const rewards = (allStagesWon && combatResult === 'victory') ? this.calculateRewards(playerCharacters, challenge, segments) : null;
 
     return {
       combatID,
@@ -736,15 +768,26 @@ class CombatEngine {
   /**
    * Calculate rewards using the challenge object directly
    */
-  calculateRewards(players, challenge) {
+  calculateRewards(players, challenge, segments = []) {
      const rewards = {
         experienceGained: {},
-        lootDropped: []
+        lootDropped: [],
+        secretPathCompleted: false
     };
 
     const baseXP = challenge?.rewards?.baseXP || 100;
     const baseGold = challenge?.rewards?.baseGold || 50;
     const lootTable = challenge?.rewards?.lootTable || [];
+
+    // Detect if a secret path stage was completed this run
+    const secretStage = challenge?.stages?.find(s => s.secretPath === true);
+    const secretCompleted = secretStage
+        ? segments.some(seg => seg.stageId === secretStage.stageId && seg.status === 'victory')
+        : false;
+    if (secretCompleted) {
+        rewards.secretPathCompleted = true;
+        console.log(`[REWARDS] Secret path completed for ${challenge.id}!`);
+    }
 
     // XP with diminishing returns for larger parties
     // Solo=100%, 2-person=67%, 3-person=50%, 4-person=40%
@@ -756,12 +799,16 @@ class CombatEngine {
     const recommendedLevel = challenge?.recommendedLevel || 1;
     const levelDelta = avgPartyLevel - recommendedLevel;
     const difficultyScale = Math.min(2.0, 1 / Math.max(0.1, 1 + levelDelta * 0.15));
+
+    // Secret path bonus: 2x XP
+    const secretXPMultiplier = secretCompleted ? 2.0 : 1.0;
+
     players.forEach(player => {
-        const xpReward = Math.floor(baseXP * partyScale * difficultyScale * (1 + (player.stats?.harmony || 0) / 250));
+        const xpReward = Math.floor(baseXP * partyScale * difficultyScale * secretXPMultiplier * (1 + (player.stats?.harmony || 0) / 250));
         rewards.experienceGained[player.id] = xpReward;
     });
 
-    // Loot scaled by ambition
+    // Standard loot
     lootTable.forEach(lootItem => {
         const dropChance = (lootItem.dropChance || 0.3) * (1 + (players[0]?.stats?.ambition || 0) / 500);
         if (Math.random() <= dropChance) {
@@ -773,6 +820,21 @@ class CombatEngine {
             });
         }
     });
+
+    // Secret path loot — separate pool, better items
+    if (secretCompleted && challenge?.rewards?.secretLootTable) {
+        challenge.rewards.secretLootTable.forEach(lootItem => {
+            const dropChance = (lootItem.dropChance || 0.3) * (1 + (players[0]?.stats?.ambition || 0) / 500);
+            if (Math.random() <= dropChance) {
+                rewards.lootDropped.push({
+                    characterID: players[0].id,
+                    itemID: lootItem.itemID,
+                    itemName: lootItem.itemID,
+                    rarity: lootItem.rarity
+                });
+            }
+        });
+    }
 
     return rewards;
   }
@@ -2213,16 +2275,16 @@ class CombatEngine {
     players.forEach(p => {
         const baseInitiative = (((p.stats?.ambition) || 0) * 0.5) + (((p.stats?.conviction) || 0) * 0.15);
         const randomComponent = Math.random() * 40;
-        const initiative = baseInitiative + randomComponent;
-        console.log(`[INITIATIVE] ${p.name}: Ambition=${p.stats?.ambition || 0}, Conviction=${p.stats?.conviction || 0}, Base=${baseInitiative.toFixed(1)}, Random=${randomComponent.toFixed(1)}, Total=${initiative.toFixed(1)}`);
-        combatants.push({ ...p, initiative });
+        p.initiative = baseInitiative + randomComponent;
+        console.log(`[INITIATIVE] ${p.name}: Ambition=${p.stats?.ambition || 0}, Conviction=${p.stats?.conviction || 0}, Base=${baseInitiative.toFixed(1)}, Random=${randomComponent.toFixed(1)}, Total=${p.initiative.toFixed(1)}`);
+        combatants.push(p); // push reference, not copy
     });
     enemies.forEach(e => {
         const baseInitiative = (((e.stats?.ambition) || 0) * 0.5) + (((e.stats?.conviction) || 0) * 0.15);
         const randomComponent = Math.random() * 40;
-        const initiative = baseInitiative + randomComponent;
-        console.log(`[INITIATIVE] ${e.name}: Ambition=${e.stats?.ambition || 0}, Conviction=${e.stats?.conviction || 0}, Base=${baseInitiative.toFixed(1)}, Random=${randomComponent.toFixed(1)}, Total=${initiative.toFixed(1)}`);
-        combatants.push({ ...e, initiative });
+        e.initiative = baseInitiative + randomComponent;
+        console.log(`[INITIATIVE] ${e.name}: Ambition=${e.stats?.ambition || 0}, Conviction=${e.stats?.conviction || 0}, Base=${baseInitiative.toFixed(1)}, Random=${randomComponent.toFixed(1)}, Total=${e.initiative.toFixed(1)}`);
+        combatants.push(e); // push reference, not copy
     });
     return combatants;
   }
@@ -2462,13 +2524,19 @@ class CombatEngine {
     if (combatResult.result === 'victory' && challenge) {
         if (!stats.challengeCompletions) stats.challengeCompletions = {};
         if (!stats.challengeCompletions[challenge.id]) {
-            stats.challengeCompletions[challenge.id] = { completed: true, completions: 0, bestTime: null, totalTime: 0 };
+            stats.challengeCompletions[challenge.id] = { completed: true, completions: 0, secretCompletions: 0, bestTime: null, totalTime: 0 };
         }
         stats.challengeCompletions[challenge.id].completions = stats.challengeCompletions[challenge.id].completions + 1;
         stats.challengeCompletions[challenge.id].totalTime = stats.challengeCompletions[challenge.id].totalTime + combatResult.totalTurns;
         const currentBest = stats.challengeCompletions[challenge.id].bestTime;
         if (!currentBest || combatResult.totalTurns < currentBest) {
             stats.challengeCompletions[challenge.id].bestTime = combatResult.totalTurns;
+        }
+        // Track secret path completions for lore unlocks
+        if (combatResult.rewards?.secretPathCompleted) {
+            stats.challengeCompletions[challenge.id].secretCompletions =
+                (stats.challengeCompletions[challenge.id].secretCompletions || 0) + 1;
+            console.log(`[STATS] ${character.name} secret path completions for ${challenge.id}: ${stats.challengeCompletions[challenge.id].secretCompletions}`);
         }
     }
 

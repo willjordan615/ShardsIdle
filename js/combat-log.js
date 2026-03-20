@@ -98,6 +98,8 @@ async function displayCombatLog(combatData) {
         enemyStatus.innerHTML   = '';
         logDisplay.innerHTML    = '';
         resultDisplay.innerHTML = '';
+        const suddenDeathBanner = document.getElementById('suddenDeathBanner');
+        if (suddenDeathBanner) suddenDeathBanner.style.display = 'none';
 
         // Reset pause and scroll state for new combat
         window.combatPaused = false;
@@ -626,6 +628,23 @@ function renderTurn(turn, logDisplay, hpMaxes, hpCurrent) {
             <div class="turn-header">${icon} ${turn.actorName} uses ${actionName}</div>
             <div class="turn-message">${turn.result?.message}</div>
         `;
+        logDisplay.appendChild(turnEl);
+        _scrollLogToBottom(logDisplay);
+        return;
+    }
+
+    // Sudden death — escalating field damage
+    if (turn.action?.type === 'sudden_death') {
+        turnEl.classList.add('narrative-turn');
+        turnEl.style.border = '1px solid #c0392b';
+        turnEl.style.background = 'rgba(192,57,43,0.08)';
+        turnEl.innerHTML = `
+            <div class="turn-header" style="color:#e74c3c;">⚠ ${turn.actorName}</div>
+            <div class="turn-message" style="color:#e74c3c;">${turn.result?.message}</div>
+        `;
+        // Show the persistent warning banner
+        const banner = document.getElementById('suddenDeathBanner');
+        if (banner) banner.style.display = 'block';
         logDisplay.appendChild(turnEl);
         _scrollLogToBottom(logDisplay);
         return;

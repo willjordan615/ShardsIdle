@@ -1336,6 +1336,11 @@
       {
         "unlocksAfter": 15,
         "text": "The Heart-Wisp does not remember the monks. It remembers the prayers they left behind, still warm in the stone."
+      },
+      {
+        "unlocksAfter": 1,
+        "requiresSecret": true,
+        "text": "The altar does not mark where the monks prayed. It marks where they stopped the thing beneath from coming up. The prayer was a lock, not a gift."
       }
     ],
     "stages": [
@@ -1505,6 +1510,29 @@
               "type": "narrative_only",
               "narrative": "The altar is just stone to those who cannot hear it. The Heart-Wisp makes no distinction between them and the last ten parties who tried to take its flowers."
             }
+          },
+          {
+            "id": "roots_below_sense",
+            "name": "Something Beneath",
+            "spawnChance": 1.0,
+            "checkType": "skill",
+            "requiredSkillID": "nature_touch",
+            "checkStat": "harmony",
+            "secondaryStat": "ambition",
+            "difficultyThreshold": 65,
+            "successEffect": {
+              "type": "narrative_only",
+              "narrative": "The altar pulses once beneath your hand \u2014 not outward, but downward. Something old stirs below the stone. A crack appears at the altar's base that wasn't there before."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You sense something beneath the altar but cannot reach it. The moment passes."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "magnitude": 0,
+              "narrative": "The altar is cold stone to those who cannot hear it."
+            }
           }
         ],
         "lootTable": [
@@ -1527,6 +1555,61 @@
             "itemID": "consumable_potion_mana_minor",
             "dropChance": 0.25,
             "rarity": "common"
+          }
+        ],
+        "stageBranches": [
+          {
+            "condition": {
+              "type": "has_skill",
+              "value": "nature_touch"
+            },
+            "nextStageId": 99,
+            "overrideDescription": "The crack in the altar widens. The party descends."
+          },
+          {
+            "nextStageId": null
+          }
+        ]
+      },
+      {
+        "stageId": 99,
+        "title": "The Roots Below",
+        "secretPath": true,
+        "description": "Beneath the altar, the roots of the willow circle descend into a chamber that predates the shrine by centuries. The air is cold. The thing that was locked here is awake.",
+        "enemies": [
+          {
+            "enemyTypeID": "twisted_vine_tendril",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 4
+          },
+          {
+            "enemyTypeID": "heart_wisp_unbound",
+            "countRange": [
+              1,
+              1
+            ],
+            "level": 4
+          }
+        ],
+        "preCombatOpportunities": [],
+        "lootTable": [
+          {
+            "itemID": "scepter_nature_tier1",
+            "dropChance": 0.3,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "wand_holy_tier1",
+            "dropChance": 0.25,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "health_potion",
+            "dropChance": 0.5,
+            "rarity": "uncommon"
           }
         ]
       }
@@ -1569,6 +1652,28 @@
           "itemID": "consumable_potion_mana_minor",
           "dropChance": 0.3,
           "rarity": "common"
+        }
+      ],
+      "secretLootTable": [
+        {
+          "itemID": "totem_life_tier1",
+          "dropChance": 0.5,
+          "rarity": "uncommon"
+        },
+        {
+          "itemID": "acc_amulet_crystal_tier2",
+          "dropChance": 0.3,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "scepter_nature_tier1",
+          "dropChance": 0.35,
+          "rarity": "uncommon"
+        },
+        {
+          "itemID": "wand_holy_tier1",
+          "dropChance": 0.35,
+          "rarity": "uncommon"
         }
       ]
     }

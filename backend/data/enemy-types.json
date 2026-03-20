@@ -1068,5 +1068,78 @@
         "rarity": "uncommon"
       }
     ]
+  },
+  {
+    "id": "twisted_vine_tendril",
+    "name": "Twisted Vine Tendril",
+    "description": "A root from the shrine's corrupted depths, animated by something that was never meant to surface \u2014 it grasps and holds without letting go.",
+    "stats": {
+      "conviction": 40,
+      "endurance": 50,
+      "ambition": 30,
+      "harmony": 20
+    },
+    "armorValue": 0,
+    "aiProfile": "aggressive",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "entangle",
+      "nature_wrap",
+      "shove"
+    ],
+    "skillSelectionCount": 2,
+    "tags": [
+      "spirit",
+      "nature",
+      "melee"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "heart_wisp_unbound",
+    "name": "Heart-Wisp Unbound",
+    "description": "The Heart-Wisp stripped of its centuries of restraint \u2014 what remains when a guardian forgets what it was guarding against.",
+    "stats": {
+      "conviction": 140,
+      "endurance": 180,
+      "ambition": 90,
+      "harmony": 160
+    },
+    "armorValue": 8,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "entangle",
+      "sacred_roots",
+      "nature_touch",
+      "shout",
+      "holy_roots",
+      "buff_defense"
+    ],
+    "skillSelectionCount": 5,
+    "tags": [
+      "spirit",
+      "boss",
+      "caster"
+    ],
+    "lootTable": [
+      {
+        "itemID": "totem_life_tier1",
+        "dropChance": 0.4,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "acc_amulet_crystal_tier2",
+        "dropChance": 0.25,
+        "rarity": "rare"
+      },
+      {
+        "itemID": "wand_holy_tier1",
+        "dropChance": 0.3,
+        "rarity": "uncommon"
+      }
+    ]
   }
 ]
