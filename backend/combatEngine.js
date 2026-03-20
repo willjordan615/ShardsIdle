@@ -448,15 +448,21 @@ class CombatEngine {
          break;
       }
 
-      // Reset lastUsedSkillId at the start of each stage
-      playerCharacters.forEach(p => { p.lastUsedSkillId = null; });
+      // Reset lastUsedSkillId and buffCooldowns at the start of each stage
+      playerCharacters.forEach(p => { p.lastUsedSkillId = null; p.buffCooldowns = {}; });
 
       let stageTurnCount = stageTurns.length;
       const startStageHP = playerCharacters.map(p => ({ id: p.id, hp: p.currentHP }));
 
       while (!this.isCombatFinished(playerCharacters, enemies)) {
         for (const combatant of turnOrder) {
-          if (combatant.defeated) continue;
+          if (combatant.defeated || combatant.currentHP <= 0) {
+            if (combatant.currentHP <= 0 && !combatant.defeated) {
+              console.warn(`[SAFETY] ${combatant.name} has 0 HP but defeated=false — forcing defeated.`);
+              combatant.defeated = true;
+            }
+            continue;
+          }
 
           stageTurnCount++;
           globalTurnCount++;
@@ -473,13 +479,24 @@ class CombatEngine {
 
           if (combatant.type === 'player') {
             const playerChar = playerCharacters.find(p => p.id === combatant.id);
-            const context = this._buildContext(stageIndex, allStages, playerCharacters, enemies, playerChar);
-            const action = this.selectPlayerAction(playerChar, playerCharacters, enemies, context);
+            const context = this._buildContext(stageIndex, allStages, playerCharacters, enemies, playerChar, stageTurnCount);
+            const action = this.selectAction(playerChar, playerCharacters, enemies, context, {
+              isEnemy: false,
+              focusChance: 1.0,
+            });
             const turnResult = this.resolveAction(action, playerChar, playerCharacters, enemies);
             
             // Track last used skill for proc pressure
             if (action.type === 'skill' && action.skillID) {
               playerChar.lastUsedSkillId = action.skillID;
+            }
+            // Track last buff turn for cooldown scoring
+            if (action.type === 'skill') {
+              const usedSkill = this.skills.find(s => s.id === action.skillID);
+              if (usedSkill && (usedSkill.category === 'BUFF' || usedSkill.category === 'DEFENSE' || usedSkill.category === 'UTILITY')) {
+                if (!playerChar.buffCooldowns) playerChar.buffCooldowns = {};
+                playerChar.buffCooldowns[action.skillID] = stageTurnCount;
+              }
             }
 
             turn.action = action;
@@ -499,8 +516,13 @@ class CombatEngine {
             const enemy = enemies.find(e => e.id === combatant.id);
             if (!enemy || enemy.defeated || enemy.currentHP <= 0) continue;
             
-            const context = this._buildContext(stageIndex, allStages, playerCharacters, enemies, enemy);
-            const action = this.selectEnemyAction(enemy, playerCharacters, enemies, context);
+            const context = this._buildContext(stageIndex, allStages, playerCharacters, enemies, enemy, stageTurnCount);
+            const enemyProfile = enemy.aiProfile || 'aggressive';
+            const enemyFocusChance = { aggressive: 0.70, tactical: 0.65, berserker: 0.40, support: 0.55 }[enemyProfile] ?? 0.70;
+            const action = this.selectAction(enemy, enemies, playerCharacters, context, {
+              isEnemy: true,
+              focusChance: enemyFocusChance,
+            });
             
             if (action.type === 'blocked') {
               turn.action = action;
@@ -513,6 +535,15 @@ class CombatEngine {
             turn.action = action;
             turn.roll = turnResult.roll;
             turn.result = turnResult.result;
+
+            // Track buff cooldowns for enemies — same logic as players
+            if (action.type === 'skill') {
+              const usedSkill = this.skills.find(s => s.id === action.skillID);
+              if (usedSkill && (usedSkill.category === 'BUFF' || usedSkill.category === 'DEFENSE' || usedSkill.category === 'UTILITY')) {
+                if (!enemy.buffCooldowns) enemy.buffCooldowns = {};
+                enemy.buffCooldowns[action.skillID] = stageTurnCount;
+              }
+            }
           }
 
           stageTurns.push(turn);
@@ -747,403 +778,334 @@ class CombatEngine {
   }
 
   /**
-   * Select action for a player character - uses dynamic skill selection
+   * Unified action selection for players, bots, and enemies.
+   * opts.isEnemy       — true for enemies (different skill pool, no child procs, no conservation)
+   * opts.focusChance   — 1.0 for players/bots (always focused), 0.4–0.7 for enemies by profile
    */
-  selectPlayerAction(character, players, enemies, context = {}) {
-    const aliveEnemies = enemies.filter(e => !e.defeated);
-    if (aliveEnemies.length === 0) return { type: 'attack', target: null };
+  selectAction(actor, allies, opponents, context = {}, opts = {}) {
+    const {
+      isEnemy = false,
+      focusChance = 1.0,
+    } = opts;
 
-    const profile = character.aiProfile || 'balanced';
+    // ── Stun/block check ─────────────────────────────────────────────────────
+    const actionBlock = this.statusEngine.checkActionBlock(actor);
+    if (!actionBlock.canAct) {
+      console.log(`[DEBUG] ${actor.name} is stunned and cannot act!`);
+      return { type: 'blocked', reason: actionBlock.reason };
+    }
 
-    // Profile modifiers
+    const aliveOpponents = opponents.filter(e => !e.defeated);
+    const aliveAllies    = allies.filter(a => !a.defeated);
+    if (aliveOpponents.length === 0) return { type: 'attack', target: null };
+
+    const profile = actor.aiProfile || (isEnemy ? 'aggressive' : 'balanced');
+    const conservationEnabled = !isEnemy && profile !== 'aggressive';
+    const procPressureBonus   = profile === 'opportunist' ? 1.6 : 1.35;
+
+    // ── Emergency survival (HP critical) ────────────────────────────────────
     const emergencyHPThreshold = profile === 'cautious' ? 0.4 : 0.2;
-    const allyRescueThreshold  = (profile === 'support') ? 0.5 : 0.3;
-    const procPressureBonus    = (profile === 'opportunist') ? 1.6 : 1.35;
-    const conservationEnabled  = (profile !== 'aggressive');
+    if (profile !== 'berserker' && actor.currentHP <= actor.maxHP * emergencyHPThreshold) {
+      const healSkill = isEnemy
+        ? this.getEnemySkillByCategory(actor.skills, 'HEALING')
+        : (this.getAvailableSkillByCategory(actor, 'HEALING') || this.getAvailableSkillByCategory(actor, 'HEALING_AOE'));
+      if (healSkill) {
+        const action = { type: 'skill', skillID: healSkill.id, target: actor.id };
+        return isEnemy ? action : this.checkChildSkillProc(actor, action, allies, opponents);
+      }
+      const defSkill = isEnemy
+        ? this.getEnemySkillByCategory(actor.skills, 'DEFENSE')
+        : this.getAvailableSkillByCategory(actor, 'DEFENSE');
+      if (defSkill && !isEnemy) {
+        const action = { type: 'skill', skillID: defSkill.id, target: actor.id };
+        return this.checkChildSkillProc(actor, action, allies, opponents);
+      }
+    }
 
-    // ── Emergency survival override (HP critical) ──
-    if (character.currentHP <= character.maxHP * emergencyHPThreshold) {
-        const healSkill = this.getAvailableSkillByCategory(character, 'HEALING') ||
-                          this.getAvailableSkillByCategory(character, 'HEALING_AOE');
+    // ── Ally rescue (non-aggressive non-enemy) ───────────────────────────────
+    if (!isEnemy && profile !== 'aggressive') {
+      const allyRescueThreshold = profile === 'support' ? 0.5 : 0.3;
+      const lowHPAlly = allies.find(p =>
+        !p.defeated && p.id !== actor.id && p.currentHP <= p.maxHP * allyRescueThreshold
+      );
+      if (lowHPAlly) {
+        const healSkill = this.getAvailableSkillByCategory(actor, 'HEALING') ||
+                          this.getAvailableSkillByCategory(actor, 'HEALING_AOE');
         if (healSkill) {
-            const action = { type: 'skill', skillID: healSkill.id, target: character.id };
-            return this.checkChildSkillProc(character, action, players, enemies);
+          const action = { type: 'skill', skillID: healSkill.id, target: lowHPAlly.id };
+          return this.checkChildSkillProc(actor, action, allies, opponents);
         }
-        // No heal — try defense
-        const defSkill = this.getAvailableSkillByCategory(character, 'DEFENSE');
-        if (defSkill) {
-            const action = { type: 'skill', skillID: defSkill.id, target: character.id };
-            return this.checkChildSkillProc(character, action, players, enemies);
-        }
+      }
     }
 
-    // ── Ally rescue ──
-    if (profile !== 'aggressive') {
-        const lowHPAlly = players.find(p =>
-            !p.defeated && p.id !== character.id &&
-            p.currentHP <= p.maxHP * allyRescueThreshold
-        );
-        if (lowHPAlly) {
-            const healSkill = this.getAvailableSkillByCategory(character, 'HEALING') ||
-                              this.getAvailableSkillByCategory(character, 'HEALING_AOE');
-            if (healSkill) {
-                const action = { type: 'skill', skillID: healSkill.id, target: lowHPAlly.id };
-                return this.checkChildSkillProc(character, action, players, enemies);
-            }
-        }
-    }
-
-    // ── RESTORATION — prefer over NO_RESOURCES when stamina/mana both low but not zero ──
-    const staminaRatio = character.currentStamina / character.maxStamina;
-    const manaRatio    = character.currentMana    / character.maxMana;
+    // ── Resource restoration ─────────────────────────────────────────────────
+    const staminaRatio = actor.currentStamina / actor.maxStamina;
+    const manaRatio    = actor.currentMana    / actor.maxMana;
     if (staminaRatio < 0.15 && manaRatio < 0.15) {
-        const restoreSkill = this.getAvailableSkillByCategory(character, 'RESTORATION')
-            || this.getAvailableSkillByCategory(character, 'CONSUMABLE_RESTORATION');
-        if (restoreSkill) {
-            const action = { type: 'skill', skillID: restoreSkill.id, target: character.id };
-            return this.checkChildSkillProc(character, action, players, enemies);
-        }
+      const restoreSkill = isEnemy
+        ? this.getEnemySkillByCategory(actor.skills, 'RESTORATION')
+        : (this.getAvailableSkillByCategory(actor, 'RESTORATION') || this.getAvailableSkillByCategory(actor, 'CONSUMABLE_RESTORATION'));
+      if (restoreSkill) {
+        const action = { type: 'skill', skillID: restoreSkill.id, target: actor.id };
+        return isEnemy ? action : this.checkChildSkillProc(actor, action, allies, opponents);
+      }
     }
 
-    // ── Build candidate pool ──
-    const pool = this.getAugmentedSkillPool(character);
-    const candidates = [];
+    // ── Support profile: ally buff/heal ──────────────────────────────────────
+    if (isEnemy && profile === 'support' && aliveAllies.length > 1 && Math.random() < 0.35) {
+      const buffSkill = this.getEnemySkillByCategory(actor.skills, 'BUFF');
+      if (buffSkill) {
+        const weakestAlly = aliveAllies
+          .filter(a => a.id !== actor.id)
+          .reduce((min, a) => a.currentHP < min.currentHP ? a : min, aliveAllies[0]);
+        return { type: 'skill', skillID: buffSkill.id, target: weakestAlly.id };
+      }
+    }
 
-    const damageCategories = ['DAMAGE_SINGLE','DAMAGE_AOE','DAMAGE_MAGIC','DAMAGE_AOE_MAGIC'];
-    const allSkillCategories = [
-        ...damageCategories,
-        'HEALING','HEALING_AOE','CONTROL','BUFF','DEFENSE','UTILITY','RESTORATION',
-        'CONSUMABLE_HEALING','CONSUMABLE_RESTORATION','CONSUMABLE_DAMAGE'
+    // ── Targeting — weighted random vs focused ───────────────────────────────
+    const statusEngine = this.statusEngine;
+    function _weightedRandomTarget(pool) {
+      const weights = pool.map(p => {
+        let w = 1.0;
+        if (p.statusEffects?.some(e => e.id === 'taunt'   && e.duration > 0)) w *= 4.0;
+        if (p.statusEffects?.some(e => e.id === 'stealth' && e.duration > 0)) w *= 0.15;
+        p.statusEffects?.forEach(activeStatus => {
+          const def = statusEngine?.statusMap?.[activeStatus.id];
+          if (def?.targetingWeight && activeStatus.duration > 0) w *= def.targetingWeight;
+        });
+        return w;
+      });
+      const total = weights.reduce((a, b) => a + b, 0);
+      let roll = Math.random() * total;
+      for (let i = 0; i < pool.length; i++) {
+        roll -= weights[i];
+        if (roll <= 0) return pool[i];
+      }
+      return pool[pool.length - 1];
+    }
+
+    const tauntTarget = aliveOpponents.find(p =>
+      p.statusEffects?.some(e => e.id === 'taunt' && e.duration > 0)
+    );
+
+    let primaryTarget;
+    const usePreferred = Math.random() < focusChance;
+    if (!usePreferred || profile === 'berserker') {
+      primaryTarget = _weightedRandomTarget(aliveOpponents);
+    } else if (tauntTarget) {
+      primaryTarget = tauntTarget;
+      if (isEnemy) console.log(`[TAUNT] ${actor.name} drawn to ${tauntTarget.name}`);
+    } else if (profile === 'tactical') {
+      primaryTarget = aliveOpponents.reduce((best, p) =>
+        this._threatScore(p) > this._threatScore(best) ? p : best
+      );
+    } else {
+      primaryTarget = aliveOpponents.reduce((min, p) => p.currentHP < min.currentHP ? p : min);
+    }
+
+    // ── Build skill pool ─────────────────────────────────────────────────────
+    const validCategories = [
+      'DAMAGE_SINGLE','DAMAGE_AOE','DAMAGE_MAGIC','DAMAGE_AOE_MAGIC',
+      'HEALING','HEALING_AOE','CONTROL','BUFF','DEFENSE','UTILITY','RESTORATION',
+      'CONSUMABLE_HEALING','CONSUMABLE_RESTORATION','CONSUMABLE_DAMAGE'
     ];
 
-    for (const skillID of pool) {
-        const skill = this.skills.find(s => s.id === skillID);
-        if (!skill || !this.hasResources(character, skill)) continue;
-        if (!allSkillCategories.includes(skill.category)) continue;
+    const rawPool = isEnemy
+      ? (actor.skills || []).map(id => this.skills.find(s => s.id === id)).filter(Boolean)
+      : [...this.getAugmentedSkillPool(actor)].map(id => this.skills.find(s => s.id === id)).filter(Boolean);
 
-        // Determine target
-        let target = null;
+    const usableSkills = rawPool.filter(s => this.hasResources(actor, s) && validCategories.includes(s.category));
+
+    if (usableSkills.length > 0) {
+      const candidates = usableSkills.map(skill => {
         const cat = skill.category;
+        let target = primaryTarget.id;
 
+        // Resolve target per category
         if (cat === 'HEALING' || cat === 'HEALING_AOE' || cat === 'RESTORATION' ||
             cat === 'BUFF' || cat === 'DEFENSE' ||
             cat === 'CONSUMABLE_HEALING' || cat === 'CONSUMABLE_RESTORATION') {
-            target = character.id;
-        } else if (cat === 'CONTROL' || cat === 'UTILITY') {
-            // Check if skill has any self-only effects vs enemy effects
-            const hasEnemyEffect = skill.effects?.some(e =>
-                e.targets === 'single_enemy' || e.targets === 'all_enemies' ||
-                (!e.targets && (e.type === 'apply_debuff'))
-            );
-            const hasSelfOnlyEffects = skill.effects?.every(e =>
-                e.targets === 'self' || e.type === 'apply_buff'
-            );
-
-            if (hasSelfOnlyEffects && !hasEnemyEffect) {
-                target = character.id; // purely self-targeting utility/buff
-            } else if (profile === 'disruptor' && context.highestThreatScore > 0) {
-                const threatened = aliveEnemies.reduce((best, e) =>
-                    this._threatScore(e) > this._threatScore(best) ? e : best
-                );
-                target = threatened.id;
-            } else {
-                target = aliveEnemies.reduce((min, e) => e.currentHP < min.currentHP ? e : min).id;
-            }
+          target = actor.id;
         } else if (cat.includes('AOE')) {
-            target = null; // AOE hits all
-        } else {
-            // Damage single: default lowest HP, but disruptor targets highest threat
-            if (profile === 'disruptor' && context.highestThreatScore > 0) {
-                const threatened = aliveEnemies.reduce((best, e) =>
-                    this._threatScore(e) > this._threatScore(best) ? e : best
-                );
-                target = threatened.id;
-            } else {
-                target = aliveEnemies.reduce((min, e) => e.currentHP < min.currentHP ? e : min).id;
-            }
+          target = null;
+        } else if (cat === 'CONTROL' || cat === 'UTILITY') {
+          const hasEnemyEffect = skill.effects?.some(e =>
+            e.targets === 'single_enemy' || e.targets === 'all_enemies' ||
+            (!e.targets && e.type === 'apply_debuff')
+          );
+          const hasSelfOnly = skill.effects?.every(e =>
+            e.targets === 'self' || e.type === 'apply_buff'
+          );
+          if (hasSelfOnly && !hasEnemyEffect) {
+            target = actor.id;
+          } else if (profile === 'disruptor' && context.highestThreatScore > 0) {
+            target = aliveOpponents.reduce((best, e) =>
+              this._threatScore(e) > this._threatScore(best) ? e : best
+            ).id;
+          }
+          // else target stays as primaryTarget.id
         }
 
-        const score = this._scoreAction(character, skill, target, context, {
-            aliveEnemies, players, profile, procPressureBonus, conservationEnabled
-        });
+        let score = skill.basePower ?? 1;
 
-        candidates.push({ skill, target, score });
-    }
+        // Berserker skips all modifiers — raw power only
+        if (profile === 'berserker') return { skill, target, score };
 
-    if (candidates.length > 0) {
-        candidates.sort((a, b) => b.score - a.score);
-        const best = candidates[0];
+        // ── Shared scoring modifiers ─────────────────────────────────────────
+
+        // Resource ratio
+        const resourceRatio = skill.costType === 'stamina'
+          ? actor.currentStamina / actor.maxStamina
+          : skill.costType === 'mana'
+            ? actor.currentMana / actor.maxMana
+            : 1.0;
+        if (resourceRatio < 0.3) score *= 0.5;
+
+        // Stage budget conservation (players only)
+        if (conservationEnabled && context.stagesRemaining > 0) {
+          const budgetRatio = skill.costType === 'stamina'
+            ? context.staminaBudgetRatio : context.manaBudgetRatio;
+          if (budgetRatio < 0.6) score *= profile === 'cautious' ? 0.55 : 0.75;
+        }
+
+        // Debuff redundancy
+        const targetCombatant = target ? [...aliveOpponents, ...allies].find(c => c.id === target) : null;
+        if (targetCombatant) {
+          const primaryDebuff = skill.effects?.find(e => e.type === 'apply_debuff')?.debuff;
+          if (primaryDebuff && this._targetHasDebuff(targetCombatant, primaryDebuff)) score *= 0.55;
+        }
+
+        // Buff redundancy + active buff penalty
+        if (cat === 'BUFF' || cat === 'DEFENSE') {
+          const primaryBuff = skill.effects?.find(e => e.type === 'apply_buff')?.buff;
+          if (primaryBuff && this._targetHasDebuff(actor, primaryBuff)) score *= 0.15;
+          const activeBuffCount = (actor.statusEffects || []).filter(e => e.duration > 0).length;
+          if (activeBuffCount >= 1) score *= 0.4;
+          if (activeBuffCount >= 2) score *= 0.3;
+        }
+
+        // Buff cooldown
+        if ((cat === 'BUFF' || cat === 'DEFENSE' || cat === 'UTILITY') && actor.buffCooldowns) {
+          const lastUsedTurn = actor.buffCooldowns[skill.id];
+          if (lastUsedTurn !== undefined) {
+            const buffDuration = skill.effects?.find(e => e.duration)?.duration || 3;
+            const cooldownWindow = buffDuration + 3;
+            const turnsSinceUse = (context.stageTurnCount || 0) - lastUsedTurn;
+            if (turnsSinceUse < cooldownWindow) {
+              score *= Math.max(0.05, turnsSinceUse / cooldownWindow);
+            }
+          }
+        }
+
+        // Healing efficiency
+        if (cat === 'HEALING' || cat === 'HEALING_AOE' || cat === 'CONSUMABLE_HEALING') {
+          const healTarget = target ? [...aliveOpponents, ...allies].find(c => c.id === target) : actor;
+          if (healTarget) {
+            const hpRatio = healTarget.currentHP / healTarget.maxHP;
+            if (hpRatio > 0.8) score *= 0.1;
+            else if (hpRatio > 0.6) score *= 0.4;
+            else if (hpRatio < 0.3) score *= 2.0;
+          }
+        }
+
+        // Proc pressure bonus (players only)
+        if (!isEnemy && context.lastUsedSkillId &&
+            cat && !['DEFENSE','BUFF','RESTORATION'].includes(cat) &&
+            this._hasProcOpportunity(actor, skill.id, context.lastUsedSkillId)) {
+          const childSkill = this.skills.find(child =>
+            child.parentSkills?.includes(skill.id) &&
+            child.parentSkills?.includes(context.lastUsedSkillId)
+          );
+          const childRecord = childSkill ? actor.skills?.find(s => s.skillID === childSkill.id) : null;
+          const alreadyUnlocked = childRecord && (childRecord.skillLevel || 0) >= 1;
+          if (!alreadyUnlocked) score *= procPressureBonus;
+        }
+
+        // AOE value
+        if (cat && cat.includes('AOE')) score *= Math.max(1, aliveOpponents.length * 0.5);
+
+        // Turn decay for buffs
+        if (cat === 'BUFF' || cat === 'DEFENSE' || cat === 'UTILITY') {
+          const turn = context.stageTurnCount || 0;
+          score *= Math.max(0.35, 1.0 - (turn * 0.045));
+        }
+
+        // Finishing blow
+        if (targetCombatant && targetCombatant.currentHP <= targetCombatant.maxHP * 0.25) score *= 1.2;
+
+        // Highest threat targeting bonus
+        if (targetCombatant && context.highestThreatScore > 0) {
+          if (Math.abs(this._threatScore(targetCombatant) - context.highestThreatScore) < 0.01) score *= 1.15;
+        }
+
+        // Profile boosts
+        if (profile === 'support') {
+          if (cat === 'HEALING' || cat === 'HEALING_AOE' || cat === 'BUFF') score *= 1.5;
+          if (cat && cat.includes('DAMAGE')) score *= 0.7;
+        }
+        if (profile === 'disruptor') {
+          if (cat === 'CONTROL') score *= 1.6;
+          if (cat === 'UTILITY') score *= 1.3;
+        }
+        if (profile === 'aggressive') {
+          if (cat && cat.includes('DAMAGE')) score *= 1.3;
+          if (cat === 'BUFF' || cat === 'DEFENSE') score *= 0.5;
+        }
+        if (profile === 'tactical' && cat === 'CONTROL') score *= 1.4;
+
+        // Buff window bonus when healthy
+        if ((cat === 'BUFF' || cat === 'DEFENSE') &&
+            actor.currentHP > actor.maxHP * 0.75 && resourceRatio > 0.5) {
+          const enemyPressure = aliveOpponents.length > aliveAllies.length;
+          const soloMultiplier = aliveAllies.length <= 1 ? 0.2 : 1.0;
+          score *= soloMultiplier * (enemyPressure ? 0.6 : 1.15);
+        }
+
+        // AOE healing bonus when 2+ allies hurt
+        if (cat === 'HEALING_AOE') {
+          const hurtAllies = allies.filter(p => !p.defeated && p.currentHP < p.maxHP * 0.7).length;
+          if (hurtAllies >= 2) score *= 1.4;
+        }
+
+        return { skill, target, score };
+      });
+
+      candidates.sort((a, b) => b.score - a.score);
+      const best = candidates[0];
+      if (best) {
         const action = { type: 'skill', skillID: best.skill.id, target: best.target };
-        return this.checkChildSkillProc(character, action, players, enemies);
+        return isEnemy ? action : this.checkChildSkillProc(actor, action, allies, opponents);
+      }
     }
 
-    // NEW LOGIC: NO RESOURCES FALLBACK
+    // ── Desperation: NO_RESOURCES fallback ───────────────────────────────────
     const desperationPool = this.skills.filter(s => s.category === 'NO_RESOURCES');
-
     if (desperationPool.length > 0) {
-        const randomIndex = Math.floor(Math.random() * desperationPool.length);
-        const chosenSkill = desperationPool[randomIndex];
-
-        console.log(`[DESPERATION] ${character.name} ${character.id} is out of resources! Randomly selected: ${chosenSkill.name}`);
-
-        let targetId = null;
-        // A skill is selfish (self-targeted) only if it has NO enemy damage effects.
-        // Skills like desperate_attack have a self-debuff but deal damage to enemies —
-        // the self-debuff is a cost, not the primary target.
-        const hasDamageEffect = chosenSkill.effects?.some(e =>
-            e.type === 'damage' &&
-            (!e.targets || e.targets === 'single_enemy' || e.targets === 'all_enemies')
-        );
-        const isSelfish = !hasDamageEffect && chosenSkill.effects?.some(e =>
-            e.type === 'restore_resource' ||
-            (e.type === 'apply_buff'   && e.targets === 'self') ||
-            (e.type === 'apply_debuff' && e.targets === 'self')
-        );
-
-        if (isSelfish) {
-            targetId = character.id;
-        } else {
-            const target = aliveEnemies.reduce((min, e) => e.currentHP < min.currentHP ? e : min);
-            targetId = target.id;
-        }
-
-        return { 
-            type: 'skill', 
-            skillID: chosenSkill.id, 
-            target: targetId 
-        };
+      const chosenSkill = desperationPool[Math.floor(Math.random() * desperationPool.length)];
+      console.log(`[DESPERATION] ${actor.name} ${actor.id} is out of resources! Randomly selected: ${chosenSkill.name}`);
+      const hasDamageEffect = chosenSkill.effects?.some(e =>
+        e.type === 'damage' && (!e.targets || e.targets === 'single_enemy' || e.targets === 'all_enemies')
+      );
+      const isSelfish = !hasDamageEffect && chosenSkill.effects?.some(e =>
+        e.type === 'restore_resource' ||
+        (e.type === 'apply_buff'   && e.targets === 'self') ||
+        (e.type === 'apply_debuff' && e.targets === 'self')
+      );
+      const targetId = isSelfish ? actor.id
+        : aliveOpponents.reduce((min, e) => e.currentHP < min.currentHP ? e : min).id;
+      return { type: 'skill', skillID: chosenSkill.id, target: targetId };
     }
 
-    console.error(`[CRITICAL] ${character.name} ${character.id} has no resources AND the global NO_RESOURCES pool is empty! Falling back to basic attack.`);
-    const lowestHPEnemyFallback = aliveEnemies.reduce((min, e) => e.currentHP < min.currentHP ? e : min);
-    return { type: 'attack', target: lowestHPEnemyFallback.id };
+    console.error(`[CRITICAL] ${actor.name} has no resources AND NO_RESOURCES pool is empty!`);
+    const fallback = aliveOpponents.reduce((min, e) => e.currentHP < min.currentHP ? e : min);
+    return { type: 'attack', target: fallback.id };
   }
 
-  /**
-   * Select action for an enemy - uses dynamic skill selection
-   */
-  selectEnemyAction(enemy, players, enemies, context = {}) {
-    const actionBlock = this.statusEngine.checkActionBlock(enemy);
-    if (!actionBlock.canAct) {
-        console.log(`[DEBUG] ${enemy.name} is stunned and cannot act!`);
-        return { type: 'blocked', reason: actionBlock.reason };
-    }
-
-    const alivePlayers = players.filter(p => !p.defeated);
-    if (alivePlayers.length === 0) return { type: 'attack', target: null };
-
-    if (!enemy.skills || enemy.skills.length === 0) {
-        const target = alivePlayers.reduce((min, p) => p.currentHP < min.currentHP ? p : min);
-        return { type: 'attack', target: target.id };
-    }
-
-    const profile = enemy.aiProfile || 'aggressive';
-
-    // ── Targeting weights ──
-    // Each player gets a weight that influences how likely they are to be chosen.
-    // Taunt: greatly increases selection weight
-    // Stealth: greatly reduces selection weight (but doesn't make target immune)
-    // Weights are used when the enemy makes a random target choice.
-    const statusEngine = this.statusEngine;
-
-    function _weightedRandomTarget(pool) {
-        const weights = pool.map(p => {
-            let w = 1.0;
-            if (p.statusEffects?.some(e => e.id === 'taunt'   && e.duration > 0)) w *= 4.0;
-            if (p.statusEffects?.some(e => e.id === 'stealth' && e.duration > 0)) w *= 0.15;
-            // marked/provoked: apply targetingWeight multiplier from status definition
-            p.statusEffects?.forEach(activeStatus => {
-                const def = statusEngine?.statusMap?.[activeStatus.id];
-                if (def?.targetingWeight && activeStatus.duration > 0) {
-                    w *= def.targetingWeight;
-                }
-            });
-            return w;
-        });
-        const total = weights.reduce((a, b) => a + b, 0);
-        let roll = Math.random() * total;
-        for (let i = 0; i < pool.length; i++) {
-            roll -= weights[i];
-            if (roll <= 0) return pool[i];
-        }
-        return pool[pool.length - 1];
-    }
-
-    // Taunt: check if any player has taunt active (used to bias preferred-target logic too)
-    const tauntTarget = alivePlayers.find(p =>
-        p.statusEffects?.some(e => e.id === 'taunt' && e.duration > 0)
-    );
-    const aliveEnemies = enemies.filter(e => !e.defeated);
-
-    // Emergency heal
-    if (profile !== 'berserker' && enemy.currentHP <= enemy.maxHP * 0.3) {
-        const healSkill = this.getEnemySkillByCategory(enemy.skills, 'HEALING');
-        if (healSkill) return { type: 'skill', skillID: healSkill.id, target: enemy.id };
-    }
-
-    // Resource restoration — use when both stamina and mana are critically low
-    const staminaRatio = enemy.currentStamina / enemy.maxStamina;
-    const manaRatio    = enemy.currentMana    / enemy.maxMana;
-    if (staminaRatio < 0.15 && manaRatio < 0.15) {
-        const restoreSkill = this.getEnemySkillByCategory(enemy.skills, 'RESTORATION');
-        if (restoreSkill) return { type: 'skill', skillID: restoreSkill.id, target: enemy.id };
-    }
-
-    // Support profile: occasionally buff/heal allies
-    if (profile === 'support' && aliveEnemies.length > 1 && Math.random() < 0.35) {
-        const buffSkill = this.getEnemySkillByCategory(enemy.skills, 'BUFF');
-        if (buffSkill) {
-            const weakestAlly = aliveEnemies
-                .filter(e => e.id !== enemy.id)
-                .reduce((min, e) => e.currentHP < min.currentHP ? e : min, aliveEnemies[0]);
-            return { type: 'skill', skillID: buffSkill.id, target: weakestAlly.id };
-        }
-    }
-
-    // Build all usable skills (include CONTROL, BUFF, DEFENSE, RESTORATION — not just DAMAGE)
-    const usableSkills = enemy.skills
-        .map(skillID => this.skills.find(s => s.id === skillID))
-        .filter(s => s && this.hasResources(enemy, s) &&
-            ['DAMAGE_SINGLE','DAMAGE_AOE','DAMAGE_MAGIC','DAMAGE_AOE_MAGIC',
-             'CONTROL','BUFF','DEFENSE','UTILITY','RESTORATION'].includes(s.category)
-        );
-
-    if (usableSkills.length === 0) {
-        // No usable skills — fall through to desperation below
-        null;
-    } else {
-        // Pick target based on profile, with weighted randomness so enemies
-        // don't always robotically focus the same target.
-        // focusChance = probability of picking the "preferred" target;
-        // otherwise picks randomly from alive players.
-        const focusChance = {
-            aggressive: 0.70,
-            tactical:   0.65,
-            berserker:  0.40,
-            support:    0.55,
-        }[profile] ?? 0.70;
-
-        let primaryTarget = null;
-
-        // Taunt: when a taunting player exists, non-berserker profiles always use
-        // weighted random (which strongly favours the taunting player). Berserker
-        // only uses weighted random on its random rolls, not its preferred-target rolls.
-        const usePreferred = Math.random() < focusChance;
-
-        if (!usePreferred || profile === 'berserker') {
-            // Random selection — weights handle taunt and stealth influence
-            primaryTarget = _weightedRandomTarget(alivePlayers);
-        } else if (tauntTarget) {
-            // Preferred selection but taunt is active — honour taunt
-            primaryTarget = tauntTarget;
-            console.log(`[TAUNT] ${enemy.name} drawn to ${tauntTarget.name}`);
-        } else if (profile === 'tactical') {
-            primaryTarget = alivePlayers.reduce((best, p) =>
-                this._threatScore(p) > this._threatScore(best) ? p : best
-            );
-        } else {
-            // aggressive / support / default: lowest HP
-            primaryTarget = alivePlayers.reduce((min, p) => p.currentHP < min.currentHP ? p : min);
-        }
-
-        // Score candidates
-        const candidates = usableSkills.map(skill => {
-            let target = primaryTarget.id;
-            const cat = skill.category;
-
-            // AOE
-            if (cat.includes('AOE')) target = null;
-            // Control: prefer debuff if not already applied
-            if (cat === 'CONTROL') {
-                const mainDebuff = skill.effects?.find(e => e.type === 'apply_debuff')?.debuff;
-                if (mainDebuff && this._targetHasDebuff(primaryTarget, mainDebuff)) {
-                    // Already debuffed — score will be penalised
-                }
-            }
-
-            let score = skill.basePower || 1;
-
-            // Berserker: always highest power, no modifiers
-            if (profile === 'berserker') return { skill, target, score };
-
-            // Debuff redundancy penalty
-            const mainDebuff = skill.effects?.find(e => e.type === 'apply_debuff')?.debuff;
-            if (mainDebuff && primaryTarget && this._targetHasDebuff(primaryTarget, mainDebuff)) {
-                score *= 0.5;
-            }
-
-            // Buff redundancy penalty — don't recast a buff already active on self
-            const mainBuff = skill.effects?.find(e => e.type === 'apply_buff' && (e.targets === 'self' || !e.targets))?.buff;
-            if (mainBuff && enemy.statusEffects?.some(s => s.id === mainBuff && s.duration > 0)) {
-                score *= 0.15;
-            }
-
-            // AOE bonus
-            if (cat.includes('AOE') && alivePlayers.length >= 2) {
-                score *= (alivePlayers.length * 0.5);
-            }
-
-            // Control bonus for tactical profile
-            if (profile === 'tactical' && cat === 'CONTROL') score *= 1.4;
-
-            // Finishing blow bonus
-            if (primaryTarget && primaryTarget.currentHP <= primaryTarget.maxHP * 0.25) score *= 1.2;
-
-            return { skill, target, score };
-        });
-
-        candidates.sort((a, b) => b.score - a.score);
-        const best = candidates[0];
-        if (best) {
-            return { type: 'skill', skillID: best.skill.id, target: best.target };
-        }
-    }
-
-    // NEW LOGIC: NO RESOURCES FALLBACK (Enemies)
-    const desperationPool = this.skills.filter(s => s.category === 'NO_RESOURCES');
-
-    if (desperationPool.length > 0) {
-        const randomIndex = Math.floor(Math.random() * desperationPool.length);
-        const chosenSkill = desperationPool[randomIndex];
-
-        console.log(`[DESPERATION] ${enemy.name} ${enemy.id} is out of resources! Randomly selected: ${chosenSkill.name}`);
-
-        let targetId = null;
-        const hasDamageEffect = chosenSkill.effects?.some(e =>
-            e.type === 'damage' &&
-            (!e.targets || e.targets === 'single_enemy' || e.targets === 'all_enemies')
-        );
-        const isSelfish = !hasDamageEffect && chosenSkill.effects?.some(e =>
-            e.type === 'restore_resource' ||
-            (e.type === 'apply_buff'   && e.targets === 'self') ||
-            (e.type === 'apply_debuff' && e.targets === 'self')
-        );
-
-        if (isSelfish) {
-            targetId = enemy.id;
-        } else {
-            const target = alivePlayers.reduce((min, p) => p.currentHP < min.currentHP ? p : min);
-            targetId = target.id;
-        }
-
-        return { 
-            type: 'skill', 
-            skillID: chosenSkill.id, 
-            target: targetId 
-        };
-    }
-
-    console.error(`[CRITICAL] ${enemy.name} has no resources AND the global NO_RESOURCES pool is empty! Falling back to basic attack.`);
-    const targetFallback = alivePlayers.reduce((min, p) => p.currentHP < min.currentHP ? p : min);
-    return { type: 'attack', target: targetFallback.id };
-  }
-
-  // ── AI HELPER METHODS ─────────────────────────────────────────────────────
 
   /**
    * Build the context object passed to both action selectors each turn.
    */
-  _buildContext(stageIndex, allStages, players, enemies, actor) {
+  _buildContext(stageIndex, allStages, players, enemies, actor, stageTurnCount = 0) {
     const totalStages     = allStages.length;
     const stagesRemaining = Math.max(0, totalStages - stageIndex - 1);
     const aliveEnemies    = enemies.filter(e => !e.defeated);
@@ -1159,6 +1121,7 @@ class CombatEngine {
       aliveEnemies,
       alivePlayers,
       highestThreatScore,
+      stageTurnCount,
       lastUsedSkillId:  actor.lastUsedSkillId || null,
       // Budget ratios only meaningful for players persisting across stages.
       // Enemies respawn fresh each stage so conservation pressure doesn't apply.
@@ -1214,6 +1177,27 @@ class CombatEngine {
         const primaryBuff = skill.effects?.find(e => e.type === 'apply_buff')?.buff;
         if (primaryBuff && this._targetHasDebuff(character, primaryBuff)) {
             score *= 0.15; // very low — almost never reapply an active buff
+        }
+        // Broader penalty: if the character already has ANY active buff, 
+        // deprioritize adding more — deal damage instead
+        const activeBuffCount = (character.statusEffects || []).filter(e => e.duration > 0).length;
+        if (activeBuffCount >= 1) score *= 0.4;
+        if (activeBuffCount >= 2) score *= 0.3; // stacks — heavily penalize buff stacking
+    }
+
+    // ── Buff cooldown — penalize reusing a buff skill too soon after last use ──
+    // Prevents immediate reapplication the moment a buff expires.
+    // Cooldown window = buff duration + 3 turns grace period.
+    if ((cat === 'BUFF' || cat === 'DEFENSE' || cat === 'UTILITY') && character.buffCooldowns) {
+        const lastUsedTurn = character.buffCooldowns[skill.id];
+        if (lastUsedTurn !== undefined) {
+            const buffDuration = skill.effects?.find(e => e.duration)?.duration || 3;
+            const cooldownWindow = buffDuration + 3;
+            const turnsSinceUse = (context.stageTurnCount || 0) - lastUsedTurn;
+            if (turnsSinceUse < cooldownWindow) {
+                const cooldownPenalty = Math.max(0.05, turnsSinceUse / cooldownWindow);
+                score *= cooldownPenalty;
+            }
         }
     }
 
@@ -1276,8 +1260,16 @@ class CombatEngine {
         if (cat === 'BUFF' || cat === 'DEFENSE') score *= 0.5;
     }
 
+    // ── Turn decay — buffs lose value as combat extends ──────────────────────
+    // Early turns: buffing is smart. Late turns: just deal damage.
+    // Decays from 1.0 at turn 0 to ~0.35 at turn 15+
+    if (cat === 'BUFF' || cat === 'DEFENSE' || cat === 'UTILITY') {
+        const turn = context.stageTurnCount || 0;
+        const decayMultiplier = Math.max(0.35, 1.0 - (turn * 0.045));
+        score *= decayMultiplier;
+    }
+
     // ── Buff window — bonus for buffing when healthy and not outnumbered ──
-    // Reduce DEFENSE value when enemies outnumber the party — pressure demands damage, not self-buffing.
     if ((cat === 'BUFF' || cat === 'DEFENSE') &&
         character.currentHP > character.maxHP * 0.75 &&
         resourceRatio > 0.5) {

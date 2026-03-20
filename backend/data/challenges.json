@@ -1,65 +1,28 @@
 [
   {
-    "id": "challenge_goblin_camp",
-    "name": "Goblin Encampment",
-    "description": "Clear out a nest of goblins threatening the nearby village. A good test for fresh adventurers.",
+    "id": "challenge_grizzlethorn_encampment",
+    "name": "Grizzlethorn Encampment",
+    "description": "A displaced goblin tribe has claimed the ironwood thicket at the edge of the Whispering Woods, raiding trade carts to survive after being driven from their mountain territory. They are not conquerors \u2014 but they are desperate, and desperate things bite.",
     "difficulty": 1,
-    "recommendedLevel": 1,
+    "recommendedLevel": 2,
     "minPartySize": 1,
     "maxPartySize": 4,
     "stages": [
       {
         "stageId": 1,
-        "title": "The Perimeter",
-        "description": "Two scouts patrol the outer fence. They haven't spotted you yet.",
+        "title": "The Overgrown Path",
+        "description": "The trail into the thicket narrows to single file as the ironwood closes in \u2014 and something moves in the branches above.",
         "enemies": [
           {
-            "enemyTypeID": "goblin_scout",
+            "enemyTypeID": "grizzlethorn_thornwalker",
             "countRange": [
               2,
               3
             ],
             "level": 1
-          }
-        ],
-        "lootTable": [
-          {
-            "itemID": "health_potion_minor",
-            "dropChance": 0.35,
-            "rarity": "common"
           },
           {
-            "itemID": "dagger_rusty_tier0",
-            "dropChance": 0.2,
-            "rarity": "common"
-          },
-          {
-            "itemID": "head_cloth_cap_tier0",
-            "dropChance": 0.15,
-            "rarity": "common"
-          },
-          {
-            "itemID": "consumable_bomb_smoke",
-            "dropChance": 0.1,
-            "rarity": "common"
-          }
-        ]
-      },
-      {
-        "stageId": 2,
-        "title": "The Archery Nest",
-        "description": "You breach the fence, but an archer has line of sight from a watchtower!",
-        "enemies": [
-          {
-            "enemyTypeID": "goblin_archer",
-            "countRange": [
-              1,
-              2
-            ],
-            "level": 2
-          },
-          {
-            "enemyTypeID": "goblin_scout",
+            "enemyTypeID": "grizzlethorn_scrapper",
             "countRange": [
               1,
               2
@@ -69,28 +32,158 @@
         ],
         "preCombatOpportunities": [
           {
-            "id": "evasive_footwork_approach",
-            "name": "Serpentine Approach",
-            "requiredSkillID": "footwork",
+            "id": "spot_the_watchers",
+            "name": "Eyes in the Canopy",
+            "spawnChance": 0.7,
+            "checkType": "skill",
+            "requiredSkillID": "sense",
             "checkStat": "ambition",
-            "secondaryStat": "endurance",
-            "difficultyThreshold": 45,
+            "secondaryStat": "harmony",
+            "difficultyThreshold": 35,
             "successEffect": {
               "type": "narrative_only",
-              "magnitude": 0,
-              "narrative": "Using expert Footwork, the party weaves through the arrow fire in a serpentine pattern. They reach cover untouched!"
+              "narrative": "The party spots the Thornwalkers before they loose their first volley. The fight begins on the party's terms."
             },
             "failureEffect": {
               "type": "apply_direct_damage",
-              "magnitude": 0.2,
+              "magnitude": 0.1,
               "statScale": "maxHP",
-              "narrative": "The footwork fails! A stray arrow catches a party member as they stumble."
+              "narrative": "The party senses something but can't place it. Three arrows find gaps in armor before anyone shouts a warning."
             },
             "fallbackEffect": {
               "type": "apply_direct_damage",
-              "magnitude": 0.3,
+              "magnitude": 0.15,
               "statScale": "maxHP",
-              "narrative": "Lacking the Footwork skill to evade, the party is forced to sprint across open ground. Arrows rain down, striking home before they can reach cover!"
+              "narrative": "The Thornwalkers watch the party walk the path below them like they've watched a hundred caravans. Nobody looks up."
+            }
+          },
+          {
+            "id": "halfling_memory",
+            "name": "Old Hunting Ground",
+            "spawnChance": 0.4,
+            "checkType": "stat",
+            "checkStat": "harmony",
+            "secondaryStat": "ambition",
+            "difficultyThreshold": 45,
+            "successEffect": {
+              "type": "narrative_only",
+              "narrative": "Someone in the party knows this land \u2014 the old halfling paths through the roots lead around the first ambush entirely."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "The memory is there but too vague. The path forks and the party picks wrong."
+            }
+          },
+          {
+            "id": "noise_in_the_brush",
+            "name": "A Branch Snaps",
+            "spawnChance": 0.35,
+            "checkType": "random",
+            "successChance": 0.0,
+            "successEffect": {
+              "type": "narrative_only",
+              "narrative": "Nothing. Probably a bird."
+            },
+            "failureEffect": {
+              "type": "apply_direct_damage",
+              "magnitude": 0.08,
+              "statScale": "maxHP",
+              "narrative": "A tripwire catches an ankle. Not serious \u2014 just a reminder the goblins have had weeks to prepare this ground."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion_minor",
+            "dropChance": 0.35,
+            "rarity": "common"
+          },
+          {
+            "itemID": "consumable_food_ration",
+            "dropChance": 0.3,
+            "rarity": "common"
+          },
+          {
+            "itemID": "crossbow_wood_tier0",
+            "dropChance": 0.18,
+            "rarity": "common"
+          }
+        ]
+      },
+      {
+        "stageId": 2,
+        "title": "The Encampment",
+        "description": "The trade-canvas tents of the Grizzlethorn are packed together in a clearing \u2014 movement is difficult and the Bone Elders are already chanting.",
+        "enemies": [
+          {
+            "enemyTypeID": "grizzlethorn_brute",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 2
+          },
+          {
+            "enemyTypeID": "grizzlethorn_bone_elder",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 2
+          },
+          {
+            "enemyTypeID": "grizzlethorn_scrapper",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 1
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "silence_the_elders",
+            "name": "Strike Before the Chant",
+            "spawnChance": 0.6,
+            "checkType": "skill",
+            "requiredSkillID": "misdirect",
+            "checkStat": "ambition",
+            "secondaryStat": "conviction",
+            "difficultyThreshold": 40,
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "grizzlethorn_bone_elder",
+              "count": 1,
+              "narrative": "One party member slips through the tent flaps and catches a Bone Elder mid-chant. One less curse to fight through."
+            },
+            "failureEffect": {
+              "type": "apply_direct_damage",
+              "magnitude": 0.1,
+              "statScale": "maxHP",
+              "narrative": "The attempt is spotted. The Elder finishes the chant before the party can close the gap."
+            },
+            "fallbackEffect": {
+              "type": "apply_direct_damage",
+              "magnitude": 0.12,
+              "statScale": "maxHP",
+              "narrative": "The party has no way to slip past quietly. The Elders are mid-chant before the first blow lands."
+            }
+          },
+          {
+            "id": "recognize_the_fear",
+            "name": "Desperate Eyes",
+            "spawnChance": 0.45,
+            "checkType": "stat",
+            "checkStat": "harmony",
+            "secondaryStat": "endurance",
+            "difficultyThreshold": 50,
+            "successEffect": {
+              "type": "narrative_only",
+              "narrative": "The party notices the fear in the Scrappers' eyes. These aren't raiders by choice. The hesitation costs the goblins the first exchange."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "The party sees only enemies. The fight is harder for it."
             }
           }
         ],
@@ -101,24 +194,95 @@
             "rarity": "common"
           },
           {
-            "itemID": "health_potion",
-            "dropChance": 0.15,
-            "rarity": "uncommon"
-          },
-          {
-            "itemID": "crossbow_wood_tier0",
+            "itemID": "mace_iron_tier0",
             "dropChance": 0.18,
             "rarity": "common"
           },
           {
-            "itemID": "head_cloth_cap_tier0",
-            "dropChance": 0.12,
+            "itemID": "chest_leather_tunic_tier0",
+            "dropChance": 0.15,
             "rarity": "common"
           },
           {
-            "itemID": "consumable_potion_speed_buff",
-            "dropChance": 0.08,
+            "itemID": "head_leather_hood_tier0",
+            "dropChance": 0.12,
+            "rarity": "common"
+          }
+        ]
+      },
+      {
+        "stageId": 3,
+        "title": "Chief Grik's Hideout",
+        "description": "The largest tent in the encampment is reinforced with stolen timber and iron spikes. Chief Grik is already on his feet.",
+        "enemies": [
+          {
+            "enemyTypeID": "chief_grik",
+            "countRange": [
+              1,
+              1
+            ],
+            "level": 3
+          },
+          {
+            "enemyTypeID": "grizzlethorn_scrapper",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 2
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "griks_grief",
+            "name": "What He's Fighting For",
+            "spawnChance": 0.5,
+            "checkType": "stat",
+            "checkStat": "harmony",
+            "secondaryStat": "conviction",
+            "difficultyThreshold": 60,
+            "successEffect": {
+              "type": "narrative_only",
+              "narrative": "The trophies on the tent poles aren't trophies \u2014 they're belongings. Someone recognizes what they are. Grik notices the pause. The fight begins a breath slower."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "The tent is dark. Nobody sees anything except a very large goblin with an axe."
+            }
+          },
+          {
+            "id": "grik_ambush",
+            "name": "He Was Waiting",
+            "spawnChance": 0.35,
+            "checkType": "random",
+            "successChance": 0.0,
+            "successEffect": {
+              "type": "narrative_only",
+              "narrative": "The tent is empty. Grik drops from the ceiling."
+            },
+            "failureEffect": {
+              "type": "apply_direct_damage",
+              "magnitude": 0.12,
+              "statScale": "maxHP",
+              "narrative": "Grik was behind the tent flap. The first swing connects before anyone is ready."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "axe_iron_tier0",
+            "dropChance": 0.35,
             "rarity": "uncommon"
+          },
+          {
+            "itemID": "health_potion",
+            "dropChance": 0.3,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "chest_leather_tunic_tier0",
+            "dropChance": 0.2,
+            "rarity": "common"
           }
         ]
       }
@@ -128,67 +292,56 @@
       "baseGold": 100,
       "lootTable": [
         {
-          "itemID": "goblin_dagger",
-          "rarity": "common",
-          "dropChance": 0.4
-        },
-        {
-          "itemID": "dagger_rusty_tier0",
-          "rarity": "common",
-          "dropChance": 0.25
-        },
-        {
           "itemID": "axe_iron_tier0",
-          "rarity": "common",
-          "dropChance": 0.2
-        },
-        {
-          "itemID": "sword_iron_tier0",
-          "rarity": "common",
-          "dropChance": 0.2
-        },
-        {
-          "itemID": "chest_leather_tunic_tier0",
-          "rarity": "common",
-          "dropChance": 0.2
-        },
-        {
-          "itemID": "head_leather_hood_tier0",
-          "rarity": "common",
-          "dropChance": 0.15
-        },
-        {
-          "itemID": "shield_wood_tier0",
-          "rarity": "common",
-          "dropChance": 0.15
-        },
-        {
-          "itemID": "health_potion_minor",
-          "rarity": "common",
-          "dropChance": 0.5
-        },
-        {
-          "itemID": "stamina_potion_minor",
-          "rarity": "common",
-          "dropChance": 0.3
-        },
-        {
-          "itemID": "consumable_tool_torch",
-          "rarity": "common",
-          "dropChance": 0.25
+          "dropChance": 0.25,
+          "rarity": "common"
         },
         {
           "itemID": "dagger_iron_tier0",
-          "rarity": "uncommon",
-          "dropChance": 0.1
+          "dropChance": 0.25,
+          "rarity": "common"
         },
         {
-          "itemID": "chest_chain_shirt_tier0",
-          "rarity": "uncommon",
-          "dropChance": 0.08
+          "itemID": "crossbow_wood_tier0",
+          "dropChance": 0.2,
+          "rarity": "common"
+        },
+        {
+          "itemID": "chest_leather_tunic_tier0",
+          "dropChance": 0.25,
+          "rarity": "common"
+        },
+        {
+          "itemID": "head_leather_hood_tier0",
+          "dropChance": 0.2,
+          "rarity": "common"
+        },
+        {
+          "itemID": "health_potion_minor",
+          "dropChance": 0.5,
+          "rarity": "common"
+        },
+        {
+          "itemID": "consumable_food_ration",
+          "dropChance": 0.35,
+          "rarity": "common"
         }
       ]
-    }
+    },
+    "lore": [
+      {
+        "unlocksAfter": 1,
+        "text": "The halfling families who hunted this wood remember it differently. They call it the Greywood now, and none of them will say why."
+      },
+      {
+        "unlocksAfter": 5,
+        "text": "Grik's tribe was called the Stoneback Clan before the displacement. The mountain they came from has no name on any surface map."
+      },
+      {
+        "unlocksAfter": 15,
+        "text": "A merchant who survived a Grizzlethorn raid swore they only took food. Never coin, never weapons. Just food."
+      }
+    ]
   },
   {
     "id": "challenge_forest_dungeon",
@@ -891,7 +1044,21 @@
           "rarity": "common"
         }
       ]
-    }
+    },
+    "lore": [
+      {
+        "unlocksAfter": 1,
+        "text": "The ward-stones lining the Godspine were placed by Khaz-Morad engineers three centuries ago. The dwarves who know how to repair them died in the first year of the war."
+      },
+      {
+        "unlocksAfter": 5,
+        "text": "Elara Stonehand was a grain merchant before the blockade. She has not left the pass in two years. She does not talk about going home anymore."
+      },
+      {
+        "unlocksAfter": 15,
+        "text": "Thorin Ironvein has turned down three separate offers of safe passage. Nobody knows if he is waiting for a sign from the mountain or if he simply has nowhere left to go."
+      }
+    ]
   },
   {
     "id": "challenge_sunken_sanctum",
@@ -1131,6 +1298,277 @@
           "itemID": "consumable_potion_speed_buff",
           "dropChance": 0.15,
           "rarity": "uncommon"
+        }
+      ]
+    },
+    "lore": [
+      {
+        "unlocksAfter": 1,
+        "text": "The ritual that sank Aethelgard was not meant to bind the spirit. The original text called it an invitation. The spirit accepted."
+      },
+      {
+        "unlocksAfter": 5,
+        "text": "The Tidebound Penitents keep no written records. They say that writing things down is how lies become history."
+      },
+      {
+        "unlocksAfter": 15,
+        "text": "Archbishop Valerius has not spoken in eleven years. His congregation insists he communicates through the water. Visitors who stay long enough begin to agree."
+      }
+    ]
+  },
+  {
+    "id": "challenge_whispering_willow_shrine",
+    "name": "Whispering Willow Shrine",
+    "description": "A forgotten shrine deep in the shallow valley, where minor nature spirits have claimed the abandoned altar of a dissolved monastic order. They mean no harm \u2014 but they guard this ground as if their existence depends on it, because it does.",
+    "difficulty": 1,
+    "recommendedLevel": 1,
+    "minPartySize": 1,
+    "maxPartySize": 4,
+    "lore": [
+      {
+        "unlocksAfter": 1,
+        "text": "The Order of the Verdant Word dissolved not from heresy but from debt. Their final records show a tithe unpaid for eleven years."
+      },
+      {
+        "unlocksAfter": 5,
+        "text": "The willow circle was not planted. It grew on its own around the altar in a single season, two years after the monks left."
+      },
+      {
+        "unlocksAfter": 15,
+        "text": "The Heart-Wisp does not remember the monks. It remembers the prayers they left behind, still warm in the stone."
+      }
+    ],
+    "stages": [
+      {
+        "stageId": 1,
+        "title": "The Outer Grove",
+        "description": "The willow circle begins here \u2014 trailing branches brush the path and small lights dart between the roots, watching.",
+        "enemies": [
+          {
+            "enemyTypeID": "willow_sparkling",
+            "countRange": [
+              2,
+              4
+            ],
+            "level": 1
+          },
+          {
+            "enemyTypeID": "willow_vine_tender",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 1
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "read_the_shrine",
+            "name": "Old Markings",
+            "spawnChance": 0.65,
+            "checkType": "skill",
+            "requiredSkillID": "attunement",
+            "checkStat": "harmony",
+            "secondaryStat": "ambition",
+            "difficultyThreshold": 30,
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "willow_sparkling",
+              "count": 1,
+              "narrative": "The inscriptions on the path stones are a greeting, not a warning. Someone in the party traces the symbols and the nearest Sparkling dims \u2014 curious rather than alarmed."
+            },
+            "failureEffect": {
+              "type": "apply_direct_damage",
+              "magnitude": 0.08,
+              "statScale": "maxHP",
+              "narrative": "The symbols mean something, but the reading is wrong. The Sparklings flare bright and a root catches an ankle before the party steadies itself."
+            },
+            "fallbackEffect": {
+              "type": "apply_direct_damage",
+              "magnitude": 0.1,
+              "statScale": "maxHP",
+              "narrative": "The path stones are covered in old script nobody can read. The spirits take the ignorance as disrespect and the branches close in."
+            }
+          },
+          {
+            "id": "quiet_approach",
+            "name": "Move Softly",
+            "spawnChance": 0.5,
+            "checkType": "stat",
+            "checkStat": "harmony",
+            "secondaryStat": "ambition",
+            "difficultyThreshold": 40,
+            "successEffect": {
+              "type": "narrative_only",
+              "narrative": "The party moves through the outer grove without disturbing the grass. The Sparklings orbit at a distance, weighing whether these visitors mean harm. They haven't decided yet."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "Someone snaps a branch. The grove goes quiet for a moment, then very loud."
+            }
+          },
+          {
+            "id": "morning_mist",
+            "name": "The Mist Thickens",
+            "spawnChance": 0.3,
+            "checkType": "random",
+            "successChance": 0.0,
+            "successEffect": {
+              "type": "narrative_only",
+              "narrative": "The mist parts unexpectedly, drawn back by a change in the wind."
+            },
+            "failureEffect": {
+              "type": "apply_direct_damage",
+              "magnitude": 0.07,
+              "statScale": "maxHP",
+              "narrative": "The morning mist rolls in thicker than expected. Someone walks face-first into a willow branch they didn't see coming."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "consumable_potion_health_minor",
+            "dropChance": 0.35,
+            "rarity": "common"
+          },
+          {
+            "itemID": "acc_cloak_rag_tier0",
+            "dropChance": 0.15,
+            "rarity": "common"
+          }
+        ]
+      },
+      {
+        "stageId": 2,
+        "title": "The Inner Shrine",
+        "description": "The altar at the center of the willow circle hums with residual prayer. The Heart-Wisp drifts above it, and the Mist-Callers have already begun their work.",
+        "enemies": [
+          {
+            "enemyTypeID": "willow_mist_caller",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 1
+          },
+          {
+            "enemyTypeID": "heart_wisp",
+            "countRange": [
+              1,
+              1
+            ],
+            "level": 2
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "leave_an_offering",
+            "name": "An Offering at the Altar",
+            "spawnChance": 0.7,
+            "checkType": "skill",
+            "requiredSkillID": "attunement",
+            "checkStat": "harmony",
+            "secondaryStat": "endurance",
+            "difficultyThreshold": 35,
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "willow_mist_caller",
+              "count": 1,
+              "narrative": "Someone places something at the altar's base \u2014 it doesn't matter what, only that it was given freely. One of the Mist-Callers stills, drawn to examine the gift, and does not return to the fight."
+            },
+            "failureEffect": {
+              "type": "apply_direct_damage",
+              "magnitude": 0.1,
+              "statScale": "maxHP",
+              "narrative": "The gesture is there but the intent reads as hollow. The Heart-Wisp pulses once, and the mist thickens in response."
+            },
+            "fallbackEffect": {
+              "type": "apply_direct_damage",
+              "magnitude": 0.12,
+              "statScale": "maxHP",
+              "narrative": "Nobody in the party knows the old forms of greeting. The Heart-Wisp has been waiting two hundred years for someone who does."
+            }
+          },
+          {
+            "id": "altar_resonance",
+            "name": "The Stone Remembers",
+            "spawnChance": 0.45,
+            "checkType": "stat",
+            "checkStat": "harmony",
+            "secondaryStat": "conviction",
+            "difficultyThreshold": 50,
+            "successEffect": {
+              "type": "narrative_only",
+              "narrative": "The altar responds to the party's presence \u2014 a faint warmth in the stone, a brief cessation of the hum. The Heart-Wisp tilts, uncertain. It has not felt this in a long time."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "The altar is just stone to those who cannot hear it. The Heart-Wisp makes no distinction between them and the last ten parties who tried to take its flowers."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "acc_amulet_wood_tier0",
+            "dropChance": 0.25,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "wand_wood_tier0",
+            "dropChance": 0.2,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "consumable_potion_health_minor",
+            "dropChance": 0.4,
+            "rarity": "common"
+          },
+          {
+            "itemID": "consumable_potion_mana_minor",
+            "dropChance": 0.25,
+            "rarity": "common"
+          }
+        ]
+      }
+    ],
+    "rewards": {
+      "baseXP": 300,
+      "baseGold": 100,
+      "lootTable": [
+        {
+          "itemID": "wand_wood_tier0",
+          "dropChance": 0.25,
+          "rarity": "uncommon"
+        },
+        {
+          "itemID": "wand_apprentice_tier0",
+          "dropChance": 0.2,
+          "rarity": "uncommon"
+        },
+        {
+          "itemID": "acc_amulet_wood_tier0",
+          "dropChance": 0.3,
+          "rarity": "uncommon"
+        },
+        {
+          "itemID": "chest_acolyte_robe_tier0",
+          "dropChance": 0.2,
+          "rarity": "uncommon"
+        },
+        {
+          "itemID": "head_cloth_cap_tier0",
+          "dropChance": 0.25,
+          "rarity": "common"
+        },
+        {
+          "itemID": "consumable_potion_health_minor",
+          "dropChance": 0.5,
+          "rarity": "common"
+        },
+        {
+          "itemID": "consumable_potion_mana_minor",
+          "dropChance": 0.3,
+          "rarity": "common"
         }
       ]
     }

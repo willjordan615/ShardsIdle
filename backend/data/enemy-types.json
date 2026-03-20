@@ -28,7 +28,12 @@
     "armorValue": 1,
     "physEvasion": 2,
     "magEvasion": 0,
-    "aiProfile": "aggressive"
+    "aiProfile": "aggressive",
+    "tags": [
+      "goblin",
+      "scout",
+      "melee"
+    ]
   },
   {
     "id": "goblin_archer",
@@ -59,7 +64,12 @@
     "armorValue": 0,
     "physEvasion": 3,
     "magEvasion": 0,
-    "aiProfile": "tactical"
+    "aiProfile": "tactical",
+    "tags": [
+      "goblin",
+      "archer",
+      "ranged"
+    ]
   },
   {
     "id": "spider_small",
@@ -84,7 +94,12 @@
     "armorValue": 1,
     "physEvasion": 2,
     "magEvasion": 0,
-    "aiProfile": "aggressive"
+    "aiProfile": "aggressive",
+    "tags": [
+      "beast",
+      "spider",
+      "melee"
+    ]
   },
   {
     "id": "spider_large",
@@ -110,7 +125,12 @@
     "armorValue": 2,
     "physEvasion": 1,
     "magEvasion": 0,
-    "aiProfile": "berserker"
+    "aiProfile": "berserker",
+    "tags": [
+      "beast",
+      "spider",
+      "tank"
+    ]
   },
   {
     "id": "orc_warrior",
@@ -148,6 +168,11 @@
         "dropChance": 0.08,
         "rarity": "uncommon"
       }
+    ],
+    "tags": [
+      "orc",
+      "soldier",
+      "melee"
     ]
   },
   {
@@ -186,6 +211,11 @@
         "dropChance": 0.08,
         "rarity": "uncommon"
       }
+    ],
+    "tags": [
+      "orc",
+      "shaman",
+      "caster"
     ]
   },
   {
@@ -219,7 +249,12 @@
     "armorValue": 12,
     "physEvasion": 2,
     "magEvasion": 5,
-    "aiProfile": "tactical"
+    "aiProfile": "tactical",
+    "tags": [
+      "dragon",
+      "boss",
+      "melee"
+    ]
   },
   {
     "id": "ironvein_conscript",
@@ -259,6 +294,11 @@
       "basic_attack",
       "shove",
       "block"
+    ],
+    "tags": [
+      "dwarf",
+      "soldier",
+      "melee"
     ]
   },
   {
@@ -298,6 +338,11 @@
       "aim",
       "footwork",
       "misdirect"
+    ],
+    "tags": [
+      "dwarf",
+      "scout",
+      "ranged"
     ]
   },
   {
@@ -337,6 +382,11 @@
       "basic_attack",
       "misdirect",
       "footwork"
+    ],
+    "tags": [
+      "human",
+      "scavenger",
+      "melee"
     ]
   },
   {
@@ -383,6 +433,11 @@
       "shove",
       "shield_bash",
       "shout"
+    ],
+    "tags": [
+      "dwarf",
+      "soldier",
+      "tank"
     ]
   },
   {
@@ -435,6 +490,11 @@
       "shield_bash",
       "earthquake",
       "berserker_rage"
+    ],
+    "tags": [
+      "dwarf",
+      "boss",
+      "melee"
     ]
   },
   {
@@ -467,8 +527,12 @@
     ],
     "availableSkills": [
       "basic_attack",
-      "shove",
-      "proc_deep_wound"
+      "shove"
+    ],
+    "tags": [
+      "human",
+      "undead",
+      "melee"
     ]
   },
   {
@@ -507,8 +571,12 @@
     "availableSkills": [
       "basic_attack",
       "shove",
-      "proc_marked",
-      "proc_deep_wound"
+      "aim"
+    ],
+    "tags": [
+      "human",
+      "soldier",
+      "melee"
     ]
   },
   {
@@ -550,6 +618,11 @@
       "first_aid",
       "rest",
       "shout"
+    ],
+    "tags": [
+      "human",
+      "caster",
+      "support"
     ]
   },
   {
@@ -596,6 +669,11 @@
       "block",
       "shove",
       "stone_skin"
+    ],
+    "tags": [
+      "human",
+      "soldier",
+      "tank"
     ]
   },
   {
@@ -650,6 +728,345 @@
       "heal_major",
       "buff_defense",
       "frozen_cry"
+    ],
+    "tags": [
+      "human",
+      "boss",
+      "caster"
+    ]
+  },
+  {
+    "id": "grizzlethorn_scrapper",
+    "name": "Grizzlethorn Scrapper",
+    "description": "Young goblins with clubs and stolen knives who compensate for their fragility by attacking in coordinated packs, targeting the same party member until they drop.",
+    "stats": {
+      "conviction": 30,
+      "endurance": 25,
+      "ambition": 60,
+      "harmony": 0
+    },
+    "armorValue": 0,
+    "aiProfile": "aggressive",
+    "equipment": {
+      "mainHand": "dagger_rusty_tier0"
+    },
+    "availableSkills": [
+      "basic_attack",
+      "shove"
+    ],
+    "skillSelectionCount": 2,
+    "lootTable": [
+      {
+        "itemID": "dagger_rusty_tier0",
+        "dropChance": 0.15,
+        "rarity": "common"
+      },
+      {
+        "itemID": "health_potion_minor",
+        "dropChance": 0.2,
+        "rarity": "common"
+      }
+    ],
+    "tags": [
+      "goblin",
+      "scrapper",
+      "melee"
+    ]
+  },
+  {
+    "id": "grizzlethorn_thornwalker",
+    "name": "Thornwalker",
+    "description": "The Grizzlethorn scouts who strike from the tree line with crossbows and vanish into the underbrush before the party can close the distance.",
+    "stats": {
+      "conviction": 45,
+      "endurance": 30,
+      "ambition": 80,
+      "harmony": 0
+    },
+    "armorValue": 0,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "crossbow_wood_tier0"
+    },
+    "availableSkills": [
+      "aim",
+      "footwork",
+      "misdirect"
+    ],
+    "skillSelectionCount": 2,
+    "lootTable": [
+      {
+        "itemID": "crossbow_wood_tier0",
+        "dropChance": 0.18,
+        "rarity": "common"
+      },
+      {
+        "itemID": "head_leather_hood_tier0",
+        "dropChance": 0.12,
+        "rarity": "common"
+      },
+      {
+        "itemID": "health_potion_minor",
+        "dropChance": 0.2,
+        "rarity": "common"
+      }
+    ],
+    "tags": [
+      "goblin",
+      "scout",
+      "ranged"
+    ]
+  },
+  {
+    "id": "grizzlethorn_bone_elder",
+    "name": "Bone Elder",
+    "description": "A robed spiritual advisor who chants curses that degrade the party's focus and precision \u2014 never raising a weapon, always the most dangerous enemy in the tent.",
+    "stats": {
+      "conviction": 20,
+      "endurance": 25,
+      "ambition": 25,
+      "harmony": 70
+    },
+    "armorValue": 0,
+    "aiProfile": "support",
+    "equipment": {},
+    "availableSkills": [
+      "buff_defense",
+      "shout",
+      "rest"
+    ],
+    "skillSelectionCount": 3,
+    "lootTable": [
+      {
+        "itemID": "health_potion_minor",
+        "dropChance": 0.25,
+        "rarity": "common"
+      },
+      {
+        "itemID": "consumable_food_ration",
+        "dropChance": 0.3,
+        "rarity": "common"
+      }
+    ],
+    "tags": [
+      "goblin",
+      "elder",
+      "support"
+    ]
+  },
+  {
+    "id": "grizzlethorn_brute",
+    "name": "Grizzlethorn Brute",
+    "description": "A large goblin armored in scavenged plate fragments who stands between the party and the Bone Elders, absorbing punishment that would kill a lesser fighter.",
+    "stats": {
+      "conviction": 55,
+      "endurance": 80,
+      "ambition": 20,
+      "harmony": 0
+    },
+    "armorValue": 10,
+    "aiProfile": "berserker",
+    "equipment": {
+      "mainHand": "mace_iron_tier0",
+      "chest": "chest_leather_tunic_tier0"
+    },
+    "availableSkills": [
+      "basic_attack",
+      "block",
+      "shove",
+      "stone_skin"
+    ],
+    "skillSelectionCount": 2,
+    "lootTable": [
+      {
+        "itemID": "mace_iron_tier0",
+        "dropChance": 0.2,
+        "rarity": "common"
+      },
+      {
+        "itemID": "chest_leather_tunic_tier0",
+        "dropChance": 0.15,
+        "rarity": "common"
+      },
+      {
+        "itemID": "health_potion_minor",
+        "dropChance": 0.25,
+        "rarity": "common"
+      }
+    ],
+    "tags": [
+      "goblin",
+      "brute",
+      "tank"
+    ]
+  },
+  {
+    "id": "chief_grik",
+    "name": "Chief Grik",
+    "description": "The goblin who held the scattered Grizzlethorn bands together after the displacement \u2014 a brutal pragmatist who rules by combat prowess and enters a grief-rage when his tribe is threatened.",
+    "stats": {
+      "conviction": 100,
+      "endurance": 110,
+      "ambition": 60,
+      "harmony": 10
+    },
+    "armorValue": 14,
+    "aiProfile": "berserker",
+    "equipment": {
+      "mainHand": "axe_iron_tier0"
+    },
+    "availableSkills": [
+      "basic_attack",
+      "shove",
+      "shout",
+      "warcry",
+      "blood_fury",
+      "berserker_rage"
+    ],
+    "skillSelectionCount": 4,
+    "lootTable": [
+      {
+        "itemID": "axe_iron_tier0",
+        "dropChance": 0.5,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "chest_leather_tunic_tier0",
+        "dropChance": 0.35,
+        "rarity": "common"
+      },
+      {
+        "itemID": "health_potion",
+        "dropChance": 0.4,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "goblin",
+      "boss",
+      "melee"
+    ]
+  },
+  {
+    "id": "willow_sparkling",
+    "name": "Sparkling",
+    "description": "A newly manifested spirit barely more than a conscious mote of light \u2014 its rapid, unpredictable movement makes it difficult to target and harder to dismiss.",
+    "stats": {
+      "conviction": 15,
+      "endurance": 15,
+      "ambition": 90,
+      "harmony": 0
+    },
+    "armorValue": 0,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "footwork",
+      "misdirect"
+    ],
+    "skillSelectionCount": 2,
+    "tags": [
+      "spirit",
+      "wisp",
+      "melee"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "willow_vine_tender",
+    "name": "Vine-Tender",
+    "description": "An established shrine spirit that coaxes the willow roots to life, briefly anchoring a party member in place while its kin press the advantage.",
+    "stats": {
+      "conviction": 25,
+      "endurance": 30,
+      "ambition": 40,
+      "harmony": 40
+    },
+    "armorValue": 0,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "entangle",
+      "nature_wrap",
+      "rest"
+    ],
+    "skillSelectionCount": 2,
+    "tags": [
+      "spirit",
+      "nature",
+      "support"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "willow_mist_caller",
+    "name": "Mist-Caller",
+    "description": "A spirit that weaves thin fog from morning dew, reducing visibility and forcing the party to fight half-blind in a haze of its own making.",
+    "stats": {
+      "conviction": 20,
+      "endurance": 20,
+      "ambition": 60,
+      "harmony": 60
+    },
+    "armorValue": 0,
+    "aiProfile": "support",
+    "equipment": {},
+    "availableSkills": [
+      "misdirect",
+      "footwork",
+      "shout"
+    ],
+    "skillSelectionCount": 2,
+    "tags": [
+      "spirit",
+      "wisp",
+      "support"
+    ],
+    "lootTable": []
+  },
+  {
+    "id": "heart_wisp",
+    "name": "Heart-Wisp",
+    "description": "The ancient spirit that has anchored the shrine for two centuries \u2014 not malicious, but immovable in its guardianship, and capable of calling on the full strength of the grove when pushed.",
+    "stats": {
+      "conviction": 40,
+      "endurance": 45,
+      "ambition": 50,
+      "harmony": 30
+    },
+    "armorValue": 0,
+    "aiProfile": "tactical",
+    "equipment": {},
+    "availableSkills": [
+      "basic_attack",
+      "entangle",
+      "buff_defense",
+      "first_aid",
+      "shout"
+    ],
+    "skillSelectionCount": 3,
+    "tags": [
+      "spirit",
+      "boss",
+      "caster"
+    ],
+    "lootTable": [
+      {
+        "itemID": "acc_amulet_wood_tier0",
+        "dropChance": 0.5,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "consumable_potion_health_minor",
+        "dropChance": 0.6,
+        "rarity": "common"
+      },
+      {
+        "itemID": "wand_wood_tier0",
+        "dropChance": 0.3,
+        "rarity": "uncommon"
+      }
     ]
   }
 ]

@@ -48,13 +48,23 @@ function renderChallenges() {
         return;
     }
 
+    // Get completion counts for the current character
+    const character = window.gameData.characters?.find(c => c.id === currentState.detailCharacterId);
+    const completions = character?.combatStats?.challengeCompletions || {};
+
     container.innerHTML = '';
     
     window.gameData.challenges.forEach(challenge => {
         const card = document.createElement('div');
         card.className = 'card';
-        card.onclick = async () => await selectChallenge(challenge);
-        
+
+        const count = completions[challenge.id]?.completions || 0;
+        const loreEntries = challenge.lore || [];
+        const unlockedLore = loreEntries.filter(e => count >= e.unlocksAfter);
+        const lockedCount  = loreEntries.filter(e => count < e.unlocksAfter).length;
+        const hasLore = loreEntries.length > 0;
+        const loreId = `lore-${challenge.id}`;
+
         card.innerHTML = `
             <div class="challenge-difficulty">Difficulty ${challenge.difficulty}</div>
             <div class="card-title">${challenge.name}</div>
@@ -65,9 +75,33 @@ function renderChallenges() {
             <div class="card-description" style="margin-top: 0.5rem;">
                 ${challenge.minPartySize}-${challenge.maxPartySize} members
             </div>
+            ${hasLore ? `
+            <div style="margin-top:0.75rem; border-top:1px solid rgba(139,115,85,0.2); padding-top:0.5rem;">
+                <button onclick="event.stopPropagation(); toggleLore('${loreId}')"
+                    style="background:none; border:none; color:#8b7355; font-size:0.72rem; letter-spacing:0.06em; text-transform:uppercase; cursor:pointer; padding:0;">
+                    📖 Lore ${unlockedLore.length > 0 ? `(${unlockedLore.length}/${loreEntries.length})` : ''}
+                </button>
+                <div id="${loreId}" style="display:none; margin-top:0.5rem;">
+                    ${unlockedLore.map(e => `
+                        <div style="color:#a09070; font-size:0.78rem; font-style:italic; margin-bottom:0.4rem; line-height:1.5;">
+                            "${e.text}"
+                        </div>`).join('')}
+                    ${lockedCount > 0 ? `
+                        <div style="color:#444; font-size:0.72rem; margin-top:0.25rem;">
+                            ${Array(lockedCount).fill('🔒').join(' ')} ${lockedCount} entr${lockedCount === 1 ? 'y' : 'ies'} undiscovered
+                        </div>` : ''}
+                </div>
+            </div>` : ''}
         `;
+
+        card.onclick = async () => await selectChallenge(challenge);
         container.appendChild(card);
     });
+}
+
+function toggleLore(id) {
+    const el = document.getElementById(id);
+    if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
 }
 
 /**

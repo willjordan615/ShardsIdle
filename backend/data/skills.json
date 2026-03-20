@@ -31,7 +31,7 @@
     "description": "Center the spirit through focused devotion, attuning to forces beyond the physical.",
     "category": "BUFF",
     "parentSkills": [],
-    "basePower": 4,
+    "basePower": 1.2,
     "baseHitChance": 1.0,
     "critChance": 0.0,
     "critMultiplier": 1.0,
@@ -45,7 +45,7 @@
       {
         "type": "apply_buff",
         "buff": "spell_amplification",
-        "duration": 2,
+        "duration": 4,
         "chance": 1.0
       }
     ],
@@ -57,7 +57,7 @@
     "description": "Resonate with living and natural systems, sensing the flow of life around you.",
     "category": "UTILITY",
     "parentSkills": [],
-    "basePower": 3,
+    "basePower": 1.0,
     "baseHitChance": 1.0,
     "critChance": 0.0,
     "critMultiplier": 1.0,
@@ -71,7 +71,7 @@
       {
         "type": "apply_buff",
         "buff": "protection",
-        "duration": 2,
+        "duration": 4,
         "chance": 1.0
       }
     ],
@@ -247,7 +247,7 @@
         "type": "apply_buff",
         "targets": "self",
         "buff": "fortitude",
-        "duration": 2,
+        "duration": 3,
         "magnitude": 1,
         "chance": 1.0
       }
@@ -259,7 +259,7 @@
     "name": "All Stats Buff",
     "category": "BUFF",
     "description": "Increase all attributes.",
-    "basePower": 0.0,
+    "basePower": 1.0,
     "costType": "none",
     "costAmount": 0,
     "requiredLevel": 1,
@@ -288,9 +288,9 @@
     "name": "Defense Buff",
     "category": "BUFF",
     "description": "Increase armor and damage resistance.",
-    "basePower": 0.0,
-    "costType": "none",
-    "costAmount": 0,
+    "basePower": 0.6,
+    "costType": "stamina",
+    "costAmount": 8,
     "requiredLevel": 1,
     "scalingFactors": {
       "conviction": 0.3,
@@ -298,7 +298,7 @@
     },
     "baseHitChance": 1.0,
     "critChance": 0.0,
-    "delay": 600,
+    "delay": 1200,
     "hitCount": {
       "fixed": 1
     },
@@ -346,7 +346,7 @@
     "name": "Speed Buff",
     "category": "BUFF",
     "description": "Increase attack speed and evasion.",
-    "basePower": 0.0,
+    "basePower": 0.8,
     "costType": "none",
     "costAmount": 0,
     "requiredLevel": 1,
@@ -375,7 +375,7 @@
     "name": "Strength Buff",
     "category": "BUFF",
     "description": "Increase conviction and damage output.",
-    "basePower": 0.0,
+    "basePower": 0.8,
     "costType": "none",
     "costAmount": 0,
     "requiredLevel": 1,
@@ -562,7 +562,7 @@
     "name": "Focus",
     "category": "BUFF",
     "description": "Concentrate your power for enhanced effectiveness.",
-    "basePower": 0.0,
+    "basePower": 0.9,
     "costType": "mana",
     "costAmount": 8,
     "requiredLevel": 1,
@@ -593,7 +593,7 @@
     "name": "Footwork",
     "category": "DEFENSE",
     "description": "Move with agility to evade attacks.",
-    "basePower": 1.0,
+    "basePower": 0.9,
     "costType": "stamina",
     "costAmount": 4,
     "requiredLevel": 1,
@@ -614,7 +614,7 @@
         "type": "apply_buff",
         "targets": "self",
         "buff": "fortitude",
-        "duration": 1,
+        "duration": 3,
         "magnitude": 0.4,
         "chance": 1.0
       }
@@ -706,7 +706,7 @@
     "name": "Misdirect",
     "category": "DEFENSE",
     "description": "Confuse your enemies with feints and misdirection.",
-    "basePower": 0.0,
+    "basePower": 0.9,
     "costType": "stamina",
     "costAmount": 6,
     "requiredLevel": 1,
@@ -759,7 +759,8 @@
         "magnitude": 0.7,
         "duration": 4
       }
-    ]
+    ],
+    "enemyUsable": false
   },
   {
     "id": "proc_burn",
@@ -788,7 +789,8 @@
         "magnitude": 0.5,
         "duration": 3
       }
-    ]
+    ],
+    "enemyUsable": false
   },
   {
     "id": "proc_burn_aoe",
@@ -817,7 +819,8 @@
         "magnitude": 0.4,
         "duration": 2
       }
-    ]
+    ],
+    "enemyUsable": false
   },
   {
     "id": "proc_chill",
@@ -846,7 +849,8 @@
         "magnitude": 0.4,
         "duration": 2
       }
-    ]
+    ],
+    "enemyUsable": false
   },
   {
     "id": "proc_chill_aoe",
@@ -875,7 +879,8 @@
         "magnitude": 0.3,
         "duration": 2
       }
-    ]
+    ],
+    "enemyUsable": false
   },
   {
     "id": "proc_chime",
@@ -904,7 +909,8 @@
         "magnitude": 0.3,
         "duration": 2
       }
-    ]
+    ],
+    "enemyUsable": false
   },
   {
     "id": "proc_disorient",
@@ -933,7 +939,8 @@
         "magnitude": 0.5,
         "duration": 2
       }
-    ]
+    ],
+    "enemyUsable": false
   },
   {
     "id": "proc_echo",
@@ -962,7 +969,8 @@
         "magnitude": 0.5,
         "duration": 1
       }
-    ]
+    ],
+    "enemyUsable": false
   },
   {
     "id": "proc_fade",
@@ -993,7 +1001,8 @@
         "magnitude": 0.5,
         "chance": 1.0
       }
-    ]
+    ],
+    "enemyUsable": false
   },
   {
     "id": "proc_harmony",
@@ -1022,7 +1031,8 @@
         "magnitude": 0.4,
         "duration": 2
       }
-    ]
+    ],
+    "enemyUsable": false
   },
   {
     "id": "proc_holy_light",
@@ -1053,7 +1063,8 @@
         "magnitude": 1,
         "chance": 1.0
       }
-    ]
+    ],
+    "enemyUsable": false
   },
   {
     "id": "proc_lullaby",
@@ -1082,7 +1093,8 @@
         "chance": 0.4,
         "duration": 2
       }
-    ]
+    ],
+    "enemyUsable": false
   },
   {
     "id": "proc_melody",
@@ -1111,7 +1123,8 @@
         "magnitude": 0.3,
         "duration": 2
       }
-    ]
+    ],
+    "enemyUsable": false
   },
   {
     "id": "proc_poison",
@@ -1140,7 +1153,8 @@
         "magnitude": 0.6,
         "duration": 3
       }
-    ]
+    ],
+    "enemyUsable": false
   },
   {
     "id": "proc_resonance",
@@ -1169,7 +1183,8 @@
         "magnitude": 0.5,
         "duration": 1
       }
-    ]
+    ],
+    "enemyUsable": false
   },
   {
     "id": "proc_shock",
@@ -1198,7 +1213,8 @@
         "chance": 0.3,
         "duration": 1
       }
-    ]
+    ],
+    "enemyUsable": false
   },
   {
     "id": "proc_silence",
@@ -1226,7 +1242,8 @@
         "debuff": "silence",
         "duration": 2
       }
-    ]
+    ],
+    "enemyUsable": false
   },
   {
     "id": "proc_stealth",
@@ -1255,7 +1272,8 @@
         "buff": "stealth",
         "duration": 2
       }
-    ]
+    ],
+    "enemyUsable": false
   },
   {
     "id": "proc_stun",
@@ -1283,7 +1301,8 @@
         "debuff": "stun",
         "duration": 1
       }
-    ]
+    ],
+    "enemyUsable": false
   },
   {
     "id": "proc_stun_aoe",
@@ -1311,7 +1330,8 @@
         "debuff": "stun",
         "duration": 1
       }
-    ]
+    ],
+    "enemyUsable": false
   },
   {
     "id": "proc_whisper",
@@ -1338,7 +1358,8 @@
         "targets": "self",
         "utility": "subtle_effect"
       }
-    ]
+    ],
+    "enemyUsable": false
   },
   {
     "id": "produce_flame",
@@ -1388,7 +1409,7 @@
     "name": "Rest",
     "category": "RESTORATION",
     "description": "Take a moment to catch your breath and recover.",
-    "basePower": 0.4,
+    "basePower": 0.9,
     "costType": "none",
     "costAmount": 0,
     "requiredLevel": 1,
@@ -1649,7 +1670,7 @@
     "name": "Shout",
     "category": "BUFF",
     "description": "Rally your allies with a powerful cry.",
-    "basePower": 0.0,
+    "basePower": 0.8,
     "costType": "stamina",
     "costAmount": 8,
     "requiredLevel": 1,
@@ -1660,7 +1681,7 @@
     "baseHitChance": 1.0,
     "critChance": 0.0,
     "isStarterSkill": true,
-    "delay": 1000,
+    "delay": 1200,
     "hitCount": {
       "fixed": 1
     },
@@ -2234,7 +2255,7 @@
     "effects": [
       {
         "type": "apply_debuff",
-        "targets": "single_enemy",
+        "targets": "self",
         "debuff": "confused",
         "chance": 1.0,
         "duration": 2,
@@ -2242,7 +2263,7 @@
       },
       {
         "type": "apply_debuff",
-        "targets": "single_enemy",
+        "targets": "self",
         "debuff": "dazed",
         "chance": 1.0,
         "duration": 2,
@@ -8423,7 +8444,8 @@
         "magnitude": 1,
         "duration": 3
       }
-    ]
+    ],
+    "enemyUsable": false
   },
   {
     "id": "proc_poison_strong",
@@ -8452,7 +8474,8 @@
         "magnitude": 1,
         "duration": 4
       }
-    ]
+    ],
+    "enemyUsable": false
   },
   {
     "id": "proc_poison_deadly",
@@ -8481,7 +8504,8 @@
         "magnitude": 1,
         "duration": 5
       }
-    ]
+    ],
+    "enemyUsable": false
   },
   {
     "id": "proc_chilled",
@@ -8510,7 +8534,8 @@
         "magnitude": 1,
         "duration": 3
       }
-    ]
+    ],
+    "enemyUsable": false
   },
   {
     "id": "proc_electrified",
@@ -8539,7 +8564,8 @@
         "magnitude": 1,
         "duration": 2
       }
-    ]
+    ],
+    "enemyUsable": false
   },
   {
     "id": "proc_shadowed",
@@ -8568,7 +8594,8 @@
         "magnitude": 1,
         "duration": 3
       }
-    ]
+    ],
+    "enemyUsable": false
   },
   {
     "id": "proc_arcane_burn",
@@ -8597,7 +8624,8 @@
         "magnitude": 1,
         "duration": 3
       }
-    ]
+    ],
+    "enemyUsable": false
   },
   {
     "id": "proc_deep_wound",
@@ -8626,7 +8654,8 @@
         "magnitude": 1,
         "duration": 4
       }
-    ]
+    ],
+    "enemyUsable": false
   },
   {
     "id": "proc_mana_burn",
@@ -8655,7 +8684,8 @@
         "magnitude": 1,
         "duration": 3
       }
-    ]
+    ],
+    "enemyUsable": false
   },
   {
     "id": "proc_marked",
@@ -8683,7 +8713,8 @@
         "magnitude": 1,
         "duration": 3
       }
-    ]
+    ],
+    "enemyUsable": false
   },
   {
     "id": "lifetap",

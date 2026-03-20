@@ -345,6 +345,11 @@ async function displayCombatLog(combatData) {
                         }
                     }
 
+                    // Status tick kills — grey out target if their HP hit 0 from a DoT
+                    if (turn.action?.type === 'status' && turn.result?.targetHPAfter === 0) {
+                        animateHit(turn.actor, false, true);
+                    }
+
                     await sleep(turnDelay);
                 }
 
