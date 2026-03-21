@@ -154,10 +154,9 @@ function createTables() {
             `, (err) => {
                 if (err) reject(err);
                 else {
-                    // Migration: add aiProfile column to existing databases
-                    db.run(`ALTER TABLE characters ADD COLUMN aiProfile TEXT DEFAULT 'balanced'`, () => {
-                        // Ignore error — column already exists on fresh installs
-                    });
+                    // Migrations: add columns to existing databases (errors ignored — column exists on fresh installs)
+                    db.run(`ALTER TABLE characters ADD COLUMN aiProfile TEXT DEFAULT 'balanced'`, () => {});
+                    db.run(`ALTER TABLE characters ADD COLUMN roleTag TEXT DEFAULT NULL`, () => {});
                     resolve();
                 }
             });
@@ -367,8 +366,8 @@ function saveCharacter(character) {
                 ownerUserId, isPublic, shareCode, buildName, buildDescription,
                 importCount, lastSharedAt,
                 avatarId, avatarColor, avatarFrame, title, lastActiveAt,
-                createdAt, lastModified, lastSuccessfulChallengeId, aiProfile
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                createdAt, lastModified, lastSuccessfulChallengeId, aiProfile, roleTag
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(id) DO UPDATE SET
                 name = ?, race = ?, level = ?, experience = ?,
                 conviction = ?, endurance = ?, ambition = ?, harmony = ?,
@@ -378,7 +377,7 @@ function saveCharacter(character) {
                 ownerUserId = ?, isPublic = ?, shareCode = ?, buildName = ?, buildDescription = ?,
                 importCount = ?, lastSharedAt = ?,
                 avatarId = ?, avatarColor = ?, avatarFrame = ?, title = ?, lastActiveAt = ?,
-                lastModified = ?, lastSuccessfulChallengeId = ?, aiProfile = ?`,
+                lastModified = ?, lastSuccessfulChallengeId = ?, aiProfile = ?, roleTag = ?`,
             [
                 character.id, character.name, character.race, character.level, character.experience,
                 character.stats?.conviction || 0, character.stats?.endurance || 0,
@@ -403,6 +402,7 @@ function saveCharacter(character) {
                 character.createdAt || Date.now(), Date.now(),
                 character.lastSuccessfulChallengeId || null,
                 character.aiProfile || 'balanced',
+                character.roleTag || null,
                 // ON CONFLICT UPDATE values
                 character.name, character.race, character.level, character.experience,
                 character.stats?.conviction || 0, character.stats?.endurance || 0,
@@ -425,7 +425,8 @@ function saveCharacter(character) {
                 character.avatarFrame || null, character.title || null,
                 character.lastActiveAt || Date.now(),
                 Date.now(), character.lastSuccessfulChallengeId || null,
-                character.aiProfile || 'balanced'
+                character.aiProfile || 'balanced',
+                character.roleTag || null,
             ],
             function(err) {
                 if (err) reject(err);
@@ -478,7 +479,9 @@ function getCharacter(characterId) {
                     lastModified: row.lastModified,
                     lastActiveAt: row.lastActiveAt,
                     lastSuccessfulChallengeId: row.lastSuccessfulChallengeId || null,
-                    aiProfile: row.aiProfile || 'balanced'
+                    aiProfile: row.aiProfile || 'balanced',
+                    roleTag: row.roleTag || null,
+                    shareEnabled: row.isPublic === 1,
                 });
             } else {
                 resolve(null);
@@ -530,7 +533,9 @@ function getAllCharacters() {
                     lastModified: row.lastModified,
                     lastActiveAt: row.lastActiveAt,
                     lastSuccessfulChallengeId: row.lastSuccessfulChallengeId || null,
-                    aiProfile: row.aiProfile || 'balanced'
+                    aiProfile: row.aiProfile || 'balanced',
+                    roleTag: row.roleTag || null,
+                    shareEnabled: row.isPublic === 1,
                 })) : [];
                 resolve(characters);
             }

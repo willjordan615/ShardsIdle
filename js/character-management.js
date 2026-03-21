@@ -1628,9 +1628,6 @@ function renderGearUpgradeBadge(character) {
     badge.style.display = hasUpgrade ? 'inline' : 'none';
 }
 
-/**
-* Render export button — reflects current sharing state.
-*/
 function renderExportButton(character) {
     const btn = document.getElementById('exportCharacterBtn');
     if (!btn) return;
@@ -1649,13 +1646,14 @@ function renderExportButton(character) {
         btn.disabled = false;
         btn.style.opacity = '1';
         btn.style.cursor = 'pointer';
-        if (character.shareEnabled) {
-            btn.textContent   = '📤 Sharing: On';
+        const isSharing = !!(character.shareEnabled || character.isPublic);
+        if (isSharing) {
+            btn.textContent       = '📤 Sharing: On';
             btn.style.color       = '#4cd964';
             btn.style.borderColor = '#4cd964';
             btn.title = 'Sharing enabled — click to turn off';
         } else {
-            btn.textContent   = '📤 Sharing: Off';
+            btn.textContent       = '📤 Sharing: Off';
             btn.style.color       = '';
             btn.style.borderColor = '';
             btn.title = 'Click to share this character publicly';

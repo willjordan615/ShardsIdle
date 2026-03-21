@@ -144,13 +144,13 @@ function createBrowseCard(char) {
     const roleLabel = char.roleTag ? ROLE_LABELS[char.roleTag] : null;
     const profileEmoji = profileLabels[char.aiProfile] || '⚖️';
 
-    // Milestone badges
+    // Milestone badges with tooltips
     const badges = [];
-    if (milestones.firstBlood)        badges.push({ icon: '🩸', label: 'First Blood' });
-    if (milestones.hundredKills)      badges.push({ icon: '💀', label: '100 Kills' });
-    if (milestones.masterHealer)      badges.push({ icon: '✨', label: 'Master Healer' });
-    if (milestones.undefeated)        badges.push({ icon: '🏆', label: 'Undefeated' });
-    if (milestones.centuryOfCombats)  badges.push({ icon: '⚔️', label: '100 Combats' });
+    if (milestones.firstBlood)        badges.push({ icon: '🩸', label: 'First Blood — Won their first combat' });
+    if (milestones.hundredKills)      badges.push({ icon: '💀', label: '100 Kills — Defeated 100 enemies' });
+    if (milestones.masterHealer)      badges.push({ icon: '✨', label: 'Master Healer — 10,000 healing done' });
+    if (milestones.undefeated)        badges.push({ icon: '🏆', label: 'Undefeated — 10+ wins, no losses' });
+    if (milestones.centuryOfCombats)  badges.push({ icon: '⚔️', label: 'Century — 100 combats fought' });
 
     const statCell = (label, value, color = '#fff') =>
         `<div style="padding:0.35rem 0.5rem;background:rgba(255,255,255,0.04);border-radius:5px;">
@@ -345,6 +345,7 @@ window.toggleCharacterSharing = async function() {
         const character = await getCharacter(characterId);
         if (!character) throw new Error('Character not found');
 
+        // shareEnabled is now an alias for isPublic returned by the server
         const enabling = !character.shareEnabled;
 
         const res = await authFetch(`${BACKEND_URL}/api/character/export`, {
@@ -361,13 +362,15 @@ window.toggleCharacterSharing = async function() {
         if (!res.ok) throw new Error((await res.json()).error || 'Failed');
         const data = await res.json();
 
+        // Update local object and persist — isPublic is the canonical field
+        character.isPublic    = enabling;
         character.shareEnabled = enabling;
         if (enabling) character.shareCode = data.shareCode;
         await saveCharacterToServer(character);
 
         if (btn) {
             btn.disabled = false;
-            btn.textContent = enabling ? '📤 Sharing: On' : '📤 Sharing: Off';
+            btn.textContent   = enabling ? '📤 Sharing: On' : '📤 Sharing: Off';
             btn.style.color       = enabling ? '#4cd964' : '';
             btn.style.borderColor = enabling ? '#4cd964' : '';
         }
@@ -380,11 +383,8 @@ window.toggleCharacterSharing = async function() {
     } catch(e) {
         if (btn) { btn.disabled = false; }
         if (typeof showError === 'function') showError('Sharing toggle failed: ' + e.message);
-        // Re-render button to restore correct state
-        if (typeof renderExportButton === 'function' && window.currentState?.detailCharacterId) {
-            const c = await getCharacter(window.currentState.detailCharacterId);
-            if (c) renderExportButton(c);
-        }
+        const c = await getCharacter(characterId);
+        if (c && typeof renderExportButton === 'function') renderExportButton(c);
     }
 };
 

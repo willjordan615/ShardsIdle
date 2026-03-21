@@ -616,11 +616,11 @@ async function loadPublicCompanions() {
             const roleLabel = char.roleTag ? ROLE_LABELS[char.roleTag] : null;
             const milestones = stats.milestones || {};
             const badges = [
-                milestones.firstBlood       && '🩸',
-                milestones.hundredKills     && '💀',
-                milestones.masterHealer     && '✨',
-                milestones.undefeated       && '🏆',
-                milestones.centuryOfCombats && '⚔️',
+                milestones.firstBlood       && { icon: '🩸', title: 'First Blood — Won their first combat' },
+                milestones.hundredKills     && { icon: '💀', title: '100 Kills' },
+                milestones.masterHealer     && { icon: '✨', title: 'Master Healer — 10,000 healing done' },
+                milestones.undefeated       && { icon: '🏆', title: 'Undefeated — 10+ wins, no losses' },
+                milestones.centuryOfCombats && { icon: '⚔️', title: 'Century — 100 combats fought' },
             ].filter(Boolean);
 
             card.innerHTML = `
@@ -639,7 +639,7 @@ async function loadPublicCompanions() {
                         <div style="color:#d4af37;font-weight:bold;font-size:0.85rem;">${stats.winRate ? (parseFloat(stats.winRate)*100).toFixed(0)+'%' : '—'}</div>
                     </div>
                 </div>
-                ${badges.length ? `<div style="margin-bottom:0.3rem;font-size:0.9rem;">${badges.join(' ')}</div>` : ''}
+                ${badges.length ? `<div style="margin-bottom:0.3rem;font-size:0.9rem;">${badges.map(b => `<span title="${b.title}" style="cursor:default;">${b.icon}</span>`).join(' ')}</div>` : ''}
                 <div style="color:#8b7355;font-size:0.7rem;margin-bottom:0.4rem;">${char.importCount || 0} imports</div>
                 <button class="secondary" style="width:100%;font-size:0.82rem;" ${disabled ? 'disabled' : ''}>${disabledLabel || 'Add to Party'}</button>
             `;
