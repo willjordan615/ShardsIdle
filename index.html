@@ -513,7 +513,38 @@
                     <div class="admin-items-list" id="adminItemsList"></div>
                 </div>
                 <div id="adminTabContent_skills" style="display:none; max-height:70vh; overflow-y:auto;">
-                    <div id="adminSkillTreeContent"></div>
+                    <!-- Sub-tabs -->
+                    <div style="display:flex;gap:6px;padding:8px 8px 0;">
+                        <button id="skillSubTab_edit" onclick="switchSkillSubTab('edit')"
+                            style="padding:4px 12px;background:#1a3a2a;border:1px solid #3a6a4a;color:#8fa;cursor:pointer;border-radius:4px;font-size:.82em;">✏️ Edit Skills</button>
+                        <button id="skillSubTab_tree" onclick="switchSkillSubTab('tree')"
+                            style="padding:4px 12px;background:#2a3a2a;border:1px solid #333;color:#888;cursor:pointer;border-radius:4px;font-size:.82em;">🔗 Combo Tree</button>
+                    </div>
+                    <div id="skillSubContent_edit" style="padding:8px;">
+                        <div style="display:flex;gap:6px;margin-bottom:6px;">
+                            <input type="text" id="adminSkillSearch" placeholder="Search skills..." oninput="adminFilterSkills(this.value)"
+                                style="flex:1;padding:5px 8px;background:#0f1923;color:#d4af37;border:1px solid #333;border-radius:4px;font-size:.82em;">
+                            <select id="adminSkillCatFilter" onchange="adminFilterSkills()"
+                                style="padding:5px;background:#0f1923;color:#aaa;border:1px solid #333;border-radius:4px;font-size:.82em;">
+                                <option value="">All Categories</option>
+                                <option>DAMAGE_SINGLE</option><option>DAMAGE_MAGIC</option><option>DAMAGE_AOE</option>
+                                <option>HEALING</option><option>HEALING_AOE</option><option>BUFF</option>
+                                <option>DEFENSE</option><option>CONTROL</option><option>RESTORATION</option>
+                                <option>UTILITY</option><option>NO_RESOURCES</option><option>DAMAGE_PROC</option>
+                                <option>HEALING_PROC</option><option>CONTROL_PROC</option><option>DEFENSE_PROC</option>
+                                <option>UTILITY_PROC</option><option>CONSUMABLE_HEALING</option>
+                            </select>
+                            <button onclick="openAdminSkill(-1)"
+                                style="padding:5px 10px;background:#1a3a1a;border:1px solid #3a6a3a;color:#8fa;cursor:pointer;border-radius:4px;font-size:.82em;">+ New</button>
+                        </div>
+                        <div id="adminSkillCount" style="color:#555;font-size:.75em;margin-bottom:4px;"></div>
+                        <select id="adminSkillSelect" onchange="openAdminSkill(parseInt(this.value))" size="14"
+                            style="width:100%;background:#0a0f1a;color:#ccc;border:1px solid #1a2a3a;border-radius:4px;font-family:monospace;font-size:.82em;"></select>
+                        <div id="adminSkillEditor" style="display:none;margin-top:10px;"></div>
+                    </div>
+                    <div id="skillSubContent_tree" style="display:none;padding:8px;">
+                        <div id="adminSkillTreeContent"></div>
+                    </div>
                 </div>
                 <div id="adminTabContent_enemies"    style="display:none; max-height:70vh; overflow-y:auto;"></div>
                 <div id="adminTabContent_snapshots"  style="display:none; max-height:70vh; overflow-y:auto;"></div>
@@ -1156,6 +1187,80 @@
                 <button onclick="submitRegister()" style="width:100%; margin-bottom:0.75rem;">Create Account</button>
                 <button onclick="closeAuthModal()" class="secondary" style="width:100%; opacity:0.5; font-size:0.85rem;">Continue as Guest</button>
             </div>
+        </div>
+    </div>
+
+    <!-- SKILL EFFECT MODAL (Admin Panel) -->
+    <div id="adminEffectModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:10000;align-items:center;justify-content:center;">
+        <div style="background:#0d0d1a;border:1px solid #2a2a5a;border-radius:10px;padding:1.5rem;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;position:relative;">
+            <button onclick="document.getElementById('adminEffectModal').style.display='none'" style="position:absolute;top:.75rem;right:.75rem;background:none;border:none;color:#555;font-size:1.2rem;cursor:pointer;">×</button>
+            <h3 style="color:#d4af37;margin-bottom:1rem;">Edit Effect</h3>
+            <input type="hidden" id="eff-idx">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px;">
+                <div class="admin-field"><label>Type</label>
+                    <select id="eff-type" onchange="adminUpdateEffectFields()">
+                        <option value="damage">Damage</option>
+                        <option value="heal">Heal</option>
+                        <option value="apply_buff">Apply Buff</option>
+                        <option value="apply_debuff">Apply Debuff</option>
+                        <option value="restore_resource">Restore Resource</option>
+                        <option value="lifetap">Lifetap</option>
+                        <option value="dispel">Dispel</option>
+                        <option value="cleanse">Cleanse</option>
+                        <option value="utility">Utility</option>
+                    </select></div>
+                <div class="admin-field"><label>Targets</label>
+                    <select id="eff-targets">
+                        <option value="single_enemy">Single Enemy</option>
+                        <option value="all_enemies">All Enemies</option>
+                        <option value="self">Self</option>
+                        <option value="single_ally">Single Ally</option>
+                        <option value="all_allies">All Allies</option>
+                    </select></div>
+                <div class="admin-field"><label>Chance</label>
+                    <select id="eff-chance">
+                        <option value="1.0">Always</option>
+                        <option value="0.9">90%</option><option value="0.75">75%</option>
+                        <option value="0.5">50%</option><option value="0.25">25%</option>
+                        <option value="0.1">10%</option>
+                    </select></div>
+            </div>
+            <div id="eff-damage-fields" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+                <div class="admin-field"><label>Damage Type</label>
+                    <select id="eff-dmgtype">
+                        <option value="physical">Physical</option><option value="fire">Fire</option>
+                        <option value="cold">Cold</option><option value="electric">Electric</option>
+                        <option value="poison">Poison</option><option value="shadow">Shadow</option>
+                        <option value="arcane">Arcane</option><option value="holy">Holy</option>
+                        <option value="nature">Nature</option><option value="">N/A</option>
+                    </select></div>
+                <div class="admin-field"><label>Ignore Armor (0–1)</label>
+                    <input type="number" id="eff-ignorearmor" step="0.1" min="0" max="1" value="0"></div>
+            </div>
+            <div id="eff-buff-fields" style="display:none;margin-bottom:8px;">
+                <div class="admin-field"><label>Status ID</label>
+                    <input type="text" id="eff-buff-search" placeholder="Search statuses..." oninput="adminFilterStatusList(this.value)"
+                        style="width:100%;margin-bottom:4px;">
+                    <select id="eff-buff" size="5" style="width:100%;font-family:monospace;font-size:.82em;background:#0a0f1a;color:#ccc;border:1px solid #1a2a3a;border-radius:4px;"></select>
+                </div>
+                <div class="admin-field" style="margin-top:6px;"><label>Duration (turns)</label>
+                    <input type="number" id="eff-duration" value="2" min="0"></div>
+            </div>
+            <div id="eff-resource-fields" style="display:none;margin-bottom:8px;">
+                <div class="admin-field"><label>Resource</label>
+                    <select id="eff-resource"><option value="stamina">Stamina</option><option value="mana">Mana</option></select></div>
+            </div>
+            <div id="eff-magnitude-fields" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+                <div class="admin-field"><label>Magnitude</label>
+                    <input type="number" step="0.05" id="eff-magnitude" value="1.0"></div>
+                <div class="admin-field"><label>Scales By</label>
+                    <select id="eff-scalesby">
+                        <option value="harmony">Harmony</option><option value="conviction">Conviction</option>
+                        <option value="endurance">Endurance</option><option value="ambition">Ambition</option>
+                        <option value="basePower">Base Power</option>
+                    </select></div>
+            </div>
+            <button onclick="adminConfirmSaveEffect()" style="width:100%;padding:8px;background:#1a3a2a;border:1px solid #3a6a4a;color:#8fa;cursor:pointer;border-radius:4px;">Save Effect</button>
         </div>
     </div>
 

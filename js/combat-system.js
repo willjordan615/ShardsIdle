@@ -555,7 +555,7 @@ async function loadPublicCompanions() {
         // an empty level= param that may cause unintended server-side filtering.
         const params = new URLSearchParams({ sortBy, limit: '20' });
         if (level) params.append('level', level);
-        const response = await fetch(`${BACKEND_URL}/api/character/browse?${params}`);
+        const response = await authFetch(`${BACKEND_URL}/api/character/browse?${params}`);
         
         if (!response.ok) throw new Error('Failed to load');
         
@@ -575,15 +575,14 @@ async function loadPublicCompanions() {
             return;
         }
         
-        const deviceId = getDeviceId();
+        const authUserId = window.authState?.userId;
 
-        // FIX #4: Build cards using DOM methods and data-* attributes instead of
-        // inline onclick strings, eliminating the XSS risk from user-supplied
-        // character names and race values that previously only escaped single quotes.
         container.innerHTML = '';
         characters.forEach(char => {
             const stats = char.combatStats || {};
-            const isOwn = deviceId && char.ownerUserId && char.ownerUserId === deviceId;
+            // Use server-side isOwn flag (set by browse route using auth token)
+            // Fall back to client-side check against authState for cases where flag is missing
+            const isOwn = char.isOwn || (authUserId && char.ownerUserId && char.ownerUserId === authUserId);
             const alreadyAdded = currentState.currentParty.some(m => m.originalCharacterId === char.originalCharacterId);
             const disabled = isOwn || alreadyAdded;
             const disabledLabel = isOwn ? 'Your Character' : alreadyAdded ? 'Already in Party' : null;

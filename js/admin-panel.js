@@ -289,7 +289,7 @@ window.switchAdminTab = function(tab) {
         if (btn) btn.style.background = t === tab ? '' : '#2a3a2a';
     });
 
-    if (tab === 'skills')     renderAdminSkillTree();
+    if (tab === 'skills')     switchSkillSubTab('edit');
     if (tab === 'enemies')    loadAdminEnemies();
     if (tab === 'characters') loadAdminCharacters();
     if (tab === 'snapshots')  loadAdminSnapshots();
@@ -720,4 +720,341 @@ window.adminClearLogs = async function() {
         if (data.success) alert(`Cleared ${data.deleted} combat logs.`);
         else alert('Failed: ' + JSON.stringify(data));
     } catch(e) { alert('Error: ' + e.message); }
+};
+
+// ── Skill Editor Tab ──────────────────────────────────────────────────────────
+
+let _adminSkills        = [];
+let _adminSkillIdx      = -1;
+let _adminSkillEffects  = [];
+const ALL_STATUSES = ["all_stats","ambition_edge","ambition_falter","amplify","arcane_burn","armor_break","attack_boost","barrier","berserker_stance_buff","bleed","blind","bloodlust_buff","burn","chilled","confused","conviction_drain","conviction_surge","counter_ready","cursed","cursed_blood","dazed","deep_wound","defense","echo","electrified","endurance_crack","endurance_shield","evasion_boost","exhaustion","focus","fortify_buff","fortitude","freeze","harmony","harmony_bond","harmony_discord","haste","knockback","life_leech","loot_luck","mana_burn","marked","poison","poison_deadly","poison_strong","poison_weak","poison_weapon","protection","provoked","regen","shadowed","silence","siphon_ward","sleep","slow","speed_boost","spell_amplification","stealth","strength","stun","stun_weapon","taunt","unity","weaken"];
+
+window.switchSkillSubTab = function(tab) {
+    document.getElementById('skillSubContent_edit').style.display = tab === 'edit' ? 'block' : 'none';
+    document.getElementById('skillSubContent_tree').style.display = tab === 'tree' ? 'block' : 'none';
+    document.getElementById('skillSubTab_edit').style.background  = tab === 'edit' ? '#1a3a2a' : '#2a3a2a';
+    document.getElementById('skillSubTab_edit').style.color       = tab === 'edit' ? '#8fa' : '#888';
+    document.getElementById('skillSubTab_tree').style.background  = tab === 'tree' ? '#1a3a2a' : '#2a3a2a';
+    document.getElementById('skillSubTab_tree').style.color       = tab === 'tree' ? '#8fa' : '#888';
+    if (tab === 'edit' && !_adminSkills.length) _adminLoadSkills();
+    if (tab === 'tree') renderAdminSkillTree();
+};
+
+async function _adminLoadSkills() {
+    try {
+        const res = await fetch(BACKEND_URL + '/api/data/skills');
+        _adminSkills = await res.json();
+        adminFilterSkills();
+    } catch(e) { console.error('[ADMIN] skill load failed:', e); }
+}
+
+window.adminFilterSkills = function(q) {
+    const search = (q !== undefined ? q : document.getElementById('adminSkillSearch')?.value || '').toLowerCase();
+    const catF   = document.getElementById('adminSkillCatFilter')?.value || '';
+    const sel    = document.getElementById('adminSkillSelect');
+    if (!sel) return;
+    sel.innerHTML = '';
+    let count = 0;
+    [..._adminSkills]
+        .map((s, i) => ({ s, i }))
+        .sort((a, b) => a.s.name.localeCompare(b.s.name))
+        .forEach(({ s, i }) => {
+            if (catF && s.category !== catF) return;
+            if (search && !s.name.toLowerCase().includes(search) && !s.id.toLowerCase().includes(search)) return;
+            const tag = s.isStarterSkill ? '⭐ ' : (s.parentSkills?.length === 2) ? '🔮 ' : '';
+            const opt = document.createElement('option');
+            opt.value = i;
+            opt.textContent = `${tag}${s.name} (${s.id})`;
+            sel.appendChild(opt);
+            count++;
+        });
+    const countEl = document.getElementById('adminSkillCount');
+    if (countEl) countEl.textContent = `${count} skill${count !== 1 ? 's' : ''} shown`;
+};
+
+window.openAdminSkill = function(idx) {
+    _adminSkillIdx = idx;
+    const s = idx >= 0 ? _adminSkills[idx] : null;
+    const isNew = !s;
+    const el = document.getElementById('adminSkillEditor');
+    if (!el) return;
+
+    _adminSkillEffects = s ? JSON.parse(JSON.stringify(s.effects || [])) : [];
+
+    const v = (k, fb = '') => String(s?.[k] ?? fb);
+    const n = (k, fb = 0)  => s?.[k] ?? fb;
+
+    const isChild = !!(s?.parentSkills?.length === 2);
+    const hitCountType = s?.hitCount?.min !== undefined ? 'range' : 'fixed';
+
+    const CATS = ['DAMAGE_SINGLE','DAMAGE_MAGIC','DAMAGE_AOE','DAMAGE_PROC','HEALING','HEALING_AOE','HEALING_PROC','RESTORATION','BUFF','DEFENSE','DEFENSE_PROC','CONTROL','CONTROL_PROC','UTILITY','UTILITY_PROC','TRAP','CONSUMABLE_HEALING','CONSUMABLE_DAMAGE','CONSUMABLE_RESTORATION','CONSUMABLE_ESCAPE','NO_RESOURCES','WEAPON_SKILL'];
+    const catOpts = CATS.map(c => `<option value="${c}" ${v('category') === c ? 'selected' : ''}>${c}</option>`).join('');
+
+    el.innerHTML = `
+        <div style="border-top:1px solid #1a2a3a;padding-top:10px;">
+            <div style="color:#d4af37;font-weight:bold;margin-bottom:8px;">${isNew ? '➕ New Skill' : '✏️ ' + (s.name || '')}</div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px;">
+                <div class="admin-field"><label>ID</label>
+                    <input type="text" id="sk_id" value="${v('id')}" ${isNew ? '' : 'readonly style="opacity:.5"'}></div>
+                <div class="admin-field"><label>Name</label>
+                    <input type="text" id="sk_name" value="${v('name')}" oninput="${isNew ? 'adminAutoSkillId(this.value)' : ''}"></div>
+                <div class="admin-field"><label>Category</label>
+                    <select id="sk_cat">${catOpts}</select></div>
+                <div class="admin-field"><label>Cost Type</label>
+                    <select id="sk_costtype">
+                        ${['stamina','mana','none'].map(c => `<option value="${c}" ${v('costType')===c?'selected':''}>${c}</option>`).join('')}
+                    </select></div>
+                <div class="admin-field"><label>Cost Amount</label>
+                    <input type="number" id="sk_costamt" value="${n('costAmount',5)}"></div>
+                <div class="admin-field"><label>Base Power</label>
+                    <input type="number" step="0.1" id="sk_power" value="${n('basePower',1.0)}"></div>
+                <div class="admin-field"><label>Hit Chance</label>
+                    <input type="number" step="0.01" id="sk_hitchance" value="${n('baseHitChance',0.95)}"></div>
+                <div class="admin-field"><label>Crit Chance</label>
+                    <input type="number" step="0.01" id="sk_critchance" value="${n('critChance',0.05)}"></div>
+                <div class="admin-field"><label>Crit Multiplier</label>
+                    <input type="number" step="0.1" id="sk_critmult" value="${n('critMultiplier',1.5)}"></div>
+                <div class="admin-field"><label>Delay (ms)</label>
+                    <input type="number" id="sk_delay" value="${n('delay',1000)}"></div>
+            </div>
+
+            <div class="admin-field" style="margin-bottom:6px;"><label>Description</label>
+                <textarea id="sk_desc" style="width:100%;height:44px;">${v('description')}</textarea></div>
+
+            <div style="color:#8b7355;font-size:.73rem;letter-spacing:1px;text-transform:uppercase;margin:6px 0 3px;">Scaling Factors</div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:6px;">
+                <div class="admin-field"><label>Conviction</label><input type="number" step="0.1" id="sk_sc_con" value="${n('scalingFactors.conviction',0)||s?.scalingFactors?.conviction||0}"></div>
+                <div class="admin-field"><label>Endurance</label><input type="number" step="0.1" id="sk_sc_end" value="${s?.scalingFactors?.endurance||0}"></div>
+                <div class="admin-field"><label>Ambition</label><input type="number" step="0.1" id="sk_sc_amb" value="${s?.scalingFactors?.ambition||0}"></div>
+                <div class="admin-field"><label>Harmony</label><input type="number" step="0.1" id="sk_sc_har" value="${s?.scalingFactors?.harmony||0}"></div>
+            </div>
+
+            <div style="display:flex;gap:16px;margin-bottom:6px;font-size:.82em;">
+                <label><input type="checkbox" id="sk_isStarter" ${s?.isStarterSkill?'checked':''}> Starter Skill</label>
+                <label><input type="checkbox" id="sk_isChild" ${isChild?'checked':''} onchange="adminToggleChildFields()"> Child Skill</label>
+            </div>
+
+            <div id="sk_childFields" style="display:${isChild?'block':'none'};margin-bottom:6px;background:rgba(0,0,0,0.2);padding:8px;border-radius:4px;">
+                <div style="color:#8b7355;font-size:.73rem;text-transform:uppercase;margin-bottom:4px;">Parent Skills</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 80px;gap:6px;">
+                    <div class="admin-field"><label>Parent 1 ID</label>
+                        <input type="text" id="sk_parent1" value="${s?.parentSkills?.[0]||''}"></div>
+                    <div class="admin-field"><label>Parent 2 ID</label>
+                        <input type="text" id="sk_parent2" value="${s?.parentSkills?.[1]||''}"></div>
+                    <div class="admin-field"><label>Proc %</label>
+                        <input type="number" step="0.01" id="sk_procchance" value="${n('procChance',0.05)}"></div>
+                </div>
+            </div>
+
+            <div style="color:#8b7355;font-size:.73rem;letter-spacing:1px;text-transform:uppercase;margin:6px 0 3px;">
+                Effects
+                <button onclick="adminOpenEffectModal(null)" style="margin-left:8px;padding:2px 8px;background:#1a2a3a;border:1px solid #345;color:#8af;cursor:pointer;border-radius:3px;font-size:.75rem;">+ Add</button>
+            </div>
+            <div id="sk_effectsList" style="margin-bottom:8px;"></div>
+
+            <div style="display:flex;gap:6px;">
+                <button class="admin-btn-save" onclick="adminSaveSkill(${isNew})">${isNew ? '✅ Create' : '💾 Save'}</button>
+                ${!isNew ? `<button class="admin-btn-cancel" style="background:#8b2222;" onclick="adminDeleteSkill()">🗑️ Delete</button>` : ''}
+                <button class="admin-btn-cancel" onclick="document.getElementById('adminSkillEditor').style.display='none'">Cancel</button>
+            </div>
+        </div>`;
+
+    _adminRenderEffectsList();
+    el.style.display = 'block';
+};
+
+window.adminAutoSkillId = function(name) {
+    const el = document.getElementById('sk_id');
+    if (!el || el.dataset.userEdited === 'true') return;
+    el.value = name.toLowerCase().replace(/[^a-z0-9\s]/g,'').trim().replace(/\s+/g,'_');
+};
+
+window.adminToggleChildFields = function() {
+    const show = document.getElementById('sk_isChild')?.checked;
+    const f = document.getElementById('sk_childFields');
+    if (f) f.style.display = show ? 'block' : 'none';
+};
+
+function _adminRenderEffectsList() {
+    const el = document.getElementById('sk_effectsList');
+    if (!el) return;
+    if (!_adminSkillEffects.length) { el.innerHTML = '<div style="color:#555;font-size:.8em;">No effects.</div>'; return; }
+    el.innerHTML = _adminSkillEffects.map((eff, i) => {
+        const statusId = eff.buff || eff.debuff || '';
+        const extras = [eff.damageType, statusId, eff.resource,
+            eff.magnitude !== undefined ? `mag:${eff.magnitude}` : '',
+            eff.duration ? `${eff.duration}t` : '',
+        ].filter(Boolean).join(' ');
+        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:3px 6px;background:rgba(0,0,0,0.25);border-radius:3px;margin-bottom:3px;font-size:.8em;">
+            <span style="color:#ccc;"><strong style="color:#d4af37;">${eff.type}</strong> → <em style="color:#aaa;">${eff.targets}</em> <span style="color:#666;">${extras}</span></span>
+            <div style="display:flex;gap:4px;">
+                <button onclick="adminOpenEffectModal(${i})" style="padding:1px 6px;background:#1a2a3a;border:1px solid #345;color:#8af;cursor:pointer;border-radius:3px;">Edit</button>
+                <button onclick="adminRemoveEffect(${i})" style="padding:1px 6px;background:#2a1a1a;border:1px solid #533;color:#f88;cursor:pointer;border-radius:3px;">✕</button>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+window.adminRemoveEffect = function(i) {
+    _adminSkillEffects.splice(i, 1);
+    _adminRenderEffectsList();
+};
+
+window.adminOpenEffectModal = function(idx) {
+    const eff = (idx !== null && _adminSkillEffects[idx]) ? _adminSkillEffects[idx] : {};
+    document.getElementById('eff-idx').value    = idx === null ? '' : idx;
+    document.getElementById('eff-type').value   = eff.type    || 'damage';
+    document.getElementById('eff-targets').value = eff.targets || 'single_enemy';
+    document.getElementById('eff-chance').value = String(eff.chance ?? 1.0);
+    document.getElementById('eff-dmgtype').value = eff.damageType || 'physical';
+    document.getElementById('eff-ignorearmor').value = eff.ignoreArmor ?? 0;
+    document.getElementById('eff-magnitude').value = eff.magnitude ?? 1.0;
+    document.getElementById('eff-duration').value = eff.duration ?? 2;
+    document.getElementById('eff-resource').value = eff.resource || 'stamina';
+    document.getElementById('eff-scalesby').value = eff.scalesBy || 'harmony';
+    adminPopulateStatusList(eff.buff || eff.debuff || '');
+    adminUpdateEffectFields();
+    document.getElementById('adminEffectModal').style.display = 'flex';
+};
+
+window.adminUpdateEffectFields = function() {
+    const type = document.getElementById('eff-type').value;
+    document.getElementById('eff-damage-fields').style.display  = type === 'damage' ? 'grid' : 'none';
+    document.getElementById('eff-buff-fields').style.display    = ['apply_buff','apply_debuff'].includes(type) ? 'block' : 'none';
+    document.getElementById('eff-resource-fields').style.display = type === 'restore_resource' ? 'block' : 'none';
+    document.getElementById('eff-magnitude-fields').style.display = !['dispel','cleanse','utility'].includes(type) ? 'grid' : 'none';
+    if (['apply_buff','apply_debuff'].includes(type)) adminPopulateStatusList(document.getElementById('eff-buff')?.value || '');
+};
+
+window.adminPopulateStatusList = function(selected) {
+    const search = (document.getElementById('eff-buff-search')?.value || '').toLowerCase();
+    const sel = document.getElementById('eff-buff');
+    if (!sel) return;
+    sel.innerHTML = '';
+    ALL_STATUSES.filter(s => !search || s.includes(search)).forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s; opt.textContent = s;
+        if (s === selected) opt.selected = true;
+        sel.appendChild(opt);
+    });
+};
+
+window.adminFilterStatusList = function(q) { adminPopulateStatusList(document.getElementById('eff-buff')?.value || ''); };
+
+window.adminConfirmSaveEffect = function() {
+    const idxVal = document.getElementById('eff-idx').value;
+    const idx    = idxVal === '' ? null : parseInt(idxVal);
+    const type   = document.getElementById('eff-type').value;
+
+    const eff = {
+        type,
+        targets: document.getElementById('eff-targets').value,
+        chance:  parseFloat(document.getElementById('eff-chance').value) || 1.0,
+    };
+    if (!['dispel','cleanse','utility'].includes(type)) {
+        const mag = parseFloat(document.getElementById('eff-magnitude').value);
+        if (!isNaN(mag)) eff.magnitude = mag;
+        const sb = document.getElementById('eff-scalesby').value;
+        if (sb) eff.scalesBy = sb;
+    }
+    if (type === 'damage') {
+        const dt = document.getElementById('eff-dmgtype').value;
+        if (dt) eff.damageType = dt;
+        const ia = parseFloat(document.getElementById('eff-ignorearmor').value);
+        if (ia > 0) eff.ignoreArmor = ia;
+    }
+    if (type === 'apply_buff' || type === 'apply_debuff') {
+        const statusId = document.getElementById('eff-buff').value;
+        if (statusId) { type === 'apply_buff' ? (eff.buff = statusId) : (eff.debuff = statusId); }
+        const dur = parseInt(document.getElementById('eff-duration').value);
+        if (!isNaN(dur)) eff.duration = dur;
+    }
+    if (type === 'restore_resource') eff.resource = document.getElementById('eff-resource').value;
+
+    if (idx !== null) _adminSkillEffects[idx] = eff;
+    else _adminSkillEffects.push(eff);
+
+    _adminRenderEffectsList();
+    document.getElementById('adminEffectModal').style.display = 'none';
+};
+
+window.adminSaveSkill = async function(isNew) {
+    const id   = document.getElementById('sk_id')?.value.trim();
+    const name = document.getElementById('sk_name')?.value.trim();
+    if (!id || !name) { alert('ID and name are required.'); return; }
+
+    const isChild  = document.getElementById('sk_isChild')?.checked;
+    const parent1  = document.getElementById('sk_parent1')?.value.trim();
+    const parent2  = document.getElementById('sk_parent2')?.value.trim();
+
+    const skill = {
+        id, name,
+        category:      document.getElementById('sk_cat')?.value,
+        description:   document.getElementById('sk_desc')?.value.trim() || '',
+        basePower:     parseFloat(document.getElementById('sk_power')?.value) || 1.0,
+        costType:      document.getElementById('sk_costtype')?.value,
+        costAmount:    parseInt(document.getElementById('sk_costamt')?.value) || 0,
+        requiredLevel: 1,
+        baseHitChance: parseFloat(document.getElementById('sk_hitchance')?.value) || 0.95,
+        critChance:    parseFloat(document.getElementById('sk_critchance')?.value) || 0.05,
+        critMultiplier: parseFloat(document.getElementById('sk_critmult')?.value) || 1.5,
+        delay:         parseInt(document.getElementById('sk_delay')?.value) || 1000,
+        hitCount:      { fixed: 1 },
+        scalingFactors: {
+            conviction: parseFloat(document.getElementById('sk_sc_con')?.value) || 0,
+            endurance:  parseFloat(document.getElementById('sk_sc_end')?.value) || 0,
+            ambition:   parseFloat(document.getElementById('sk_sc_amb')?.value) || 0,
+            harmony:    parseFloat(document.getElementById('sk_sc_har')?.value) || 0,
+        },
+        effects: _adminSkillEffects,
+    };
+    if (document.getElementById('sk_isStarter')?.checked) skill.isStarterSkill = true;
+    if (isChild && parent1 && parent2) {
+        skill.isChildSkill = true;
+        skill.isStarterSkill = false;
+        skill.parentSkills = [parent1, parent2];
+        skill.procChance = parseFloat(document.getElementById('sk_procchance')?.value) || 0.05;
+    }
+
+    if (isNew) {
+        if (_adminSkills.some(s => s.id === id)) { alert('Skill ID already exists.'); return; }
+        _adminSkills.push(skill);
+        _adminSkillIdx = _adminSkills.length - 1;
+    } else {
+        // Preserve fields not shown in the editor (tags, etc.)
+        _adminSkills[_adminSkillIdx] = { ..._adminSkills[_adminSkillIdx], ...skill };
+    }
+
+    try {
+        const res = await fetch(BACKEND_URL + '/api/admin/data/skills', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(_adminSkills)
+        });
+        const data = await res.json();
+        if (data.success) {
+            if (typeof showSuccess === 'function') showSuccess(`Skill "${name}" saved. Reload game to see changes.`);
+            adminFilterSkills();
+            document.getElementById('adminSkillEditor').style.display = 'none';
+        } else throw new Error(data.error || 'Save failed');
+    } catch(e) { alert('Save failed: ' + e.message); }
+};
+
+window.adminDeleteSkill = async function() {
+    if (_adminSkillIdx < 0) return;
+    const s = _adminSkills[_adminSkillIdx];
+    if (!confirm(`Delete "${s.name}"? This cannot be undone.`)) return;
+    _adminSkills.splice(_adminSkillIdx, 1);
+    _adminSkillIdx = -1;
+    try {
+        await fetch(BACKEND_URL + '/api/admin/data/skills', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(_adminSkills)
+        });
+        if (typeof showSuccess === 'function') showSuccess('Skill deleted.');
+        adminFilterSkills();
+        document.getElementById('adminSkillEditor').style.display = 'none';
+    } catch(e) { alert('Delete failed: ' + e.message); }
 };
