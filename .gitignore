@@ -1,4 +1,12 @@
+# Dependencies
 backend/node_modules/
+
+# Database (each install gets its own)
 backend/data/game.db
+backend/db/
+
+# Windows batch files
 *.bat
+
+# Zip archives
 *.zip

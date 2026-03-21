@@ -1,7 +1,7 @@
 // backend/database.js
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
-const DB_PATH = path.join(__dirname, 'data', 'game.db');
+const DB_PATH = path.join(__dirname, 'db', 'game.db');
 let db;
 
 function initializeDatabase() {

@@ -159,6 +159,12 @@ app.use('/api/character', characterSnapshotsRoutes);
 // Initialize database and start server
 async function start() {
     try {
+        // Ensure the db directory exists (separate from data/ to avoid volume conflicts)
+        const dbDir = path.join(__dirname, 'db');
+        if (!fs.existsSync(dbDir)) {
+            fs.mkdirSync(dbDir, { recursive: true });
+        }
+
         loadGameData();
         
         // Initialize core database tables
