@@ -241,7 +241,7 @@
             <!-- Character footer — always full width, outside column layout -->
             <div class="detail-footer">
                 <button onclick="deleteCharacter(currentState.detailCharacterId)" class="danger">🗑 Delete Character</button>
-                <button onclick="openShareModal(currentState.detailCharacterId)" class="secondary">📤 Share Character</button>
+                <button id="exportCharacterBtn" onclick="toggleCharacterSharing()" class="secondary">📤 Sharing: Off</button>
             </div>
 
         </div><!-- end #detail screen -->
@@ -421,45 +421,6 @@
 
         <!-- ========================================== -->
         <!-- ADDED: SHARE CHARACTER MODAL               -->
-        <!-- ========================================== -->
-        <div id="shareModal">
-            <div>
-                <h2 style="margin-bottom: 1.5rem;">Share Character</h2>
-                <button onclick="closeModal('shareModal')" class="secondary" style="margin-bottom: 1rem; float: right;">×</button>
-
-                <p class="subtitle">When sharing is enabled, your character automatically updates in the browse list after each combat.</p>
-
-                <!-- Setup section: shown when sharing is off -->
-                <div id="shareSetupSection">
-                    <div class="form-group">
-                        <label>Build Name (optional):</label>
-                        <input type="text" id="shareBuildName" placeholder="e.g., Tank Build">
-                    </div>
-                    <div class="form-group">
-                        <label>Build Description (optional):</label>
-                        <textarea id="shareBuildDescription" placeholder="Describe your build..." style="min-height: 80px; width: 100%;"></textarea>
-                    </div>
-                </div>
-
-                <!-- Active section: shown when sharing is on -->
-                <div id="shareActiveSection" style="display:none;">
-                    <div style="background: rgba(10, 14, 39, 0.6); border: 1px solid #4cd964; border-radius: 6px; padding: 1rem; margin: 1rem 0;">
-                        <p id="shareCodeLevel" style="color:#aaa; font-size:0.85rem; margin:0 0 0.5rem 0;"></p>
-                        <p class="subtitle" style="margin-bottom:0.5rem;">Share Code:</p>
-                        <div class="grid-2" style="align-items: center;">
-                            <code id="shareCodeValue" style="font-size: 1.5rem; color: #4cd964; letter-spacing: 2px;"></code>
-                            <button onclick="copyShareCode()" class="secondary">Copy</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="shareToggleSection" style="margin-top: 1rem; display:flex; gap:0.5rem; justify-content:flex-end;">
-                    <button onclick="closeModal('shareModal')" class="secondary">Cancel</button>
-                    <button id="shareToggleBtn" onclick="handleShareToggle()" data-action="enable">Enable Sharing</button>
-                </div>
-            </div>
-        </div>
-
         <!-- ========================================== -->
         <!-- ADDED: IMPORT CHARACTER MODAL              -->
         <!-- ========================================== -->

@@ -544,7 +544,7 @@ async function createCharacter() {
             }));
             // Inject racial intrinsic skill
             const raceDef = window.gameData?.races?.find(r => r.id === currentState.selectedRace?.id);
-            const intrinsicId = raceDef?.intrinsicSkills?.[0] || raceDef?.bonusSkills?.[0];
+            const intrinsicId = raceDef?.intrinsicSkills?.[0];
             if (intrinsicId && !equipped.some(s => s.skillID === intrinsicId)) {
                 equipped.push({
                     skillID: intrinsicId,
@@ -720,7 +720,7 @@ async function renderRoster() {
  */
 async function ensureIntrinsicSkill(character) {
     const raceDef = window.gameData?.races?.find(r => r.id === character.race);
-    const intrinsicId = raceDef?.intrinsicSkills?.[0] || raceDef?.bonusSkills?.[0];
+    const intrinsicId = raceDef?.intrinsicSkills?.[0];
     if (!intrinsicId) return false;
 
     const existing = (character.skills || []).find(s => s.skillID === intrinsicId);
@@ -996,7 +996,7 @@ async function renderCharacterSkills(character) {
 
     // Racial bonus skill — always shown, marked as innate
     const raceDef = window.gameData?.races?.find(r => r.id === character.race);
-    const racialSkillIds = raceDef?.intrinsicSkills || raceDef?.bonusSkills || [];
+    const racialSkillIds = raceDef?.intrinsicSkills || [];
     if (racialSkillIds.length) {
         const racialSection = document.createElement('div');
         racialSection.style.cssText = 'margin-top:1rem;';
@@ -1588,33 +1588,37 @@ function renderGearUpgradeBadge(character) {
 }
 
 /**
-* Render export button (disabled for imported characters)
+* Render export button — reflects current sharing state.
 */
 function renderExportButton(character) {
-    const exportBtn = document.getElementById('exportCharacterBtn');
-    if (!exportBtn) return;
+    const btn = document.getElementById('exportCharacterBtn');
+    if (!btn) return;
 
-    if (character && character.id) {
-        currentState.detailCharacterId = character.id;
-    }
+    if (character && character.id) currentState.detailCharacterId = character.id;
 
     if (character.isImportedReference) {
-        exportBtn.disabled = true;
-        exportBtn.textContent = 'Cannot Export (Imported Character)';
-        exportBtn.title = 'Only the original owner can export this character';
-        exportBtn.style.opacity = '0.5';
-        exportBtn.style.cursor = 'not-allowed';
+        btn.disabled = true;
+        btn.textContent = '📤 Sharing: N/A';
+        btn.title = 'Imported characters cannot be shared';
+        btn.style.opacity = '0.4';
+        btn.style.cursor = 'not-allowed';
+        btn.style.color = '';
+        btn.style.borderColor = '';
     } else {
-        exportBtn.disabled = false;
-        exportBtn.textContent = character.shareEnabled ? '🟢 Sharing On' : 'Share Character';
-        exportBtn.title = character.shareEnabled
-            ? 'Sharing enabled — click to manage'
-            : 'Share this character with other players';
-        exportBtn.style.opacity = '1';
-        exportBtn.style.cursor = 'pointer';
-
-        const capturedId = character.id;
-        exportBtn.onclick = () => openShareModal(capturedId);
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        btn.style.cursor = 'pointer';
+        if (character.shareEnabled) {
+            btn.textContent   = '📤 Sharing: On';
+            btn.style.color       = '#4cd964';
+            btn.style.borderColor = '#4cd964';
+            btn.title = 'Sharing enabled — click to turn off';
+        } else {
+            btn.textContent   = '📤 Sharing: Off';
+            btn.style.color       = '';
+            btn.style.borderColor = '';
+            btn.title = 'Click to share this character publicly';
+        }
     }
 }
 
