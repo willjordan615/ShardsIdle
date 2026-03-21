@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../database');
 const crypto = require('crypto');
-const { requireAuth } = require('./auth');
+const { requireAuth, optionalAuth } = require('./auth');
 
 /**
  * Generate a readable share code from character name
