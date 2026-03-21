@@ -1,15 +1,17 @@
 FROM node:18-alpine
 
+# Install build tools needed to compile sqlite3 from source
+RUN apk add --no-cache python3 make g++
+
 WORKDIR /app
 
 # Copy backend dependencies and install
+# --ignore-scripts=false ensures sqlite3 native bindings are rebuilt for Linux
 COPY backend/package.json ./backend/
-RUN npm install --prefix backend
+RUN cd /app/backend && npm install --build-from-source
 
 # Copy all project files
 COPY . .
-
-EXPOSE 3001
 
 WORKDIR /app/backend
 CMD ["node", "server.js"]
