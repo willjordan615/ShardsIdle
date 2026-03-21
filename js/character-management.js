@@ -996,12 +996,13 @@ async function renderCharacterSkills(character) {
 
     // Racial bonus skill — always shown, marked as innate
     const raceDef = window.gameData?.races?.find(r => r.id === character.race);
-    if (raceDef?.bonusSkills?.length) {
+    const racialSkillIds = raceDef?.intrinsicSkills || raceDef?.bonusSkills || [];
+    if (racialSkillIds.length) {
         const racialSection = document.createElement('div');
         racialSection.style.cssText = 'margin-top:1rem;';
         racialSection.innerHTML = `<div style="color:#888; font-size:0.75rem; letter-spacing:1px; text-transform:uppercase; margin-bottom:6px;">Racial Ability</div>`;
 
-        raceDef.bonusSkills.forEach(skillId => {
+        racialSkillIds.forEach(skillId => {
             const skillDef = window.gameData?.skills?.find(s => s.id === skillId);
             if (!skillDef) return;
             const card = document.createElement('div');

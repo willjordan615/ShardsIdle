@@ -451,23 +451,17 @@ class CombatEngine {
 
       // --- BRANCHING LOGIC ---
       if (stage.stageBranches && stage.stageBranches.length > 0) {
-        let resolvedNextStageId = null;
+        let resolvedNextStageId = undefined; // undefined = no branch fired yet
 
         for (const branch of stage.stageBranches) {
           if (!branch.condition) {
-            // Default fallback branch — keep as candidate but keep scanning for a condition match
-            resolvedNextStageId = branch.nextStageId;
+            // Default fallback branch — null nextStageId means "end after this stage"
+            resolvedNextStageId = branch.nextStageId; // may be null (end) or a stageId
             if (branch.overrideDescription) stage.description = branch.overrideDescription;
-            continue; 
-          }
-
-          // Optional chance gate — secret paths use this to stay rare (e.g. 0.05 = 5%)
-          // If the roll fails, treat as if the condition was never met and fall through.
-          if (branch.chance !== undefined && Math.random() > branch.chance) {
             continue;
           }
 
-          // Evaluate Condition
+          // Evaluate condition first
           let conditionMet = false;
           const cond = branch.condition;
           if (cond.type === 'has_skill') {
@@ -499,7 +493,7 @@ class CombatEngine {
             );
           } else if (cond.type === 'has_skill_tag_and_stat') {
             // A SINGLE character must have both: an equipped skill with the given tag at level >= 1
-            // AND meet the stat threshold. The same person must satisfy both conditions.
+            // AND meet the stat threshold.
             const taggedSkillIds = this.skills
               .filter(s => s.tags && s.tags.includes(cond.skillTag))
               .map(s => s.id);
@@ -526,24 +520,31 @@ class CombatEngine {
           } else if (cond.type === 'random') {
             conditionMet = Math.random() < (cond.chance || 0.5);
           }
-          
+
+          // Condition must pass first; then apply optional chance gate
           if (conditionMet) {
+            if (branch.chance !== undefined && Math.random() > branch.chance) {
+              continue; // Party qualifies but the opportunity didn't present itself this run
+            }
             resolvedNextStageId = branch.nextStageId;
             if (branch.overrideDescription) stage.description = branch.overrideDescription;
-           // console.log(`[BRANCH] Condition met (${branch.condition.type}: ${branch.condition.value}). Jumping to Stage ${resolvedNextStageId}`);
             break;
           }
         }
 
-        if (resolvedNextStageId !== null) {
-          const targetIdx = allStages.findIndex(s => s.stageId === resolvedNextStageId);
-          if (targetIdx !== -1) {
-            stage = allStages[targetIdx];
-            // FIX: record target so stageIndex++ below advances PAST the branched stage
-            forcedNextStageIndex = targetIdx;
-            //console.log(`[BRANCH] Resolved to stage index ${targetIdx} (stageId: ${stage.stageId})`);
+        // Only act on the resolved branch if one was explicitly set
+        if (resolvedNextStageId !== undefined) {
+          if (resolvedNextStageId === null) {
+            // Default fallback said "end after this stage" — skip past all remaining stages
+            forcedNextStageIndex = allStages.length - 1;
           } else {
-            console.error(`[BRANCH] Target stage ${resolvedNextStageId} not found!`);
+            const targetIdx = allStages.findIndex(s => s.stageId === resolvedNextStageId);
+            if (targetIdx !== -1) {
+              stage = allStages[targetIdx];
+              forcedNextStageIndex = targetIdx;
+            } else {
+              console.error(`[BRANCH] Target stage ${resolvedNextStageId} not found!`);
+            }
           }
         }
       }
