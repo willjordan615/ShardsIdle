@@ -1,128 +1,302 @@
 [
   {
-    "characterID": "bot_gareth_warrior",
-    "characterName": "Gareth",
-    "level": 3,
-    "stats": {
-      "conviction": 80,
-      "endurance": 110,
-      "ambition": 60,
-      "harmony": 50
-    },
+    "characterID": "bot_mira_defender",
+    "characterName": "Mira",
+    "role": "Defender",
+    "level": 1,
+    "race": "human",
+    "stats": { "conviction": 55, "endurance": 80, "ambition": 35, "harmony": 50 },
     "skills": [
-      {
-        "skillID": "basic_attack",
-        "learned": true,
-        "usageCount": 25,
-        "skillXP": 400,
-        "skillLevel": 3,
-        "lastUsed": null
-      },
-      {
-        "skillID": "block",
-        "learned": true,
-        "usageCount": 15,
-        "skillXP": 200,
-        "skillLevel": 2,
-        "lastUsed": null
-      }
+      { "skillID": "prayer",       "learned": true, "intrinsic": true, "skillXP": 0,  "skillLevel": 1, "usageCount": 0 },
+      { "skillID": "block",        "learned": true, "skillXP": 80,  "skillLevel": 1, "usageCount": 8 },
+      { "skillID": "shout",        "learned": true, "skillXP": 60,  "skillLevel": 1, "usageCount": 6 }
     ],
-    "consumables": {
-      "health_potion_minor": 2,
-      "escape_rope": 1
-    },
-    "equipment": {
-      "mainHand": "sword_iron_tier0",
-      "offHand": null,
-      "chest": null,
-      "head": null,
-      "hands": null,
-      "legs": null,
-      "feet": null
-    }
+    "equipment": { "mainHand": "mace_wood_tier0" },
+    "consumables": { "health_potion_minor": 1 }
   },
   {
-    "characterID": "bot_elara_mage",
-    "characterName": "Elara",
-    "level": 3,
-    "stats": {
-      "conviction": 100,
-      "endurance": 55,
-      "ambition": 75,
-      "harmony": 85
-    },
+    "characterID": "bot_fen_bruiser",
+    "characterName": "Fen",
+    "role": "Bruiser",
+    "level": 1,
+    "race": "orc",
+    "stats": { "conviction": 80, "endurance": 65, "ambition": 55, "harmony": 20 },
     "skills": [
-      {
-        "skillID": "produce_flame",
-        "learned": true,
-        "usageCount": 30,
-        "skillXP": 450,
-        "skillLevel": 3,
-        "lastUsed": null
-      },
-      {
-        "skillID": "first_aid",
-        "learned": true,
-        "usageCount": 10,
-        "skillXP": 150,
-        "skillLevel": 2,
-        "lastUsed": null
-      }
+      { "skillID": "bloodlust",    "learned": true, "intrinsic": true, "skillXP": 0,  "skillLevel": 1, "usageCount": 0 },
+      { "skillID": "basic_attack", "learned": true, "skillXP": 90,  "skillLevel": 1, "usageCount": 10 },
+      { "skillID": "shove",        "learned": true, "skillXP": 50,  "skillLevel": 1, "usageCount": 5 }
     ],
-    "consumables": {
-      "mana_potion_minor": 3,
-      "health_potion_minor": 1
-    },
-    "equipment": {
-      "mainHand": "tome_flame_tier1",
-      "offHand": null,
-      "chest": null,
-      "head": null,
-      "hands": null,
-      "legs": null,
-      "feet": null
-    }
+    "equipment": { "mainHand": "axe_iron_tier0" },
+    "consumables": { "health_potion_minor": 1 }
   },
   {
-    "characterID": "bot_kess_rogue",
-    "characterName": "Kess",
+    "characterID": "bot_pip_assassin",
+    "characterName": "Pip",
+    "role": "Assassin",
+    "level": 1,
+    "race": "halfling",
+    "stats": { "conviction": 60, "endurance": 45, "ambition": 90, "harmony": 25 },
+    "skills": [
+      { "skillID": "stalk",        "learned": true, "intrinsic": true, "skillXP": 0,  "skillLevel": 1, "usageCount": 0 },
+      { "skillID": "misdirect",    "learned": true, "skillXP": 70,  "skillLevel": 1, "usageCount": 7 },
+      { "skillID": "footwork",     "learned": true, "skillXP": 55,  "skillLevel": 1, "usageCount": 6 }
+    ],
+    "equipment": { "mainHand": "dagger_rusty_tier0" },
+    "consumables": { "health_potion_minor": 1 }
+  },
+  {
+    "characterID": "bot_edda_support",
+    "characterName": "Edda",
+    "role": "Support",
+    "level": 1,
+    "race": "human",
+    "stats": { "conviction": 40, "endurance": 55, "ambition": 45, "harmony": 80 },
+    "skills": [
+      { "skillID": "prayer",       "learned": true, "intrinsic": true, "skillXP": 0,  "skillLevel": 1, "usageCount": 0 },
+      { "skillID": "first_aid",    "learned": true, "skillXP": 75,  "skillLevel": 1, "usageCount": 8 },
+      { "skillID": "attunement",   "learned": true, "skillXP": 50,  "skillLevel": 1, "usageCount": 5 }
+    ],
+    "equipment": { "mainHand": "scepter_wood_tier0" },
+    "consumables": { "health_potion_minor": 1 }
+  },
+  {
+    "characterID": "bot_tog_bruiser",
+    "characterName": "Tog",
+    "role": "Bruiser",
+    "level": 1,
+    "race": "dwarf",
+    "stats": { "conviction": 75, "endurance": 75, "ambition": 40, "harmony": 30 },
+    "skills": [
+      { "skillID": "restore_stam_minor", "learned": true, "intrinsic": true, "skillXP": 0, "skillLevel": 1, "usageCount": 0 },
+      { "skillID": "basic_attack", "learned": true, "skillXP": 80,  "skillLevel": 1, "usageCount": 9 },
+      { "skillID": "block",        "learned": true, "skillXP": 60,  "skillLevel": 1, "usageCount": 6 }
+    ],
+    "equipment": { "mainHand": "hammer_stone_tier0" },
+    "consumables": { "health_potion_minor": 1 }
+  },
+  {
+    "characterID": "bot_wren_mage",
+    "characterName": "Wren",
+    "role": "Mage",
+    "level": 1,
+    "race": "human",
+    "stats": { "conviction": 70, "endurance": 35, "ambition": 55, "harmony": 60 },
+    "skills": [
+      { "skillID": "prayer",       "learned": true, "intrinsic": true, "skillXP": 0,  "skillLevel": 1, "usageCount": 0 },
+      { "skillID": "produce_flame","learned": true, "skillXP": 70,  "skillLevel": 1, "usageCount": 7 },
+      { "skillID": "focus",        "learned": true, "skillXP": 45,  "skillLevel": 1, "usageCount": 4 }
+    ],
+    "equipment": { "mainHand": "wand_wood_tier0" },
+    "consumables": { "mana_potion_minor": 1 }
+  },
+  {
+    "characterID": "bot_cobb_utility",
+    "characterName": "Cobb",
+    "role": "Utility",
+    "level": 1,
+    "race": "dwarf",
+    "stats": { "conviction": 50, "endurance": 65, "ambition": 50, "harmony": 55 },
+    "skills": [
+      { "skillID": "restore_stam_minor", "learned": true, "intrinsic": true, "skillXP": 0, "skillLevel": 1, "usageCount": 0 },
+      { "skillID": "rest",         "learned": true, "skillXP": 60,  "skillLevel": 1, "usageCount": 6 },
+      { "skillID": "attunement",   "learned": true, "skillXP": 50,  "skillLevel": 1, "usageCount": 5 }
+    ],
+    "equipment": { "mainHand": "totem_wood_tier0" },
+    "consumables": { "health_potion_minor": 1 }
+  },
+  {
+    "characterID": "bot_sable_assassin",
+    "characterName": "Sable",
+    "role": "Assassin",
     "level": 2,
-    "stats": {
-      "conviction": 70,
-      "endurance": 65,
-      "ambition": 95,
-      "harmony": 60
-    },
+    "race": "halfling",
+    "stats": { "conviction": 70, "endurance": 55, "ambition": 110, "harmony": 35 },
     "skills": [
-      {
-        "skillID": "basic_attack",
-        "learned": true,
-        "usageCount": 20,
-        "skillXP": 300,
-        "skillLevel": 2,
-        "lastUsed": null
-      },
-      {
-        "skillID": "misdirect",
-        "learned": true,
-        "usageCount": 18,
-        "skillXP": 280,
-        "skillLevel": 2,
-        "lastUsed": null
-      }
+      { "skillID": "stalk",        "learned": true, "intrinsic": true, "skillXP": 0,   "skillLevel": 1, "usageCount": 0 },
+      { "skillID": "aim",          "learned": true, "skillXP": 120,  "skillLevel": 2, "usageCount": 14 },
+      { "skillID": "misdirect",    "learned": true, "skillXP": 100,  "skillLevel": 1, "usageCount": 10 }
     ],
-    "consumables": {
-      "escape_rope": 2,
-      "health_potion_minor": 1
-    },
-    "equipment": {
-      "mainHand": "dagger_iron_tier0",
-      "offHand": null,
-      "chest": null,
-      "head": null,
-      "hands": null,
-      "legs": null,
-      "feet": null
-    }
+    "equipment": { "mainHand": "dagger_copper_tier0" },
+    "consumables": { "health_potion_minor": 1, "escape_rope": 1 }
+  },
+  {
+    "characterID": "bot_aldric_defender",
+    "characterName": "Aldric",
+    "role": "Defender",
+    "level": 2,
+    "race": "dwarf",
+    "stats": { "conviction": 65, "endurance": 110, "ambition": 40, "harmony": 55 },
+    "skills": [
+      { "skillID": "restore_stam_minor", "learned": true, "intrinsic": true, "skillXP": 0, "skillLevel": 1, "usageCount": 0 },
+      { "skillID": "block",        "learned": true, "skillXP": 150,  "skillLevel": 2, "usageCount": 16 },
+      { "skillID": "shout",        "learned": true, "skillXP": 110,  "skillLevel": 1, "usageCount": 11 }
+    ],
+    "equipment": { "mainHand": "hammer_iron_tier0" },
+    "consumables": { "health_potion_minor": 2 }
+  },
+  {
+    "characterID": "bot_vesper_mage",
+    "characterName": "Vesper",
+    "role": "Mage",
+    "level": 3,
+    "race": "human",
+    "stats": { "conviction": 100, "endurance": 50, "ambition": 70, "harmony": 100 },
+    "skills": [
+      { "skillID": "prayer",       "learned": true, "intrinsic": true, "skillXP": 0,   "skillLevel": 1, "usageCount": 0 },
+      { "skillID": "channel",      "learned": true, "skillXP": 200,  "skillLevel": 2, "usageCount": 20 },
+      { "skillID": "produce_flame","learned": true, "skillXP": 180,  "skillLevel": 2, "usageCount": 18 }
+    ],
+    "equipment": { "mainHand": "wand_apprentice_tier0" },
+    "consumables": { "mana_potion_minor": 2, "health_potion_minor": 1 }
+  },
+  {
+    "characterID": "bot_grolt_bruiser",
+    "characterName": "Grolt",
+    "role": "Bruiser",
+    "level": 3,
+    "race": "orc",
+    "stats": { "conviction": 120, "endurance": 90, "ambition": 60, "harmony": 30 },
+    "skills": [
+      { "skillID": "bloodlust",    "learned": true, "intrinsic": true, "skillXP": 0,   "skillLevel": 1, "usageCount": 0 },
+      { "skillID": "basic_attack", "learned": true, "skillXP": 220,  "skillLevel": 2, "usageCount": 22 },
+      { "skillID": "shove",        "learned": true, "skillXP": 180,  "skillLevel": 2, "usageCount": 18 }
+    ],
+    "equipment": { "mainHand": "axe_wood_tier0" },
+    "consumables": { "health_potion_minor": 2 }
+  },
+  {
+    "characterID": "bot_linna_support",
+    "characterName": "Linna",
+    "role": "Support",
+    "level": 4,
+    "race": "human",
+    "stats": { "conviction": 60, "endurance": 80, "ambition": 60, "harmony": 130 },
+    "skills": [
+      { "skillID": "prayer",       "learned": true, "intrinsic": true, "skillXP": 0,   "skillLevel": 1, "usageCount": 0 },
+      { "skillID": "first_aid",    "learned": true, "skillXP": 280,  "skillLevel": 3, "usageCount": 28 },
+      { "skillID": "shout",        "learned": true, "skillXP": 200,  "skillLevel": 2, "usageCount": 20 }
+    ],
+    "equipment": { "mainHand": "scepter_acolyte_tier0" },
+    "consumables": { "health_potion_minor": 2, "mana_potion_minor": 1 }
+  },
+  {
+    "characterID": "bot_darro_utility",
+    "characterName": "Darro",
+    "role": "Utility",
+    "level": 5,
+    "race": "dwarf",
+    "stats": { "conviction": 80, "endurance": 110, "ambition": 80, "harmony": 80 },
+    "skills": [
+      { "skillID": "restore_stam_minor", "learned": true, "intrinsic": true, "skillXP": 0, "skillLevel": 1, "usageCount": 0 },
+      { "skillID": "attunement",   "learned": true, "skillXP": 350,  "skillLevel": 3, "usageCount": 35 },
+      { "skillID": "rest",         "learned": true, "skillXP": 280,  "skillLevel": 2, "usageCount": 28 }
+    ],
+    "equipment": { "mainHand": "totem_bone_tier0" },
+    "consumables": { "health_potion_minor": 2, "escape_rope": 1 }
+  },
+  {
+    "characterID": "bot_nyx_assassin",
+    "characterName": "Nyx",
+    "role": "Assassin",
+    "level": 6,
+    "race": "halfling",
+    "stats": { "conviction": 100, "endurance": 75, "ambition": 160, "harmony": 45 },
+    "skills": [
+      { "skillID": "stalk",        "learned": true, "intrinsic": true, "skillXP": 0,   "skillLevel": 1, "usageCount": 0 },
+      { "skillID": "aim",          "learned": true, "skillXP": 420,  "skillLevel": 4, "usageCount": 42 },
+      { "skillID": "footwork",     "learned": true, "skillXP": 350,  "skillLevel": 3, "usageCount": 35 }
+    ],
+    "equipment": { "mainHand": "dagger_scout_tier0" },
+    "consumables": { "health_potion_minor": 2, "escape_rope": 1 }
+  },
+  {
+    "characterID": "bot_brynn_defender",
+    "characterName": "Brynn",
+    "role": "Defender",
+    "level": 7,
+    "race": "orc",
+    "stats": { "conviction": 120, "endurance": 190, "ambition": 60, "harmony": 50 },
+    "skills": [
+      { "skillID": "bloodlust",    "learned": true, "intrinsic": true, "skillXP": 0,   "skillLevel": 1, "usageCount": 0 },
+      { "skillID": "block",        "learned": true, "skillXP": 520,  "skillLevel": 4, "usageCount": 52 },
+      { "skillID": "shout",        "learned": true, "skillXP": 400,  "skillLevel": 3, "usageCount": 40 }
+    ],
+    "equipment": { "mainHand": "mace_iron_tier0" },
+    "consumables": { "health_potion_minor": 3 }
+  },
+  {
+    "characterID": "bot_calder_mage",
+    "characterName": "Calder",
+    "role": "Mage",
+    "level": 8,
+    "race": "human",
+    "stats": { "conviction": 180, "endurance": 70, "ambition": 110, "harmony": 160 },
+    "skills": [
+      { "skillID": "prayer",       "learned": true, "intrinsic": true, "skillXP": 0,   "skillLevel": 1, "usageCount": 0 },
+      { "skillID": "shock",        "learned": true, "skillXP": 580,  "skillLevel": 5, "usageCount": 58 },
+      { "skillID": "channel",      "learned": true, "skillXP": 480,  "skillLevel": 4, "usageCount": 48 }
+    ],
+    "equipment": { "mainHand": "wand_flame_tier1" },
+    "consumables": { "mana_potion_minor": 3, "health_potion_minor": 1 }
+  },
+  {
+    "characterID": "bot_serak_bruiser",
+    "characterName": "Serak",
+    "role": "Bruiser",
+    "level": 9,
+    "race": "orc",
+    "stats": { "conviction": 220, "endurance": 160, "ambition": 100, "harmony": 40 },
+    "skills": [
+      { "skillID": "bloodlust",    "learned": true, "intrinsic": true, "skillXP": 0,   "skillLevel": 1, "usageCount": 0 },
+      { "skillID": "basic_attack", "learned": true, "skillXP": 650,  "skillLevel": 5, "usageCount": 65 },
+      { "skillID": "shove",        "learned": true, "skillXP": 520,  "skillLevel": 4, "usageCount": 52 }
+    ],
+    "equipment": { "mainHand": "axe_steel_tier1" },
+    "consumables": { "health_potion_minor": 3 }
+  },
+  {
+    "characterID": "bot_thessa_support",
+    "characterName": "Thessa",
+    "role": "Support",
+    "level": 10,
+    "race": "human",
+    "stats": { "conviction": 100, "endurance": 130, "ambition": 90, "harmony": 220 },
+    "skills": [
+      { "skillID": "prayer",       "learned": true, "intrinsic": true, "skillXP": 0,   "skillLevel": 1, "usageCount": 0 },
+      { "skillID": "first_aid",    "learned": true, "skillXP": 720,  "skillLevel": 6, "usageCount": 72 },
+      { "skillID": "attunement",   "learned": true, "skillXP": 580,  "skillLevel": 5, "usageCount": 58 }
+    ],
+    "equipment": { "mainHand": "scepter_light_tier1" },
+    "consumables": { "health_potion_minor": 2, "mana_potion_minor": 2 }
+  },
+  {
+    "characterID": "bot_varyn_assassin",
+    "characterName": "Varyn",
+    "role": "Assassin",
+    "level": 11,
+    "race": "halfling",
+    "stats": { "conviction": 160, "endurance": 110, "ambition": 260, "harmony": 70 },
+    "skills": [
+      { "skillID": "stalk",        "learned": true, "intrinsic": true, "skillXP": 0,   "skillLevel": 1, "usageCount": 0 },
+      { "skillID": "aim",          "learned": true, "skillXP": 800,  "skillLevel": 6, "usageCount": 80 },
+      { "skillID": "misdirect",    "learned": true, "skillXP": 650,  "skillLevel": 5, "usageCount": 65 }
+    ],
+    "equipment": { "mainHand": "dagger_hunter_tier1" },
+    "consumables": { "health_potion_minor": 3, "escape_rope": 1 }
+  },
+  {
+    "characterID": "bot_oswin_defender",
+    "characterName": "Oswin",
+    "role": "Defender",
+    "level": 12,
+    "race": "dwarf",
+    "stats": { "conviction": 150, "endurance": 280, "ambition": 80, "harmony": 90 },
+    "skills": [
+      { "skillID": "restore_stam_minor", "learned": true, "intrinsic": true, "skillXP": 0, "skillLevel": 1, "usageCount": 0 },
+      { "skillID": "block",        "learned": true, "skillXP": 900,  "skillLevel": 7, "usageCount": 90 },
+      { "skillID": "shout",        "learned": true, "skillXP": 720,  "skillLevel": 6, "usageCount": 72 }
+    ],
+    "equipment": { "mainHand": "hammer_steel_tier1" },
+    "consumables": { "health_potion_minor": 3, "mana_potion_minor": 1 }
   }
 ]

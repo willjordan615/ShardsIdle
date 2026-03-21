@@ -1257,26 +1257,27 @@
           },
           {
             "id": "roots_below_sense",
-            "name": "Something Beneath",
+            "name": "The Lock Beneath",
             "spawnChance": 1.0,
             "checkType": "skill",
             "requiredSkillID": "nature_touch",
             "checkStat": "harmony",
-            "secondaryStat": "ambition",
-            "difficultyThreshold": 65,
+            "secondaryStat": "endurance",
+            "difficultyThreshold": 130,
             "successEffect": {
               "type": "narrative_only",
-              "narrative": "The altar pulses once beneath your hand \u2014 not outward, but downward. Something old stirs below the stone. A crack appears at the altar's base that wasn't there before."
+              "narrative": "The altar responds to nature-attuned hands and a spirit in deep harmony with the land. The lock beneath is old \u2014 it was never meant for casual visitors. The crack at the altar's base opens wide enough to descend."
             },
             "failureEffect": {
               "type": "narrative_only",
-              "narrative": "You sense something beneath the altar but cannot reach it. The moment passes."
+              "narrative": "You sense the lock but cannot turn it. The harmony required is beyond what the party carries."
             },
             "fallbackEffect": {
               "type": "narrative_only",
               "magnitude": 0,
-              "narrative": "The altar is cold stone to those who cannot hear it."
-            }
+              "narrative": "The altar is cold stone to those without nature-attunement. The lock does not acknowledge you."
+            },
+            "requiredSkillTag": "nature"
           }
         ],
         "lootTable": [
@@ -1294,11 +1295,14 @@
         "stageBranches": [
           {
             "condition": {
-              "type": "has_skill",
-              "value": "nature_touch"
+              "type": "has_skill_tag_and_stat",
+              "skillTag": "nature",
+              "stat": "harmony",
+              "threshold": 130
             },
             "nextStageId": 99,
-            "overrideDescription": "The crack in the altar widens. The party descends."
+            "overrideDescription": "The lock yields. Something that has been sealed for two hundred years opens. The party descends.",
+            "chance": 0.05
           },
           {
             "nextStageId": null
@@ -1528,7 +1532,8 @@
               "value": "holy_light"
             },
             "nextStageId": 99,
-            "overrideDescription": "The verse on the bell is incomplete but you know enough to finish it. The water stirs. Something older than Bram rises from the deep."
+            "overrideDescription": "The verse on the bell is incomplete but you know enough to finish it. The water stirs. Something older than Bram rises from the deep.",
+            "chance": 0.05
           },
           {
             "nextStageId": null
@@ -1843,7 +1848,8 @@
               "value": "sense"
             },
             "nextStageId": 99,
-            "overrideDescription": "The key from the courtyard fits. The door opens inward. Below: stairs cut into the rock, and the smell of old paper and something else you cannot name."
+            "overrideDescription": "The key from the courtyard fits. The door opens inward. Below: stairs cut into the rock, and the smell of old paper and something else you cannot name.",
+            "chance": 0.05
           },
           {
             "nextStageId": null
@@ -2228,7 +2234,8 @@
               "value": "nature_touch"
             },
             "nextStageId": 99,
-            "overrideDescription": "The terms of the agreement are still binding. You speak them aloud at the well's edge. The blight recedes from the stone in a ring. The water below shifts color. Something rises."
+            "overrideDescription": "The terms of the agreement are still binding. You speak them aloud at the well's edge. The blight recedes from the stone in a ring. The water below shifts color. Something rises.",
+            "chance": 0.05
           },
           {
             "nextStageId": null
@@ -2532,7 +2539,8 @@
               "value": "loyalist_seal"
             },
             "nextStageId": 99,
-            "overrideDescription": "The Loyalist seal you carry is enough to get a message through to the supply runner sheltering in the ravine road. He emerges. Kaelen sends the interceptors."
+            "overrideDescription": "The Loyalist seal you carry is enough to get a message through to the supply runner sheltering in the ravine road. He emerges. Kaelen sends the interceptors.",
+            "chance": 0.05
           },
           {
             "nextStageId": null
@@ -2917,7 +2925,8 @@
               "value": "sleet"
             },
             "nextStageId": 99,
-            "overrideDescription": "You reach into the hearth's binding with cold and lightning \u2014 the only thing that can interrupt a fire spirit's frequency. The copper flame turns white. Something in there hears you and reaches back."
+            "overrideDescription": "You reach into the hearth's binding with cold and lightning \u2014 the only thing that can interrupt a fire spirit's frequency. The copper flame turns white. Something in there hears you and reaches back.",
+            "chance": 0.05
           },
           {
             "nextStageId": null
@@ -3309,7 +3318,8 @@
               "value": "stalk"
             },
             "nextStageId": 99,
-            "overrideDescription": "You know where the Alpha is. You know it still responds to the old frequency. The Kennel Master's secondary whistle is hanging on the tower door. You take it before anyone stops you."
+            "overrideDescription": "You know where the Alpha is. You know it still responds to the old frequency. The Kennel Master's secondary whistle is hanging on the tower door. You take it before anyone stops you.",
+            "chance": 0.05
           },
           {
             "nextStageId": null
@@ -3708,7 +3718,8 @@
               "value": "nature"
             },
             "nextStageId": 99,
-            "overrideDescription": "The door in the breach opens inward when nature magic touches it. The Ward-Core has been waiting for someone to knock correctly for two hundred years. You have knocked correctly."
+            "overrideDescription": "The door in the breach opens inward when nature magic touches it. The Ward-Core has been waiting for someone to knock correctly for two hundred years. You have knocked correctly.",
+            "chance": 0.05
           },
           {
             "nextStageId": null
@@ -4120,7 +4131,8 @@
               "value": "vulture_company_ledger"
             },
             "nextStageId": 99,
-            "overrideDescription": "The ledger opens a side door the Vault Wardens assumed was sealed. Someone on the inside left it coded to Vane family credentials. It leads down."
+            "overrideDescription": "The ledger opens a side door the Vault Wardens assumed was sealed. Someone on the inside left it coded to Vane family credentials. It leads down.",
+            "chance": 0.05
           },
           {
             "nextStageId": null
@@ -4542,7 +4554,8 @@
               "value": "holy"
             },
             "nextStageId": 99,
-            "overrideDescription": "The central stone opens to holy magic. Elara reaches through and pulls the resonance toward you. The rune circle activates \u2014 not the broken version, but the original. The Pact Chamber is inside."
+            "overrideDescription": "The central stone opens to holy magic. Elara reaches through and pulls the resonance toward you. The rune circle activates \u2014 not the broken version, but the original. The Pact Chamber is inside.",
+            "chance": 0.05
           },
           {
             "nextStageId": null
@@ -4927,7 +4940,8 @@
               "value": "ironvein_signet"
             },
             "nextStageId": 99,
-            "overrideDescription": "The signet opens the King's Bench. The Foreman's seal breaks. The assessment inside has been waiting four hundred years for someone with the right credentials to read it."
+            "overrideDescription": "The signet opens the King's Bench. The Foreman's seal breaks. The assessment inside has been waiting four hundred years for someone with the right credentials to read it.",
+            "chance": 0.05
           },
           {
             "nextStageId": null
@@ -5347,7 +5361,8 @@
               "value": "verdant_word_seal"
             },
             "nextStageId": 99,
-            "overrideDescription": "The Verdant Word Seal activates the tower's original monitoring protocol. Thrain's final report loads automatically. The Monitoring Chamber opens."
+            "overrideDescription": "The Verdant Word Seal activates the tower's original monitoring protocol. Thrain's final report loads automatically. The Monitoring Chamber opens.",
+            "chance": 0.05
           },
           {
             "nextStageId": null
@@ -5737,7 +5752,8 @@
               "value": "oath_stone"
             },
             "nextStageId": 99,
-            "overrideDescription": "The oath stone resonates with the pulse in the light. The fragment recognizes the pact frequency. A door in the lighthouse base that was sealed opens \u2014 not a physical door, a frequency door, a place in the light where you can reach through and touch what is inside."
+            "overrideDescription": "The oath stone resonates with the pulse in the light. The fragment recognizes the pact frequency. A door in the lighthouse base that was sealed opens \u2014 not a physical door, a frequency door, a place in the light where you can reach through and touch what is inside.",
+            "chance": 0.05
           },
           {
             "nextStageId": null
@@ -6150,7 +6166,8 @@
               "value": "shadow"
             },
             "nextStageId": 99,
-            "overrideDescription": "The lock opens to shadow magic applied with the right understanding. The sealed section is behind the official catalog. The Grand Archivist is already there."
+            "overrideDescription": "The lock opens to shadow magic applied with the right understanding. The sealed section is behind the official catalog. The Grand Archivist is already there.",
+            "chance": 0.05
           },
           {
             "nextStageId": null
@@ -6540,7 +6557,8 @@
               "value": "nature"
             },
             "nextStageId": 99,
-            "overrideDescription": "The ward recognizes nature magic as the frequency it was designed for. The fractured half-ritual responds. A passage opens into the ward's core. The Ward Captain is already there."
+            "overrideDescription": "The ward recognizes nature magic as the frequency it was designed for. The fractured half-ritual responds. A passage opens into the ward's core. The Ward Captain is already there.",
+            "chance": 0.05
           },
           {
             "nextStageId": null
@@ -6962,7 +6980,8 @@
               "value": "athenaeum_scroll"
             },
             "nextStageId": 99,
-            "overrideDescription": "The Athenaeum scroll maps the ley line's original configuration. The corruption was introduced at a specific point \u2014 a ritual site thirty yards north of the camp that the Tidebound are using as a water source without knowing what it is. The Sealkeeper Aldric sees the scroll and immediately understands. He leads you there."
+            "overrideDescription": "The Athenaeum scroll maps the ley line's original configuration. The corruption was introduced at a specific point \u2014 a ritual site thirty yards north of the camp that the Tidebound are using as a water source without knowing what it is. The Sealkeeper Aldric sees the scroll and immediately understands. He leads you there.",
+            "chance": 0.05
           },
           {
             "nextStageId": null
@@ -7394,7 +7413,8 @@
               "value": "monitoring_crystal"
             },
             "nextStageId": 99,
-            "overrideDescription": "The monitoring crystal resonates with the Spire's recording medium \u2014 the same frequency Thrain's watchtower used to track the water spirit. In this room, with this crystal, the unfinished vote becomes legible. The sealed vault opens. The Unfinished Debate surfaces."
+            "overrideDescription": "The monitoring crystal resonates with the Spire's recording medium \u2014 the same frequency Thrain's watchtower used to track the water spirit. In this room, with this crystal, the unfinished vote becomes legible. The sealed vault opens. The Unfinished Debate surfaces.",
+            "chance": 0.05
           },
           {
             "nextStageId": null
@@ -7839,7 +7859,8 @@
               "value": "ironvein_signet"
             },
             "nextStageId": 99,
-            "overrideDescription": "The record room is open. Thorgrim's complete assessment is inside \u2014 including the name of the third heir. The High Judge knows you have read it before you reach the dais. He is already turning to face you."
+            "overrideDescription": "The record room is open. Thorgrim's complete assessment is inside \u2014 including the name of the third heir. The High Judge knows you have read it before you reach the dais. He is already turning to face you.",
+            "chance": 0.05
           },
           {
             "nextStageId": null
@@ -8317,7 +8338,8 @@
               "value": "vulture_company_ledger"
             },
             "nextStageId": 99,
-            "overrideDescription": "The ledger is enough for the Bone-Guard captain to send for Krog directly rather than fighting first. The Parley Grounds are behind the command tent. Krog is already there."
+            "overrideDescription": "The ledger is enough for the Bone-Guard captain to send for Krog directly rather than fighting first. The Parley Grounds are behind the command tent. Krog is already there.",
+            "chance": 0.05
           },
           {
             "nextStageId": null
@@ -8741,7 +8763,8 @@
               "value": "oath_stone"
             },
             "nextStageId": 99,
-            "overrideDescription": "The First Tree's response to the Oath Stone opens the root passage to the Heart Tree Chamber. Elara is already there. She has known you were coming since the Oath Stone entered the Gallery. She has been deciding for two days whether to collapse the passage. She did not."
+            "overrideDescription": "The First Tree's response to the Oath Stone opens the root passage to the Heart Tree Chamber. Elara is already there. She has known you were coming since the Oath Stone entered the Gallery. She has been deciding for two days whether to collapse the passage. She did not.",
+            "chance": 0.05
           },
           {
             "nextStageId": null

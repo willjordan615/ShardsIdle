@@ -211,34 +211,61 @@ function renderCurrentParty() {
 }
 
 /**
- * Render available bots for selection
+ * Render available bots for selection.
+ * Shows only bots at or below the player's level, sorted by level descending
+ * so the strongest relevant bots appear first.
  */
 function renderBotsSelection() {
     const container = document.getElementById('botsDisplay');
     if (!container) return;
-    
+
     container.innerHTML = '';
-    
+
     const challenge = currentState.selectedChallenge;
     if (!challenge || !window.gameData || !window.gameData.bots) return;
-    
-    window.gameData.bots.forEach(bot => {
+
+    // Determine player level from the first owned character in the party
+    const playerChar = currentState.currentParty.find(m =>
+        !m.characterID?.startsWith('bot_') && !m.characterID?.startsWith('import_')
+    );
+    const playerLevel = playerChar?.level || 1;
+
+    // Show bots at or below player level, sorted strongest-first
+    const eligibleBots = window.gameData.bots
+        .filter(b => b.level <= playerLevel)
+        .sort((a, b) => b.level - a.level);
+
+    const roleColors = {
+        Defender:  '#4a9eff',
+        Bruiser:   '#ff6b6b',
+        Mage:      '#c77dff',
+        Support:   '#4cd964',
+        Utility:   '#ffd700',
+        Assassin:  '#ff9f43',
+    };
+
+    eligibleBots.forEach(bot => {
         const isSelected = currentState.currentParty.some(m => m.characterID === bot.characterID);
         const canAdd = currentState.currentParty.length < challenge.maxPartySize && !isSelected;
-        
+
         const derivedStats = calculateDerivedStats(bot);
         const card = document.createElement('div');
         card.className = 'card';
         if (isSelected) card.classList.add('selected');
-        
+
+        const roleColor = roleColors[bot.role] || '#aaa';
+
         card.innerHTML = `
             <div class="card-title">${bot.characterName}</div>
-            <div class="card-subtitle">Level ${bot.level}</div>
+            <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+                <span class="card-subtitle" style="margin:0;">Lv.${bot.level}</span>
+                ${bot.role ? `<span style="font-size:0.7rem; color:${roleColor}; background:rgba(255,255,255,0.06); border:1px solid ${roleColor}44; border-radius:4px; padding:1px 6px;">${bot.role}</span>` : ''}
+            </div>
             <div class="card-description" style="margin-bottom: 0.75rem;">
                 HP: ${formatNumber(derivedStats.hp)}
             </div>
         `;
-        
+
         if (canAdd) {
             card.style.cursor = 'pointer';
             card.onclick = () => addBotToParty(bot);
@@ -249,9 +276,13 @@ function renderBotsSelection() {
             card.style.opacity = '0.5';
             card.style.cursor = 'not-allowed';
         }
-        
+
         container.appendChild(card);
     });
+
+    if (eligibleBots.length === 0) {
+        container.innerHTML = '<div style="color:#555; font-style:italic; padding:1rem;">No companions available yet.</div>';
+    }
 }
 
 /**

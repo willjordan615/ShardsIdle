@@ -160,9 +160,10 @@ function createBrowseCard(char) {
             </div>
         ` : ''}
         
-        <button onclick="importCharacter('${char.shareCode}')" class="btn-primary" style="width: 100%;">
-            Import to Party
-        </button>
+        ${char.isOwn
+            ? `<div style="width:100%; text-align:center; padding:0.5rem; color:#555; font-size:0.85rem; border:1px solid #2a2a3a; border-radius:6px;">Your Character</div>`
+            : `<button onclick="importCharacter('${char.shareCode}')" class="btn-primary" style="width: 100%;">Import to Party</button>`
+        }
     `;
     
     return card;

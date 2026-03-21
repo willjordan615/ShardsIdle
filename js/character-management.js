@@ -723,10 +723,20 @@ async function ensureIntrinsicSkill(character) {
     const intrinsicId = raceDef?.intrinsicSkills?.[0] || raceDef?.bonusSkills?.[0];
     if (!intrinsicId) return false;
 
-    // Already has it
-    if ((character.skills || []).some(s => s.skillID === intrinsicId)) return false;
+    const existing = (character.skills || []).find(s => s.skillID === intrinsicId);
 
-    // Inject it
+    // Already present and correctly flagged
+    if (existing?.intrinsic) return false;
+
+    if (existing) {
+        // Present but missing intrinsic flag — patch it in place
+        existing.intrinsic = true;
+        await saveCharacterToServer(character);
+        console.log(`[MIGRATION] Patched intrinsic flag on ${intrinsicId} for ${character.name}`);
+        return true;
+    }
+
+    // Not present at all — inject it
     if (!character.skills) character.skills = [];
     character.skills.push({
         skillID: intrinsicId,
@@ -798,6 +808,7 @@ async function showCharacterDetail(characterId) {
         renderExportButton(character); 
 renderImportBadge(character);
         renderCombatHistory(characterId);
+        renderGearUpgradeBadge(character);
 
         // Populate Combat Style section
         const profile = character.aiProfile || 'balanced';
@@ -1516,6 +1527,63 @@ async function checkIfImported(characterId) {
         console.error('Error checking import status:', error);
         return { isImported: false };
     }
+}
+
+/**
+ * Score an item by total stat contribution + tier weight.
+ * Used for gear upgrade comparisons only — not build-aware by design.
+ */
+function _gearScore(itemDef) {
+    if (!itemDef) return 0;
+    const stats = ['con', 'end', 'amb', 'har', 'conviction', 'endurance', 'ambition', 'harmony'];
+    let score = stats.reduce((sum, k) => sum + (itemDef[k] || 0), 0);
+    if (itemDef.statBonuses) {
+        score += Object.values(itemDef.statBonuses).reduce((s, v) => s + (v || 0), 0);
+    }
+    score += (itemDef.tier || 0) * 2;
+    return score;
+}
+
+/**
+ * Show/hide the gear upgrade badge based on inventory vs equipped.
+ * Respects the gearAlerts setting. Runs on every character detail render.
+ */
+function renderGearUpgradeBadge(character) {
+    const badge = document.getElementById('gearUpgradeBadge');
+    if (!badge) return;
+
+    // Check setting
+    const settings = typeof loadSettings === 'function' ? loadSettings() : {};
+    if ((settings.gearAlerts || 'on') === 'off') {
+        badge.style.display = 'none';
+        return;
+    }
+
+    const equipped  = character.equipment || {};
+    const inventory = character.inventory  || [];
+    if (!inventory.length) { badge.style.display = 'none'; return; }
+
+    const GEAR_SLOTS = ['mainHand', 'offHand', 'head', 'chest', 'accessory1', 'accessory2'];
+
+    // Score each currently equipped item per slot
+    const equippedScores = {};
+    GEAR_SLOTS.forEach(slot => {
+        const itemId  = equipped[slot];
+        const itemDef = itemId ? window.gameData?.gear?.find(g => g.id === itemId) : null;
+        equippedScores[slot] = _gearScore(itemDef);
+    });
+
+    // Check if any inventory item beats what's equipped in its slot
+    const hasUpgrade = inventory.some(inv => {
+        if (!inv?.itemID) return false;
+        const itemDef = window.gameData?.gear?.find(g => g.id === inv.itemID);
+        if (!itemDef) return false;
+        const slot = itemDef.slot_id1 || itemDef.slot;
+        if (!GEAR_SLOTS.includes(slot)) return false;
+        return _gearScore(itemDef) > equippedScores[slot];
+    });
+
+    badge.style.display = hasUpgrade ? 'inline' : 'none';
 }
 
 /**

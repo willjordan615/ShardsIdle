@@ -451,7 +451,6 @@ class CombatEngine {
 
       // --- BRANCHING LOGIC ---
       if (stage.stageBranches && stage.stageBranches.length > 0) {
-        //console.log(`[BRANCH] Evaluating branches for Stage ${stage.stageId}: ${stage.title}`);
         let resolvedNextStageId = null;
 
         for (const branch of stage.stageBranches) {
@@ -460,6 +459,12 @@ class CombatEngine {
             resolvedNextStageId = branch.nextStageId;
             if (branch.overrideDescription) stage.description = branch.overrideDescription;
             continue; 
+          }
+
+          // Optional chance gate — secret paths use this to stay rare (e.g. 0.05 = 5%)
+          // If the roll fails, treat as if the condition was never met and fall through.
+          if (branch.chance !== undefined && Math.random() > branch.chance) {
+            continue;
           }
 
           // Evaluate Condition
@@ -472,7 +477,6 @@ class CombatEngine {
               )
             );
           } else if (cond.type === 'has_skill_tag') {
-            // Any equipped skill with the given tag at level >= 1
             const taggedSkillIds = this.skills
               .filter(s => s.tags && s.tags.includes(cond.value))
               .map(s => s.id);
@@ -483,30 +487,43 @@ class CombatEngine {
                 if (!equippedPool.has(id)) return false;
                 const rec = p.skills?.find(s => s.skillID === id);
                 if (rec) return (rec.skillLevel || 0) >= 1;
-                return true; // consumable-linked
+                return true;
               });
             });
           } else if (cond.type === 'has_item') {
-            // Check if any alive player has the item in consumables or consumableStash
             conditionMet = playerCharacters.some(p =>
               !p.defeated && (
                 (p.consumables && p.consumables[cond.value] > 0) ||
                 (p.consumableStash && p.consumableStash[cond.value] > 0)
               )
             );
+          } else if (cond.type === 'has_skill_tag_and_stat') {
+            // A SINGLE character must have both: an equipped skill with the given tag at level >= 1
+            // AND meet the stat threshold. The same person must satisfy both conditions.
+            const taggedSkillIds = this.skills
+              .filter(s => s.tags && s.tags.includes(cond.skillTag))
+              .map(s => s.id);
+            conditionMet = playerCharacters.some(p => {
+              if (p.defeated) return false;
+              const meetsStat = (p.stats?.[cond.stat] || 0) >= cond.threshold;
+              if (!meetsStat) return false;
+              const equippedPool = this.getAugmentedSkillPool(p);
+              return taggedSkillIds.some(id => {
+                if (!equippedPool.has(id)) return false;
+                const rec = p.skills?.find(s => s.skillID === id);
+                return rec ? (rec.skillLevel || 0) >= 1 : true;
+              });
+            });
           } else if (cond.type === 'stat_check') {
-            // cond.stat, cond.threshold — true if any alive player meets it
             conditionMet = playerCharacters.some(p =>
               !p.defeated && (p.stats?.[cond.stat] || 0) >= cond.threshold
             );
           } else if (cond.type === 'party_size') {
-            // cond.min / cond.max
             const alive = playerCharacters.filter(p => !p.defeated).length;
             const minOk = cond.min === undefined || alive >= cond.min;
             const maxOk = cond.max === undefined || alive <= cond.max;
             conditionMet = minOk && maxOk;
           } else if (cond.type === 'random') {
-            // cond.chance — fires randomly
             conditionMet = Math.random() < (cond.chance || 0.5);
           }
           
@@ -1570,6 +1587,15 @@ class CombatEngine {
                 }
             }
         });
+    }
+
+    // Drop any IDs that don't resolve to a known skill — prevents "Skill not found"
+    // from stale discovered skills or renamed entries in a character's skill array.
+    for (const id of pool) {
+        if (!this.skills.find(s => s.id === id)) {
+            console.warn(`[SKILL POOL] Dropping unknown skill ID: ${id} for ${character.name || character.id}`);
+            pool.delete(id);
+        }
     }
 
     return pool;

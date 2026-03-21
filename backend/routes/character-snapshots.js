@@ -149,7 +149,7 @@ router.post('/export', requireAuth, async (req, res) => {
  * GET /api/character/import/:shareCode
  * Import a shared character (creates a REFERENCE, not a copy)
  */
-router.get('/import/:shareCode', async (req, res) => {
+router.get('/import/:shareCode', optionalAuth, async (req, res) => {
     try {
         const { shareCode } = req.params;
         const rawDb = db.getDatabase();
@@ -167,9 +167,20 @@ router.get('/import/:shareCode', async (req, res) => {
         });
 
         if (!snapshot) {
-            return res.status(404).json({
-                error: 'Character not found or not public'
-            });
+            return res.status(404).json({ error: 'Character not found or not public' });
+        }
+
+        // Block self-import — check both owner_user_id and direct character ownership
+        if (req.userId) {
+            const ownerMatch = snapshot.owner_user_id && snapshot.owner_user_id === req.userId;
+            let charMatch = false;
+            if (!ownerMatch) {
+                const char = await db.getCharacter(snapshot.character_id);
+                charMatch = char?.ownerUserId === req.userId;
+            }
+            if (ownerMatch || charMatch) {
+                return res.status(403).json({ error: 'You cannot import your own character.' });
+            }
         }
 
         // Create import reference (NOT a copy)
@@ -242,7 +253,7 @@ router.get('/import/:shareCode', async (req, res) => {
  * GET /api/character/browse
  * Browse public characters with filters
  */
-router.get('/browse', async (req, res) => {
+router.get('/browse', optionalAuth, async (req, res) => {
     try {
         const { level, race, sortBy, orderBy, limit } = req.query;
         const rawDb = db.getDatabase();
@@ -295,6 +306,21 @@ router.get('/browse', async (req, res) => {
 });
 
 // ===== NEW: Post-process to merge live stats =====
+// Pre-fetch the requesting user's character IDs once for self-import detection
+let userCharacterIds = new Set();
+if (req.userId) {
+    try {
+        const userChars = await new Promise((resolve, reject) => {
+            rawDb.all(
+                `SELECT id FROM characters WHERE ownerUserId = ?`,
+                [req.userId],
+                (err, rows) => { if (err) reject(err); else resolve(rows || []); }
+            );
+        });
+        userCharacterIds = new Set(userChars.map(r => r.id));
+    } catch (e) { /* non-fatal */ }
+}
+
 const characters = await Promise.all(snapshots.map(async (s) => {
     // Try to fetch live character data
     let liveCombatStats = {};
@@ -304,23 +330,27 @@ const characters = await Promise.all(snapshots.map(async (s) => {
             liveCombatStats = liveChar.combatStats;
         }
     } catch (e) {
-        // Fallback to snapshot stats if live fetch fails
         console.log(`[BROWSE] Using snapshot stats for ${s.character_name}:`, e.message);
     }
-    
+
+    const isOwn = !!(req.userId && (
+        (s.owner_user_id && req.userId === s.owner_user_id) ||
+        userCharacterIds.has(s.character_id)
+    ));
+
     return {
         shareCode: s.share_code,
-        originalCharacterId: s.character_id,  // needed for self-import prevention
+        originalCharacterId: s.character_id,
         characterName: s.character_name,
         level: s.level,
         race: s.race,
-        // Use LIVE stats if available, otherwise snapshot
         combatStats: liveCombatStats,
         partyStats: JSON.parse(s.party_stats || '{}'),
         buildName: s.build_name,
         buildDescription: s.build_description,
         importCount: s.import_count,
         ownerUserId: s.owner_user_id,
+        isOwn,
         avatarId: s.avatar_id,
         title: s.title,
         lastActiveAt: s.last_active_at,

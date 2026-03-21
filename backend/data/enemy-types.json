@@ -488,9 +488,9 @@
     "name": "Grizzlethorn Scrapper",
     "description": "Young goblins with clubs and stolen knives who compensate for their fragility by attacking in coordinated packs, targeting the same party member until they drop.",
     "stats": {
-      "conviction": 30,
-      "endurance": 25,
-      "ambition": 60,
+      "conviction": 22,
+      "endurance": 19,
+      "ambition": 45,
       "harmony": 0
     },
     "armorValue": 0,
@@ -526,9 +526,9 @@
     "name": "Thornwalker",
     "description": "The Grizzlethorn scouts who strike from the tree line with crossbows and vanish into the underbrush before the party can close the distance.",
     "stats": {
-      "conviction": 45,
-      "endurance": 30,
-      "ambition": 80,
+      "conviction": 34,
+      "endurance": 22,
+      "ambition": 60,
       "harmony": 0
     },
     "armorValue": 0,
@@ -570,10 +570,10 @@
     "name": "Bone Elder",
     "description": "A robed spiritual advisor who chants curses that degrade the party's focus and precision \u2014 never raising a weapon, always the most dangerous enemy in the tent.",
     "stats": {
-      "conviction": 20,
-      "endurance": 25,
-      "ambition": 25,
-      "harmony": 70
+      "conviction": 16,
+      "endurance": 20,
+      "ambition": 20,
+      "harmony": 56
     },
     "armorValue": 0,
     "aiProfile": "support",
@@ -607,12 +607,12 @@
     "name": "Grizzlethorn Brute",
     "description": "A large goblin armored in scavenged plate fragments who stands between the party and the Bone Elders, absorbing punishment that would kill a lesser fighter.",
     "stats": {
-      "conviction": 55,
-      "endurance": 80,
-      "ambition": 20,
+      "conviction": 44,
+      "endurance": 64,
+      "ambition": 16,
       "harmony": 0
     },
-    "armorValue": 10,
+    "armorValue": 6,
     "aiProfile": "berserker",
     "equipment": {
       "mainHand": "mace_iron_tier0",
@@ -653,12 +653,12 @@
     "name": "Chief Grik",
     "description": "The goblin who held the scattered Grizzlethorn bands together after the displacement \u2014 a brutal pragmatist who rules by combat prowess and enters a grief-rage when his tribe is threatened.",
     "stats": {
-      "conviction": 100,
-      "endurance": 110,
-      "ambition": 60,
-      "harmony": 10
+      "conviction": 80,
+      "endurance": 88,
+      "ambition": 48,
+      "harmony": 8
     },
-    "armorValue": 14,
+    "armorValue": 8,
     "aiProfile": "berserker",
     "equipment": {
       "mainHand": "axe_iron_tier0"
@@ -667,9 +667,7 @@
       "basic_attack",
       "shove",
       "shout",
-      "warcry",
-      "blood_fury",
-      "berserker_rage"
+      "blood_fury"
     ],
     "skillSelectionCount": 4,
     "lootTable": [
@@ -700,9 +698,9 @@
     "name": "Sparkling",
     "description": "A newly manifested spirit barely more than a conscious mote of light \u2014 its rapid, unpredictable movement makes it difficult to target and harder to dismiss.",
     "stats": {
-      "conviction": 15,
-      "endurance": 15,
-      "ambition": 90,
+      "conviction": 11,
+      "endurance": 11,
+      "ambition": 68,
       "harmony": 0
     },
     "armorValue": 0,
@@ -725,10 +723,10 @@
     "name": "Vine-Tender",
     "description": "An established shrine spirit that coaxes the willow roots to life, briefly anchoring a party member in place while its kin press the advantage.",
     "stats": {
-      "conviction": 25,
-      "endurance": 30,
-      "ambition": 40,
-      "harmony": 40
+      "conviction": 20,
+      "endurance": 24,
+      "ambition": 32,
+      "harmony": 32
     },
     "armorValue": 0,
     "aiProfile": "tactical",
@@ -745,17 +743,18 @@
       "nature",
       "support"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "maxMana": 14
   },
   {
     "id": "willow_mist_caller",
     "name": "Mist-Caller",
     "description": "A spirit that weaves thin fog from morning dew, reducing visibility and forcing the party to fight half-blind in a haze of its own making.",
     "stats": {
-      "conviction": 20,
-      "endurance": 20,
-      "ambition": 60,
-      "harmony": 60
+      "conviction": 15,
+      "endurance": 15,
+      "ambition": 45,
+      "harmony": 45
     },
     "armorValue": 0,
     "aiProfile": "support",
@@ -778,10 +777,10 @@
     "name": "Heart-Wisp",
     "description": "The ancient spirit that has anchored the shrine for two centuries \u2014 not malicious, but immovable in its guardianship, and capable of calling on the full strength of the grove when pushed.",
     "stats": {
-      "conviction": 40,
-      "endurance": 45,
-      "ambition": 50,
-      "harmony": 30
+      "conviction": 32,
+      "endurance": 36,
+      "ambition": 40,
+      "harmony": 24
     },
     "armorValue": 0,
     "aiProfile": "tactical",
@@ -822,10 +821,10 @@
     "name": "Twisted Vine Tendril",
     "description": "A root from the shrine's corrupted depths, animated by something that was never meant to surface \u2014 it grasps and holds without letting go.",
     "stats": {
-      "conviction": 40,
-      "endurance": 50,
-      "ambition": 30,
-      "harmony": 20
+      "conviction": 34,
+      "endurance": 42,
+      "ambition": 26,
+      "harmony": 17
     },
     "armorValue": 0,
     "aiProfile": "aggressive",
@@ -842,7 +841,8 @@
       "nature",
       "melee"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "maxMana": 14
   },
   {
     "id": "heart_wisp_unbound",
@@ -895,10 +895,10 @@
     "name": "Deckhand",
     "description": "A traveler who never paid the toll. Now they collect it endlessly, unable to remember why.",
     "stats": {
-      "conviction": 30,
-      "endurance": 40,
-      "ambition": 70,
-      "harmony": 20
+      "conviction": 24,
+      "endurance": 32,
+      "ambition": 56,
+      "harmony": 16
     },
     "armorValue": 0,
     "aiProfile": "aggressive",
@@ -920,10 +920,10 @@
     "name": "Oar-Specter",
     "description": "The crossing's enforcers. They move like the current \u2014 patient, inevitable, cold.",
     "stats": {
-      "conviction": 60,
-      "endurance": 70,
-      "ambition": 50,
-      "harmony": 30
+      "conviction": 48,
+      "endurance": 56,
+      "ambition": 40,
+      "harmony": 24
     },
     "armorValue": 2,
     "aiProfile": "tactical",
@@ -946,10 +946,10 @@
     "name": "Toll-Collector",
     "description": "Demands something of everyone who passes. What it demands from you will not be coin.",
     "stats": {
-      "conviction": 50,
-      "endurance": 55,
-      "ambition": 60,
-      "harmony": 80
+      "conviction": 42,
+      "endurance": 47,
+      "ambition": 51,
+      "harmony": 68
     },
     "armorValue": 0,
     "aiProfile": "support",
@@ -972,12 +972,12 @@
     "name": "Ferryman's Echo",
     "description": "Old Bram, or what is left of him. He does not remember your face but he remembers the rules.",
     "stats": {
-      "conviction": 120,
-      "endurance": 140,
-      "ambition": 80,
-      "harmony": 160
+      "conviction": 102,
+      "endurance": 119,
+      "ambition": 68,
+      "harmony": 136
     },
-    "armorValue": 5,
+    "armorValue": 3,
     "aiProfile": "tactical",
     "equipment": {},
     "availableSkills": [
@@ -1011,10 +1011,10 @@
     "name": "Lyra",
     "description": "The river's voice, before the halflings forgot the words to speak to her. She has not forgotten them. She is simply no longer interested in patience.",
     "stats": {
-      "conviction": 100,
-      "endurance": 120,
-      "ambition": 60,
-      "harmony": 200
+      "conviction": 85,
+      "endurance": 102,
+      "ambition": 51,
+      "harmony": 170
     },
     "armorValue": 3,
     "aiProfile": "support",
@@ -1056,10 +1056,10 @@
     "name": "Vulture Scrapper",
     "description": "Former laborers, drifters, and minor criminals who found the Vulture Company before starvation found them first. They fight with the recklessness of people with nothing to lose.",
     "stats": {
-      "conviction": 50,
-      "endurance": 50,
-      "ambition": 80,
-      "harmony": 30
+      "conviction": 40,
+      "endurance": 40,
+      "ambition": 64,
+      "harmony": 24
     },
     "armorValue": 0,
     "aiProfile": "aggressive",
@@ -1082,10 +1082,10 @@
     "name": "Roadwarden",
     "description": "Ex-soldiers who know exactly how the Royal Guard operates and use that knowledge to stay one step ahead of them. They are the ones who actually run the ambushes.",
     "stats": {
-      "conviction": 60,
-      "endurance": 65,
-      "ambition": 75,
-      "harmony": 40
+      "conviction": 51,
+      "endurance": 55,
+      "ambition": 64,
+      "harmony": 34
     },
     "armorValue": 1,
     "aiProfile": "tactical",
@@ -1115,10 +1115,10 @@
     "name": "Feral Warhound",
     "description": "Trained for war, abandoned with the garrison, feral for forty years. They still respond to whistles. Just not to commands to stop.",
     "stats": {
-      "conviction": 40,
-      "endurance": 60,
-      "ambition": 90,
-      "harmony": 20
+      "conviction": 32,
+      "endurance": 48,
+      "ambition": 72,
+      "harmony": 16
     },
     "armorValue": 0,
     "aiProfile": "aggressive",
@@ -1140,10 +1140,10 @@
     "name": "Beast Handler",
     "description": "The handlers figured out that the old garrison's warhounds respond to the old garrison's whistles. They didn't figure out that the warhounds respond to everyone's blood equally.",
     "stats": {
-      "conviction": 55,
-      "endurance": 60,
-      "ambition": 70,
-      "harmony": 50
+      "conviction": 47,
+      "endurance": 51,
+      "ambition": 60,
+      "harmony": 42
     },
     "armorValue": 1,
     "aiProfile": "support",
@@ -1173,12 +1173,12 @@
     "name": "Ironbound Veteran",
     "description": "What the Royal Guard used to look like. They carry salvaged plate and genuine military discipline, which makes them considerably more dangerous than the rabble around them.",
     "stats": {
-      "conviction": 100,
-      "endurance": 110,
-      "ambition": 50,
-      "harmony": 40
+      "conviction": 85,
+      "endurance": 94,
+      "ambition": 42,
+      "harmony": 34
     },
-    "armorValue": 8,
+    "armorValue": 6,
     "aiProfile": "tactical",
     "equipment": {},
     "availableSkills": [
@@ -1211,12 +1211,12 @@
     "name": "Captain Vane",
     "description": "He was a real officer once. The commission, the rank, the posting \u2014 all legitimate. He will tell you this if you give him a moment before the fight starts. He tells everyone.",
     "stats": {
-      "conviction": 130,
-      "endurance": 140,
-      "ambition": 90,
-      "harmony": 80
+      "conviction": 110,
+      "endurance": 119,
+      "ambition": 76,
+      "harmony": 68
     },
-    "armorValue": 6,
+    "armorValue": 4,
     "aiProfile": "aggressive",
     "equipment": {},
     "availableSkills": [
@@ -1224,8 +1224,7 @@
       "slash",
       "warcry",
       "blood_letting",
-      "counter_strike",
-      "shout"
+      "counter_strike"
     ],
     "skillSelectionCount": 4,
     "tags": [
@@ -1261,12 +1260,12 @@
     "name": "Captain Vane",
     "description": "Below the tower, in the vault where the old garrison kept their records, Vane is a different person. Whatever the garrison found here changed them. He found the same records. He is not telling anyone what they say.",
     "stats": {
-      "conviction": 150,
-      "endurance": 170,
-      "ambition": 110,
-      "harmony": 90
+      "conviction": 128,
+      "endurance": 144,
+      "ambition": 94,
+      "harmony": 76
     },
-    "armorValue": 8,
+    "armorValue": 6,
     "aiProfile": "aggressive",
     "equipment": {},
     "availableSkills": [
@@ -1274,9 +1273,7 @@
       "slash",
       "warcry",
       "blood_letting",
-      "counter_strike",
-      "weak_point",
-      "shout"
+      "counter_strike"
     ],
     "skillSelectionCount": 5,
     "tags": [
@@ -1312,10 +1309,10 @@
     "name": "Sproutling",
     "description": "They were tending the orchard when the blight took them. They are still tending it. The difference is that now the orchard tends back.",
     "stats": {
-      "conviction": 20,
-      "endurance": 30,
-      "ambition": 60,
-      "harmony": 40
+      "conviction": 16,
+      "endurance": 24,
+      "ambition": 48,
+      "harmony": 32
     },
     "armorValue": 0,
     "aiProfile": "aggressive",
@@ -1338,10 +1335,10 @@
     "name": "Thorn-Weaver",
     "description": "The integration has gone further in these ones. The thorns are theirs now, not the tree's. They have stopped being able to tell the difference.",
     "stats": {
-      "conviction": 40,
-      "endurance": 50,
-      "ambition": 70,
-      "harmony": 60
+      "conviction": 34,
+      "endurance": 42,
+      "ambition": 60,
+      "harmony": 51
     },
     "armorValue": 0,
     "aiProfile": "tactical",
@@ -1365,10 +1362,10 @@
     "name": "Root-Shambler",
     "description": "The oldest gardeners. The roots grew through them rather than around them. They move slowly and do not feel pain in any way that matters to them anymore.",
     "stats": {
-      "conviction": 80,
-      "endurance": 120,
-      "ambition": 30,
-      "harmony": 50
+      "conviction": 68,
+      "endurance": 102,
+      "ambition": 26,
+      "harmony": 42
     },
     "armorValue": 4,
     "aiProfile": "aggressive",
@@ -1393,10 +1390,10 @@
     "name": "Sister Maren",
     "description": "She remembers the words of the ritual. She does not remember that she was the one who said them wrong. The Choir does not correct her. The Choir agrees with everything she says.",
     "stats": {
-      "conviction": 100,
-      "endurance": 130,
-      "ambition": 60,
-      "harmony": 180
+      "conviction": 85,
+      "endurance": 110,
+      "ambition": 51,
+      "harmony": 153
     },
     "armorValue": 2,
     "aiProfile": "support",
@@ -1434,10 +1431,10 @@
     "name": "The Elder Spring",
     "description": "The well was not just a well. The Order knew what lived in the water and built the blessing around it, not over it. Sister Maren's ritual did not corrupt the spirit \u2014 it woke it up angry.",
     "stats": {
-      "conviction": 90,
-      "endurance": 120,
-      "ambition": 50,
-      "harmony": 250
+      "conviction": 76,
+      "endurance": 102,
+      "ambition": 42,
+      "harmony": 212
     },
     "armorValue": 0,
     "aiProfile": "support",
