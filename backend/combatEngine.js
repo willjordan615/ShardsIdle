@@ -590,8 +590,8 @@ class CombatEngine {
       // Reset lastUsedSkillId and buffCooldowns at the start of each stage
       playerCharacters.forEach(p => { p.lastUsedSkillId = null; p.buffCooldowns = {}; });
 
-      const SUDDEN_DEATH_START = 250;   // turn within a stage where escalation begins
-      const SUDDEN_DEATH_BASE  = 0.04;  // 4% max HP per combatant at turn 250, +2% per 10 turns after
+      const SUDDEN_DEATH_START = 100;   // turn within a stage where escalation begins
+      const SUDDEN_DEATH_BASE  = 0.04;  // 4% max HP at turn 100, +2% per 10 turns after
       let stageTurnCount = stageTurns.length;
       const startStageHP = playerCharacters.map(p => ({ id: p.id, hp: p.currentHP }));
 
@@ -768,6 +768,11 @@ class CombatEngine {
           const pct = SUDDEN_DEATH_BASE + Math.floor(overtime / 10) * 0.02;
           const allCombatants = [...playerCharacters, ...enemies].filter(c => !c.defeated);
           if (allCombatants.length > 0) {
+            // Mark sudden death active on all combatants — reduces healing effectiveness
+            allCombatants.forEach(c => {
+              c.suddenDeathActive = true;
+              c.suddenDeathTurn = (c.suddenDeathTurn || 0) + 1;
+            });
             console.warn(`[SUDDEN DEATH] Turn ${stageTurnCount}: dealing ${(pct*100).toFixed(0)}% max HP to all combatants`);
             allCombatants.forEach(c => {
               const dmg = Math.max(1, Math.floor(c.maxHP * pct));
@@ -1143,6 +1148,23 @@ class CombatEngine {
 
     const usableSkills = rawPool.filter(s => this.hasResources(actor, s) && validCategories.includes(s.category));
 
+    // ── Untrained Strike injection ────────────────────────────────────────────
+    // When a player is mana-starved and has no affordable damage skills, inject
+    // the universal fallback. Never available to enemies.
+    if (!isEnemy) {
+      const manaRatio = actor.currentMana / actor.maxMana;
+      const hasAffordableDamage = usableSkills.some(s =>
+        s.category && (s.category.includes('DAMAGE') || s.category === 'CONTROL')
+      );
+      if (manaRatio < 0.15 && !hasAffordableDamage) {
+        const untrainedSkill = this.skills.find(s => s.id === 'untrained_strike');
+        if (untrainedSkill && this.hasResources(actor, untrainedSkill) &&
+            !usableSkills.find(s => s.id === 'untrained_strike')) {
+          usableSkills.push(untrainedSkill);
+        }
+      }
+    }
+
     if (usableSkills.length > 0) {
       const candidates = usableSkills.map(skill => {
         const cat = skill.category;
@@ -1259,7 +1281,11 @@ class CombatEngine {
           if (Math.abs(this._threatScore(targetCombatant) - context.highestThreatScore) < 0.01) score *= 1.15;
         }
 
-        // Profile boosts — genuinely distinct identities
+        // Untrained Strike — big score bonus when it's been injected (mana-starved, no damage)
+        // Its raw basePower of 1.2 would lose to many things otherwise
+        if (skill.id === 'untrained_strike') {
+          score *= 4.0;  // override all other scoring — if it's in the pool, use it
+        }
         if (profile === 'aggressive') {
           if (cat && cat.includes('DAMAGE')) score *= 1.5;
           if (cat === 'BUFF' || cat === 'DEFENSE') score *= 0.25;
@@ -1367,6 +1393,14 @@ class CombatEngine {
           if (difficulty === 'normal') score *= 0.4;
         }
 
+        // Sudden death awareness — field is killing everyone, end the fight NOW
+        if (context.suddenDeathActive) {
+          if (cat && cat.includes('DAMAGE')) score *= 2.0;
+          else if (cat === 'BUFF' || cat === 'DEFENSE' || cat === 'UTILITY') score *= 0.05;
+          else if (cat === 'HEALING' || cat === 'HEALING_AOE') score *= 0.05;
+          // untrained_strike already has its own bonus but gets the damage boost on top
+        }
+
         return { skill, target, score };
       });
 
@@ -1424,6 +1458,7 @@ class CombatEngine {
       stageTurnCount,
       lastUsedSkillId:  actor.lastUsedSkillId || null,
       lastHitDamagePct: actor.lastHitDamagePct || 0,
+      suddenDeathActive: stageTurnCount > SUDDEN_DEATH_START,
       // Budget ratios only meaningful for players persisting across stages.
       // Enemies respawn fresh each stage so conservation pressure doesn't apply.
       staminaBudgetRatio: actor.type === 'player'
@@ -2106,7 +2141,10 @@ class CombatEngine {
 
     // Consume resources
     if (skill.costType === 'stamina') {
-        actor.currentStamina = Math.max(0, actor.currentStamina - skill.costAmount);
+        const cost = skill.costPercent
+            ? Math.floor(actor.maxStamina * skill.costPercent)
+            : skill.costAmount;
+        actor.currentStamina = Math.max(0, actor.currentStamina - cost);
     } else if (skill.costType === 'mana') {
         actor.currentMana = Math.max(0, actor.currentMana - skill.costAmount);
     }
@@ -2577,7 +2615,11 @@ class CombatEngine {
                 poolType = 'hp';
                 recipient = actor;
                 const harmonyScale = 1 + ((actor.stats?.harmony || 0) / 300);
-                const healAmount = Math.max(1, Math.floor((target?.maxHP || 1) * effect.magnitude * harmonyScale));
+                let healAmount = Math.max(1, Math.floor((target?.maxHP || 1) * effect.magnitude * harmonyScale));
+                if (actor.suddenDeathActive) {
+                    const sdOvertime = actor.suddenDeathTurn || 0;
+                    healAmount = Math.floor(healAmount * Math.max(0.0, 0.20 - Math.floor(sdOvertime / 10) * 0.08));
+                }
                 recipient.currentHP = Math.min(recipient.maxHP, recipient.currentHP + healAmount);
                 //console.log(`[LIFETAP] ${skill.name}: ${actor.name} leeches ${healAmount} HP (harmony scale ${harmonyScale.toFixed(2)})`);
                 return;
@@ -2619,7 +2661,15 @@ class CombatEngine {
             }
 
             const scaleMultiplier = 1 + (statValue / CONSTANTS.STAT_SCALE);
-            const restoreAmount = Math.floor(maxPoolValue * effect.magnitude * scaleMultiplier);
+            let restoreAmount = Math.floor(maxPoolValue * effect.magnitude * scaleMultiplier);
+
+            // Sudden death — healing drops sharply to ensure stalled fights end.
+            // Starts at 20%, drops 8% per 10 turns. Floor: 0% (no healing at all eventually).
+            if (poolType === 'hp' && actor.suddenDeathActive) {
+                const sdOvertime = (actor.suddenDeathTurn || 0);
+                const healEffectiveness = Math.max(0.0, 0.20 - Math.floor(sdOvertime / 10) * 0.08);
+                restoreAmount = Math.floor(restoreAmount * healEffectiveness);
+            }
 
             const oldValue = currentPoolValue;
             const newValue = Math.min(maxPoolValue, currentPoolValue + restoreAmount);
@@ -2743,6 +2793,11 @@ class CombatEngine {
   hasResources(actor, skill) {
     // Check status blocks first (e.g. silence blocks mana skills)
     if (this.statusEngine.isSkillBlocked(actor, skill)) return false;
+    // costPercent: skill costs a percentage of the actor's max stamina
+    if (skill.costPercent && skill.costType === 'stamina') {
+      const cost = Math.floor(actor.maxStamina * skill.costPercent);
+      return actor.currentStamina >= cost;
+    }
     if (skill.costType === 'stamina') return actor.currentStamina >= skill.costAmount;
     if (skill.costType === 'mana') return actor.currentMana >= skill.costAmount;
     return true;
