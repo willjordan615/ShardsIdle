@@ -322,10 +322,10 @@ if (req.userId) {
 }
 
 const characters = await Promise.all(snapshots.map(async (s) => {
-    // Try to fetch live character data
     let liveCombatStats = {};
+    let liveChar = null;
     try {
-        const liveChar = await db.getCharacter(s.character_id);
+        liveChar = await db.getCharacter(s.character_id);
         if (liveChar?.combatStats) {
             liveCombatStats = liveChar.combatStats;
         }
@@ -346,15 +346,14 @@ const characters = await Promise.all(snapshots.map(async (s) => {
         race: s.race,
         combatStats: liveCombatStats,
         partyStats: JSON.parse(s.party_stats || '{}'),
-        buildName: s.build_name,
-        buildDescription: s.build_description,
         importCount: s.import_count,
         ownerUserId: s.owner_user_id,
         isOwn,
         avatarId: s.avatar_id,
         title: s.title,
         lastActiveAt: s.last_active_at,
-        aiProfile: s.ai_profile || 'balanced'
+        aiProfile: s.ai_profile || 'balanced',
+        roleTag: liveChar?.roleTag || null,
     };
 }));
 // ===============================================

@@ -13,6 +13,15 @@ function loadGameData() {
         gameData.skills = JSON.parse(fs.readFileSync(path.join(dataDir, 'skills.json'), 'utf8'));
         gameData.enemyTypes = JSON.parse(fs.readFileSync(path.join(dataDir, 'enemy-types.json'), 'utf8'));
         gameData.races = JSON.parse(fs.readFileSync(path.join(dataDir, 'races.json'), 'utf8'));
+        // Normalize all racial skill field names to intrinsicSkills regardless of what the JSON uses
+        gameData.races = gameData.races.map(race => {
+            const skills = race.intrinsicSkills || race.bonusSkills || race.racialSkills || race.startingSkills || [];
+            const normalized = { ...race, intrinsicSkills: skills };
+            delete normalized.bonusSkills;
+            delete normalized.racialSkills;
+            delete normalized.startingSkills;
+            return normalized;
+        });
         gameData.challenges = JSON.parse(fs.readFileSync(path.join(dataDir, 'challenges.json'), 'utf8'));
         gameData.gear = JSON.parse(fs.readFileSync(path.join(dataDir, 'items.json'), 'utf8'));
         gameData.bots = JSON.parse(fs.readFileSync(path.join(dataDir, 'bots.json'), 'utf8'));

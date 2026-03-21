@@ -231,6 +231,24 @@
                             </select>
                         </div>
                         <p id="aiProfileSaveMsg" style="color:#4cd964; font-size:0.75rem; min-height:1em; text-align:right; margin:2px 4px 0;"></p>
+
+                        <div class="loadout-slot loadout-slot--filled" style="cursor:pointer; position:relative; gap:12px; margin-top:6px;">
+                            <span class="loadout-slot__label" style="min-width:90px; flex-shrink:0;">Role</span>
+                            <span class="loadout-slot__item" id="roleTagBadge">None</span>
+                            <select id="roleTagSelect"
+                                    onchange="saveRoleTag()"
+                                    style="position:absolute; inset:0; width:100%; height:100%; opacity:0; cursor:pointer; z-index:1; font-size:16px;">
+                                <option value="">— Untagged</option>
+                                <option value="Defender">🛡 Defender</option>
+                                <option value="Bruiser">⚔️ Bruiser</option>
+                                <option value="Mage">🔮 Mage</option>
+                                <option value="Healer">💊 Healer</option>
+                                <option value="Support">💚 Support</option>
+                                <option value="Utility">🔧 Utility</option>
+                                <option value="Assassin">🗡️ Assassin</option>
+                            </select>
+                        </div>
+                        <p id="roleTagSaveMsg" style="color:#4cd964; font-size:0.75rem; min-height:1em; text-align:right; margin:2px 4px 0;"></p>
                     </div>
                 </div>
             </div>

@@ -824,6 +824,17 @@ renderImportBadge(character);
         if (badge) badge.textContent = profileLabels[profile] || profile;
         const select = document.getElementById('aiProfileDetailSelect');
         if (select) select.value = profile;
+
+        // Role tag
+        const roleTag = character.roleTag || '';
+        const ROLE_LABELS = {
+            Defender: '🛡 Defender', Bruiser: '⚔️ Bruiser', Mage: '🔮 Mage',
+            Healer: '💊 Healer', Support: '💚 Support', Utility: '🔧 Utility', Assassin: '🗡️ Assassin'
+        };
+        const roleTagBadge = document.getElementById('roleTagBadge');
+        if (roleTagBadge) roleTagBadge.textContent = ROLE_LABELS[roleTag] || 'None';
+        const roleTagSelect = document.getElementById('roleTagSelect');
+        if (roleTagSelect) roleTagSelect.value = roleTag;
         const msg = document.getElementById('aiProfileSaveMsg');
         if (msg) msg.textContent = '';
 
@@ -1279,6 +1290,36 @@ async function saveAiProfile() {
     } catch (err) {
         if (msg) msg.textContent = 'Failed to save. Try again.';
         console.error('saveAiProfile error:', err);
+    }
+}
+
+async function saveRoleTag() {
+    const characterId = currentState.detailCharacterId;
+    const select = document.getElementById('roleTagSelect');
+    const msg    = document.getElementById('roleTagSaveMsg');
+    const badge  = document.getElementById('roleTagBadge');
+    if (!characterId || !select) return;
+
+    const roleTag = select.value;
+    const ROLE_LABELS = {
+        Defender: '🛡 Defender', Bruiser: '⚔️ Bruiser', Mage: '🔮 Mage',
+        Healer: '💊 Healer', Support: '💚 Support', Utility: '🔧 Utility', Assassin: '🗡️ Assassin'
+    };
+
+    try {
+        const character = await getCharacter(characterId);
+        if (!character) throw new Error('Character not found');
+        character.roleTag = roleTag;
+        await saveCharacterToServer(character);
+
+        if (badge) badge.textContent = ROLE_LABELS[roleTag] || 'None';
+        if (msg) {
+            msg.textContent = 'Role saved.';
+            setTimeout(() => { if (msg) msg.textContent = ''; }, 2000);
+        }
+    } catch (err) {
+        if (msg) msg.textContent = 'Failed to save.';
+        console.error('saveRoleTag error:', err);
     }
 }
 

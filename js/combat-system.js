@@ -609,23 +609,39 @@ async function loadPublicCompanions() {
                 });
             }
 
+            const ROLE_LABELS = {
+                Defender:'🛡 Defender', Bruiser:'⚔️ Bruiser', Mage:'🔮 Mage',
+                Healer:'💊 Healer', Support:'💚 Support', Utility:'🔧 Utility', Assassin:'🗡️ Assassin'
+            };
+            const roleLabel = char.roleTag ? ROLE_LABELS[char.roleTag] : null;
+            const milestones = stats.milestones || {};
+            const badges = [
+                milestones.firstBlood       && '🩸',
+                milestones.hundredKills     && '💀',
+                milestones.masterHealer     && '✨',
+                milestones.undefeated       && '🏆',
+                milestones.centuryOfCombats && '⚔️',
+            ].filter(Boolean);
+
             card.innerHTML = `
-                <div class="card-title">${escapeHtml(char.characterName)}</div>
-                <div class="card-subtitle">Level ${char.level} ${escapeHtml(char.race)}</div>
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-top: 0.5rem;">
-                    <div style="background: rgba(10, 14, 39, 0.6); padding: 0.25rem; border-radius: 4px; text-align: center;">
-                        <div style="color: #8b7355; font-size: 0.7rem;">Wins</div>
-                        <div style="color: #4cd964; font-weight: bold;">${stats.wins || 0}</div>
+                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:2px;">
+                    <span class="card-title" style="margin:0;">${escapeHtml(char.characterName)}</span>
+                    ${roleLabel ? `<span style="font-size:0.68rem;color:#d4af37;background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.25);border-radius:8px;padding:1px 6px;">${roleLabel}</span>` : ''}
+                </div>
+                <div class="card-subtitle" style="margin-bottom:0.4rem;">Lv.${char.level} ${escapeHtml(char.race)}</div>
+                <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:4px;margin-bottom:0.35rem;">
+                    <div style="background:rgba(10,14,39,0.6);padding:0.2rem;border-radius:4px;text-align:center;">
+                        <div style="color:#8b7355;font-size:0.68rem;">Wins</div>
+                        <div style="color:#4cd964;font-weight:bold;font-size:0.85rem;">${stats.wins || 0}</div>
                     </div>
-                    <div style="background: rgba(10, 14, 39, 0.6); padding: 0.25rem; border-radius: 4px; text-align: center;">
-                        <div style="color: #8b7355; font-size: 0.7rem;">Win Rate</div>
-                        <div style="color: #d4af37; font-weight: bold;">${stats.winRate || '0.000'}</div>
+                    <div style="background:rgba(10,14,39,0.6);padding:0.2rem;border-radius:4px;text-align:center;">
+                        <div style="color:#8b7355;font-size:0.68rem;">Win Rate</div>
+                        <div style="color:#d4af37;font-weight:bold;font-size:0.85rem;">${stats.winRate ? (parseFloat(stats.winRate)*100).toFixed(0)+'%' : '—'}</div>
                     </div>
                 </div>
-                <div style="margin-top: 0.5rem; color: #8b7355; font-size: 0.75rem; text-align: center;">
-                    Imported by ${char.importCount || 0} players
-                </div>
-                <button class="secondary" style="width: 100%; margin-top: 0.5rem; font-size: 0.85rem;" ${disabled ? 'disabled' : ''}>${disabledLabel || 'Add to Party'}</button>
+                ${badges.length ? `<div style="margin-bottom:0.3rem;font-size:0.9rem;">${badges.join(' ')}</div>` : ''}
+                <div style="color:#8b7355;font-size:0.7rem;margin-bottom:0.4rem;">${char.importCount || 0} imports</div>
+                <button class="secondary" style="width:100%;font-size:0.82rem;" ${disabled ? 'disabled' : ''}>${disabledLabel || 'Add to Party'}</button>
             `;
 
             container.appendChild(card);
