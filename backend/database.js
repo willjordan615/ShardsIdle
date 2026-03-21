@@ -21,6 +21,33 @@ function createTables() {
     return new Promise((resolve, reject) => {
         db.serialize(() => {
             db.run(`
+                CREATE TABLE IF NOT EXISTS users (
+                    user_id TEXT PRIMARY KEY,
+                    username TEXT NOT NULL,
+                    password_hash TEXT,
+                    is_guest INTEGER NOT NULL DEFAULT 1,
+                    created_at INTEGER NOT NULL,
+                    last_active_at INTEGER NOT NULL
+                )
+            `, (err) => { if (err) reject(err); });
+
+            db.run(`
+                CREATE TABLE IF NOT EXISTS sessions (
+                    token TEXT PRIMARY KEY,
+                    user_id TEXT NOT NULL,
+                    created_at INTEGER NOT NULL,
+                    last_used_at INTEGER NOT NULL,
+                    expires_at INTEGER NOT NULL,
+                    FOREIGN KEY (user_id) REFERENCES users(user_id)
+                )
+            `, (err) => { if (err) reject(err); });
+
+            db.run(`
+                CREATE INDEX IF NOT EXISTS idx_sessions_user
+                ON sessions(user_id)
+            `, (err) => { if (err) reject(err); });
+
+            db.run(`
                 CREATE TABLE IF NOT EXISTS combat_logs (
                     id TEXT PRIMARY KEY,
                     challengeID TEXT NOT NULL,
@@ -199,7 +226,11 @@ async function initializeCharacterSnapshotsTable() {
         ['consumableStash', "TEXT NOT NULL DEFAULT '{}'"],
         ['gold',            'REAL NOT NULL DEFAULT 0'],
         ['arcaneDust',      'REAL NOT NULL DEFAULT 0'],
-        ['beltOrder',       "TEXT NOT NULL DEFAULT '[null,null,null,null]'"]
+        ['beltOrder',       "TEXT NOT NULL DEFAULT '[null,null,null,null]'"],
+        ['shareEnabled',    'INTEGER DEFAULT 0'],
+        ['shareCode',       'TEXT DEFAULT NULL'],
+        ['buildName',       'TEXT DEFAULT NULL'],
+        ['buildDescription','TEXT DEFAULT NULL'],
     ]) {
         await new Promise((resolve) => {
             db.run(`ALTER TABLE characters ADD COLUMN ${col} ${def}`, (err) => {
@@ -578,6 +609,124 @@ function getDatabase() {
     return db;
 }
 
+// ── Auth helpers ──────────────────────────────────────────────────────────────
+
+const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days sliding
+
+function createUser(userId, username, passwordHash, isGuest) {
+    return new Promise((resolve, reject) => {
+        const now = Date.now();
+        db.run(
+            `INSERT INTO users (user_id, username, password_hash, is_guest, created_at, last_active_at)
+             VALUES (?, ?, ?, ?, ?, ?)`,
+            [userId, username, passwordHash || null, isGuest ? 1 : 0, now, now],
+            function(err) { if (err) reject(err); else resolve(); }
+        );
+    });
+}
+
+function getUserById(userId) {
+    return new Promise((resolve, reject) => {
+        db.get(`SELECT * FROM users WHERE user_id = ?`, [userId], (err, row) => {
+            if (err) reject(err); else resolve(row || null);
+        });
+    });
+}
+
+function getUserByUsername(username) {
+    return new Promise((resolve, reject) => {
+        db.get(`SELECT * FROM users WHERE username = ? AND is_guest = 0`, [username], (err, row) => {
+            if (err) reject(err); else resolve(row || null);
+        });
+    });
+}
+
+function updateUserPassword(userId, passwordHash, username) {
+    return new Promise((resolve, reject) => {
+        const now = Date.now();
+        db.run(
+            `UPDATE users SET password_hash = ?, username = ?, is_guest = 0, last_active_at = ? WHERE user_id = ?`,
+            [passwordHash, username, now, userId],
+            function(err) { if (err) reject(err); else resolve(); }
+        );
+    });
+}
+
+function createSession(token, userId) {
+    return new Promise((resolve, reject) => {
+        const now     = Date.now();
+        const expires = now + SESSION_TTL_MS;
+        db.run(
+            `INSERT INTO sessions (token, user_id, created_at, last_used_at, expires_at)
+             VALUES (?, ?, ?, ?, ?)`,
+            [token, userId, now, now, expires],
+            function(err) { if (err) reject(err); else resolve(); }
+        );
+    });
+}
+
+function getSession(token) {
+    return new Promise((resolve, reject) => {
+        const now = Date.now();
+        db.get(
+            `SELECT * FROM sessions WHERE token = ? AND expires_at > ?`,
+            [token, now],
+            (err, row) => { if (err) reject(err); else resolve(row || null); }
+        );
+    });
+}
+
+function touchSession(token) {
+    // Slide the expiry window on each use
+    const now     = Date.now();
+    const expires = now + SESSION_TTL_MS;
+    return new Promise((resolve, reject) => {
+        db.run(
+            `UPDATE sessions SET last_used_at = ?, expires_at = ? WHERE token = ?`,
+            [now, expires, token],
+            function(err) { if (err) reject(err); else resolve(); }
+        );
+    });
+}
+
+function deleteSession(token) {
+    return new Promise((resolve, reject) => {
+        db.run(`DELETE FROM sessions WHERE token = ?`, [token],
+            function(err) { if (err) reject(err); else resolve(); }
+        );
+    });
+}
+
+function transferCharactersToUser(fromGuestId, toUserId) {
+    return new Promise((resolve, reject) => {
+        db.run(
+            `UPDATE characters SET ownerUserId = ? WHERE ownerUserId = ?`,
+            [toUserId, fromGuestId],
+            function(err) { if (err) reject(err); else resolve(this.changes); }
+        );
+    });
+}
+
+function pruneExpiredSessions() {
+    return new Promise((resolve, reject) => {
+        const now = Date.now();
+        db.run(`DELETE FROM sessions WHERE expires_at < ?`, [now], function(err) {
+            if (err) { console.error('[AUTH] Session prune error:', err); reject(err); }
+            else {
+                if (this.changes > 0) console.log(`[AUTH] Pruned ${this.changes} expired sessions`);
+                resolve(this.changes);
+            }
+        });
+    });
+}
+
+function scheduleSessionPruning() {
+    pruneExpiredSessions().catch(err => console.error('[AUTH] Startup session prune failed:', err));
+    setInterval(() => {
+        pruneExpiredSessions().catch(err => console.error('[AUTH] Scheduled session prune failed:', err));
+    }, 6 * 60 * 60 * 1000);
+}
+
 // ── Combat log pruning ────────────────────────────────────────────────────────
 // Two-tier cleanup to prevent unbounded growth in an idle game context:
 //   1. Strip full turn data from logs older than 24h (keep metadata + segment summaries)
@@ -689,5 +838,17 @@ module.exports = {
     createImportReference,
     incrementImportUsage,
     isImportedCharacter,
-    getDatabase
+    getDatabase,
+    // Auth
+    createUser,
+    getUserById,
+    getUserByUsername,
+    updateUserPassword,
+    createSession,
+    getSession,
+    touchSession,
+    deleteSession,
+    transferCharactersToUser,
+    pruneExpiredSessions,
+    scheduleSessionPruning,
 };

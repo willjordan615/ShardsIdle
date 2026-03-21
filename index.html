@@ -12,6 +12,7 @@
         <header>
             <h1>Shards Idle</h1>
             <p class="subtitle">An Asynchronous Group-Based PvE RPG</p>
+            <div id="authUserDisplay" style="position:absolute; top:1rem; right:3.5rem; font-size:0.8rem; display:flex; align-items:center;"></div>
             <button id="settingsOpenBtn" class="settings-btn secondary" title="Settings">⚙ Settings</button>
         </header>
 
@@ -180,7 +181,10 @@
                         <div style="margin-bottom: 1rem;">
                             <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
                                 <span style="color: #8b7355; font-size: 0.75rem; text-transform: uppercase;">Level</span>
-                                <span style="color: #d4af37; font-weight: bold;" id="detailLevel">1</span>
+                                <span id="detailLevel" style="font-weight: bold;">
+                                    <span style="color: #d4af37;">1</span>
+                                    <span style="color: #555; font-size: 0.85em;"> → 2</span>
+                                </span>
                             </div>
                             <div class="health-bar">
                                 <div class="health-bar-fill" id="xpBar" style="width: 0%"></div>
@@ -336,6 +340,7 @@
             <div class="nav-buttons combat-nav">
                 <button onclick="viewCharacterDuringCombat()" class="secondary">👤 View Character</button>
                 <button id="pauseBtn" onclick="toggleCombatPause()" class="secondary" style="margin-left:8px;">⏸ Pause</button>
+                <button id="ffBtn" onclick="toggleCombatFF()" class="secondary" style="margin-left:8px;">⏩ FF</button>
             </div>
 
             <!-- Stage banner: title + pre-combat result + enemy flash reveal -->
@@ -421,36 +426,36 @@
             <div>
                 <h2 style="margin-bottom: 1.5rem;">Share Character</h2>
                 <button onclick="closeModal('shareModal')" class="secondary" style="margin-bottom: 1rem; float: right;">×</button>
-                
-                <p class="subtitle">Generate a share code to let other players import this character.</p>
-                
-                <div class="form-group">
-                    <label>Build Name (optional):</label>
-                    <input type="text" id="shareBuildName" placeholder="e.g., Tank Build">
-                </div>
-                
-                <div class="form-group">
-                    <label>Build Description (optional):</label>
-                    <textarea id="shareBuildDescription" placeholder="Describe your build..." style="min-height: 80px; width: 100%;"></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" id="shareIsPublic" checked> Make publicly browsable
-                    </label>
-                </div>
-                
-                <div id="shareCodeDisplay" style="display: none; background: rgba(10, 14, 39, 0.6); border: 1px solid #4cd964; border-radius: 6px; padding: 1rem; margin: 1rem 0;">
-                    <p class="subtitle">Your Share Code:</p>
-                    <div class="grid-2" style="align-items: center;">
-                        <code id="shareCodeValue" style="font-size: 1.5rem; color: #4cd964; letter-spacing: 2px;">PLAYERA-9C86</code>
-                        <button onclick="copyShareCode()" class="secondary">Copy</button>
+
+                <p class="subtitle">When sharing is enabled, your character automatically updates in the browse list after each combat.</p>
+
+                <!-- Setup section: shown when sharing is off -->
+                <div id="shareSetupSection">
+                    <div class="form-group">
+                        <label>Build Name (optional):</label>
+                        <input type="text" id="shareBuildName" placeholder="e.g., Tank Build">
+                    </div>
+                    <div class="form-group">
+                        <label>Build Description (optional):</label>
+                        <textarea id="shareBuildDescription" placeholder="Describe your build..." style="min-height: 80px; width: 100%;"></textarea>
                     </div>
                 </div>
-                
-                <div style="margin-top: 1rem;">
+
+                <!-- Active section: shown when sharing is on -->
+                <div id="shareActiveSection" style="display:none;">
+                    <div style="background: rgba(10, 14, 39, 0.6); border: 1px solid #4cd964; border-radius: 6px; padding: 1rem; margin: 1rem 0;">
+                        <p id="shareCodeLevel" style="color:#aaa; font-size:0.85rem; margin:0 0 0.5rem 0;"></p>
+                        <p class="subtitle" style="margin-bottom:0.5rem;">Share Code:</p>
+                        <div class="grid-2" style="align-items: center;">
+                            <code id="shareCodeValue" style="font-size: 1.5rem; color: #4cd964; letter-spacing: 2px;"></code>
+                            <button onclick="copyShareCode()" class="secondary">Copy</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="shareToggleSection" style="margin-top: 1rem; display:flex; gap:0.5rem; justify-content:flex-end;">
                     <button onclick="closeModal('shareModal')" class="secondary">Cancel</button>
-                    <button onclick="exportCharacter()" id="shareExportBtn">Generate Share Code</button>
+                    <button id="shareToggleBtn" onclick="handleShareToggle()" data-action="enable">Enable Sharing</button>
                 </div>
             </div>
         </div>
@@ -492,20 +497,26 @@
                     <h2>🔧 Admin Panel</h2>
                     <button onclick="closeAdminPanel()" class="admin-close-btn">Close</button>
                 </div>
-                <div style="display:flex; gap:8px; margin-bottom:12px;">
-                    <button id="adminTabItems" onclick="switchAdminTab('items')" class="admin-btn-create" style="flex:1;">📦 Items</button>
-                    <button id="adminTabSkills" onclick="switchAdminTab('skills')" class="admin-btn-create" style="flex:1; background:#2a3a2a;">🔗 Skill Tree</button>
+                <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
+                    <button id="adminTabItems"      onclick="switchAdminTab('items')"      class="admin-btn-create" style="flex:1;">📦 Items</button>
+                    <button id="adminTab_skills"    onclick="switchAdminTab('skills')"     class="admin-btn-create" style="flex:1; background:#2a3a2a;">🔗 Skills</button>
+                    <button id="adminTab_characters" onclick="switchAdminTab('characters')" class="admin-btn-create" style="flex:1; background:#2a3a2a;">👤 Characters</button>
+                    <button id="adminTab_snapshots" onclick="switchAdminTab('snapshots')"  class="admin-btn-create" style="flex:1; background:#2a3a2a;">📤 Snapshots</button>
+                    <button id="adminTab_db"        onclick="switchAdminTab('db')"         class="admin-btn-create" style="flex:1; background:#2a3a2a;">🗄 DB</button>
                 </div>
-                <div id="adminTabContentItems">
+                <div id="adminTabContent_items">
                     <div class="admin-search">
                         <input type="text" class="admin-search-input" placeholder="Search items..." id="adminSearchInput">
                         <button class="admin-btn-create" onclick="openAdminEditor()">+ Create Item</button>
                     </div>
                     <div class="admin-items-list" id="adminItemsList"></div>
                 </div>
-                <div id="adminTabContentSkills" style="display:none; max-height:70vh; overflow-y:auto;">
+                <div id="adminTabContent_skills" style="display:none; max-height:70vh; overflow-y:auto;">
                     <div id="adminSkillTreeContent"></div>
                 </div>
+                <div id="adminTabContent_characters" style="display:none; max-height:70vh; overflow-y:auto;"></div>
+                <div id="adminTabContent_snapshots"  style="display:none; max-height:70vh; overflow-y:auto;"></div>
+                <div id="adminTabContent_db"         style="display:none; max-height:70vh; overflow-y:auto;"></div>
                 <div class="admin-footer">
                     Admin Panel v1.0 | Shards Idle
                 </div>
@@ -1059,7 +1070,79 @@
         const settingsBtn = document.getElementById('settingsOpenBtn');
         if (settingsBtn) settingsBtn.addEventListener('click', openSettings);
     });
+
+    // Auth tab visual state
+    const _origSwitchAuthTab = window.switchAuthTab;
+    window.switchAuthTab = function(tab) {
+        if (_origSwitchAuthTab) _origSwitchAuthTab(tab);
+        document.querySelectorAll('.auth-tab-btn').forEach(b => {
+            const isActive = b.dataset.tab === tab;
+            b.style.opacity = isActive ? '1' : '0.5';
+        });
+    };
     </script>
+
+    <!-- AUTH MODAL -->
+    <div id="authModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:9999; align-items:center; justify-content:center;">
+        <div style="background:#0f0f1e; border:1px solid #2a2a4a; border-radius:10px; padding:2rem; width:100%; max-width:380px; position:relative;">
+            <button onclick="closeAuthModal()" style="position:absolute; top:0.75rem; right:0.75rem; background:none; border:none; color:#888; font-size:1.2rem; cursor:pointer;">×</button>
+            <h2 style="margin-bottom:1.25rem; color:#d4af37;">Sign In</h2>
+
+            <!-- Tab buttons -->
+            <div style="display:flex; gap:0.5rem; margin-bottom:1.5rem;">
+                <button class="auth-tab-btn active" data-tab="login"    onclick="switchAuthTab('login')"    style="flex:1;">Log In</button>
+                <button class="auth-tab-btn"         data-tab="register" onclick="switchAuthTab('register')" style="flex:1; opacity:0.6;">Create Account</button>
+            </div>
+
+            <!-- Error display -->
+            <div id="authError" style="color:#ff6b6b; font-size:0.85rem; margin-bottom:0.75rem; min-height:1.1rem;"></div>
+
+            <!-- Login tab -->
+            <div id="authLoginTab">
+                <div class="form-group" style="margin-bottom:0.75rem;">
+                    <label style="font-size:0.85rem; color:#8b7355;">Username</label>
+                    <input type="text" id="loginUsername" placeholder="Your username" autocomplete="username"
+                           style="width:100%; margin-top:0.25rem;"
+                           onkeydown="if(event.key==='Enter') submitLogin()">
+                </div>
+                <div class="form-group" style="margin-bottom:1.25rem;">
+                    <label style="font-size:0.85rem; color:#8b7355;">Password</label>
+                    <input type="password" id="loginPassword" placeholder="Your password" autocomplete="current-password"
+                           style="width:100%; margin-top:0.25rem;"
+                           onkeydown="if(event.key==='Enter') submitLogin()">
+                </div>
+                <button onclick="submitLogin()" style="width:100%; margin-bottom:0.75rem;">Log In</button>
+                <button onclick="closeAuthModal()" class="secondary" style="width:100%; opacity:0.6;">Continue as Guest</button>
+            </div>
+
+            <!-- Register tab -->
+            <div id="authRegisterTab" style="display:none;">
+                <p style="font-size:0.8rem; color:#8b7355; margin-bottom:1rem;">
+                    Creates an account and links your current guest characters to it.
+                </p>
+                <div class="form-group" style="margin-bottom:0.75rem;">
+                    <label style="font-size:0.85rem; color:#8b7355;">Username <span style="color:#555;">(letters, numbers, _ -)</span></label>
+                    <input type="text" id="registerUsername" placeholder="3–24 characters" autocomplete="username"
+                           style="width:100%; margin-top:0.25rem;"
+                           onkeydown="if(event.key==='Enter') submitRegister()">
+                </div>
+                <div class="form-group" style="margin-bottom:0.75rem;">
+                    <label style="font-size:0.85rem; color:#8b7355;">Password <span style="color:#555;">(min 8 characters)</span></label>
+                    <input type="password" id="registerPassword" placeholder="At least 8 characters" autocomplete="new-password"
+                           style="width:100%; margin-top:0.25rem;"
+                           onkeydown="if(event.key==='Enter') submitRegister()">
+                </div>
+                <div class="form-group" style="margin-bottom:1.25rem;">
+                    <label style="font-size:0.85rem; color:#8b7355;">Confirm Password</label>
+                    <input type="password" id="registerConfirm" placeholder="Repeat password" autocomplete="new-password"
+                           style="width:100%; margin-top:0.25rem;"
+                           onkeydown="if(event.key==='Enter') submitRegister()">
+                </div>
+                <button onclick="submitRegister()" style="width:100%; margin-bottom:0.75rem;">Create Account</button>
+                <button onclick="closeAuthModal()" class="secondary" style="width:100%; opacity:0.6;">Continue as Guest</button>
+            </div>
+        </div>
+    </div>
 
 </body>
 </html>

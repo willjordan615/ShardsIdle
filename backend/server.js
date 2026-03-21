@@ -9,6 +9,7 @@ const { router: dataRoutes, loadGameData } = require('./routes/data');
 const characterRoutes = require('./routes/character');
 const adminRoutes = require('./routes/admin');
 const characterSnapshotsRoutes = require('./routes/character-snapshots');
+const { router: authRoutes } = require('./routes/auth');
 const { resetCombatEngine } = combatRoutes;
 
 const app = express();
@@ -141,6 +142,9 @@ app.post('/api/admin/data/skills', (req, res) => {
 
 // --- EXISTING ROUTES (Restored) ---
 
+// Auth routes
+app.use('/api/auth', authRoutes);
+
 // Combat routes
 app.use('/api/combat', combatRoutes);
 
@@ -176,9 +180,12 @@ async function start() {
         console.log('Character snapshots table initialized');
 
         // Start combat log pruning schedule (runs on startup + every 6 hours)
-        // Strips full turn data from logs >24h old, deletes logs >7 days old
         db.scheduleCombatLogPruning();
         console.log('Combat log pruning scheduled');
+
+        // Start session pruning schedule (runs on startup + every 6 hours)
+        db.scheduleSessionPruning();
+        console.log('Session pruning scheduled');
         
         app.listen(PORT, () => {
             console.log(`\n🚀 Server running on http://localhost:${PORT}`);

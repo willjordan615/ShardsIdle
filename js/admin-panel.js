@@ -278,11 +278,21 @@
 // ── Skill Tree Tab ────────────────────────────────────────────────────────────
 
 window.switchAdminTab = function(tab) {
-    document.getElementById('adminTabContentItems').style.display = tab === 'items' ? 'block' : 'none';
-    document.getElementById('adminTabContentSkills').style.display = tab === 'skills' ? 'block' : 'none';
-    document.getElementById('adminTabItems').style.background = tab === 'items' ? '' : '#2a3a2a';
-    document.getElementById('adminTabSkills').style.background = tab === 'skills' ? '' : '#2a3a2a';
-    if (tab === 'skills') renderAdminSkillTree();
+    const tabs = ['items', 'skills', 'characters', 'snapshots', 'db'];
+    tabs.forEach(t => {
+        const content = document.getElementById('adminTabContent_' + t);
+        if (content) content.style.display = t === tab ? 'block' : 'none';
+        const btn = document.getElementById('adminTab_' + t) ||
+                    document.getElementById('adminTabItems'); // fallback for items
+        if (btn && btn.id === 'adminTab_' + t) btn.style.background = t === tab ? '' : '#2a3a2a';
+    });
+    // items tab button has different ID
+    const itemsBtn = document.getElementById('adminTabItems');
+    if (itemsBtn) itemsBtn.style.background = tab === 'items' ? '' : '#2a3a2a';
+    if (tab === 'skills')     renderAdminSkillTree();
+    if (tab === 'characters') loadAdminCharacters();
+    if (tab === 'snapshots')  loadAdminSnapshots();
+    if (tab === 'db')         renderAdminDB();
 };
 
 window.renderAdminSkillTree = function() {
@@ -348,4 +358,168 @@ window.filterSkillTree = function(query) {
         const visible = [...sec.querySelectorAll('.skill-tree-row')].some(r => r.style.display !== 'none');
         sec.style.display = visible ? '' : 'none';
     });
+};
+
+// ── Characters Tab ────────────────────────────────────────────────────────────
+
+async function loadAdminCharacters() {
+    const el = document.getElementById('adminTabContent_characters');
+    if (!el) return;
+    el.innerHTML = '<p style="color:#aaa;padding:12px;">Loading...</p>';
+    try {
+        const res = await fetch(BACKEND_URL + '/api/admin/db/characters');
+        const rows = await res.json();
+        if (!rows.length) { el.innerHTML = '<p style="color:#888;padding:12px;">No characters found.</p>'; return; }
+        el.innerHTML = `
+            <table style="width:100%;border-collapse:collapse;font-size:.85em;">
+                <thead><tr style="color:#aaa;border-bottom:1px solid #333;">
+                    <th style="text-align:left;padding:6px;">Name</th>
+                    <th style="text-align:left;padding:6px;">Race</th>
+                    <th style="text-align:center;padding:6px;">Lvl</th>
+                    <th style="text-align:center;padding:6px;">XP</th>
+                    <th style="padding:6px;"></th>
+                </tr></thead>
+                <tbody>${rows.map(r => `
+                    <tr style="border-bottom:1px solid #222;" id="char-row-${esc(r.id)}">
+                        <td style="padding:6px;">${esc(r.name)}</td>
+                        <td style="padding:6px;color:#aaa;">${esc(r.race)}</td>
+                        <td style="padding:6px;text-align:center;">${r.level}</td>
+                        <td style="padding:6px;text-align:center;">${(r.experience||0).toLocaleString()}</td>
+                        <td style="padding:6px;text-align:right;">
+                            <button onclick="adminViewCharacter('${esc(r.id)}')" style="margin-right:4px;padding:2px 8px;background:#1a2a3a;border:1px solid #345;color:#8af;cursor:pointer;border-radius:3px;">View</button>
+                            <button onclick="adminDeleteCharacter('${esc(r.id)}','${esc(r.name)}')" style="padding:2px 8px;background:#2a1a1a;border:1px solid #533;color:#f88;cursor:pointer;border-radius:3px;">Delete</button>
+                        </td>
+                    </tr>`).join('')}
+                </tbody>
+            </table>`;
+    } catch(e) { el.innerHTML = `<p style="color:#f88;padding:12px;">Error: ${e.message}</p>`; }
+}
+
+window.adminViewCharacter = async function(id) {
+    try {
+        const res = await fetch(BACKEND_URL + '/api/admin/db/characters/' + encodeURIComponent(id));
+        const char = await res.json();
+        const info = `Name: ${char.name}\nRace: ${char.race}\nLevel: ${char.level}\nXP: ${char.experience}\nSkills: ${(char.skills||[]).length}\nEquipment: ${JSON.stringify(char.equipment||{},null,2)}`;
+        alert(info);
+    } catch(e) { alert('Error: ' + e.message); }
+};
+
+window.adminDeleteCharacter = async function(id, name) {
+    if (!confirm(`Delete character "${name}"? This cannot be undone.`)) return;
+    try {
+        const res = await fetch(BACKEND_URL + '/api/admin/db/characters/' + encodeURIComponent(id), { method: 'DELETE' });
+        const data = await res.json();
+        if (data.success) {
+            const row = document.getElementById('char-row-' + id);
+            if (row) row.remove();
+        } else { alert('Delete failed: ' + JSON.stringify(data)); }
+    } catch(e) { alert('Error: ' + e.message); }
+};
+
+// ── Snapshots Tab ─────────────────────────────────────────────────────────────
+
+async function loadAdminSnapshots() {
+    const el = document.getElementById('adminTabContent_snapshots');
+    if (!el) return;
+    el.innerHTML = '<p style="color:#aaa;padding:12px;">Loading...</p>';
+    try {
+        const res = await fetch(BACKEND_URL + '/api/admin/db/snapshots');
+        const rows = await res.json();
+        if (!rows.length) { el.innerHTML = '<p style="color:#888;padding:12px;">No snapshots found.</p>'; return; }
+        el.innerHTML = `
+            <table style="width:100%;border-collapse:collapse;font-size:.85em;">
+                <thead><tr style="color:#aaa;border-bottom:1px solid #333;">
+                    <th style="text-align:left;padding:6px;">Name</th>
+                    <th style="text-align:left;padding:6px;">Code</th>
+                    <th style="text-align:center;padding:6px;">Lvl</th>
+                    <th style="text-align:center;padding:6px;">Public</th>
+                    <th style="text-align:center;padding:6px;">Imports</th>
+                    <th style="padding:6px;"></th>
+                </tr></thead>
+                <tbody>${rows.map(r => `
+                    <tr style="border-bottom:1px solid #222;" id="snap-row-${esc(r.snapshot_id)}">
+                        <td style="padding:6px;">${esc(r.character_name)}</td>
+                        <td style="padding:6px;color:#aaa;font-family:monospace;">${esc(r.share_code)}</td>
+                        <td style="padding:6px;text-align:center;">${r.level}</td>
+                        <td style="padding:6px;text-align:center;">${r.is_public ? '✓' : '—'}</td>
+                        <td style="padding:6px;text-align:center;">${r.import_count||0}</td>
+                        <td style="padding:6px;text-align:right;">
+                            <button onclick="adminDeleteSnapshot('${esc(r.snapshot_id)}','${esc(r.character_name)}')" style="padding:2px 8px;background:#2a1a1a;border:1px solid #533;color:#f88;cursor:pointer;border-radius:3px;">Delete</button>
+                        </td>
+                    </tr>`).join('')}
+                </tbody>
+            </table>`;
+    } catch(e) { el.innerHTML = `<p style="color:#f88;padding:12px;">Error: ${e.message}</p>`; }
+}
+
+window.adminDeleteSnapshot = async function(id, name) {
+    if (!confirm(`Delete snapshot for "${name}"? This removes the share code.`)) return;
+    try {
+        const res = await fetch(BACKEND_URL + '/api/admin/db/snapshots/' + encodeURIComponent(id), { method: 'DELETE' });
+        const data = await res.json();
+        if (data.success) {
+            const row = document.getElementById('snap-row-' + id);
+            if (row) row.remove();
+        } else { alert('Delete failed: ' + JSON.stringify(data)); }
+    } catch(e) { alert('Error: ' + e.message); }
+};
+
+// ── DB Query Tab ──────────────────────────────────────────────────────────────
+
+function renderAdminDB() {
+    const el = document.getElementById('adminTabContent_db');
+    if (!el || el.dataset.rendered) return;
+    el.dataset.rendered = '1';
+    el.innerHTML = `
+        <div style="padding:12px;">
+            <p style="color:#aaa;margin-bottom:8px;font-size:.85em;">SELECT and PRAGMA queries only.</p>
+            <textarea id="adminDbQuery" placeholder="SELECT * FROM characters LIMIT 10"
+                style="width:100%;box-sizing:border-box;height:80px;background:#111;color:#ddd;border:1px solid #333;padding:8px;font-family:monospace;font-size:.85em;border-radius:4px;resize:vertical;"></textarea>
+            <div style="display:flex;gap:8px;margin-top:8px;">
+                <button onclick="adminRunQuery()" style="padding:6px 16px;background:#1a3a2a;border:1px solid #3a6a4a;color:#8fa;cursor:pointer;border-radius:4px;">Run Query</button>
+                <button onclick="adminClearLogs()" style="padding:6px 16px;background:#2a1a1a;border:1px solid #533;color:#f88;cursor:pointer;border-radius:4px;">Clear All Combat Logs</button>
+            </div>
+            <div id="adminDbResults" style="margin-top:12px;max-height:50vh;overflow-y:auto;"></div>
+        </div>`;
+}
+
+window.adminRunQuery = async function() {
+    const sql = document.getElementById('adminDbQuery')?.value?.trim();
+    if (!sql) return;
+    const results = document.getElementById('adminDbResults');
+    results.innerHTML = '<p style="color:#aaa;">Running...</p>';
+    try {
+        const res = await fetch(BACKEND_URL + '/api/admin/db/query', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sql })
+        });
+        const data = await res.json();
+        if (data.error) { results.innerHTML = `<p style="color:#f88;">${esc(data.error)}</p>`; return; }
+        if (!data.rows.length) { results.innerHTML = '<p style="color:#888;">No results.</p>'; return; }
+        const cols = Object.keys(data.rows[0]);
+        results.innerHTML = `
+            <p style="color:#aaa;font-size:.8em;margin-bottom:6px;">${data.count} row(s)</p>
+            <div style="overflow-x:auto;">
+            <table style="width:100%;border-collapse:collapse;font-size:.8em;">
+                <thead><tr style="color:#aaa;border-bottom:1px solid #333;">
+                    ${cols.map(c => `<th style="text-align:left;padding:4px 8px;">${esc(c)}</th>`).join('')}
+                </tr></thead>
+                <tbody>${data.rows.map(row => `
+                    <tr style="border-bottom:1px solid #1a1a1a;">
+                        ${cols.map(c => `<td style="padding:4px 8px;color:#ccc;">${esc(String(row[c] ?? ''))}</td>`).join('')}
+                    </tr>`).join('')}
+                </tbody>
+            </table></div>`;
+    } catch(e) { results.innerHTML = `<p style="color:#f88;">Error: ${e.message}</p>`; }
+};
+
+window.adminClearLogs = async function() {
+    if (!confirm('Delete ALL combat logs? This frees up space but removes all history.')) return;
+    try {
+        const res = await fetch(BACKEND_URL + '/api/admin/db/combat-logs', { method: 'DELETE' });
+        const data = await res.json();
+        if (data.success) alert(`Cleared ${data.deleted} combat logs.`);
+        else alert('Failed: ' + JSON.stringify(data));
+    } catch(e) { alert('Error: ' + e.message); }
 };

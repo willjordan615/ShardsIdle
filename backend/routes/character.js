@@ -1,15 +1,84 @@
+// backend/routes/character.js
 const express = require('express');
-const router = express.Router();
-const db = require('../database');
+const router  = express.Router();
+const db      = require('../database');
+const { requireAuth, optionalAuth } = require('./auth');
+
+// ── Input sanitization ────────────────────────────────────────────────────────
+function sanitizeText(value, maxLength = 40) {
+    if (typeof value !== 'string') return '';
+    return value
+        .replace(/<[^>]*>/g, '')
+        .replace(/[<>"'&]/g, '')
+        .replace(/[\x00-\x1F]/g, '')
+        .trim()
+        .slice(0, maxLength);
+}
+
+// ── Ownership check ───────────────────────────────────────────────────────────
+function ownsCharacter(character, userId) {
+    if (!character.ownerUserId) return false;
+    return character.ownerUserId === userId;
+}
 
 /**
  * GET /api/characters
- * Get all characters for the user
+ * Returns only the characters owned by the authenticated user.
  */
-router.get('/', async (req, res) => {
+router.get('/', requireAuth, async (req, res) => {
     try {
-        const characters = await db.getAllCharacters();
-        res.json({ success: true, characters });
+        const rawDb = db.getDatabase();
+        const rows = await new Promise((resolve, reject) => {
+            rawDb.all(
+                `SELECT * FROM characters WHERE ownerUserId = ?`,
+                [req.userId],
+                (err, rows) => { if (err) reject(err); else resolve(rows || []); }
+            );
+        });
+
+        const parsed = rows.map(row => ({
+            id:           row.id,
+            name:         row.name,
+            race:         row.race,
+            level:        row.level,
+            experience:   row.experience,
+            stats: {
+                conviction: row.conviction,
+                endurance:  row.endurance,
+                ambition:   row.ambition,
+                harmony:    row.harmony,
+            },
+            equipment:        JSON.parse(row.equipment   || '{}'),
+            skills:           JSON.parse(row.skills      || '[]'),
+            consumables:      JSON.parse(row.consumables || '{}'),
+            consumableStash:  JSON.parse(row.consumableStash || '{}'),
+            beltOrder:        JSON.parse(row.beltOrder   || '[null,null,null,null]'),
+            inventory:        JSON.parse(row.inventory   || '[]'),
+            gold:             row.gold       || 0,
+            arcaneDust:       row.arcaneDust || 0,
+            unlockedCombos:   JSON.parse(row.unlockedCombos || '[]'),
+            combatStats:      JSON.parse(row.combatStats || '{}'),
+            partyStats:       JSON.parse(row.partyStats  || '{}'),
+            ownerUserId:      row.ownerUserId,
+            isPublic:         !!row.isPublic,
+            shareEnabled:     !!row.shareEnabled,
+            shareCode:        row.shareCode        || null,
+            buildName:        row.buildName        || null,
+            buildDescription: row.buildDescription || null,
+            importCount:      row.importCount      || 0,
+            lastSharedAt:     row.lastSharedAt,
+            avatarId:         row.avatarId,
+            avatarColor:      row.avatarColor,
+            avatarFrame:      row.avatarFrame,
+            title:            row.title,
+            createdAt:        row.createdAt,
+            lastModified:     row.lastModified,
+            lastActiveAt:     row.lastActiveAt,
+            lastSuccessfulChallengeId: row.lastSuccessfulChallengeId || null,
+            aiProfile:        row.aiProfile || 'balanced',
+        }));
+
+        res.json({ success: true, characters: parsed });
     } catch (error) {
         console.error('Error fetching characters:', error);
         res.status(500).json({ success: false, error: error.message });
@@ -18,14 +87,13 @@ router.get('/', async (req, res) => {
 
 /**
  * GET /api/characters/:characterId
- * Get a specific character
+ * Returns a character only if the requester owns it.
  */
-router.get('/:characterId', async (req, res) => {
+router.get('/:characterId', requireAuth, async (req, res) => {
     try {
         const character = await db.getCharacter(req.params.characterId);
-        if (!character) {
-            return res.status(404).json({ success: false, error: 'Character not found' });
-        }
+        if (!character) return res.status(404).json({ success: false, error: 'Character not found' });
+        if (!ownsCharacter(character, req.userId)) return res.status(403).json({ success: false, error: 'Forbidden' });
         res.json({ success: true, character });
     } catch (error) {
         console.error('Error fetching character:', error);
@@ -33,64 +101,34 @@ router.get('/:characterId', async (req, res) => {
     }
 });
 
-// ── Input sanitization ────────────────────────────────────────────────────────
-// Strip HTML tags, control characters, and enforce max length on any
-// free-text field supplied by the player. Prevents XSS in browse/public views.
-function sanitizeText(value, maxLength = 40) {
-    if (typeof value !== 'string') return '';
-    return value
-        .replace(/<[^>]*>/g, '')      // strip HTML tags
-        .replace(/[<>"'&]/g, '')      // strip remaining dangerous chars
-        .replace(/[\x00-\x1F]/g, '')  // strip control characters
-        .trim()
-        .slice(0, maxLength);
-}
-
 /**
  * POST /api/characters
- * Create a new character
+ * Create a new character — always owned by the authenticated user.
  */
-router.post('/', async (req, res) => {
+router.post('/', requireAuth, async (req, res) => {
     try {
         const character = req.body;
-        
-        // Validation
+
         if (!character.id || !character.name || !character.race) {
-            return res.status(400).json({ 
-                success: false, 
-                error: 'Missing required fields: id, name, race' 
-            });
+            return res.status(400).json({ success: false, error: 'Missing required fields: id, name, race' });
         }
-        
         if (!character.stats || typeof character.stats !== 'object') {
-            return res.status(400).json({ 
-                success: false, 
-                error: 'Invalid stats object' 
-            });
+            return res.status(400).json({ success: false, error: 'Invalid stats object' });
         }
 
-        // Sanitize free-text fields
         character.name = sanitizeText(character.name, 30);
-        if (!character.name) {
-            return res.status(400).json({ success: false, error: 'Invalid character name' });
-        }
-        
-        // Ensure default values
-        character.level = character.level || 1;
-        character.experience = character.experience || 0;
-        character.equipment = character.equipment || {};
-        character.skills = character.skills || [];
+        if (!character.name) return res.status(400).json({ success: false, error: 'Invalid character name' });
+
+        character.ownerUserId = req.userId;
+        character.level       = character.level       || 1;
+        character.experience  = character.experience  || 0;
+        character.equipment   = character.equipment   || {};
+        character.skills      = character.skills      || [];
         character.consumables = character.consumables || {};
-        character.inventory = character.inventory || [];
-        
-        // Save to database
+        character.inventory   = character.inventory   || [];
+
         await db.saveCharacter(character);
-        
-        res.json({ 
-            success: true, 
-            message: 'Character created',
-            character 
-        });
+        res.json({ success: true, message: 'Character created', character });
     } catch (error) {
         console.error('Error creating character:', error);
         res.status(500).json({ success: false, error: error.message });
@@ -99,37 +137,25 @@ router.post('/', async (req, res) => {
 
 /**
  * PUT /api/characters/:characterId
- * Update a character
+ * Update a character — only the owner may update.
  */
-router.put('/:characterId', async (req, res) => {
+router.put('/:characterId', requireAuth, async (req, res) => {
     try {
-        const character = req.body;
-        
-        // Verify character exists and belongs to user
         const existing = await db.getCharacter(req.params.characterId);
-        if (!existing) {
-            return res.status(404).json({ success: false, error: 'Character not found' });
-        }
-        
-        // Ensure ID matches
-        character.id = req.params.characterId;
+        if (!existing) return res.status(404).json({ success: false, error: 'Character not found' });
+        if (!ownsCharacter(existing, req.userId)) return res.status(403).json({ success: false, error: 'Forbidden' });
 
-        // Sanitize free-text fields on update
+        const character      = req.body;
+        character.id         = req.params.characterId;
+        character.ownerUserId = req.userId;
+
         if (character.name) {
             character.name = sanitizeText(character.name, 30);
-            if (!character.name) {
-                return res.status(400).json({ success: false, error: 'Invalid character name' });
-            }
+            if (!character.name) return res.status(400).json({ success: false, error: 'Invalid character name' });
         }
-        
-        // Save to database
+
         await db.saveCharacter(character);
-        
-        res.json({ 
-            success: true, 
-            message: 'Character updated',
-            character 
-        });
+        res.json({ success: true, message: 'Character updated', character });
     } catch (error) {
         console.error('Error updating character:', error);
         res.status(500).json({ success: false, error: error.message });
@@ -138,9 +164,9 @@ router.put('/:characterId', async (req, res) => {
 
 /**
  * PATCH /api/characters/:characterId/aiProfile
- * Update a character's AI profile without full save
+ * Update AI profile — only the owner may update.
  */
-router.patch('/:characterId/aiProfile', async (req, res) => {
+router.patch('/:characterId/aiProfile', requireAuth, async (req, res) => {
     try {
         const { aiProfile } = req.body;
         const valid = ['balanced','aggressive','cautious','support','disruptor','opportunist'];
@@ -148,9 +174,8 @@ router.patch('/:characterId/aiProfile', async (req, res) => {
             return res.status(400).json({ success: false, error: `Invalid aiProfile. Must be one of: ${valid.join(', ')}` });
         }
         const character = await db.getCharacter(req.params.characterId);
-        if (!character) {
-            return res.status(404).json({ success: false, error: 'Character not found' });
-        }
+        if (!character) return res.status(404).json({ success: false, error: 'Character not found' });
+        if (!ownsCharacter(character, req.userId)) return res.status(403).json({ success: false, error: 'Forbidden' });
         character.aiProfile = aiProfile;
         await db.saveCharacter(character);
         res.json({ success: true, aiProfile });
@@ -162,23 +187,15 @@ router.patch('/:characterId/aiProfile', async (req, res) => {
 
 /**
  * DELETE /api/characters/:characterId
- * Delete a character
+ * Delete a character — only the owner may delete.
  */
-router.delete('/:characterId', async (req, res) => {
+router.delete('/:characterId', requireAuth, async (req, res) => {
     try {
-        // Verify character exists
         const existing = await db.getCharacter(req.params.characterId);
-        if (!existing) {
-            return res.status(404).json({ success: false, error: 'Character not found' });
-        }
-        
-        // Delete from database
+        if (!existing) return res.status(404).json({ success: false, error: 'Character not found' });
+        if (!ownsCharacter(existing, req.userId)) return res.status(403).json({ success: false, error: 'Forbidden' });
         await db.deleteCharacter(req.params.characterId);
-        
-        res.json({ 
-            success: true, 
-            message: 'Character deleted'
-        });
+        res.json({ success: true, message: 'Character deleted' });
     } catch (error) {
         console.error('Error deleting character:', error);
         res.status(500).json({ success: false, error: error.message });

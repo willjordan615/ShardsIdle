@@ -224,7 +224,7 @@ class StatusEngine {
             .map(effect => ({ ...effect, duration: effect.duration - 1 }))
             .filter(effect => {
                 if (effect.duration <= 0) {
-                    console.log(`[STATUS] ${effect.name} expired on ${target.name}`);
+                    //console.log(`[STATUS] ${effect.name} expired on ${target.name}`);
                     return false;
                 }
                 return true;
@@ -259,7 +259,7 @@ class StatusEngine {
         const index = target.statusEffects.findIndex(s => s.id === statusId);
         if (index >= 0) {
             const removed = target.statusEffects.splice(index, 1);
-            console.log(`[STATUS] Removed ${removed[0].name} from ${target.name}`);
+            //console.log(`[STATUS] Removed ${removed[0].name} from ${target.name}`);
             return true;
         }
         return false;

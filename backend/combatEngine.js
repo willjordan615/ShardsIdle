@@ -131,7 +131,8 @@ class CombatEngine {
     const eligible = opportunities.filter(op => {
       const roll = Math.random();
       const passes = roll < (op.spawnChance !== undefined ? op.spawnChance : 1.0);
-      if (!passes) console.log(`[PRE-COMBAT] Opportunity "${op.name}" skipped (spawnChance roll failed)`);
+      //DEBUG
+      //if (!passes) console.log(`[PRE-COMBAT] Opportunity "${op.name}" skipped (spawnChance roll failed)`);
       return passes;
     });
 
@@ -252,7 +253,8 @@ class CombatEngine {
         if (owner) {
           if (owner.consumables?.[itemID] > 0) owner.consumables[itemID]--;
           else if (owner.consumableStash?.[itemID] > 0) owner.consumableStash[itemID]--;
-          console.log(`[PRE-COMBAT] ${owner.name} used ${itemID} as offering`);
+          //DEBUG
+          //console.log(`[PRE-COMBAT] ${owner.name} used ${itemID} as offering`);
         }
       }
     } else if (checkType === 'item_and_stat') {
@@ -301,13 +303,14 @@ class CombatEngine {
     }
 
     // ── Step 5: Log ──────────────────────────────────────────────────────
-    console.log(`\n[PRE-COMBAT] === ${op.name} ===`);
-    console.log(`[PRE-COMBAT] checkType: ${checkType} | conditionMet: ${conditionMet} | isFallback: ${isFallback}`);
-    if (checkType !== 'none' && checkType !== 'random') {
-      console.log(`[PRE-COMBAT] Best actor: ${bestActor?.name} | statValue: ${bestStatValue.toFixed(1)} | chance: ${(highestChance*100).toFixed(1)}%`);
-    }
-    console.log(`[PRE-COMBAT] Roll: ${rolled.toFixed(3)} | Result: ${isFallback ? 'FALLBACK' : isSuccess ? '✅ SUCCESS' : '❌ FAILURE'}`);
-    console.log(`[PRE-COMBAT] Narrative: "${effect.narrative}"\n`);
+    //DEBUG
+    //console.log(`\n[PRE-COMBAT] === ${op.name} ===`);
+    //console.log(`[PRE-COMBAT] checkType: ${checkType} | conditionMet: ${conditionMet} | isFallback: ${isFallback}`);
+    //if (checkType !== 'none' && checkType !== 'random') {
+      //console.log(`[PRE-COMBAT] Best actor: ${bestActor?.name} | statValue: ${bestStatValue.toFixed(1)} | chance: ${(highestChance*100).toFixed(1)}%`);
+    //}
+    //console.log(`[PRE-COMBAT] Roll: ${rolled.toFixed(3)} | Result: ${isFallback ? 'FALLBACK' : isSuccess ? '✅ SUCCESS' : '❌ FAILURE'}`);
+    //console.log(`[PRE-COMBAT] Narrative: "${effect.narrative}"\n`);
 
     const narrativeTurn = {
       turnNumber: currentTurnCount,
@@ -344,7 +347,7 @@ class CombatEngine {
         for (let i = enemies.length - 1; i >= 0 && removed < countToRemove; i--) {
           if (enemies[i].id.includes(targetTypeID)) { enemies.splice(i, 1); removed++; }
         }
-        console.log(`[PRE-COMBAT] Removed ${removed}x ${targetTypeID} from combat`);
+        //console.log(`[PRE-COMBAT] Removed ${removed}x ${targetTypeID} from combat`);
       }
     } else if (effect.type === 'apply_buff') {
       // Apply a status buff to all alive party members
@@ -448,7 +451,7 @@ class CombatEngine {
 
       // --- BRANCHING LOGIC ---
       if (stage.stageBranches && stage.stageBranches.length > 0) {
-        console.log(`[BRANCH] Evaluating branches for Stage ${stage.stageId}: ${stage.title}`);
+        //console.log(`[BRANCH] Evaluating branches for Stage ${stage.stageId}: ${stage.title}`);
         let resolvedNextStageId = null;
 
         for (const branch of stage.stageBranches) {
@@ -510,7 +513,7 @@ class CombatEngine {
           if (conditionMet) {
             resolvedNextStageId = branch.nextStageId;
             if (branch.overrideDescription) stage.description = branch.overrideDescription;
-            console.log(`[BRANCH] Condition met (${branch.condition.type}: ${branch.condition.value}). Jumping to Stage ${resolvedNextStageId}`);
+           // console.log(`[BRANCH] Condition met (${branch.condition.type}: ${branch.condition.value}). Jumping to Stage ${resolvedNextStageId}`);
             break;
           }
         }
@@ -521,7 +524,7 @@ class CombatEngine {
             stage = allStages[targetIdx];
             // FIX: record target so stageIndex++ below advances PAST the branched stage
             forcedNextStageIndex = targetIdx;
-            console.log(`[BRANCH] Resolved to stage index ${targetIdx} (stageId: ${stage.stageId})`);
+            //console.log(`[BRANCH] Resolved to stage index ${targetIdx} (stageId: ${stage.stageId})`);
           } else {
             console.error(`[BRANCH] Target stage ${resolvedNextStageId} not found!`);
           }
@@ -534,7 +537,7 @@ class CombatEngine {
         break;
       }
 
-      console.log(`\n[STAGE] Starting Stage ${stage.stageId}: ${stage.title}`);
+      //console.log(`\n[STAGE] Starting Stage ${stage.stageId}: ${stage.title}`);
       
       const enemies = this.initializeEnemies(stage.enemies);
       const initiative = this.calculateInitiative(playerCharacters, enemies, partySnapshots);
@@ -704,7 +707,7 @@ class CombatEngine {
               const source = allCombatants.find(c => c.id === sourceId && !c.defeated);
               if (source) {
                 source.currentHP = Math.min(source.maxHP, source.currentHP + amount);
-                console.log(`[LIFEDRAIN] ${source.name} leeches ${amount} HP from ${combatant.name}`);
+                //console.log(`[LIFEDRAIN] ${source.name} leeches ${amount} HP from ${combatant.name}`);
               }
             });
           }
@@ -969,7 +972,7 @@ class CombatEngine {
     // ── Stun/block check ─────────────────────────────────────────────────────
     const actionBlock = this.statusEngine.checkActionBlock(actor);
     if (!actionBlock.canAct) {
-      console.log(`[DEBUG] ${actor.name} is stunned and cannot act!`);
+      //console.log(`[DEBUG] ${actor.name} is stunned and cannot act!`);
       return { type: 'blocked', reason: actionBlock.reason };
     }
 
@@ -1072,7 +1075,7 @@ class CombatEngine {
       primaryTarget = _weightedRandomTarget(aliveOpponents);
     } else if (tauntTarget) {
       primaryTarget = tauntTarget;
-      if (isEnemy) console.log(`[TAUNT] ${actor.name} drawn to ${tauntTarget.name}`);
+      //if (isEnemy) console.log(`[TAUNT] ${actor.name} drawn to ${tauntTarget.name}`);
     } else if (profile === 'tactical') {
       primaryTarget = aliveOpponents.reduce((best, p) =>
         this._threatScore(p) > this._threatScore(best) ? p : best
@@ -1260,7 +1263,7 @@ class CombatEngine {
     const desperationPool = this.skills.filter(s => s.category === 'NO_RESOURCES');
     if (desperationPool.length > 0) {
       const chosenSkill = desperationPool[Math.floor(Math.random() * desperationPool.length)];
-      console.log(`[DESPERATION] ${actor.name} ${actor.id} is out of resources! Randomly selected: ${chosenSkill.name}`);
+      //console.log(`[DESPERATION] ${actor.name} ${actor.id} is out of resources! Randomly selected: ${chosenSkill.name}`);
       const hasDamageEffect = chosenSkill.effects?.some(e =>
         e.type === 'damage' && (!e.targets || e.targets === 'single_enemy' || e.targets === 'all_enemies')
       );
@@ -1635,7 +1638,7 @@ class CombatEngine {
                 const itemSkillId = itemDef?.skillID || itemDef?.effect_skillid;
                 if (itemSkillId === parentSkillId) {
                     consumables[consumableId]--;
-                    console.log(`[CHILD PROC] Consumed ${consumableId} (${consumables[consumableId]} remaining)`);
+                    //console.log(`[CHILD PROC] Consumed ${consumableId} (${consumables[consumableId]} remaining)`);
                 }
             });
         });
@@ -1654,7 +1657,7 @@ class CombatEngine {
                 discovered:   true,
                 discoveredAt: Date.now()
             });
-            console.log(`[CHILD PROC] ✨ ${character.name} discovered: ${childSkill.name}!`);
+            //console.log(`[CHILD PROC] ✨ ${character.name} discovered: ${childSkill.name}!`);
         }
 
         // --- REMOVED: XP Award Logic ---
@@ -1663,7 +1666,7 @@ class CombatEngine {
         // based on the strict rules (Discovery XP only if Level 0).
         // This prevents double-dipping and the "Echo Loop".
         
-        console.log(`[CHILD PROC] ${character.name} → ${childSkill.name} (replaced ${selectedSkillDef.name})`);
+        //console.log(`[CHILD PROC] ${character.name} → ${childSkill.name} (replaced ${selectedSkillDef.name})`);
 
         return {
             type:             'skill',
@@ -1697,7 +1700,7 @@ class CombatEngine {
             if (rolled <= procChance) {
                 procs.push({ skillId: procSkillId, chance: procChance });
             } else {
-                console.log(`[PROC] ${weapon.name} proc ${procSkillId} FAILED (chance=${procChance}%, rolled=${rolled.toFixed(1)})`);
+                //console.log(`[PROC] ${weapon.name} proc ${procSkillId} FAILED (chance=${procChance}%, rolled=${rolled.toFixed(1)})`);
             }
         }
     }
@@ -1708,7 +1711,7 @@ class CombatEngine {
             console.warn(`[PROC] Skill not found: ${proc.skillId}`);
             return;
         }
-        console.log(`[PROC] ${weapon.name} triggered ${procSkill.name} on ${target.name}!`);
+        //console.log(`[PROC] ${weapon.name} triggered ${procSkill.name} on ${target.name}!`);
         this.applySkillEffects(procSkill, actor, target);
 
         if (procSkill.effects?.some(e => e.type === 'damage')) {
@@ -1717,9 +1720,9 @@ class CombatEngine {
             if (target.currentHP <= 0) {
                 target.currentHP = 0;
                 target.defeated = true;
-                console.log(`[DEBUG] ${target.name} defeated by proc! (HP: 0)`);
+                //console.log(`[DEBUG] ${target.name} defeated by proc! (HP: 0)`);
             }
-            console.log(`[PROC] ${procSkill.name} dealt ${procDamage} damage to ${target.name}`);
+            //console.log(`[PROC] ${procSkill.name} dealt ${procDamage} damage to ${target.name}`);
         }
     });
   }
@@ -1741,7 +1744,7 @@ class CombatEngine {
         const { skillId, chance } = statusDef.onHitProc;
         const rolled = Math.random() * 100;
         if (rolled > chance) {
-            console.log(`[STATUS PROC] ${activeStatus.name} proc FAILED (chance=${chance}%, rolled=${rolled.toFixed(1)})`);
+            //console.log(`[STATUS PROC] ${activeStatus.name} proc FAILED (chance=${chance}%, rolled=${rolled.toFixed(1)})`);
             return;
         }
 
@@ -1751,7 +1754,7 @@ class CombatEngine {
             return;
         }
 
-        console.log(`[STATUS PROC] ${activeStatus.name} triggered ${procSkill.name} on ${target.name}!`);
+        //console.log(`[STATUS PROC] ${activeStatus.name} triggered ${procSkill.name} on ${target.name}!`);
         this.applySkillEffects(procSkill, actor, target);
 
         if (procSkill.effects?.some(e => e.type === 'damage')) {
@@ -1760,9 +1763,9 @@ class CombatEngine {
             if (target.currentHP <= 0) {
                 target.currentHP = 0;
                 target.defeated = true;
-                console.log(`[DEBUG] ${target.name} defeated by status proc! (HP: 0)`);
+                //console.log(`[DEBUG] ${target.name} defeated by status proc! (HP: 0)`);
             }
-            console.log(`[STATUS PROC] ${procSkill.name} dealt ${procDamage} damage to ${target.name}`);
+            //console.log(`[STATUS PROC] ${procSkill.name} dealt ${procDamage} damage to ${target.name}`);
         }
     });
   }
@@ -1774,7 +1777,7 @@ class CombatEngine {
 
     const skill = this.skills.find(s => s.id === action.skillID);
     if (!skill) {
-        console.log(`[DEBUG] Skill not found: ${action.skillID}`);
+        //console.log(`[DEBUG] Skill not found: ${action.skillID}`);
         return {
             roll: null,
             result: { message: 'Skill not found', success: false, delay: 1000 }
@@ -1802,7 +1805,7 @@ class CombatEngine {
 
     const finalDelay = Math.round(skill.delay * delayMultiplier * statusDelayMult);
     const statusDelayNote = statusDelayMult !== 1.0 ? `, status=${statusDelayMult.toFixed(2)}x` : '';
-    console.log(`[DELAY] ${actor.name} ${skill.name}: base=${skill.delay}ms, weapon=${weapon?.delay || 'none'}${statusDelayNote}, final=${finalDelay}ms`);
+    //console.log(`[DELAY] ${actor.name} ${skill.name}: base=${skill.delay}ms, weapon=${weapon?.delay || 'none'}${statusDelayNote}, final=${finalDelay}ms`);
 
     // Consume resources
     if (skill.costType === 'stamina') {
@@ -1821,7 +1824,7 @@ class CombatEngine {
             const itemSkillId = itemDef.skillID || itemDef.effect_skillid;
             if (itemSkillId === skill.id) {
                 consumables[consumableId]--;
-                console.log(`[CONSUMABLE] ${actor.name} used ${itemDef.name} (${consumables[consumableId]} remaining)`);
+                //console.log(`[CONSUMABLE] ${actor.name} used ${itemDef.name} (${consumables[consumableId]} remaining)`);
                 break;
             }
         }
@@ -1837,7 +1840,7 @@ class CombatEngine {
     // Multi-Hit Support
     const hitCount = skill.hitCount?.fixed ||
         Math.floor(Math.random() * (skill.hitCount?.max - skill.hitCount?.min + 1)) + (skill.hitCount?.min || 1);
-    console.log(`[HITCOUNT] ${actor.name} ${skill.name}: rolling ${hitCount} hit(s)`);
+    //console.log(`[HITCOUNT] ${actor.name} ${skill.name}: rolling ${hitCount} hit(s)`);
 
     // ── Determine target list from effect definitions ──
     // AOE is driven by effect targets, not category name.
@@ -1919,12 +1922,12 @@ class CombatEngine {
         if (target.currentHP <= 0) {
             target.currentHP = 0;
             target.defeated = true;
-            console.log(`[DEBUG] ${target.name} defeated! (HP: 0)`);
+            //console.log(`[DEBUG] ${target.name} defeated! (HP: 0)`);
         }
 
         if (hitDamage > 0 && target.statusEffects?.some(e => e.id === 'sleep' && e.duration > 0)) {
             this.statusEngine.removeStatus(target, 'sleep');
-            console.log(`[STATUS] ${target.name} woke up from damage!`);
+            //console.log(`[STATUS] ${target.name} woke up from damage!`);
         }
 
         // Counter-ready (single-target hits only)
@@ -1937,13 +1940,13 @@ class CombatEngine {
                     if (Math.random() * 100 <= chance) {
                         const counterSkill = this.skills.find(s => s.id === skillId);
                         if (counterSkill) {
-                            console.log(`[COUNTER] ${target.name} counters ${actor.name} with ${counterSkill.name}!`);
+                            //console.log(`[COUNTER] ${target.name} counters ${actor.name} with ${counterSkill.name}!`);
                             this.applySkillEffects(counterSkill, target, actor);
                             if (counterSkill.effects?.some(e => e.type === 'damage')) {
                                 const counterDamage = this.calculateDamage(target, counterSkill, actor, false, 1);
                                 actor.currentHP -= counterDamage;
                                 if (actor.currentHP <= 0) { actor.currentHP = 0; actor.defeated = true; }
-                                console.log(`[COUNTER] ${counterSkill.name} dealt ${counterDamage} to ${actor.name}`);
+                                //console.log(`[COUNTER] ${counterSkill.name} dealt ${counterDamage} to ${actor.name}`);
                             }
                             this.statusEngine.removeStatus(target, 'counter_ready');
                         }
@@ -1967,7 +1970,7 @@ class CombatEngine {
                 const harmonyScale = 1 + ((actor.stats?.harmony || 0) / 300);
                 const healAmount = Math.max(1, Math.floor(hitDamage * fraction * harmonyScale));
                 actor.currentHP = Math.min(actor.maxHP, actor.currentHP + healAmount);
-                console.log(`[LIFEDRAIN] ${actor.name} healed ${healAmount} via ${statusDef.name} on ${target.name}`);
+                //console.log(`[LIFEDRAIN] ${actor.name} healed ${healAmount} via ${statusDef.name} on ${target.name}`);
             });
         }
 
@@ -1984,7 +1987,7 @@ class CombatEngine {
                 actor.currentHP -= tapAmount;
                 if (actor.currentHP <= 0) { actor.currentHP = 0; actor.defeated = true; }
                 target.currentHP = Math.min(target.maxHP, target.currentHP + tapAmount);
-                console.log(`[LIFEDRAIN] Cursed Blood: ${target.name} leeches ${tapAmount} from ${actor.name}`);
+                //console.log(`[LIFEDRAIN] Cursed Blood: ${target.name} leeches ${tapAmount} from ${actor.name}`);
             });
         }
 
@@ -2096,7 +2099,7 @@ class CombatEngine {
         totalDamage *= varianceMultiplier;
         
         // Debug Log: Now 'weapon' is defined in scope!
-        console.log(`[VARIANCE DEBUG] Weapon: ${weapon.name} (${weaponType}), Roll: ${varianceMultiplier.toFixed(2)}x, Range: [${minVar}, ${maxVar}]`);
+        //console.log(`[VARIANCE DEBUG] Weapon: ${weapon.name} (${weaponType}), Roll: ${varianceMultiplier.toFixed(2)}x, Range: [${minVar}, ${maxVar}]`);
       }
     }
 
@@ -2162,7 +2165,7 @@ class CombatEngine {
     const flooredDamage = Math.max(1, Math.floor(finalDamage));
     
     // ===== STEP 9: Log AFTER flooring =====
-    console.log(`[DAMAGE] ${actor.name} → ${target.name}: ${totalDamage.toFixed(2)} total (after variance) = ${flooredDamage} after resistances/defense [${damageBreakdown.join(', ')}]`);
+    //console.log(`[DAMAGE] ${actor.name} → ${target.name}: ${totalDamage.toFixed(2)} total (after variance) = ${flooredDamage} after resistances/defense [${damageBreakdown.join(', ')}]`);
     
     return flooredDamage;
   }
@@ -2174,7 +2177,7 @@ class CombatEngine {
         const rolled = Math.random();
         const success = rolled <= applyChance;
         if (!success) {
-            console.log(`[EFFECT] ${skill.name}: ${effect.type} FAILED to apply (chance=${applyChance}, rolled=${rolled.toFixed(3)})`);
+            //console.log(`[EFFECT] ${skill.name}: ${effect.type} FAILED to apply (chance=${applyChance}, rolled=${rolled.toFixed(3)})`);
             return; 
         }
 
@@ -2195,7 +2198,7 @@ class CombatEngine {
                 const harmonyScale = 1 + ((actor.stats?.harmony || 0) / 300);
                 const healAmount = Math.max(1, Math.floor((target?.maxHP || 1) * effect.magnitude * harmonyScale));
                 recipient.currentHP = Math.min(recipient.maxHP, recipient.currentHP + healAmount);
-                console.log(`[LIFETAP] ${skill.name}: ${actor.name} leeches ${healAmount} HP (harmony scale ${harmonyScale.toFixed(2)})`);
+                //console.log(`[LIFETAP] ${skill.name}: ${actor.name} leeches ${healAmount} HP (harmony scale ${harmonyScale.toFixed(2)})`);
                 return;
             }
 
@@ -2245,7 +2248,7 @@ class CombatEngine {
             else if (poolType === 'stamina') recipient.currentStamina = newValue;
             else if (poolType === 'mana') recipient.currentMana = newValue;
 
-            console.log(`[EFFECT] ${skill.name}: Restored ${actualRestored} ${poolType.toUpperCase()} to ${recipient.name} (Scaled by ${scaleStat}:${statValue})`);
+            //console.log(`[EFFECT] ${skill.name}: Restored ${actualRestored} ${poolType.toUpperCase()} to ${recipient.name} (Scaled by ${scaleStat}:${statValue})`);
             return;
         }
 
@@ -2257,7 +2260,7 @@ class CombatEngine {
                 // Stamp sourceId so leech DoTs know who to credit heals to
                 const applied = debuffTarget.statusEffects?.find(s => s.id === effect.debuff);
                 if (applied) applied.sourceId = actor.id;
-                console.log(`[EFFECT] ${skill.name}: ${effect.debuff} applied to ${debuffTarget.name}`);
+                //console.log(`[EFFECT] ${skill.name}: ${effect.debuff} applied to ${debuffTarget.name}`);
             }
         } else if (effect.type === 'apply_buff' && effect.buff) {
             let buffTarget = actor;
@@ -2269,15 +2272,15 @@ class CombatEngine {
                 allies.forEach(ally => {
                     this.statusEngine.applyStatus(ally, effect.buff, effect.duration, effect.magnitude || 1);
                 });
-                console.log(`[EFFECT] ${skill.name}: ${effect.buff} applied by ${actor.name} to all allies (${allies.map(a => a.name).join(', ')})`);
+                //console.log(`[EFFECT] ${skill.name}: ${effect.buff} applied by ${actor.name} to all allies (${allies.map(a => a.name).join(', ')})`);
                 return;
             } else if (effect.targets === 'all_allies') {
-                console.log(`[EFFECT] ${skill.name}: AOE buff ${effect.buff} (no allPlayers context — self only)`);
+                //console.log(`[EFFECT] ${skill.name}: AOE buff ${effect.buff} (no allPlayers context — self only)`);
             }
             this.statusEngine.applyStatus(buffTarget, effect.buff, effect.duration, effect.magnitude || 1);
-            console.log(`[EFFECT] ${skill.name}: ${effect.buff} applied to ${buffTarget.name}`);
+            //console.log(`[EFFECT] ${skill.name}: ${effect.buff} applied to ${buffTarget.name}`);
         } else if (effect.type === 'damage' && effect.damageType) {
-            console.log(`[EFFECT] ${skill.name}: Damage effect (${effect.damageType}) processed in calculateDamage()`);
+            //console.log(`[EFFECT] ${skill.name}: Damage effect (${effect.damageType}) processed in calculateDamage()`);
 
         } else if (effect.type === 'cleanse') {
             // Remove debuffs from an ally (or self)
@@ -2295,10 +2298,10 @@ class CombatEngine {
             const removed = toRemove.slice(0, maxRemove);
             removed.forEach(s => {
                 this.statusEngine.removeStatus(cleanseTarget, s.id);
-                console.log(`[EFFECT] ${skill.name}: Cleansed ${s.name} from ${cleanseTarget.name}`);
+                //console.log(`[EFFECT] ${skill.name}: Cleansed ${s.name} from ${cleanseTarget.name}`);
             });
             if (removed.length === 0) {
-                console.log(`[EFFECT] ${skill.name}: Nothing to cleanse on ${cleanseTarget.name}`);
+                //console.log(`[EFFECT] ${skill.name}: Nothing to cleanse on ${cleanseTarget.name}`);
             }
 
         } else if (effect.type === 'dispel') {
@@ -2318,10 +2321,10 @@ class CombatEngine {
             const removed = toRemove.slice(0, maxRemove);
             removed.forEach(s => {
                 this.statusEngine.removeStatus(dispelTarget, s.id);
-                console.log(`[EFFECT] ${skill.name}: Dispelled ${s.name} from ${dispelTarget.name}`);
+                //console.log(`[EFFECT] ${skill.name}: Dispelled ${s.name} from ${dispelTarget.name}`);
             });
             if (removed.length === 0) {
-                console.log(`[EFFECT] ${skill.name}: Nothing to dispel on ${dispelTarget.name}`);
+                //console.log(`[EFFECT] ${skill.name}: Nothing to dispel on ${dispelTarget.name}`);
             }
         }
     });
@@ -2392,14 +2395,14 @@ class CombatEngine {
         const baseInitiative = (((p.stats?.ambition) || 0) * 0.5) + (((p.stats?.conviction) || 0) * 0.15);
         const randomComponent = Math.random() * 40;
         p.initiative = baseInitiative + randomComponent;
-        console.log(`[INITIATIVE] ${p.name}: Ambition=${p.stats?.ambition || 0}, Conviction=${p.stats?.conviction || 0}, Base=${baseInitiative.toFixed(1)}, Random=${randomComponent.toFixed(1)}, Total=${p.initiative.toFixed(1)}`);
+        //console.log(`[INITIATIVE] ${p.name}: Ambition=${p.stats?.ambition || 0}, Conviction=${p.stats?.conviction || 0}, Base=${baseInitiative.toFixed(1)}, Random=${randomComponent.toFixed(1)}, Total=${p.initiative.toFixed(1)}`);
         combatants.push(p); // push reference, not copy
     });
     enemies.forEach(e => {
         const baseInitiative = (((e.stats?.ambition) || 0) * 0.5) + (((e.stats?.conviction) || 0) * 0.15);
         const randomComponent = Math.random() * 40;
         e.initiative = baseInitiative + randomComponent;
-        console.log(`[INITIATIVE] ${e.name}: Ambition=${e.stats?.ambition || 0}, Conviction=${e.stats?.conviction || 0}, Base=${baseInitiative.toFixed(1)}, Random=${randomComponent.toFixed(1)}, Total=${e.initiative.toFixed(1)}`);
+        //console.log(`[INITIATIVE] ${e.name}: Ambition=${e.stats?.ambition || 0}, Conviction=${e.stats?.conviction || 0}, Base=${baseInitiative.toFixed(1)}, Random=${randomComponent.toFixed(1)}, Total=${e.initiative.toFixed(1)}`);
         combatants.push(e); // push reference, not copy
     });
     return combatants;
@@ -2424,7 +2427,7 @@ class CombatEngine {
           } else if (def.count) {
               spawnCount = def.count;
           }
-        console.log(`✅ [SPAWN] Spawning ${spawnCount}x ${enemyType.name} (Lvl ${enemyLevel})...`);
+        //console.log(`✅ [SPAWN] Spawning ${spawnCount}x ${enemyType.name} (Lvl ${enemyLevel})...`);
 
         for (let i = 0; i < spawnCount; i++) {
             globalEnemyIndex++;
@@ -2436,7 +2439,7 @@ class CombatEngine {
                 const weapon = enemyType.equipment.map(itemId => this.gear.find(g => g.id === itemId)).find(item => item && (item.slot_id1 === 'mainHand' || item.type.includes('weapon') || item.dmg1));
                 if (weapon) {
                     equipment.mainHand = weapon.id;
-                    if (i === 0) console.log(`[EQUIP] ${enemyType.name} (Lvl ${enemyLevel}) equipped ${weapon.name}`);
+                    //if (i === 0) console.log(`[EQUIP] ${enemyType.name} (Lvl ${enemyLevel}) equipped ${weapon.name}`);
                 }
                 const armor = enemyType.equipment.map(itemId => this.gear.find(g => g.id === itemId)).find(item => item && (item.slot_id1 === 'chest' || item.armor));
                 if (armor) equipment.chest = armor.id;
@@ -2445,7 +2448,7 @@ class CombatEngine {
                 equipment = { ...equipment, ...enemyType.equipment };
                 if (i === 0 && equipment.mainHand) {
                     const weapon = this.gear.find(g => g.id === equipment.mainHand);
-                    if (weapon) console.log(`[EQUIP] ${enemyType.name} (Lvl ${enemyLevel}) equipped ${weapon.name}`);
+                   // if (weapon) console.log(`[EQUIP] ${enemyType.name} (Lvl ${enemyLevel}) equipped ${weapon.name}`);
                 }
             }
 
@@ -2480,7 +2483,7 @@ class CombatEngine {
             });
         }
     });
-    console.log(`[SPAWN] Total enemies spawned: ${enemies.length}`);
+    //console.log(`[SPAWN] Total enemies spawned: ${enemies.length}`);
     return enemies;
   }
 
@@ -2652,7 +2655,7 @@ class CombatEngine {
         if (combatResult.rewards?.secretPathCompleted) {
             stats.challengeCompletions[challenge.id].secretCompletions =
                 (stats.challengeCompletions[challenge.id].secretCompletions || 0) + 1;
-            console.log(`[STATS] ${character.name} secret path completions for ${challenge.id}: ${stats.challengeCompletions[challenge.id].secretCompletions}`);
+            //console.log(`[STATS] ${character.name} secret path completions for ${challenge.id}: ${stats.challengeCompletions[challenge.id].secretCompletions}`);
         }
     }
 

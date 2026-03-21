@@ -298,93 +298,128 @@ function copyShareCode() {
 }
  
 /**
- * Export current character
+ * Open share modal for current character — reflects current sharing state
  */
-async function exportCharacter() {
-    // Read the ID stored on the modal by openShareModal()
-    const modal = document.getElementById('shareModal');
-    const characterId = modal?.dataset.characterId;
- 
-    if (!characterId) {
-        showError('No character selected');
-        return;
-    }
-    
-    const buildName = document.getElementById('shareBuildName')?.value || '';
-    const buildDescription = document.getElementById('shareBuildDescription')?.value || '';
-    const isPublic = document.getElementById('shareIsPublic')?.checked ?? true;
-    
-    try {
-        const response = await fetch(`${BACKEND_URL}/api/character/export`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                characterId,
-                isPublic,
-                buildName,
-                buildDescription
-            })
-        });
-        
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error || 'Export failed');
-        }
-        
-        const data = await response.json();
-        
-        // Display share code
-        const display = document.getElementById('shareCodeDisplay');
-        const codeValue = document.getElementById('shareCodeValue');
-        const exportBtn = document.getElementById('shareExportBtn');
-        
-        if (display && codeValue) {
-            codeValue.textContent = data.shareCode;
-            display.style.display = 'block';
-            exportBtn.textContent = 'Share Code Generated';
-            exportBtn.disabled = true;
-        }
-        
-        showSuccess('Character exported successfully!');
-        
-    } catch (error) {
-        console.error('Export error:', error);
-        showError('Failed to export: ' + error.message);
-    }
-}
- 
-/**
- * Open share modal for current character
- */
-function openShareModal(characterId) {
-    if (!characterId) {
-        showError('No character selected');
-        return;
-    }
- 
-    // Store the ID on the modal element so exportCharacter() can read it
-    // without needing window.currentState (which may not be on window if
-    // currentState is declared with let/const in game-data.js)
+async function openShareModal(characterId) {
+    if (!characterId) { showError('No character selected'); return; }
+
     const modal = document.getElementById('shareModal');
     if (modal) modal.dataset.characterId = characterId;
- 
-    // Reset modal state
-    const buildNameInput = document.getElementById('shareBuildName');
-    const buildDescInput = document.getElementById('shareBuildDescription');
-    const isPublicCheckbox = document.getElementById('shareIsPublic');
-    const codeDisplay = document.getElementById('shareCodeDisplay');
-    const exportBtn = document.getElementById('shareExportBtn');
- 
-    if (buildNameInput) buildNameInput.value = '';
-    if (buildDescInput) buildDescInput.value = '';
-    if (isPublicCheckbox) isPublicCheckbox.checked = true;
-    if (codeDisplay) codeDisplay.style.display = 'none';
-    if (exportBtn) {
-        exportBtn.textContent = 'Generate Share Code';
-        exportBtn.disabled = false;
+
+    const character = await getCharacter(characterId);
+    if (!character) { showError('Character not found'); return; }
+
+    const isEnabled   = !!character.shareEnabled;
+    const hasCode     = !!character.shareCode;
+
+    // Elements
+    const toggleSection  = document.getElementById('shareToggleSection');
+    const setupSection   = document.getElementById('shareSetupSection');
+    const activeSection  = document.getElementById('shareActiveSection');
+    const toggleBtn      = document.getElementById('shareToggleBtn');
+    const codeValue      = document.getElementById('shareCodeValue');
+    const codeLevel      = document.getElementById('shareCodeLevel');
+
+    // Show active state if sharing is on
+    if (toggleSection)  toggleSection.style.display  = 'block';
+    if (isEnabled && hasCode) {
+        if (setupSection)   setupSection.style.display   = 'none';
+        if (activeSection)  activeSection.style.display  = 'block';
+        if (codeValue)      codeValue.textContent        = character.shareCode;
+        if (codeLevel)      codeLevel.textContent        = `Level ${character.level} ${character.name} — auto-syncing after each combat`;
+        if (toggleBtn) { toggleBtn.textContent = 'Disable Sharing'; toggleBtn.dataset.action = 'disable'; }
+    } else {
+        if (setupSection)   setupSection.style.display   = 'block';
+        if (activeSection)  activeSection.style.display  = 'none';
+        const buildNameInput = document.getElementById('shareBuildName');
+        const buildDescInput = document.getElementById('shareBuildDescription');
+        if (buildNameInput) buildNameInput.value = character.buildName || '';
+        if (buildDescInput) buildDescInput.value = character.buildDescription || '';
+        if (toggleBtn) { toggleBtn.textContent = 'Enable Sharing'; toggleBtn.dataset.action = 'enable'; }
     }
- 
+
     showModal('shareModal');
+}
+
+/**
+ * Handle the share toggle button — enable or disable sharing
+ */
+async function handleShareToggle() {
+    const modal       = document.getElementById('shareModal');
+    const characterId = modal?.dataset.characterId;
+    const btn         = document.getElementById('shareToggleBtn');
+    if (!characterId || !btn) return;
+
+    const action = btn.dataset.action;
+
+    if (action === 'enable') {
+        const buildName        = document.getElementById('shareBuildName')?.value || '';
+        const buildDescription = document.getElementById('shareBuildDescription')?.value || '';
+        btn.disabled = true;
+        btn.textContent = 'Enabling...';
+        try {
+            const res = await authFetch(`${BACKEND_URL}/api/character/export`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ characterId, isPublic: true, buildName, buildDescription, enableSharing: true })
+            });
+            if (!res.ok) throw new Error((await res.json()).error || 'Export failed');
+            const data = await res.json();
+
+            // Persist shareEnabled + shareCode on the character locally
+            const character = await getCharacter(characterId);
+            if (character) {
+                character.shareEnabled     = true;
+                character.shareCode        = data.shareCode;
+                character.buildName        = buildName;
+                character.buildDescription = buildDescription;
+                await saveCharacterToServer(character);
+            }
+
+            // Update modal to active state
+            const codeValue = document.getElementById('shareCodeValue');
+            const codeLevel = document.getElementById('shareCodeLevel');
+            if (codeValue) codeValue.textContent = data.shareCode;
+            if (codeLevel) codeLevel.textContent = `Level ${data.level} ${data.characterName} — auto-syncing after each combat`;
+            document.getElementById('shareSetupSection').style.display  = 'none';
+            document.getElementById('shareActiveSection').style.display = 'block';
+            btn.textContent      = 'Disable Sharing';
+            btn.dataset.action   = 'disable';
+            btn.disabled         = false;
+            showSuccess('Sharing enabled! Your character will update automatically after each combat.');
+        } catch (e) {
+            showError('Failed to enable sharing: ' + e.message);
+            btn.disabled = false;
+            btn.textContent = 'Enable Sharing';
+        }
+
+    } else {
+        // Disable — flip is_public to 0 on the snapshot, clear flag on character
+        btn.disabled = true;
+        btn.textContent = 'Disabling...';
+        try {
+            await authFetch(`${BACKEND_URL}/api/character/export`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ characterId, isPublic: false, buildName: '', buildDescription: '', enableSharing: false })
+            });
+            const character = await getCharacter(characterId);
+            if (character) {
+                character.shareEnabled = false;
+                await saveCharacterToServer(character);
+            }
+            document.getElementById('shareSetupSection').style.display  = 'block';
+            document.getElementById('shareActiveSection').style.display = 'none';
+            btn.textContent    = 'Enable Sharing';
+            btn.dataset.action = 'enable';
+            btn.disabled       = false;
+            showSuccess('Sharing disabled. Your character is no longer visible in the browse list.');
+        } catch (e) {
+            showError('Failed to disable sharing: ' + e.message);
+            btn.disabled = false;
+            btn.textContent = 'Disable Sharing';
+        }
+    }
 }
  
 /**

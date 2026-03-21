@@ -475,7 +475,7 @@ async function startCombat(forcedChallengeId) {
 
         console.log('[COMBAT] Starting combat:', requestBody.challengeID);
 
-        const response = await fetch(`${BACKEND_URL}/api/combat/start`, {
+        const response = await authFetch(`${BACKEND_URL}/api/combat/start`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(requestBody)

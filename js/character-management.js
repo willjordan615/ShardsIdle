@@ -16,10 +16,8 @@ function initCharacterCreation() {
  */
 async function getCharacter(characterId) {
     try {
-        const response = await fetch(`${BACKEND_URL}/api/characters/${characterId}`);
-        if (!response.ok) {
-            throw new Error(`Server error: ${response.status}`);
-        }
+        const response = await authFetch(`${BACKEND_URL}/api/characters/${characterId}`);
+        if (!response.ok) throw new Error(`Server error: ${response.status}`);
         const data = await response.json();
         return data.character;
     } catch (error) {
@@ -33,17 +31,15 @@ async function getCharacter(characterId) {
  */
 async function saveCharacter(character) {
     try {
-        const response = await fetch(`${BACKEND_URL}/api/characters`, {
+        const response = await authFetch(`${BACKEND_URL}/api/characters`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(character)
         });
-        
         if (!response.ok) {
             const errorData = await response.json();
             throw new Error(errorData.error || `Server error: ${response.status}`);
         }
-        
         const data = await response.json();
         return data.character;
     } catch (error) {
@@ -58,17 +54,15 @@ async function saveCharacter(character) {
  */
 async function saveCharacterToServer(character) {
     try {
-        const response = await fetch(`${BACKEND_URL}/api/characters/${character.id}`, {
+        const response = await authFetch(`${BACKEND_URL}/api/characters/${character.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(character)
         });
-        
         if (!response.ok) {
             const errorData = await response.json();
             throw new Error(errorData.error || 'Failed to update character');
         }
-        
         return await response.json();
     } catch (error) {
         console.error('Error saving character:', error);
@@ -646,7 +640,7 @@ async function createCharacter() {
  */
 async function renderRoster() {
     try {
-        const response = await fetch(`${BACKEND_URL}/api/characters`);
+        const response = await authFetch(`${BACKEND_URL}/api/characters`);
         if (!response.ok) {
             throw new Error('Failed to load characters');
         }
@@ -776,7 +770,10 @@ async function showCharacterDetail(characterId) {
         const dustEl = document.getElementById('detailDust');
         if (goldEl) goldEl.textContent = `💰 ${(character.gold || 0).toFixed(0)}g`;
         if (dustEl) dustEl.textContent = `✨ ${(character.arcaneDust || 0).toFixed(2)} dust`;
-        document.getElementById('detailLevel').textContent = character.level;
+        const detailLevelEl = document.getElementById('detailLevel');
+        if (detailLevelEl) {
+            detailLevelEl.innerHTML = `<span style="color:#d4af37;">${character.level}</span><span style="color:#555; font-size:0.85em;"> → ${character.level + 1}</span>`;
+        }
         
         const totalStats = calculateTotalStats(character);
         document.getElementById('detailConviction').textContent = totalStats.conviction;
@@ -1243,7 +1240,7 @@ async function saveAiProfile() {
 
     const aiProfile = select.value;
     try {
-        const response = await fetch(`${BACKEND_URL}/api/characters/${characterId}/aiProfile`, {
+        const response = await authFetch(`${BACKEND_URL}/api/characters/${characterId}/aiProfile`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ aiProfile })
@@ -1276,8 +1273,7 @@ async function saveAiProfile() {
 async function deleteCharacter(characterId) {
     if (confirm('Are you sure you want to delete this character? This cannot be undone.')) {
         try {
-            const response = await fetch(`${BACKEND_URL}/api/characters/${characterId}`, {
-                method: 'DELETE',
+            const response = await authFetch(`${BACKEND_URL}/api/characters/${characterId}`, {
                 headers: { 'Content-Type': 'application/json' }
             });
             
@@ -1529,12 +1525,10 @@ function renderExportButton(character) {
     const exportBtn = document.getElementById('exportCharacterBtn');
     if (!exportBtn) return;
 
-    // ENSURE Global State is synced immediately
     if (character && character.id) {
         currentState.detailCharacterId = character.id;
     }
 
-    // Check if character is imported (cannot re-export)
     if (character.isImportedReference) {
         exportBtn.disabled = true;
         exportBtn.textContent = 'Cannot Export (Imported Character)';
@@ -1543,13 +1537,13 @@ function renderExportButton(character) {
         exportBtn.style.cursor = 'not-allowed';
     } else {
         exportBtn.disabled = false;
-        exportBtn.textContent = 'Share Character';
-        exportBtn.title = 'Export this character for others to use';
+        exportBtn.textContent = character.shareEnabled ? '🟢 Sharing On' : 'Share Character';
+        exportBtn.title = character.shareEnabled
+            ? 'Sharing enabled — click to manage'
+            : 'Share this character with other players';
         exportBtn.style.opacity = '1';
         exportBtn.style.cursor = 'pointer';
-        
-        // Capture the ID at render time and pass directly — avoids window.currentState
-        // scope mismatch between character-management.js and browse-system.js
+
         const capturedId = character.id;
         exportBtn.onclick = () => openShareModal(capturedId);
     }

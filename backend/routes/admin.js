@@ -183,5 +183,95 @@ router.delete('/items/:id', (req, res) => {
     }
 });
 
+// ── DB Admin Routes ───────────────────────────────────────────────────────────
+// These require the live database — load it lazily via db module
+function getDB() {
+    return require('../database').getDatabase();
+}
+
+// GET /api/admin/db/characters — list all characters
+router.get('/db/characters', (req, res) => {
+    const db = getDB();
+    db.all(`SELECT id, name, race, level, experience FROM characters ORDER BY level DESC`, [], (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(rows || []);
+    });
+});
+
+// GET /api/admin/db/characters/:id — get full character data
+router.get('/db/characters/:id', (req, res) => {
+    const db = getDB();
+    db.get(`SELECT * FROM characters WHERE id = ?`, [req.params.id], (err, row) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (!row) return res.status(404).json({ error: 'Not found' });
+        try { row.skills = JSON.parse(row.skills || '[]'); } catch(e) {}
+        try { row.equipment = JSON.parse(row.equipment || '{}'); } catch(e) {}
+        try { row.stats = JSON.parse(row.stats || '{}'); } catch(e) {}
+        res.json(row);
+    });
+});
+
+// DELETE /api/admin/db/characters/:id — delete a character
+router.delete('/db/characters/:id', (req, res) => {
+    const db = getDB();
+    db.run(`DELETE FROM characters WHERE id = ?`, [req.params.id], function(err) {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ success: true, deleted: this.changes });
+    });
+});
+
+// GET /api/admin/db/snapshots — list all snapshots
+router.get('/db/snapshots', (req, res) => {
+    const db = getDB();
+    db.all(`SELECT snapshot_id, character_name, share_code, level, race, is_public, import_count, created_at
+            FROM character_snapshots ORDER BY created_at DESC`, [], (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(rows || []);
+    });
+});
+
+// DELETE /api/admin/db/snapshots/:id — delete a snapshot
+router.delete('/db/snapshots/:id', (req, res) => {
+    const db = getDB();
+    db.run(`DELETE FROM character_snapshots WHERE snapshot_id = ?`, [req.params.id], function(err) {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ success: true, deleted: this.changes });
+    });
+});
+
+// GET /api/admin/db/combat-logs — list recent combat logs (summary only)
+router.get('/db/combat-logs', (req, res) => {
+    const db = getDB();
+    db.all(`SELECT id, challengeID, partyID, result, totalTurns, createdAt
+            FROM combat_logs ORDER BY createdAt DESC LIMIT 100`, [], (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(rows || []);
+    });
+});
+
+// DELETE /api/admin/db/combat-logs — clear all combat logs
+router.delete('/db/combat-logs', (req, res) => {
+    const db = getDB();
+    db.run(`DELETE FROM combat_logs`, [], function(err) {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ success: true, deleted: this.changes });
+    });
+});
+
+// POST /api/admin/db/query — run a raw SQL query (SELECT only for safety)
+router.post('/db/query', (req, res) => {
+    const { sql } = req.body;
+    if (!sql) return res.status(400).json({ error: 'No SQL provided' });
+    const trimmed = sql.trim().toUpperCase();
+    if (!trimmed.startsWith('SELECT') && !trimmed.startsWith('PRAGMA')) {
+        return res.status(403).json({ error: 'Only SELECT and PRAGMA queries allowed' });
+    }
+    const db = getDB();
+    db.all(sql, [], (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ rows: rows || [], count: (rows || []).length });
+    });
+});
+
 module.exports = router;
 module.exports.loadGameData = loadGameData;

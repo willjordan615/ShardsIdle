@@ -10,6 +10,210 @@
 // or deployed to any host, since the backend always serves the frontend.
 const BACKEND_URL = '';
 
+// ── Auth state ────────────────────────────────────────────────────────────────
+// Single source of truth for the session token and current user.
+// Updated by initAuth() on load and by login/register/guest flows.
+window.authState = {
+    token:    null,
+    userId:   null,
+    username: null,
+    isGuest:  true,
+    ready:    false,   // true once initAuth() has resolved
+};
+
+function getAuthToken() { return window.authState.token; }
+
+/**
+ * Fetch wrapper that injects Authorization header on all API calls.
+ * Drop-in replacement for fetch() — same signature.
+ */
+window.authFetch = function(url, options = {}) {
+    const token = getAuthToken();
+    const headers = { ...(options.headers || {}) };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    return fetch(url, { ...options, headers });
+};
+
+/**
+ * Persist auth state to localStorage.
+ */
+function saveAuthState() {
+    if (window.authState.token) {
+        localStorage.setItem('authToken', window.authState.token);
+    } else {
+        localStorage.removeItem('authToken');
+    }
+}
+
+/**
+ * Apply a login/guest response payload to authState.
+ */
+function applyAuthResponse(data) {
+    window.authState.token    = data.token;
+    window.authState.userId   = data.userId;
+    window.authState.username = data.username;
+    window.authState.isGuest  = !!data.isGuest;
+    window.authState.ready    = true;
+    saveAuthState();
+}
+
+/**
+ * Initialize auth on page load.
+ * 1. Try stored token → /api/auth/me
+ * 2. If invalid/missing, create guest account automatically
+ */
+async function initAuth() {
+    const stored = localStorage.getItem('authToken');
+    if (stored) {
+        try {
+            const res = await fetch(`${BACKEND_URL}/api/auth/me`, {
+                headers: { 'Authorization': `Bearer ${stored}` }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                window.authState.token    = stored;
+                window.authState.userId   = data.userId;
+                window.authState.username = data.username;
+                window.authState.isGuest  = !!data.isGuest;
+                window.authState.ready    = true;
+                updateAuthUI();
+                return;
+            }
+        } catch (e) {
+            console.warn('[AUTH] Token validation failed:', e.message);
+        }
+        localStorage.removeItem('authToken');
+    }
+
+    // No valid token — create guest automatically
+    try {
+        const res = await fetch(`${BACKEND_URL}/api/auth/guest`, { method: 'POST' });
+        if (res.ok) {
+            const data = await res.json();
+            applyAuthResponse(data);
+            updateAuthUI();
+            return;
+        }
+    } catch (e) {
+        console.error('[AUTH] Guest creation failed:', e.message);
+    }
+
+    // Offline/error fallback — mark ready so game can still load
+    window.authState.ready = true;
+}
+
+/**
+ * Update the auth indicator in the nav bar.
+ */
+function updateAuthUI() {
+    const el = document.getElementById('authUserDisplay');
+    if (!el) return;
+    const { username, isGuest } = window.authState;
+    if (isGuest) {
+        el.innerHTML = `<span style="color:#888;">Guest</span> <button onclick="showAuthModal('login')" style="font-size:0.75rem; padding:2px 8px; margin-left:6px;">Log In</button>`;
+    } else {
+        el.innerHTML = `<span style="color:#d4af37;">${username}</span> <button onclick="authLogout()" style="font-size:0.75rem; padding:2px 8px; margin-left:6px; opacity:0.6;">Log Out</button>`;
+    }
+}
+
+/**
+ * Log out — invalidate server session, clear local state, create new guest.
+ */
+async function authLogout() {
+    try {
+        await authFetch(`${BACKEND_URL}/api/auth/logout`, { method: 'POST' });
+    } catch (e) { /* non-fatal */ }
+    localStorage.removeItem('authToken');
+    window.authState = { token: null, userId: null, username: null, isGuest: true, ready: false };
+    await initAuth();
+    updateAuthUI();
+    if (typeof renderRoster === 'function') renderRoster();
+    if (typeof showScreen === 'function') showScreen('hub');
+}
+
+window.showAuthModal = function(tab = 'login') {
+    const modal = document.getElementById('authModal');
+    if (!modal) return;
+    switchAuthTab(tab);
+    // Pre-populate guest token for migration on login
+    const guestInput = document.getElementById('authGuestToken');
+    if (guestInput && window.authState.isGuest && window.authState.token) {
+        guestInput.value = window.authState.token;
+    }
+    modal.style.display = 'flex';
+};
+
+window.closeAuthModal = function() {
+    const modal = document.getElementById('authModal');
+    if (modal) modal.style.display = 'none';
+    document.getElementById('authError').textContent = '';
+};
+
+window.switchAuthTab = function(tab) {
+    document.getElementById('authLoginTab').style.display  = tab === 'login'    ? 'block' : 'none';
+    document.getElementById('authRegisterTab').style.display = tab === 'register' ? 'block' : 'none';
+    document.querySelectorAll('.auth-tab-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.tab === tab);
+    });
+};
+
+window.submitLogin = async function() {
+    const username   = document.getElementById('loginUsername').value.trim();
+    const password   = document.getElementById('loginPassword').value;
+    const errorEl    = document.getElementById('authError');
+    const guestToken = window.authState.isGuest ? window.authState.token : null;
+    errorEl.textContent = '';
+
+    if (!username || !password) { errorEl.textContent = 'Username and password required.'; return; }
+
+    try {
+        const res = await fetch(`${BACKEND_URL}/api/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password, guestToken })
+        });
+        const data = await res.json();
+        if (!res.ok) { errorEl.textContent = data.error || 'Login failed.'; return; }
+        applyAuthResponse(data);
+        closeAuthModal();
+        updateAuthUI();
+        if (typeof renderRoster === 'function') renderRoster();
+    } catch (e) {
+        errorEl.textContent = 'Network error. Please try again.';
+    }
+};
+
+window.submitRegister = async function() {
+    const username  = document.getElementById('registerUsername').value.trim();
+    const password  = document.getElementById('registerPassword').value;
+    const confirm   = document.getElementById('registerConfirm').value;
+    const errorEl   = document.getElementById('authError');
+    errorEl.textContent = '';
+
+    if (!username || !password) { errorEl.textContent = 'Username and password required.'; return; }
+    if (password !== confirm)   { errorEl.textContent = 'Passwords do not match.'; return; }
+    if (password.length < 8)    { errorEl.textContent = 'Password must be at least 8 characters.'; return; }
+
+    try {
+        const res = await authFetch(`${BACKEND_URL}/api/auth/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+        if (!res.ok) { errorEl.textContent = data.error || 'Registration failed.'; return; }
+        // Update local state — token stays the same, account is now registered
+        window.authState.username = data.username;
+        window.authState.isGuest  = false;
+        saveAuthState();
+        closeAuthModal();
+        updateAuthUI();
+        if (typeof showSuccess === 'function') showSuccess(`Welcome, ${data.username}! Your characters have been saved to your account.`);
+    } catch (e) {
+        errorEl.textContent = 'Network error. Please try again.';
+    }
+};
+
 let gameData = {
     races: [],
     skills: [],
@@ -26,6 +230,9 @@ let gameData = {
  */
 async function initializeGame() {
     try {
+        // Auth must resolve before any protected API calls
+        await initAuth();
+
         console.log('Loading game data from backend...');
         const response = await fetch(`${BACKEND_URL}/api/data/all`);
 

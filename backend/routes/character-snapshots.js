@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../database');
 const crypto = require('crypto');
+const { requireAuth } = require('./auth');
 
 /**
  * Generate a readable share code from character name
@@ -29,7 +30,7 @@ function sanitizeText(value, maxLength = 40) {
  * POST /api/character/export
  * Export a character to the sharing system (only owners can export)
  */
-router.post('/export', async (req, res) => {
+router.post('/export', requireAuth, async (req, res) => {
     try {
         let { characterId, isPublic, buildName, buildDescription } = req.body;
 
@@ -57,82 +58,72 @@ router.post('/export', async (req, res) => {
             return res.status(404).json({ error: 'Character not found' });
         }
 
-        // Generate unique share code
-        const shareCode = generateShareCode(character.name);
+        // Only the owner may export
+        if (character.ownerUserId !== req.userId) {
+            return res.status(403).json({ error: 'Forbidden' });
+        }
 
-        // Get ownerUserId (will be null until auth is implemented)
-        const ownerUserId = character.ownerUserId || null;
+        // Get ownerUserId from auth context
+        const ownerUserId = req.userId;
 
         // Get raw database instance for direct SQL queries
         const rawDb = db.getDatabase();
 
-        // Prepare snapshot data
-        const snapshot = {
-            snapshot_id: crypto.randomUUID(),
-            character_id: characterId,
-            owner_user_id: ownerUserId,
-            share_code: shareCode,
-            character_name: character.name,
-            level: character.level,
-            race: character.race,
-            stats: JSON.stringify(character.stats),
-            skills: JSON.stringify(character.skills),
-            equipment: JSON.stringify(character.equipment),
-            combat_stats: JSON.stringify(character.combatStats || {}),
-            party_stats: JSON.stringify(character.partyStats || {}),
-            avatar_id: character.avatarId || null,
-            avatar_color: character.avatarColor || null,
-            avatar_frame: character.avatarFrame || null,
-            title: character.title || null,
-            build_name: buildName || null,
-            build_description: buildDescription || null,
-            is_public: isPublic ? 1 : 0,
-            import_count: 0,
-            ai_profile: character.aiProfile || 'balanced',
-            last_shared_at: new Date().toISOString(),
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-        };
+        // Check for existing snapshot to preserve share_code across re-exports
+        const existing = await new Promise((resolve, reject) => {
+            rawDb.get(
+                `SELECT snapshot_id, share_code FROM character_snapshots WHERE character_id = ?`,
+                [characterId],
+                (err, row) => { if (err) reject(err); else resolve(row); }
+            );
+        });
 
-        // Insert snapshot into database
+        const shareCode = existing?.share_code || generateShareCode(character.name);
+
+        const snapshotId    = existing?.snapshot_id || crypto.randomUUID();
+        const now           = new Date().toISOString();
+        const stats         = JSON.stringify(character.stats);
+        const skills        = JSON.stringify(character.skills);
+        const equipment     = JSON.stringify(character.equipment);
+        const combat_stats  = JSON.stringify(character.combatStats || {});
+        const party_stats   = JSON.stringify(character.partyStats || {});
+
+        // Upsert — update if exists, insert if new
         await new Promise((resolve, reject) => {
-            rawDb.run(`
-                INSERT INTO character_snapshots 
-                (snapshot_id, character_id, owner_user_id, share_code, character_name, level, race, 
-                 stats, skills, equipment, combat_stats, party_stats,
-                 avatar_id, avatar_color, avatar_frame, title,
-                 build_name, build_description, is_public, import_count,
-                 ai_profile, created_at, updated_at, last_shared_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            `, [
-                snapshot.snapshot_id,
-                snapshot.character_id,
-                snapshot.owner_user_id,
-                snapshot.share_code,
-                snapshot.character_name,
-                snapshot.level,
-                snapshot.race,
-                snapshot.stats,
-                snapshot.skills,
-                snapshot.equipment,
-                snapshot.combat_stats,
-                snapshot.party_stats,
-                snapshot.avatar_id,
-                snapshot.avatar_color,
-                snapshot.avatar_frame,
-                snapshot.title,
-                snapshot.build_name,
-                snapshot.build_description,
-                snapshot.is_public,
-                snapshot.import_count,
-                snapshot.ai_profile,
-                snapshot.created_at,
-                snapshot.updated_at,
-                snapshot.last_shared_at
-            ], (err) => {
-                if (err) reject(err);
-                else resolve();
-            });
+            if (existing) {
+                rawDb.run(`
+                    UPDATE character_snapshots SET
+                        owner_user_id=?, character_name=?, level=?, race=?,
+                        stats=?, skills=?, equipment=?, combat_stats=?, party_stats=?,
+                        avatar_id=?, avatar_color=?, avatar_frame=?, title=?,
+                        build_name=?, build_description=?, is_public=?,
+                        ai_profile=?, updated_at=?, last_shared_at=?
+                    WHERE character_id=?
+                `, [
+                    ownerUserId, character.name, character.level, character.race,
+                    stats, skills, equipment, combat_stats, party_stats,
+                    character.avatarId || null, character.avatarColor || null, character.avatarFrame || null, character.title || null,
+                    buildName || null, buildDescription || null, isPublic ? 1 : 0,
+                    character.aiProfile || 'balanced', now, now,
+                    characterId
+                ], (err) => { if (err) reject(err); else resolve(); });
+            } else {
+                rawDb.run(`
+                    INSERT INTO character_snapshots 
+                    (snapshot_id, character_id, owner_user_id, share_code, character_name, level, race,
+                     stats, skills, equipment, combat_stats, party_stats,
+                     avatar_id, avatar_color, avatar_frame, title,
+                     build_name, build_description, is_public, import_count,
+                     ai_profile, created_at, updated_at, last_shared_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                `, [
+                    snapshotId, characterId, ownerUserId, shareCode, character.name, character.level, character.race,
+                    stats, skills, equipment, combat_stats, party_stats,
+                    character.avatarId || null, character.avatarColor || null, character.avatarFrame || null, character.title || null,
+                    buildName || null, buildDescription || null, isPublic ? 1 : 0, 0,
+                    character.aiProfile || 'balanced', now, now, now
+                ], (err) => { if (err) reject(err); else resolve(); });
+            }
         });
 
         // Update character with sharing metadata
@@ -142,10 +133,11 @@ router.post('/export', async (req, res) => {
 
         res.json({
             shareCode,
-            message: 'Character exported successfully',
+            message: existing ? 'Character share updated' : 'Character exported successfully',
             isPublic,
             characterName: character.name,
-            level: character.level
+            level: character.level,
+            updated: !!existing
         });
     } catch (error) {
         console.error('[EXPORT] Error:', error);

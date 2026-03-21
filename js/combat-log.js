@@ -10,6 +10,29 @@ window.toggleCombatPause = function() {
     if (btn) btn.textContent = window.combatPaused ? '▶ Resume' : '⏸ Pause';
 };
 
+window._ffActive = false;
+window._preFfSpeed = 1.0;
+
+window.toggleCombatFF = function() {
+    const btn = document.getElementById('ffBtn');
+    if (!window._ffActive) {
+        window._preFfSpeed = window.combatSpeedMultiplier || 1.0;
+        window.combatSpeedMultiplier = 0.05;
+        window._ffActive = true;
+        if (btn) btn.textContent = '⏩ FF (on)';
+        // Also unpause if paused
+        if (window.combatPaused) {
+            window.combatPaused = false;
+            const pauseBtn = document.getElementById('pauseBtn');
+            if (pauseBtn) pauseBtn.textContent = '⏸ Pause';
+        }
+    } else {
+        window.combatSpeedMultiplier = window._preFfSpeed;
+        window._ffActive = false;
+        if (btn) btn.textContent = '⏩ FF';
+    }
+};
+
 // Scroll tracking — stop auto-scroll when user scrolls up manually
 let _userScrolledUp = false;
 
@@ -101,11 +124,15 @@ async function displayCombatLog(combatData) {
         const suddenDeathBanner = document.getElementById('suddenDeathBanner');
         if (suddenDeathBanner) suddenDeathBanner.style.display = 'none';
 
-        // Reset pause and scroll state for new combat
+        // Reset pause, FF, and scroll state for new combat
         window.combatPaused = false;
         _userScrolledUp = false;
+        window._ffActive = false;
+        window.combatSpeedMultiplier = parseFloat(window.currentSettings?.combatSpeed) || 1.0;
         const pauseBtn = document.getElementById('pauseBtn');
         if (pauseBtn) pauseBtn.textContent = '⏸ Pause';
+        const ffBtn = document.getElementById('ffBtn');
+        if (ffBtn) ffBtn.textContent = '⏩ FF';
         const scrollBtn = document.getElementById('scrollResumeBtn');
         if (scrollBtn) scrollBtn.style.display = 'none';
         _initScrollTracking();
@@ -443,9 +470,12 @@ async function displayCombatLog(combatData) {
         const rewards = combatData.rewards || {};
         if (lootListEl) {
             if (rewards.lootDropped && rewards.lootDropped.length > 0) {
-                lootListEl.innerHTML = rewards.lootDropped.map(l =>
-                    `<span style="color:${l.rarity === 'legendary' ? '#ffaa00' : l.rarity === 'rare' ? '#00d4ff' : '#fff'}">• ${l.itemID}</span>`
-                ).join('<br>');
+                lootListEl.innerHTML = rewards.lootDropped.map(l => {
+                    const itemDef = window.gameData?.gear?.find(g => g.id === l.itemID)
+                                 || window.gameData?.consumables?.find(g => g.id === l.itemID);
+                    const displayName = itemDef?.name || l.itemID;
+                    return `<span style="color:${l.rarity === 'legendary' ? '#ffaa00' : l.rarity === 'rare' ? '#00d4ff' : '#fff'}">• ${displayName}</span>`;
+                }).join('<br>');
             } else {
                 lootListEl.innerHTML = '<span style="color:#666">No loot dropped.</span>';
             }
@@ -1304,6 +1334,27 @@ try {
 
     const xpEntries = Object.entries(rewards.experienceGained || {});
     xpEntries.forEach(([charId, xp]) => console.log(`[REWARDS] XP awarded to ${charId}: ${xp}`));
+
+    // Auto-sync sharing for characters with shareEnabled
+    for (const [charId, character] of Object.entries(savedCharacters)) {
+        if (!character.shareEnabled) continue;
+        try {
+            await authFetch(`${typeof BACKEND_URL !== 'undefined' ? BACKEND_URL : ''}/api/character/export`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    characterId: charId,
+                    isPublic: true,
+                    buildName: character.buildName || '',
+                    buildDescription: character.buildDescription || '',
+                    enableSharing: true
+                })
+            });
+            console.log(`[SHARE] Auto-synced snapshot for ${character.name}`);
+        } catch (e) {
+            console.warn(`[SHARE] Auto-sync failed for ${character.name}:`, e.message);
+        }
+    }
 
 } catch (error) {
     console.error('[REWARDS] Failed to apply rewards:', error);
