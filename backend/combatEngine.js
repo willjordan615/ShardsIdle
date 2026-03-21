@@ -941,7 +941,7 @@ class CombatEngine {
     const secretXPMultiplier = secretCompleted ? 2.0 : 1.0;
 
     players.forEach(player => {
-        const xpReward = Math.floor(baseXP * partyScale * difficultyScale * secretXPMultiplier * (1 + (player.stats?.harmony || 0) / 250));
+        const xpReward = Math.floor(baseXP * partyScale * difficultyScale * secretXPMultiplier * (1 + (player.stats?.harmony || 0) / 750));
         rewards.experienceGained[player.id] = xpReward;
     });
 
@@ -2064,114 +2064,193 @@ class CombatEngine {
       weapon = this.gear.find(g => g.id === actor.equipment.mainHand);
     }
 
-    // ===== STEP 1: Calculate Base Skill Damage =====
+    // ===== STEP 1: Calculate Base Skill Damage (NO stat scaling yet) =====
+    // Stat multiplier is computed here but applied AFTER weapon damage is added,
+    // so stats amplify the entire attack rather than just the tiny skill base.
     const baseDamage = (skill.basePower ?? 1) * (1 + (skillLevel - 1) * 0.1);
-    
-    // Stat scaling (ADDITIVE per spec, not multiplicative)
+
     const scaling = skill.scalingFactors || {};
     let statMultiplier = 0;
-    
     if (scaling.conviction) statMultiplier += ((actor.stats?.conviction) || 0) * scaling.conviction / CONSTANTS.STAT_SCALE;
-    if (scaling.endurance) statMultiplier += ((actor.stats?.endurance) || 0) * scaling.endurance / CONSTANTS.STAT_SCALE;
-    if (scaling.ambition) statMultiplier += ((actor.stats?.ambition) || 0) * scaling.ambition / CONSTANTS.STAT_SCALE;
-    if (scaling.harmony) statMultiplier += ((actor.stats?.harmony) || 0) * scaling.harmony / CONSTANTS.STAT_SCALE;
-    
-    const skillDamage = baseDamage * (1 + statMultiplier);
-    
+    if (scaling.endurance)  statMultiplier += ((actor.stats?.endurance)  || 0) * scaling.endurance  / CONSTANTS.STAT_SCALE;
+    if (scaling.ambition)   statMultiplier += ((actor.stats?.ambition)   || 0) * scaling.ambition   / CONSTANTS.STAT_SCALE;
+    if (scaling.harmony)    statMultiplier += ((actor.stats?.harmony)    || 0) * scaling.harmony    / CONSTANTS.STAT_SCALE;
+
+    // skillDamage is raw base — stat multiplier applied later to the whole pool
+    const skillDamage = baseDamage;
+
     // ===== CHECK: Skip weapon damage for healing skills =====
     const isHealingSkill = skill.category === 'HEALING' || skill.effects?.some(e => e.type === 'heal');
-    
+
+    // ===== CLASSIFY SKILL: physical, magic, or hybrid =====
+    const MAGIC_DAMAGE_TYPES    = new Set(['fire','cold','lightning','electric','arcane','holy','shadow','nature','poison']);
+    const PHYSICAL_DAMAGE_TYPES = new Set(['physical','slashing','piercing','bludgeoning']);
+
+    const skillDamageTypes  = (skill.effects || [])
+      .filter(e => e.type === 'damage' && e.damageType)
+      .map(e => e.damageType.toLowerCase());
+
+    const skillHasMagicType    = skillDamageTypes.some(t => MAGIC_DAMAGE_TYPES.has(t));
+    const skillHasPhysicalType = skillDamageTypes.some(t => PHYSICAL_DAMAGE_TYPES.has(t));
+
+    const isMagicSkill  = skill.category === 'DAMAGE_MAGIC' || (skillHasMagicType && !skillHasPhysicalType);
+    const isHybridSkill = skillHasMagicType && skillHasPhysicalType;
+
     // ===== STEP 2: Collect Weapon Damage & Type =====
     let weaponTotalDamage = 0;
-    const weaponDamageBreakdown = {}; // { "Physical": 28, "Holy": 15 }
+    const weaponDamageBreakdown = {};
     let weaponType = null;
 
     if (!isHealingSkill && weapon) {
-      // Use the pre-fetched weapon
       weaponType = weapon.type ? weapon.type.toLowerCase() : null;
-      
-      if (weapon.dmg1) { 
-        weaponTotalDamage += weapon.dmg1; 
-        weaponDamageBreakdown[weapon.dmg_type_1] = (weaponDamageBreakdown[weapon.dmg_type_1] || 0) + weapon.dmg1; 
-      }
-      if (weapon.dmg2) { 
-        weaponTotalDamage += weapon.dmg2; 
-        weaponDamageBreakdown[weapon.dmg_type_2] = (weaponDamageBreakdown[weapon.dmg_type_2] || 0) + weapon.dmg2; 
-      }
-      if (weapon.dmg3) { 
-        weaponTotalDamage += weapon.dmg3; 
-        weaponDamageBreakdown[weapon.dmg_type_3] = (weaponDamageBreakdown[weapon.dmg_type_3] || 0) + weapon.dmg3; 
-      }
-      if (weapon.dmg4) { 
-        weaponTotalDamage += weapon.dmg4; 
-        weaponDamageBreakdown[weapon.dmg_type_4] = (weaponDamageBreakdown[weapon.dmg_type_4] || 0) + weapon.dmg4; 
+      for (const [dmg, type] of [
+        [weapon.dmg1, weapon.dmg_type_1],
+        [weapon.dmg2, weapon.dmg_type_2],
+        [weapon.dmg3, weapon.dmg_type_3],
+        [weapon.dmg4, weapon.dmg_type_4],
+      ]) {
+        if (dmg && type) {
+          weaponTotalDamage += dmg;
+          weaponDamageBreakdown[type] = (weaponDamageBreakdown[type] || 0) + dmg;
+        }
       }
     }
 
-    // ===== STEP 3: Total Damage = Skill + Weapon =====
-    let totalDamage = skillDamage + weaponTotalDamage;
-    
-    // ===== STEP 4: Apply Dynamic Weapon Variance (NEW) =====
-    // Only apply variance to physical attacks with a known weapon type
-    if (!isHealingSkill && weaponTotalDamage > 0 && weaponType) {
-      // Look up the profile generated in the constructor based on item.type
+    // ===== STEP 3: Build damage pool by skill type =====
+    let totalDamage = 0;
+    let finalDamageBreakdown = {}; // type → raw damage before armor/resistance
+
+    const ARMOR_K    = 16;
+    const armorValue = target ? (target.armorValue || 0) : 0;
+    const armorReduction = armorValue / (armorValue + ARMOR_K);
+
+    if (isHealingSkill) {
+      totalDamage = skillDamage;
+
+    } else if (isMagicSkill) {
+      // ── MAGIC PATH ────────────────────────────────────────────────────────
+      // Full weapon damage adds to the pool. Type distribution comes from the
+      // skill's declared types. Matching weapon types earn a +20% bonus on the
+      // matched portion — rewarding synergy without penalising broad weapons.
+
+      const magicTypes = skillDamageTypes.filter(t => MAGIC_DAMAGE_TYPES.has(t));
+      const fallbackTypes = magicTypes.length ? magicTypes : ['arcane'];
+      const typeCount = fallbackTypes.length;
+
+      // Skill base distributed evenly across its declared types
+      for (const t of fallbackTypes) {
+        finalDamageBreakdown[t] = (finalDamageBreakdown[t] || 0) + (skillDamage / typeCount);
+      }
+
+      // Full weapon damage added — type distribution mirrors skill's declared types
+      if (weaponTotalDamage > 0) {
+        for (const t of fallbackTypes) {
+          finalDamageBreakdown[t] = (finalDamageBreakdown[t] || 0) + (weaponTotalDamage / typeCount);
+        }
+      }
+
+      // Match bonus: +20% of each weapon damage component whose type matches a skill type
+      for (const [wpnType, wpnDmg] of Object.entries(weaponDamageBreakdown)) {
+        const wt = wpnType.toLowerCase();
+        if (fallbackTypes.includes(wt)) {
+          finalDamageBreakdown[wt] = (finalDamageBreakdown[wt] || 0) + (wpnDmg * 0.2);
+        }
+      }
+
+      totalDamage = Object.values(finalDamageBreakdown).reduce((a, b) => a + b, 0);
+
+    } else if (isHybridSkill) {
+      // ── HYBRID PATH ───────────────────────────────────────────────────────
+      // Physical weapon damage splits by weapon proportions (standard physical path).
+      // Magic weapon component: full weapon adds to magic type(s), match bonus applies.
+      // Skill base split evenly across all declared types.
+
+      const physTypes  = skillDamageTypes.filter(t => PHYSICAL_DAMAGE_TYPES.has(t));
+      const magicTypes = skillDamageTypes.filter(t => MAGIC_DAMAGE_TYPES.has(t));
+      const totalTypes = skillDamageTypes.length || 1;
+
+      // Skill base split across all types
+      for (const t of physTypes)  finalDamageBreakdown[t] = (finalDamageBreakdown[t] || 0) + (skillDamage / totalTypes);
+      for (const t of magicTypes) finalDamageBreakdown[t] = (finalDamageBreakdown[t] || 0) + (skillDamage / totalTypes);
+
+      // Physical weapon damage — split proportionally across physical weapon types
+      for (const [wpnType, wpnDmg] of Object.entries(weaponDamageBreakdown)) {
+        if (PHYSICAL_DAMAGE_TYPES.has(wpnType.toLowerCase())) {
+          finalDamageBreakdown[wpnType] = (finalDamageBreakdown[wpnType] || 0) + wpnDmg;
+        }
+      }
+
+      // Magic weapon component — adds to skill's magic type(s) evenly + match bonus
+      const wpnMagTotal = Object.entries(weaponDamageBreakdown)
+        .filter(([t]) => MAGIC_DAMAGE_TYPES.has(t.toLowerCase()))
+        .reduce((s, [, v]) => s + v, 0);
+      if (wpnMagTotal > 0 && magicTypes.length > 0) {
+        for (const t of magicTypes) {
+          finalDamageBreakdown[t] = (finalDamageBreakdown[t] || 0) + (wpnMagTotal / magicTypes.length);
+        }
+        // Match bonus on magic weapon portion
+        for (const [wpnType, wpnDmg] of Object.entries(weaponDamageBreakdown)) {
+          if (magicTypes.includes(wpnType.toLowerCase())) {
+            finalDamageBreakdown[wpnType.toLowerCase()] = (finalDamageBreakdown[wpnType.toLowerCase()] || 0) + (wpnDmg * 0.2);
+          }
+        }
+      }
+
+      totalDamage = Object.values(finalDamageBreakdown).reduce((a, b) => a + b, 0);
+
+    } else {
+      // ── PHYSICAL PATH ─────────────────────────────────────────────────────
+      // Skill base + full weapon, split by weapon type proportions. Unchanged.
+      totalDamage = skillDamage + weaponTotalDamage;
+
+      if (weaponTotalDamage > 0) {
+        for (const [type, dmg] of Object.entries(weaponDamageBreakdown)) {
+          finalDamageBreakdown[type] = totalDamage * (dmg / weaponTotalDamage);
+        }
+      } else {
+        const fallbackType = skillDamageTypes[0] || 'physical';
+        finalDamageBreakdown[fallbackType] = skillDamage;
+      }
+    }
+
+    // ===== STEP 3b: Apply stat multiplier to the ENTIRE pool =====
+    // Stats now amplify the full attack (skill base + weapon + match bonus),
+    // making stat investment meaningful across the whole damage range.
+    if (statMultiplier > 0 && !isHealingSkill) {
+      for (const t of Object.keys(finalDamageBreakdown)) {
+        finalDamageBreakdown[t] *= (1 + statMultiplier);
+      }
+      totalDamage *= (1 + statMultiplier);
+    }
+
+    // ===== STEP 4: Apply Weapon Variance (physical skills only) =====
+    if (!isHealingSkill && !isMagicSkill && weaponTotalDamage > 0 && weaponType) {
       const profile = this.weaponVarianceProfiles[weaponType] || this.weaponVarianceProfiles['default'];
-      
       if (profile) {
         const [minVar, maxVar] = profile;
-        // Calculate random multiplier within the range [min, max]
         const varianceMultiplier = minVar + (Math.random() * (maxVar - minVar));
-        
-        // Apply variance to the TOTAL damage (Skill + Weapon) to simulate swing consistency
         totalDamage *= varianceMultiplier;
-        
-        // Debug Log: Now 'weapon' is defined in scope!
-        //console.log(`[VARIANCE DEBUG] Weapon: ${weapon.name} (${weaponType}), Roll: ${varianceMultiplier.toFixed(2)}x, Range: [${minVar}, ${maxVar}]`);
+        for (const t of Object.keys(finalDamageBreakdown)) {
+          finalDamageBreakdown[t] *= varianceMultiplier;
+        }
       }
     }
 
-    // ===== STEP 5: Split Damage by Type (Proportional to Weapon) =====
+    // ===== STEP 5: Apply Armor Reduction + Per-type Resistances =====
     let finalDamage = 0;
-    const damageBreakdown = []; // For debugging
+    const damageBreakdown = [];
 
-    // If weapon has damage types, split proportionally
-    if (weaponTotalDamage > 0 && Object.keys(weaponDamageBreakdown).length > 0) {
-      // Percentage armor reduction: armor / (armor + K), diminishing returns, never reaches 100%.
-      // K=16 means armor=6 → 27% reduction, armor=16 → 50%, armor=30 → 65%.
-      const ARMOR_K = 16;
-      const armorValue = target.armorValue || 0;
-      const armorReduction = armorValue / (armorValue + ARMOR_K);
-      const damageAfterArmor = totalDamage * (1 - armorReduction);
-
-      for (const [damageType, typeDamage] of Object.entries(weaponDamageBreakdown)) {
-        // Calculate proportion of this damage type relative to original weapon dmg
-        const proportion = typeDamage / weaponTotalDamage;
-
-        // Split the armor-reduced total damage by proportion
-        let typeDamagePortion = damageAfterArmor * proportion;
-
-        // Apply resistance for this specific damage type
-        if (target.resistances && target.resistances[damageType]) {
-          const resistance = target.resistances[damageType] || 0;
-          typeDamagePortion = typeDamagePortion * (1 - resistance);
-        }
-
-        damageBreakdown.push(`${damageType}:${typeDamagePortion.toFixed(2)}`);
-        finalDamage += typeDamagePortion;
+    for (const [damageType, rawDmg] of Object.entries(finalDamageBreakdown)) {
+      let portion = rawDmg * (1 - armorReduction);
+      if (target?.resistances?.[damageType]) {
+        portion *= (1 - (target.resistances[damageType] || 0));
       }
-    } 
-    // No weapon damage types - apply defense/resistance to total
-    else {
-      // Percentage armor reduction (same formula)
-      const ARMOR_K = 16;
-      const armorValue = target.armorValue || 0;
-      const armorReduction = armorValue / (armorValue + ARMOR_K);
-      finalDamage = totalDamage * (1 - armorReduction);
-      // Check skill effect for damage type resistance
-      if (skill.effects?.[0]?.damageType && target.resistances) {
-        const resistance = target.resistances[skill.effects[0].damageType] || 0;
-        finalDamage = finalDamage * (1 - resistance);
-      }
+      damageBreakdown.push(`${damageType}:${portion.toFixed(2)}`);
+      finalDamage += portion;
+    }
+
+    if (finalDamage === 0 && !isHealingSkill) {
+      finalDamage = skillDamage * (1 - armorReduction);
     }
 
     // ===== STEP 6: Apply Critical Multiplier =====

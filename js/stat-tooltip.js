@@ -4,45 +4,48 @@
 const STAT_DEFINITIONS = {
     conviction: {
         name: 'Conviction',
-        description: 'Strength of will and magical power. Core stat for damage, spellcasting, and utility.',
+        description: 'Raw force of will and physical power. The primary offensive stat for fighters, bruisers, and fire, arcane, and lightning mages.',
         effects: [
-            '• Scales physical and magical damage skills',
-            '• Powers utility and detection abilities',
-            '• Enhances spell potency and effects',
-            '• Increases magical skill effectiveness'
+            '• Increases maximum HP and Stamina',
+            '• Raises hit chance on all attacks',
+            '• Amplifies damage for fighter and strength-based skills',
+            '• Scales fire, arcane, lightning, holy, and shadow magic',
+            '• A small contributor to critical strike chance',
         ]
     },
     endurance: {
         name: 'Endurance',
-        description: 'Physical toughness and stamina. Governs defense, durability, and recovery.',
+        description: 'Durability and staying power. A survivability stat first — it contributes modestly to physical damage, but you do not stack it for offense.',
         effects: [
-            '• Increases maximum health (HP)',
-            '• Increases armor rating',
-            '• Increases stamina pool',
-            '• Scales defensive and blocking abilities',
-            '• Powers stamina restoration and recovery skills'
+            '• Significantly increases maximum HP and Stamina',
+            '• Contributes a small bonus to physical attack damage',
+            '• The defining stat of bruiser-style skills (pummel, earthquake, shove)',
+            '• Does not affect hit chance, crit, or magic damage',
         ]
     },
     ambition: {
         name: 'Ambition',
-        description: 'Cunning and decisive action. Governs critical strikes, evasion, initiative, and loot acquisition.',
+        description: 'Speed, cunning, and precision. The primary offensive stat for rogues and skirmishers, and for fire, arcane, and lightning mages. Also improves loot drop rates.',
         effects: [
-            '• Scales with damage for precision and crit chance',
-            '• Increases evasion and dodge chance',
-            '• Determines combat initiative order',
-            '• Affects loot rarity and drop chance',
-            '• Powers cunning and evasion-based skills'
+            '• Primary driver of critical strike chance',
+            '• Amplifies damage for rogue and finesse-based skills',
+            '• Scales lightning, shadow, and arcane magic',
+            '• Raises Mana slightly',
+            '• Improves retreat success chance',
+            '• Increases item drop chance (ambition 150 = +30%, ambition 300 = +60%)',
         ]
     },
     harmony: {
         name: 'Harmony',
-        description: 'Inner balance and healing affinity. Scales support, healing, and group benefits.',
+        description: 'Attunement to magic and the natural world. The primary stat for ice, holy, and nature/poison mages — and the dominant stat for healers and supports. Also accelerates experience gain.',
         effects: [
-            '• Scales healing spell power',
-            '• Scales support and buff abilities',
-            '• Powers group assistance skills',
-            '• Enhances status recovery and restoration',
-            '• Increases healing received from all sources'
+            '• Significantly increases maximum Mana',
+            '• Scales ice and cold magic damage',
+            '• Scales holy magic damage',
+            '• Scales nature and poison magic damage',
+            '• Powers all healing and restoration skills',
+            '• Increases XP earned from combat (harmony 150 = +20%, harmony 300 = +40%)',
+            '• No effect on fire, arcane, lightning, or shadow damage',
         ]
     }
 };

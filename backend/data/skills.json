@@ -5,7 +5,7 @@
     "description": "Draw ambient energy inward and project it outward as a raw arcane pulse.",
     "category": "DAMAGE_MAGIC",
     "parentSkills": [],
-    "basePower": 5,
+    "basePower": 0.9,
     "baseHitChance": 0.9,
     "critChance": 0.04,
     "critMultiplier": 1.5,
@@ -26,7 +26,11 @@
     "isStarterSkill": true,
     "tags": [
       "arcane"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.5,
+      "ambition": 0.5
+    }
   },
   {
     "id": "prayer",
@@ -123,8 +127,9 @@
     "costAmount": 7,
     "requiredLevel": 1,
     "scalingFactors": {
-      "conviction": 0.4,
-      "ambition": 0.6
+      "conviction": 0.33,
+      "ambition": 0.54,
+      "endurance": 0.13
     },
     "baseHitChance": 0.9,
     "critChance": 0.15,
@@ -213,8 +218,9 @@
     "costAmount": 6,
     "requiredLevel": 1,
     "scalingFactors": {
-      "conviction": 0.6,
-      "ambition": 0.4
+      "conviction": 0.65,
+      "ambition": 0.22,
+      "endurance": 0.13
     },
     "baseHitChance": 0.95,
     "critChance": 0.05,
@@ -1757,8 +1763,9 @@
     "costAmount": 8,
     "requiredLevel": 1,
     "scalingFactors": {
-      "conviction": 0.5,
-      "ambition": 0.5
+      "conviction": 0.62,
+      "ambition": 0.18,
+      "endurance": 0.2
     },
     "baseHitChance": 0.85,
     "critChance": 0.1,
@@ -2430,8 +2437,9 @@
     "costAmount": 10,
     "requiredLevel": 1,
     "scalingFactors": {
-      "conviction": 0.6,
-      "ambition": 0.4
+      "conviction": 0.33,
+      "ambition": 0.54,
+      "endurance": 0.13
     },
     "baseHitChance": 0.88,
     "critChance": 0.12,
@@ -2476,8 +2484,9 @@
     "costAmount": 12,
     "requiredLevel": 1,
     "scalingFactors": {
-      "conviction": 0.8,
-      "ambition": 0.2
+      "conviction": 0.65,
+      "ambition": 0.22,
+      "endurance": 0.13
     },
     "baseHitChance": 0.78,
     "critChance": 0.2,
@@ -2521,8 +2530,9 @@
     "costAmount": 9,
     "requiredLevel": 1,
     "scalingFactors": {
-      "conviction": 0.3,
-      "ambition": 0.7
+      "conviction": 0.22,
+      "ambition": 0.65,
+      "endurance": 0.13
     },
     "baseHitChance": 0.95,
     "critChance": 0.25,
@@ -2569,8 +2579,9 @@
     "costAmount": 9,
     "requiredLevel": 1,
     "scalingFactors": {
-      "conviction": 0.4,
-      "ambition": 0.6
+      "conviction": 0.33,
+      "ambition": 0.54,
+      "endurance": 0.13
     },
     "baseHitChance": 0.92,
     "critChance": 0.1,
@@ -2821,8 +2832,9 @@
     "costAmount": 10,
     "requiredLevel": 1,
     "scalingFactors": {
-      "conviction": 0.5,
-      "ambition": 0.5
+      "conviction": 0.33,
+      "ambition": 0.54,
+      "endurance": 0.13
     },
     "baseHitChance": 0.92,
     "critChance": 0.08,
@@ -2874,8 +2886,9 @@
     "costAmount": 10,
     "requiredLevel": 1,
     "scalingFactors": {
-      "conviction": 0.5,
-      "ambition": 0.5
+      "conviction": 0.33,
+      "ambition": 0.54,
+      "endurance": 0.13
     },
     "baseHitChance": 0.92,
     "critChance": 0.08,
@@ -3006,7 +3019,7 @@
       "channel",
       "focus"
     ],
-    "basePower": 10,
+    "basePower": 1.1,
     "baseHitChance": 0.95,
     "critChance": 0.1,
     "critMultiplier": 1.5,
@@ -3035,7 +3048,11 @@
     "isChildSkill": true,
     "tags": [
       "arcane"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.5,
+      "ambition": 0.5
+    }
   },
   {
     "id": "shadow_bolt",
@@ -3046,7 +3063,7 @@
       "prayer",
       "misdirect"
     ],
-    "basePower": 9,
+    "basePower": 1.1,
     "baseHitChance": 0.9,
     "critChance": 0.15,
     "critMultiplier": 1.6,
@@ -3073,7 +3090,11 @@
     "isChildSkill": true,
     "tags": [
       "shadow"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.6,
+      "harmony": 0.4
+    }
   },
   {
     "id": "holy_light",
@@ -3084,7 +3105,7 @@
       "prayer",
       "first_aid"
     ],
-    "basePower": 0,
+    "basePower": 1.3,
     "baseHitChance": 1.0,
     "critChance": 0.05,
     "critMultiplier": 1.5,
@@ -3112,7 +3133,11 @@
     "isChildSkill": true,
     "tags": [
       "holy"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.6,
+      "harmony": 0.4
+    }
   },
   {
     "id": "nature_touch",
@@ -3123,7 +3148,7 @@
       "attunement",
       "rest"
     ],
-    "basePower": 0,
+    "basePower": 1.3,
     "baseHitChance": 1.0,
     "critChance": 0.05,
     "critMultiplier": 1.5,
@@ -3150,7 +3175,11 @@
     "isChildSkill": true,
     "tags": [
       "nature"
-    ]
+    ],
+    "scalingFactors": {
+      "harmony": 0.6,
+      "ambition": 0.4
+    }
   },
   {
     "id": "apply_poison",
@@ -3193,7 +3222,7 @@
       "prayer",
       "basic_attack"
     ],
-    "basePower": 12,
+    "basePower": 1.3,
     "baseHitChance": 0.9,
     "critChance": 0.1,
     "critMultiplier": 1.5,
@@ -3221,7 +3250,11 @@
     "isChildSkill": true,
     "tags": [
       "holy"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.6,
+      "harmony": 0.4
+    }
   },
   {
     "id": "arcane_strike",
@@ -3232,7 +3265,7 @@
       "channel",
       "basic_attack"
     ],
-    "basePower": 11,
+    "basePower": 1.3,
     "baseHitChance": 0.9,
     "critChance": 0.1,
     "critMultiplier": 1.5,
@@ -3260,7 +3293,11 @@
     "isChildSkill": true,
     "tags": [
       "arcane"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.5,
+      "ambition": 0.5
+    }
   },
   {
     "id": "slash",
@@ -3271,7 +3308,7 @@
       "basic_attack",
       "aim"
     ],
-    "basePower": 10,
+    "basePower": 1.3,
     "baseHitChance": 0.95,
     "critChance": 0.15,
     "critMultiplier": 1.6,
@@ -3298,7 +3335,12 @@
     "isChildSkill": true,
     "tags": [
       "physical"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.54,
+      "ambition": 0.33,
+      "endurance": 0.13
+    }
   },
   {
     "id": "pummel",
@@ -3309,7 +3351,7 @@
       "shove",
       "basic_attack"
     ],
-    "basePower": 14,
+    "basePower": 1.3,
     "baseHitChance": 0.85,
     "critChance": 0.05,
     "critMultiplier": 1.5,
@@ -3336,7 +3378,12 @@
     "isChildSkill": true,
     "tags": [
       "physical"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.62,
+      "ambition": 0.18,
+      "endurance": 0.2
+    }
   },
   {
     "id": "pierce",
@@ -3347,7 +3394,7 @@
       "aim",
       "footwork"
     ],
-    "basePower": 11,
+    "basePower": 1.3,
     "baseHitChance": 0.95,
     "critChance": 0.2,
     "critMultiplier": 1.7,
@@ -3374,7 +3421,12 @@
     "isChildSkill": true,
     "tags": [
       "physical"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.33,
+      "ambition": 0.54,
+      "endurance": 0.13
+    }
   },
   {
     "id": "stone_skin",
@@ -3414,7 +3466,7 @@
       "slash",
       "sense"
     ],
-    "basePower": 12,
+    "basePower": 1.6,
     "baseHitChance": 0.9,
     "critChance": 0.2,
     "critMultiplier": 1.8,
@@ -3440,7 +3492,12 @@
     "isChildSkill": true,
     "tags": [
       "physical"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.22,
+      "ambition": 0.65,
+      "endurance": 0.13
+    }
   },
   {
     "id": "mind_spike",
@@ -3451,7 +3508,7 @@
       "focus",
       "shock"
     ],
-    "basePower": 13,
+    "basePower": 1.4,
     "baseHitChance": 0.95,
     "critChance": 0.15,
     "critMultiplier": 1.6,
@@ -3477,7 +3534,11 @@
     "isChildSkill": true,
     "tags": [
       "arcane"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.4,
+      "ambition": 0.6
+    }
   },
   {
     "id": "shadow_step",
@@ -3556,7 +3617,7 @@
       "slash",
       "produce_flame"
     ],
-    "basePower": 18,
+    "basePower": 1.6,
     "baseHitChance": 0.9,
     "critChance": 0.15,
     "critMultiplier": 1.6,
@@ -3587,7 +3648,12 @@
     "isChildSkill": true,
     "tags": [
       "fire"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.54,
+      "ambition": 0.33,
+      "endurance": 0.13
+    }
   },
   {
     "id": "ice_pierce",
@@ -3598,7 +3664,7 @@
       "pierce",
       "chill"
     ],
-    "basePower": 17,
+    "basePower": 1.6,
     "baseHitChance": 0.95,
     "critChance": 0.2,
     "critMultiplier": 1.7,
@@ -3629,7 +3695,12 @@
     "isChildSkill": true,
     "tags": [
       "cold"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.33,
+      "ambition": 0.54,
+      "endurance": 0.13
+    }
   },
   {
     "id": "shocking_blow",
@@ -3640,7 +3711,7 @@
       "pummel",
       "shock"
     ],
-    "basePower": 20,
+    "basePower": 1.6,
     "baseHitChance": 0.85,
     "critChance": 0.1,
     "critMultiplier": 1.5,
@@ -3671,7 +3742,12 @@
     "isChildSkill": true,
     "tags": [
       "lightning"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.62,
+      "ambition": 0.18,
+      "endurance": 0.2
+    }
   },
   {
     "id": "arcane_lunge",
@@ -3682,7 +3758,7 @@
       "lunge",
       "arcane_bolt"
     ],
-    "basePower": 19,
+    "basePower": 1.6,
     "baseHitChance": 0.9,
     "critChance": 0.15,
     "critMultiplier": 1.6,
@@ -3707,7 +3783,12 @@
     "isChildSkill": true,
     "tags": [
       "arcane"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.33,
+      "ambition": 0.54,
+      "endurance": 0.13
+    }
   },
   {
     "id": "holy_smite",
@@ -3718,7 +3799,7 @@
       "smite",
       "holy_light"
     ],
-    "basePower": 22,
+    "basePower": 1.6,
     "baseHitChance": 0.9,
     "critChance": 0.15,
     "critMultiplier": 1.7,
@@ -3744,7 +3825,11 @@
     "isChildSkill": true,
     "tags": [
       "holy"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.6,
+      "harmony": 0.4
+    }
   },
   {
     "id": "shadow_strike",
@@ -3755,7 +3840,7 @@
       "shadow_bolt",
       "basic_attack"
     ],
-    "basePower": 18,
+    "basePower": 1.6,
     "baseHitChance": 0.9,
     "critChance": 0.2,
     "critMultiplier": 1.8,
@@ -3781,7 +3866,11 @@
     "isChildSkill": true,
     "tags": [
       "shadow"
-    ]
+    ],
+    "scalingFactors": {
+      "ambition": 0.7,
+      "conviction": 0.3
+    }
   },
   {
     "id": "venomous_slash",
@@ -3792,7 +3881,7 @@
       "slash",
       "apply_poison"
     ],
-    "basePower": 16,
+    "basePower": 1.6,
     "baseHitChance": 0.95,
     "critChance": 0.15,
     "critMultiplier": 1.6,
@@ -3818,7 +3907,12 @@
     "isChildSkill": true,
     "tags": [
       "poison"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.22,
+      "ambition": 0.65,
+      "endurance": 0.13
+    }
   },
   {
     "id": "nature_wrap",
@@ -3829,7 +3923,7 @@
       "nature_touch",
       "shove"
     ],
-    "basePower": 10,
+    "basePower": 0.9,
     "baseHitChance": 0.85,
     "critChance": 0.05,
     "critMultiplier": 1.5,
@@ -3855,7 +3949,11 @@
     "isChildSkill": true,
     "tags": [
       "nature"
-    ]
+    ],
+    "scalingFactors": {
+      "harmony": 0.6,
+      "ambition": 0.4
+    }
   },
   {
     "id": "burning_aura",
@@ -3866,7 +3964,7 @@
       "produce_flame",
       "shout"
     ],
-    "basePower": 14,
+    "basePower": 1.3,
     "baseHitChance": 0.8,
     "critChance": 0.05,
     "critMultiplier": 1.5,
@@ -3894,7 +3992,11 @@
     "isChildSkill": true,
     "tags": [
       "fire"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.5,
+      "ambition": 0.5
+    }
   },
   {
     "id": "frost_nova",
@@ -3905,7 +4007,7 @@
       "chill",
       "shout"
     ],
-    "basePower": 13,
+    "basePower": 1.3,
     "baseHitChance": 0.8,
     "critChance": 0.05,
     "critMultiplier": 1.5,
@@ -3933,7 +4035,11 @@
     "isChildSkill": true,
     "tags": [
       "cold"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.3,
+      "harmony": 0.7
+    }
   },
   {
     "id": "arcane_barrier",
@@ -4016,7 +4122,7 @@
       "holy_light",
       "rest"
     ],
-    "basePower": 0,
+    "basePower": 1.1,
     "baseHitChance": 1.0,
     "critChance": 0.05,
     "critMultiplier": 1.5,
@@ -4045,7 +4151,11 @@
     "isChildSkill": true,
     "tags": [
       "holy"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.6,
+      "harmony": 0.4
+    }
   },
   {
     "id": "regrowth",
@@ -4056,7 +4166,7 @@
       "nature_touch",
       "first_aid"
     ],
-    "basePower": 0,
+    "basePower": 1.6,
     "baseHitChance": 1.0,
     "critChance": 0.05,
     "critMultiplier": 1.5,
@@ -4084,7 +4194,11 @@
     "tags": [
       "nature",
       "healing"
-    ]
+    ],
+    "scalingFactors": {
+      "harmony": 0.6,
+      "ambition": 0.4
+    }
   },
   {
     "id": "poison_cloud",
@@ -4095,7 +4209,7 @@
       "apply_poison",
       "shout"
     ],
-    "basePower": 12,
+    "basePower": 1.3,
     "baseHitChance": 0.8,
     "critChance": 0.05,
     "critMultiplier": 1.5,
@@ -4123,7 +4237,11 @@
     "isChildSkill": true,
     "tags": [
       "poison"
-    ]
+    ],
+    "scalingFactors": {
+      "harmony": 0.6,
+      "ambition": 0.4
+    }
   },
   {
     "id": "counter_strike",
@@ -4134,7 +4252,7 @@
       "block",
       "slash"
     ],
-    "basePower": 16,
+    "basePower": 1.6,
     "baseHitChance": 0.95,
     "critChance": 0.2,
     "critMultiplier": 1.8,
@@ -4162,7 +4280,12 @@
     "isChildSkill": true,
     "tags": [
       "physical"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.48,
+      "ambition": 0.42,
+      "endurance": 0.1
+    }
   },
   {
     "id": "riposte",
@@ -4173,7 +4296,7 @@
       "block",
       "pierce"
     ],
-    "basePower": 17,
+    "basePower": 1.6,
     "baseHitChance": 0.95,
     "critChance": 0.25,
     "critMultiplier": 1.9,
@@ -4207,7 +4330,12 @@
     "isChildSkill": true,
     "tags": [
       "physical"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.48,
+      "ambition": 0.42,
+      "endurance": 0.1
+    }
   },
   {
     "id": "blood_fury",
@@ -4288,7 +4416,7 @@
       "shadow_step",
       "weak_point"
     ],
-    "basePower": 25,
+    "basePower": 1.6,
     "baseHitChance": 0.95,
     "critChance": 0.5,
     "critMultiplier": 2.5,
@@ -4321,7 +4449,12 @@
     "isChildSkill": true,
     "tags": [
       "beast"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.22,
+      "ambition": 0.65,
+      "endurance": 0.13
+    }
   },
   {
     "id": "vitality_surge",
@@ -4367,7 +4500,7 @@
       "stone_skin",
       "pummel"
     ],
-    "basePower": 22,
+    "basePower": 1.6,
     "baseHitChance": 0.85,
     "critChance": 0.1,
     "critMultiplier": 1.5,
@@ -4398,7 +4531,12 @@
     "isChildSkill": true,
     "tags": [
       "physical"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.62,
+      "ambition": 0.18,
+      "endurance": 0.2
+    }
   },
   {
     "id": "lightning_chain",
@@ -4409,7 +4547,7 @@
       "shock",
       "arcane_bolt"
     ],
-    "basePower": 16,
+    "basePower": 1.3,
     "baseHitChance": 0.9,
     "critChance": 0.1,
     "critMultiplier": 1.5,
@@ -4439,7 +4577,11 @@
     "isChildSkill": true,
     "tags": [
       "lightning"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.4,
+      "ambition": 0.6
+    }
   },
   {
     "id": "ice_shard",
@@ -4450,7 +4592,7 @@
       "chill",
       "aim"
     ],
-    "basePower": 18,
+    "basePower": 1.6,
     "baseHitChance": 0.95,
     "critChance": 0.2,
     "critMultiplier": 1.7,
@@ -4476,7 +4618,11 @@
     "isChildSkill": true,
     "tags": [
       "cold"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.3,
+      "harmony": 0.7
+    }
   },
   {
     "id": "fireball",
@@ -4487,7 +4633,7 @@
       "produce_flame",
       "focus"
     ],
-    "basePower": 20,
+    "basePower": 1.3,
     "baseHitChance": 0.85,
     "critChance": 0.1,
     "critMultiplier": 1.5,
@@ -4515,7 +4661,11 @@
     "isChildSkill": true,
     "tags": [
       "fire"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.5,
+      "ambition": 0.5
+    }
   },
   {
     "id": "shadow_tendril",
@@ -4526,7 +4676,7 @@
       "shadow_bolt",
       "attunement"
     ],
-    "basePower": 12,
+    "basePower": 0.9,
     "baseHitChance": 0.85,
     "critChance": 0.05,
     "critMultiplier": 1.5,
@@ -4552,7 +4702,11 @@
     "isChildSkill": true,
     "tags": [
       "shadow"
-    ]
+    ],
+    "scalingFactors": {
+      "ambition": 0.7,
+      "conviction": 0.3
+    }
   },
   {
     "id": "holy_word",
@@ -4563,7 +4717,7 @@
       "holy_light",
       "shout"
     ],
-    "basePower": 0,
+    "basePower": 1.1,
     "baseHitChance": 1.0,
     "critChance": 0.05,
     "critMultiplier": 1.5,
@@ -4592,7 +4746,11 @@
     "isChildSkill": true,
     "tags": [
       "holy"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.6,
+      "harmony": 0.4
+    }
   },
   {
     "id": "entangle",
@@ -4603,7 +4761,7 @@
       "nature_touch",
       "footwork"
     ],
-    "basePower": 8,
+    "basePower": 0.9,
     "baseHitChance": 0.8,
     "critChance": 0.05,
     "critMultiplier": 1.5,
@@ -4629,7 +4787,11 @@
     "isChildSkill": true,
     "tags": [
       "nature"
-    ]
+    ],
+    "scalingFactors": {
+      "harmony": 0.6,
+      "ambition": 0.4
+    }
   },
   {
     "id": "acid_splash",
@@ -4640,7 +4802,7 @@
       "apply_poison",
       "chill"
     ],
-    "basePower": 19,
+    "basePower": 1.6,
     "baseHitChance": 0.9,
     "critChance": 0.1,
     "critMultiplier": 1.5,
@@ -4672,7 +4834,11 @@
     "tags": [
       "poison",
       "cold"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.3,
+      "harmony": 0.7
+    }
   },
   {
     "id": "mana_shield",
@@ -4723,7 +4889,7 @@
       "flaming_edge",
       "lunge"
     ],
-    "basePower": 28,
+    "basePower": 2.0,
     "baseHitChance": 0.9,
     "critChance": 0.15,
     "critMultiplier": 1.6,
@@ -4754,7 +4920,12 @@
     "isChildSkill": true,
     "tags": [
       "fire"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.54,
+      "ambition": 0.33,
+      "endurance": 0.13
+    }
   },
   {
     "id": "glacial_javelin",
@@ -4765,7 +4936,7 @@
       "ice_pierce",
       "aim"
     ],
-    "basePower": 32,
+    "basePower": 2.0,
     "baseHitChance": 0.95,
     "critChance": 0.25,
     "critMultiplier": 1.8,
@@ -4796,7 +4967,12 @@
     "isChildSkill": true,
     "tags": [
       "cold"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.33,
+      "ambition": 0.54,
+      "endurance": 0.13
+    }
   },
   {
     "id": "storm_hammer",
@@ -4807,7 +4983,7 @@
       "shocking_blow",
       "haymaker"
     ],
-    "basePower": 30,
+    "basePower": 1.6,
     "baseHitChance": 0.8,
     "critChance": 0.1,
     "critMultiplier": 1.5,
@@ -4841,7 +5017,12 @@
     "isChildSkill": true,
     "tags": [
       "lightning"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.62,
+      "ambition": 0.18,
+      "endurance": 0.2
+    }
   },
   {
     "id": "arcane_dash",
@@ -4852,7 +5033,7 @@
       "arcane_lunge",
       "footwork"
     ],
-    "basePower": 26,
+    "basePower": 2.0,
     "baseHitChance": 0.95,
     "critChance": 0.2,
     "critMultiplier": 1.7,
@@ -4878,7 +5059,11 @@
     "isChildSkill": true,
     "tags": [
       "arcane"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.5,
+      "ambition": 0.5
+    }
   },
   {
     "id": "divine_judgment",
@@ -4889,7 +5074,7 @@
       "holy_smite",
       "focus"
     ],
-    "basePower": 35,
+    "basePower": 2.0,
     "baseHitChance": 0.9,
     "critChance": 0.2,
     "critMultiplier": 1.8,
@@ -4915,7 +5100,11 @@
     "isChildSkill": true,
     "tags": [
       "holy"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.6,
+      "harmony": 0.4
+    }
   },
   {
     "id": "void_rend",
@@ -4926,7 +5115,7 @@
       "shadow_strike",
       "slash"
     ],
-    "basePower": 30,
+    "basePower": 2.0,
     "baseHitChance": 0.9,
     "critChance": 0.25,
     "critMultiplier": 1.9,
@@ -4952,7 +5141,12 @@
     "isChildSkill": true,
     "tags": [
       "shadow"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.22,
+      "ambition": 0.65,
+      "endurance": 0.13
+    }
   },
   {
     "id": "plague_carrier",
@@ -4963,7 +5157,7 @@
       "venomous_slash",
       "poison_cloud"
     ],
-    "basePower": 24,
+    "basePower": 1.6,
     "baseHitChance": 0.85,
     "critChance": 0.1,
     "critMultiplier": 1.5,
@@ -4991,7 +5185,11 @@
     "isChildSkill": true,
     "tags": [
       "poison"
-    ]
+    ],
+    "scalingFactors": {
+      "harmony": 0.6,
+      "ambition": 0.4
+    }
   },
   {
     "id": "primal_crush",
@@ -5002,7 +5200,7 @@
       "nature_wrap",
       "stone_fist"
     ],
-    "basePower": 28,
+    "basePower": 1.1,
     "baseHitChance": 0.85,
     "critChance": 0.1,
     "critMultiplier": 1.5,
@@ -5030,7 +5228,12 @@
         "chance": 0.4
       }
     ],
-    "isChildSkill": true
+    "isChildSkill": true,
+    "scalingFactors": {
+      "conviction": 0.62,
+      "ambition": 0.18,
+      "endurance": 0.2
+    }
   },
   {
     "id": "ring_of_fire",
@@ -5041,7 +5244,7 @@
       "burning_aura",
       "footwork"
     ],
-    "basePower": 22,
+    "basePower": 1.6,
     "baseHitChance": 0.8,
     "critChance": 0.05,
     "critMultiplier": 1.5,
@@ -5069,7 +5272,11 @@
     "isChildSkill": true,
     "tags": [
       "fire"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.5,
+      "ambition": 0.5
+    }
   },
   {
     "id": "blizzard",
@@ -5080,7 +5287,7 @@
       "frost_nova",
       "shout"
     ],
-    "basePower": 25,
+    "basePower": 1.6,
     "baseHitChance": 0.8,
     "critChance": 0.05,
     "critMultiplier": 1.5,
@@ -5108,7 +5315,11 @@
     "isChildSkill": true,
     "tags": [
       "cold"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.3,
+      "harmony": 0.7
+    }
   },
   {
     "id": "spell_reflection",
@@ -5191,7 +5402,7 @@
       "healing_light",
       "rest"
     ],
-    "basePower": 0,
+    "basePower": 1.4,
     "baseHitChance": 1.0,
     "critChance": 0.1,
     "critMultiplier": 1.5,
@@ -5220,7 +5431,11 @@
     "isChildSkill": true,
     "tags": [
       "holy"
-    ]
+    ],
+    "scalingFactors": {
+      "harmony": 0.8,
+      "conviction": 0.2
+    }
   },
   {
     "id": "forest_embrace",
@@ -5231,7 +5446,7 @@
       "regrowth",
       "entangle"
     ],
-    "basePower": 0,
+    "basePower": 1.4,
     "baseHitChance": 1.0,
     "critChance": 0.05,
     "critMultiplier": 1.5,
@@ -5260,7 +5475,11 @@
     "isChildSkill": true,
     "tags": [
       "nature"
-    ]
+    ],
+    "scalingFactors": {
+      "harmony": 0.6,
+      "ambition": 0.4
+    }
   },
   {
     "id": "toxic_fog",
@@ -5271,7 +5490,7 @@
       "poison_cloud",
       "shadow_veil"
     ],
-    "basePower": 20,
+    "basePower": 1.6,
     "baseHitChance": 0.8,
     "critChance": 0.05,
     "critMultiplier": 1.5,
@@ -5306,7 +5525,11 @@
     "isChildSkill": true,
     "tags": [
       "poison"
-    ]
+    ],
+    "scalingFactors": {
+      "ambition": 0.7,
+      "conviction": 0.3
+    }
   },
   {
     "id": "shield_bash",
@@ -5317,7 +5540,7 @@
       "counter_strike",
       "shove"
     ],
-    "basePower": 24,
+    "basePower": 2.0,
     "baseHitChance": 0.9,
     "critChance": 0.1,
     "critMultiplier": 1.5,
@@ -5343,7 +5566,12 @@
     "isChildSkill": true,
     "tags": [
       "physical"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.62,
+      "ambition": 0.18,
+      "endurance": 0.2
+    }
   },
   {
     "id": "bleed_out",
@@ -5354,7 +5582,7 @@
       "blood_fury",
       "weak_point"
     ],
-    "basePower": 30,
+    "basePower": 2.5,
     "baseHitChance": 0.9,
     "critChance": 0.3,
     "critMultiplier": 2.0,
@@ -5380,7 +5608,12 @@
     "isChildSkill": true,
     "tags": [
       "physical"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.22,
+      "ambition": 0.65,
+      "endurance": 0.13
+    }
   },
   {
     "id": "psychic_barrier",
@@ -5429,7 +5662,7 @@
       "assassinate",
       "shadow_step"
     ],
-    "basePower": 40,
+    "basePower": 2.0,
     "baseHitChance": 0.95,
     "critChance": 0.6,
     "critMultiplier": 2.5,
@@ -5462,7 +5695,12 @@
     "isChildSkill": true,
     "tags": [
       "beast"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.22,
+      "ambition": 0.65,
+      "endurance": 0.13
+    }
   },
   {
     "id": "berserker_rage",
@@ -5517,7 +5755,7 @@
       "stone_fist",
       "shove"
     ],
-    "basePower": 32,
+    "basePower": 1.6,
     "baseHitChance": 0.8,
     "critChance": 0.1,
     "critMultiplier": 1.5,
@@ -5551,7 +5789,12 @@
     "isChildSkill": true,
     "tags": [
       "physical"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.62,
+      "ambition": 0.18,
+      "endurance": 0.2
+    }
   },
   {
     "id": "chain_lightning",
@@ -5562,7 +5805,7 @@
       "lightning_chain",
       "focus"
     ],
-    "basePower": 26,
+    "basePower": 1.6,
     "baseHitChance": 0.9,
     "critChance": 0.15,
     "critMultiplier": 1.6,
@@ -5592,7 +5835,11 @@
     "isChildSkill": true,
     "tags": [
       "lightning"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.4,
+      "ambition": 0.6
+    }
   },
   {
     "id": "ice_lance",
@@ -5603,7 +5850,7 @@
       "ice_shard",
       "pierce"
     ],
-    "basePower": 30,
+    "basePower": 2.0,
     "baseHitChance": 0.95,
     "critChance": 0.25,
     "critMultiplier": 1.8,
@@ -5634,7 +5881,12 @@
     "isChildSkill": true,
     "tags": [
       "cold"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.33,
+      "ambition": 0.54,
+      "endurance": 0.13
+    }
   },
   {
     "id": "meteor",
@@ -5645,7 +5897,7 @@
       "fireball",
       "aim"
     ],
-    "basePower": 35,
+    "basePower": 1.6,
     "baseHitChance": 0.85,
     "critChance": 0.15,
     "critMultiplier": 1.6,
@@ -5680,7 +5932,12 @@
     "tags": [
       "fire",
       "arcane"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.65,
+      "ambition": 0.22,
+      "endurance": 0.13
+    }
   },
   {
     "id": "shadow_grasp",
@@ -5691,7 +5948,7 @@
       "shadow_tendril",
       "entangle"
     ],
-    "basePower": 20,
+    "basePower": 1.1,
     "baseHitChance": 0.85,
     "critChance": 0.05,
     "critMultiplier": 1.5,
@@ -5723,7 +5980,11 @@
     "isChildSkill": true,
     "tags": [
       "shadow"
-    ]
+    ],
+    "scalingFactors": {
+      "ambition": 0.7,
+      "conviction": 0.3
+    }
   },
   {
     "id": "phoenix_strike",
@@ -5734,7 +5995,7 @@
       "inferno_slice",
       "mend"
     ],
-    "basePower": 45,
+    "basePower": 2.5,
     "baseHitChance": 0.9,
     "critChance": 0.2,
     "critMultiplier": 1.8,
@@ -5773,7 +6034,12 @@
     "isChildSkill": true,
     "tags": [
       "fire"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.54,
+      "ambition": 0.33,
+      "endurance": 0.13
+    }
   },
   {
     "id": "absolute_zero",
@@ -5784,7 +6050,7 @@
       "glacial_javelin",
       "chill"
     ],
-    "basePower": 50,
+    "basePower": 2.5,
     "baseHitChance": 0.9,
     "critChance": 0.3,
     "critMultiplier": 2.0,
@@ -5810,7 +6076,11 @@
     "isChildSkill": true,
     "tags": [
       "cold"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.3,
+      "harmony": 0.7
+    }
   },
   {
     "id": "thunder_god",
@@ -5821,7 +6091,7 @@
       "storm_hammer",
       "shock"
     ],
-    "basePower": 45,
+    "basePower": 2.0,
     "baseHitChance": 0.85,
     "critChance": 0.15,
     "critMultiplier": 1.6,
@@ -5849,7 +6119,11 @@
     "isChildSkill": true,
     "tags": [
       "lightning"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.4,
+      "ambition": 0.6
+    }
   },
   {
     "id": "blink_strike",
@@ -5860,7 +6134,7 @@
       "arcane_dash",
       "arcane_bolt"
     ],
-    "basePower": 48,
+    "basePower": 2.5,
     "baseHitChance": 0.95,
     "critChance": 0.25,
     "critMultiplier": 1.9,
@@ -5886,7 +6160,11 @@
     "isChildSkill": true,
     "tags": [
       "arcane"
-    ]
+    ],
+    "scalingFactors": {
+      "ambition": 0.7,
+      "conviction": 0.3
+    }
   },
   {
     "id": "heavens_fury",
@@ -5897,7 +6175,7 @@
       "divine_judgment",
       "holy_word"
     ],
-    "basePower": 50,
+    "basePower": 2.0,
     "baseHitChance": 0.9,
     "critChance": 0.2,
     "critMultiplier": 1.8,
@@ -5925,7 +6203,11 @@
     "isChildSkill": true,
     "tags": [
       "holy"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.6,
+      "harmony": 0.4
+    }
   },
   {
     "id": "demon_form",
@@ -5971,7 +6253,7 @@
       "plague_carrier",
       "nature_touch"
     ],
-    "basePower": 40,
+    "basePower": 2.0,
     "baseHitChance": 0.85,
     "critChance": 0.1,
     "critMultiplier": 1.5,
@@ -6005,7 +6287,11 @@
     "isChildSkill": true,
     "tags": [
       "poison"
-    ]
+    ],
+    "scalingFactors": {
+      "harmony": 0.6,
+      "ambition": 0.4
+    }
   },
   {
     "id": "titan_foot",
@@ -6016,7 +6302,7 @@
       "primal_crush",
       "footwork"
     ],
-    "basePower": 38,
+    "basePower": 2.0,
     "baseHitChance": 0.85,
     "critChance": 0.1,
     "critMultiplier": 1.5,
@@ -6050,7 +6336,12 @@
     "isChildSkill": true,
     "tags": [
       "physical"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.62,
+      "ambition": 0.18,
+      "endurance": 0.2
+    }
   },
   {
     "id": "hellfire",
@@ -6061,7 +6352,7 @@
       "ring_of_fire",
       "shadow_bolt"
     ],
-    "basePower": 42,
+    "basePower": 2.0,
     "baseHitChance": 0.85,
     "critChance": 0.15,
     "critMultiplier": 1.6,
@@ -6095,7 +6386,11 @@
     "isChildSkill": true,
     "tags": [
       "fire"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.5,
+      "ambition": 0.5
+    }
   },
   {
     "id": "permafrost",
@@ -6106,7 +6401,7 @@
       "blizzard",
       "frostbite"
     ],
-    "basePower": 45,
+    "basePower": 2.0,
     "baseHitChance": 0.85,
     "critChance": 0.15,
     "critMultiplier": 1.6,
@@ -6134,7 +6429,11 @@
     "isChildSkill": true,
     "tags": [
       "cold"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.3,
+      "harmony": 0.7
+    }
   },
   {
     "id": "mirror_image",
@@ -6183,7 +6482,7 @@
       "shadow_grasp",
       "first_aid"
     ],
-    "basePower": 25,
+    "basePower": 2.5,
     "baseHitChance": 0.9,
     "critChance": 0.1,
     "critMultiplier": 1.5,
@@ -6209,7 +6508,11 @@
     "isChildSkill": true,
     "tags": [
       "healing"
-    ]
+    ],
+    "scalingFactors": {
+      "ambition": 0.7,
+      "conviction": 0.3
+    }
   },
   {
     "id": "executioner",
@@ -6220,7 +6523,7 @@
       "bleed_out",
       "smite"
     ],
-    "basePower": 60,
+    "basePower": 3.2,
     "baseHitChance": 0.9,
     "critChance": 0.4,
     "critMultiplier": 2.2,
@@ -6253,7 +6556,11 @@
     "isChildSkill": true,
     "tags": [
       "physical"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.6,
+      "harmony": 0.4
+    }
   },
   {
     "id": "mind_control",
@@ -6264,7 +6571,7 @@
       "psychic_barrier",
       "misdirect"
     ],
-    "basePower": 0,
+    "basePower": 1.8,
     "baseHitChance": 0.7,
     "critChance": 0.0,
     "critMultiplier": 1.0,
@@ -6282,7 +6589,11 @@
         "chance": 0.8
       }
     ],
-    "isChildSkill": true
+    "isChildSkill": true,
+    "scalingFactors": {
+      "conviction": 0.5,
+      "ambition": 0.5
+    }
   },
   {
     "id": "void_walk",
@@ -6331,7 +6642,7 @@
       "phoenix_strike",
       "meteor"
     ],
-    "basePower": 75,
+    "basePower": 2.5,
     "baseHitChance": 0.9,
     "critChance": 0.2,
     "critMultiplier": 1.8,
@@ -6365,7 +6676,11 @@
     "isChildSkill": true,
     "tags": [
       "fire"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.5,
+      "ambition": 0.5
+    }
   },
   {
     "id": "eternal_winter",
@@ -6376,7 +6691,7 @@
       "absolute_zero",
       "blizzard"
     ],
-    "basePower": 70,
+    "basePower": 2.5,
     "baseHitChance": 0.9,
     "critChance": 0.2,
     "critMultiplier": 1.8,
@@ -6404,7 +6719,11 @@
     "isChildSkill": true,
     "tags": [
       "cold"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.3,
+      "harmony": 0.7
+    }
   },
   {
     "id": "storm_of_a_thousand_storms",
@@ -6415,7 +6734,7 @@
       "thunder_god",
       "chain_lightning"
     ],
-    "basePower": 65,
+    "basePower": 2.5,
     "baseHitChance": 0.85,
     "critChance": 0.15,
     "critMultiplier": 1.6,
@@ -6444,7 +6763,11 @@
     "isChildSkill": true,
     "tags": [
       "lightning"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.4,
+      "ambition": 0.6
+    }
   },
   {
     "id": "reality_fracture",
@@ -6455,7 +6778,7 @@
       "blink_strike",
       "spell_reflection"
     ],
-    "basePower": 55,
+    "basePower": 2.5,
     "baseHitChance": 0.9,
     "critChance": 0.2,
     "critMultiplier": 1.7,
@@ -6483,7 +6806,11 @@
     "isChildSkill": true,
     "tags": [
       "arcane"
-    ]
+    ],
+    "scalingFactors": {
+      "ambition": 0.7,
+      "conviction": 0.3
+    }
   },
   {
     "id": "apocalypse",
@@ -6494,7 +6821,7 @@
       "heavens_fury",
       "hellfire"
     ],
-    "basePower": 80,
+    "basePower": 2.5,
     "baseHitChance": 0.9,
     "critChance": 0.2,
     "critMultiplier": 1.8,
@@ -6529,7 +6856,11 @@
     "tags": [
       "fire",
       "holy"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.5,
+      "ambition": 0.5
+    }
   },
   {
     "id": "lord_of_decay",
@@ -6540,7 +6871,7 @@
       "bio_hazard",
       "necromancy"
     ],
-    "basePower": 60,
+    "basePower": 2.5,
     "baseHitChance": 0.85,
     "critChance": 0.15,
     "critMultiplier": 1.6,
@@ -6574,7 +6905,11 @@
     "isChildSkill": true,
     "tags": [
       "poison"
-    ]
+    ],
+    "scalingFactors": {
+      "harmony": 0.6,
+      "ambition": 0.4
+    }
   },
   {
     "id": "omnipotence",
@@ -6620,7 +6955,7 @@
       "slash",
       "shadow_bolt"
     ],
-    "basePower": 18,
+    "basePower": 1.6,
     "baseHitChance": 0.9,
     "critChance": 0.15,
     "critMultiplier": 1.6,
@@ -6651,7 +6986,12 @@
     "isChildSkill": true,
     "tags": [
       "shadow"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.22,
+      "ambition": 0.65,
+      "endurance": 0.13
+    }
   },
   {
     "id": "sacred_grove",
@@ -6662,7 +7002,7 @@
       "holy_light",
       "nature_touch"
     ],
-    "basePower": 0,
+    "basePower": 1.1,
     "baseHitChance": 1.0,
     "critChance": 0.05,
     "critMultiplier": 1.5,
@@ -6692,7 +7032,11 @@
     "tags": [
       "nature",
       "holy"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.6,
+      "harmony": 0.4
+    }
   },
   {
     "id": "volatile_venom",
@@ -6703,7 +7047,7 @@
       "apply_poison",
       "arcane_bolt"
     ],
-    "basePower": 16,
+    "basePower": 1.4,
     "baseHitChance": 0.9,
     "critChance": 0.1,
     "critMultiplier": 1.5,
@@ -6729,7 +7073,11 @@
     "isChildSkill": true,
     "tags": [
       "poison"
-    ]
+    ],
+    "scalingFactors": {
+      "harmony": 0.6,
+      "ambition": 0.4
+    }
   },
   {
     "id": "divine_frost",
@@ -6740,7 +7088,7 @@
       "chill",
       "holy_light"
     ],
-    "basePower": 17,
+    "basePower": 1.4,
     "baseHitChance": 0.9,
     "critChance": 0.1,
     "critMultiplier": 1.5,
@@ -6772,7 +7120,11 @@
     "tags": [
       "cold",
       "holy"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.3,
+      "harmony": 0.7
+    }
   },
   {
     "id": "septic_flame",
@@ -6783,7 +7135,7 @@
       "produce_flame",
       "apply_poison"
     ],
-    "basePower": 15,
+    "basePower": 1.4,
     "baseHitChance": 0.9,
     "critChance": 0.1,
     "critMultiplier": 1.5,
@@ -6815,7 +7167,11 @@
     "isChildSkill": true,
     "tags": [
       "fire"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.5,
+      "ambition": 0.5
+    }
   },
   {
     "id": "runic_smash",
@@ -6826,7 +7182,7 @@
       "pummel",
       "arcane_bolt"
     ],
-    "basePower": 19,
+    "basePower": 1.6,
     "baseHitChance": 0.85,
     "critChance": 0.1,
     "critMultiplier": 1.5,
@@ -6859,7 +7215,12 @@
     "isChildSkill": true,
     "tags": [
       "arcane"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.62,
+      "ambition": 0.18,
+      "endurance": 0.2
+    }
   },
   {
     "id": "entropic_decay",
@@ -6870,7 +7231,7 @@
       "shadow_bolt",
       "nature_touch"
     ],
-    "basePower": 16,
+    "basePower": 1.4,
     "baseHitChance": 0.9,
     "critChance": 0.1,
     "critMultiplier": 1.5,
@@ -6901,7 +7262,11 @@
     "isChildSkill": true,
     "tags": [
       "shadow"
-    ]
+    ],
+    "scalingFactors": {
+      "ambition": 0.7,
+      "conviction": 0.3
+    }
   },
   {
     "id": "neuro_toxin",
@@ -6912,7 +7277,7 @@
       "shock",
       "apply_poison"
     ],
-    "basePower": 17,
+    "basePower": 1.4,
     "baseHitChance": 0.9,
     "critChance": 0.15,
     "critMultiplier": 1.6,
@@ -6944,7 +7309,11 @@
     "isChildSkill": true,
     "tags": [
       "lightning"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.4,
+      "ambition": 0.6
+    }
   },
   {
     "id": "shadow_misdirection",
@@ -7031,7 +7400,7 @@
       "entangle",
       "holy_light"
     ],
-    "basePower": 10,
+    "basePower": 1.1,
     "baseHitChance": 0.85,
     "critChance": 0.05,
     "critMultiplier": 1.5,
@@ -7063,7 +7432,11 @@
     "tags": [
       "nature",
       "holy"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.6,
+      "harmony": 0.4
+    }
   },
   {
     "id": "mana_cycle",
@@ -7188,7 +7561,7 @@
       "healing_light",
       "entangle"
     ],
-    "basePower": 0,
+    "basePower": 1.4,
     "baseHitChance": 1.0,
     "critChance": 0.05,
     "critMultiplier": 1.5,
@@ -7217,7 +7590,11 @@
     "isChildSkill": true,
     "tags": [
       "nature"
-    ]
+    ],
+    "scalingFactors": {
+      "harmony": 0.6,
+      "ambition": 0.4
+    }
   },
   {
     "id": "shadow_riposte",
@@ -7228,7 +7605,7 @@
       "counter_strike",
       "shadow_step"
     ],
-    "basePower": 24,
+    "basePower": 2.0,
     "baseHitChance": 0.95,
     "critChance": 0.2,
     "critMultiplier": 1.7,
@@ -7262,7 +7639,12 @@
     "isChildSkill": true,
     "tags": [
       "shadow"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.22,
+      "ambition": 0.65,
+      "endurance": 0.13
+    }
   },
   {
     "id": "thorned_regeneration",
@@ -7273,7 +7655,7 @@
       "regrowth",
       "nature_wrap"
     ],
-    "basePower": 0,
+    "basePower": 2.0,
     "baseHitChance": 1.0,
     "critChance": 0.05,
     "critMultiplier": 1.5,
@@ -7300,7 +7682,11 @@
     "isChildSkill": true,
     "tags": [
       "nature"
-    ]
+    ],
+    "scalingFactors": {
+      "harmony": 0.6,
+      "ambition": 0.4
+    }
   },
   {
     "id": "corrosive_wound",
@@ -7311,7 +7697,7 @@
       "venomous_slash",
       "acid_splash"
     ],
-    "basePower": 26,
+    "basePower": 2.0,
     "baseHitChance": 0.9,
     "critChance": 0.15,
     "critMultiplier": 1.6,
@@ -7337,7 +7723,11 @@
     "isChildSkill": true,
     "tags": [
       "poison"
-    ]
+    ],
+    "scalingFactors": {
+      "harmony": 0.6,
+      "ambition": 0.4
+    }
   },
   {
     "id": "smothering_darkness",
@@ -7348,7 +7738,7 @@
       "toxic_fog",
       "shadow_veil"
     ],
-    "basePower": 40,
+    "basePower": 2.0,
     "baseHitChance": 0.85,
     "critChance": 0.1,
     "critMultiplier": 1.5,
@@ -7383,7 +7773,11 @@
     "tags": [
       "shadow",
       "poison"
-    ]
+    ],
+    "scalingFactors": {
+      "ambition": 0.7,
+      "conviction": 0.3
+    }
   },
   {
     "id": "bark_carapace",
@@ -7432,7 +7826,7 @@
       "plague_carrier",
       "regrowth"
     ],
-    "basePower": 42,
+    "basePower": 2.0,
     "baseHitChance": 0.85,
     "critChance": 0.1,
     "critMultiplier": 1.5,
@@ -7467,7 +7861,11 @@
     "tags": [
       "nature",
       "poison"
-    ]
+    ],
+    "scalingFactors": {
+      "harmony": 0.6,
+      "ambition": 0.4
+    }
   },
   {
     "id": "venom_storm",
@@ -7478,7 +7876,7 @@
       "poison_cloud",
       "lightning_chain"
     ],
-    "basePower": 28,
+    "basePower": 1.6,
     "baseHitChance": 0.85,
     "critChance": 0.1,
     "critMultiplier": 1.5,
@@ -7507,7 +7905,11 @@
     "isChildSkill": true,
     "tags": [
       "poison"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.4,
+      "ambition": 0.6
+    }
   },
   {
     "id": "rotting_grasp",
@@ -7518,7 +7920,7 @@
       "shadow_grasp",
       "nature_touch"
     ],
-    "basePower": 38,
+    "basePower": 1.4,
     "baseHitChance": 0.85,
     "critChance": 0.1,
     "critMultiplier": 1.5,
@@ -7541,7 +7943,11 @@
         "chance": 0.4
       }
     ],
-    "isChildSkill": true
+    "isChildSkill": true,
+    "scalingFactors": {
+      "ambition": 0.7,
+      "conviction": 0.3
+    }
   },
   {
     "id": "martyrdom",
@@ -7552,7 +7958,7 @@
       "healing_light",
       "basic_attack"
     ],
-    "basePower": 0,
+    "basePower": 1.4,
     "baseHitChance": 1.0,
     "critChance": 0.05,
     "critMultiplier": 1.5,
@@ -7581,7 +7987,11 @@
     "isChildSkill": true,
     "tags": [
       "healing"
-    ]
+    ],
+    "scalingFactors": {
+      "harmony": 0.8,
+      "conviction": 0.2
+    }
   },
   {
     "id": "retaliatory_heal",
@@ -7592,7 +8002,7 @@
       "mend",
       "counter_strike"
     ],
-    "basePower": 0,
+    "basePower": 2.0,
     "baseHitChance": 1.0,
     "critChance": 0.1,
     "critMultiplier": 1.5,
@@ -7619,7 +8029,11 @@
     "isChildSkill": true,
     "tags": [
       "healing"
-    ]
+    ],
+    "scalingFactors": {
+      "harmony": 0.8,
+      "conviction": 0.2
+    }
   },
   {
     "id": "persistent_life",
@@ -7630,7 +8044,7 @@
       "regrowth",
       "rest"
     ],
-    "basePower": 0,
+    "basePower": 2.0,
     "baseHitChance": 1.0,
     "critChance": 0.05,
     "critMultiplier": 1.5,
@@ -7657,7 +8071,11 @@
     "isChildSkill": true,
     "tags": [
       "healing"
-    ]
+    ],
+    "scalingFactors": {
+      "harmony": 0.8,
+      "conviction": 0.2
+    }
   },
   {
     "id": "resurrection_rite",
@@ -7668,7 +8086,7 @@
       "holy_word",
       "first_aid"
     ],
-    "basePower": 0,
+    "basePower": 2.0,
     "baseHitChance": 0.8,
     "critChance": 0.1,
     "critMultiplier": 1.5,
@@ -7695,7 +8113,11 @@
     "isChildSkill": true,
     "tags": [
       "holy"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.6,
+      "harmony": 0.4
+    }
   },
   {
     "id": "life_link",
@@ -7706,7 +8128,7 @@
       "holy_light",
       "attunement"
     ],
-    "basePower": 0,
+    "basePower": 1.6,
     "baseHitChance": 1.0,
     "critChance": 0.05,
     "critMultiplier": 1.5,
@@ -7733,7 +8155,11 @@
     "isChildSkill": true,
     "tags": [
       "healing"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.6,
+      "harmony": 0.4
+    }
   },
   {
     "id": "sanctuary",
@@ -7781,7 +8207,7 @@
       "mend",
       "poison_cloud"
     ],
-    "basePower": 0,
+    "basePower": 1.4,
     "baseHitChance": 1.0,
     "critChance": 0.05,
     "critMultiplier": 1.5,
@@ -7809,7 +8235,11 @@
     "isChildSkill": true,
     "tags": [
       "healing"
-    ]
+    ],
+    "scalingFactors": {
+      "harmony": 0.6,
+      "ambition": 0.4
+    }
   },
   {
     "id": "frozen_cry",
@@ -7820,7 +8250,7 @@
       "warcry",
       "frost_nova"
     ],
-    "basePower": 15,
+    "basePower": 1.1,
     "baseHitChance": 0.85,
     "critChance": 0.1,
     "critMultiplier": 1.5,
@@ -7846,7 +8276,11 @@
     "isChildSkill": true,
     "tags": [
       "cold"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.3,
+      "harmony": 0.7
+    }
   },
   {
     "id": "decay_aura",
@@ -7857,7 +8291,7 @@
       "shadow_bolt",
       "attunement"
     ],
-    "basePower": 14,
+    "basePower": 1.3,
     "baseHitChance": 0.85,
     "critChance": 0.1,
     "critMultiplier": 1.5,
@@ -7885,7 +8319,11 @@
     "isChildSkill": true,
     "tags": [
       "shadow"
-    ]
+    ],
+    "scalingFactors": {
+      "ambition": 0.7,
+      "conviction": 0.3
+    }
   },
   {
     "id": "crystal_skin",
@@ -7934,7 +8372,7 @@
       "smite",
       "entangle"
     ],
-    "basePower": 22,
+    "basePower": 1.1,
     "baseHitChance": 0.85,
     "critChance": 0.1,
     "critMultiplier": 1.5,
@@ -7961,7 +8399,11 @@
     "tags": [
       "nature",
       "holy"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.6,
+      "harmony": 0.4
+    }
   },
   {
     "id": "phantom_lunge",
@@ -7972,7 +8414,7 @@
       "lunge",
       "shadow_step"
     ],
-    "basePower": 20,
+    "basePower": 1.6,
     "baseHitChance": 0.95,
     "critChance": 0.2,
     "critMultiplier": 1.7,
@@ -7999,7 +8441,12 @@
     "tags": [
       "shadow",
       "physical"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.22,
+      "ambition": 0.65,
+      "endurance": 0.13
+    }
   },
   {
     "id": "alchemy_fire",
@@ -8010,7 +8457,7 @@
       "produce_flame",
       "first_aid"
     ],
-    "basePower": 0,
+    "basePower": 1.6,
     "baseHitChance": 1.0,
     "critChance": 0.05,
     "critMultiplier": 1.5,
@@ -8037,7 +8484,11 @@
     "isChildSkill": true,
     "tags": [
       "fire"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.5,
+      "ambition": 0.5
+    }
   },
   {
     "id": "storm_seed",
@@ -8048,7 +8499,7 @@
       "shock",
       "nature_touch"
     ],
-    "basePower": 16,
+    "basePower": 1.4,
     "baseHitChance": 0.9,
     "critChance": 0.15,
     "critMultiplier": 1.6,
@@ -8074,7 +8525,11 @@
     "isChildSkill": true,
     "tags": [
       "lightning"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.4,
+      "ambition": 0.6
+    }
   },
   {
     "id": "blood_ice",
@@ -8085,7 +8540,7 @@
       "chill",
       "blood_letting"
     ],
-    "basePower": 24,
+    "basePower": 2.0,
     "baseHitChance": 0.9,
     "critChance": 0.2,
     "critMultiplier": 1.7,
@@ -8111,7 +8566,11 @@
     "isChildSkill": true,
     "tags": [
       "cold"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.3,
+      "harmony": 0.7
+    }
   },
   {
     "id": "echoing_prayer",
@@ -8160,7 +8619,7 @@
       "pummel",
       "arcane_strike"
     ],
-    "basePower": 18,
+    "basePower": 1.6,
     "baseHitChance": 0.85,
     "critChance": 0.1,
     "critMultiplier": 1.5,
@@ -8193,7 +8652,12 @@
     "isChildSkill": true,
     "tags": [
       "arcane"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.62,
+      "ambition": 0.18,
+      "endurance": 0.2
+    }
   },
   {
     "id": "flaming_shove",
@@ -8204,7 +8668,7 @@
       "shove",
       "produce_flame"
     ],
-    "basePower": 14,
+    "basePower": 1.6,
     "baseHitChance": 0.85,
     "critChance": 0.1,
     "critMultiplier": 1.5,
@@ -8230,7 +8694,11 @@
     "isChildSkill": true,
     "tags": [
       "fire"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.5,
+      "ambition": 0.5
+    }
   },
   {
     "id": "ice_block",
@@ -8281,7 +8749,7 @@
       "shove",
       "shock"
     ],
-    "basePower": 12,
+    "basePower": 1.3,
     "baseHitChance": 0.85,
     "critChance": 0.05,
     "critMultiplier": 1.5,
@@ -8309,7 +8777,11 @@
     "isChildSkill": true,
     "tags": [
       "lightning"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.4,
+      "ambition": 0.6
+    }
   },
   {
     "id": "shadow_block",
@@ -8360,7 +8832,7 @@
       "shove",
       "holy_light"
     ],
-    "basePower": 14,
+    "basePower": 1.6,
     "baseHitChance": 0.9,
     "critChance": 0.1,
     "critMultiplier": 1.5,
@@ -8386,7 +8858,11 @@
     "isChildSkill": true,
     "tags": [
       "holy"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.6,
+      "harmony": 0.4
+    }
   },
   {
     "id": "nature_pierce",
@@ -8397,7 +8873,7 @@
       "pierce",
       "nature_touch"
     ],
-    "basePower": 16,
+    "basePower": 1.6,
     "baseHitChance": 0.95,
     "critChance": 0.2,
     "critMultiplier": 1.7,
@@ -8423,7 +8899,12 @@
     "isChildSkill": true,
     "tags": [
       "nature"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.33,
+      "ambition": 0.54,
+      "endurance": 0.13
+    }
   },
   {
     "id": "poison_lunge",
@@ -8434,7 +8915,7 @@
       "lunge",
       "apply_poison"
     ],
-    "basePower": 17,
+    "basePower": 1.6,
     "baseHitChance": 0.9,
     "critChance": 0.15,
     "critMultiplier": 1.6,
@@ -8460,7 +8941,12 @@
     "isChildSkill": true,
     "tags": [
       "poison"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.22,
+      "ambition": 0.65,
+      "endurance": 0.13
+    }
   },
   {
     "id": "arcane_shield_bash",
@@ -8471,7 +8957,7 @@
       "shield_bash",
       "arcane_bolt"
     ],
-    "basePower": 40,
+    "basePower": 2.5,
     "baseHitChance": 0.9,
     "critChance": 0.1,
     "critMultiplier": 1.5,
@@ -8502,7 +8988,12 @@
     "isChildSkill": true,
     "tags": [
       "arcane"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.62,
+      "ambition": 0.18,
+      "endurance": 0.2
+    }
   },
   {
     "id": "fire_wall",
@@ -8552,7 +9043,7 @@
       "slash",
       "footwork"
     ],
-    "basePower": 15,
+    "basePower": 1.6,
     "baseHitChance": 0.95,
     "critChance": 0.15,
     "critMultiplier": 1.6,
@@ -8578,7 +9069,12 @@
     "isChildSkill": true,
     "tags": [
       "physical"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.33,
+      "ambition": 0.54,
+      "endurance": 0.13
+    }
   },
   {
     "id": "grounded_strike",
@@ -8589,7 +9085,7 @@
       "basic_attack",
       "attunement"
     ],
-    "basePower": 12,
+    "basePower": 1.3,
     "baseHitChance": 0.9,
     "critChance": 0.1,
     "critMultiplier": 1.5,
@@ -8615,7 +9111,12 @@
     "isChildSkill": true,
     "tags": [
       "physical"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.54,
+      "ambition": 0.33,
+      "endurance": 0.13
+    }
   },
   {
     "id": "silent_prayer",
@@ -8798,7 +9299,7 @@
       "smite",
       "blood_letting"
     ],
-    "basePower": 26,
+    "basePower": 2.0,
     "baseHitChance": 0.9,
     "critChance": 0.15,
     "critMultiplier": 1.6,
@@ -8833,7 +9334,11 @@
     "tags": [
       "holy",
       "physical"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.6,
+      "harmony": 0.4
+    }
   },
   {
     "id": "atonement",
@@ -8844,7 +9349,7 @@
       "mend",
       "prayer"
     ],
-    "basePower": 0,
+    "basePower": 1.6,
     "baseHitChance": 1.0,
     "critChance": 0.05,
     "critMultiplier": 1.5,
@@ -8871,7 +9376,11 @@
     "isChildSkill": true,
     "tags": [
       "holy"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.6,
+      "harmony": 0.4
+    }
   },
   {
     "id": "judgment_field",
@@ -8882,7 +9391,7 @@
       "holy_word",
       "entangle"
     ],
-    "basePower": 20,
+    "basePower": 1.1,
     "baseHitChance": 0.85,
     "critChance": 0.1,
     "critMultiplier": 1.5,
@@ -8908,7 +9417,11 @@
     "isChildSkill": true,
     "tags": [
       "holy"
-    ]
+    ],
+    "scalingFactors": {
+      "conviction": 0.6,
+      "harmony": 0.4
+    }
   },
   {
     "id": "spirit_walk",
@@ -9254,7 +9767,7 @@
     "category": "DAMAGE_MAGIC",
     "isStarterSkill": false,
     "parentSkills": [],
-    "basePower": 4,
+    "basePower": 0.9,
     "baseHitChance": 0.9,
     "critChance": 0.05,
     "critMultiplier": 1.5,
@@ -9265,8 +9778,8 @@
       "fixed": 1
     },
     "scalingFactors": {
-      "harmony": 0.6,
-      "conviction": 0.4
+      "conviction": 0.5,
+      "ambition": 0.5
     },
     "effects": [
       {
@@ -9469,7 +9982,9 @@
       "max": 4
     },
     "scalingFactors": {
-      "conviction": 0.6
+      "conviction": 0.65,
+      "ambition": 0.22,
+      "endurance": 0.13
     },
     "effects": [
       {
@@ -9648,7 +10163,12 @@
     "resourceCost": {
       "mana": 25
     },
-    "cooldown": 3
+    "cooldown": 3,
+    "basePower": 1.1,
+    "scalingFactors": {
+      "ambition": 0.7,
+      "conviction": 0.3
+    }
   },
   {
     "id": "dispel",
@@ -9674,7 +10194,12 @@
     "resourceCost": {
       "mana": 20
     },
-    "cooldown": 2
+    "cooldown": 2,
+    "basePower": 0.9,
+    "scalingFactors": {
+      "harmony": 0.6,
+      "ambition": 0.4
+    }
   },
   {
     "id": "water_bolt",
@@ -9707,7 +10232,12 @@
     "resourceCost": {
       "mana": 22
     },
-    "cooldown": 1
+    "cooldown": 1,
+    "basePower": 1.8,
+    "scalingFactors": {
+      "conviction": 0.4,
+      "ambition": 0.6
+    }
   },
   {
     "id": "tidal_grasp",
@@ -9740,7 +10270,12 @@
     "resourceCost": {
       "mana": 28
     },
-    "cooldown": 3
+    "cooldown": 3,
+    "basePower": 1.4,
+    "scalingFactors": {
+      "harmony": 0.5,
+      "ambition": 0.5
+    }
   },
   {
     "id": "fraying_touch",
@@ -9774,7 +10309,12 @@
     "resourceCost": {
       "mana": 24
     },
-    "cooldown": 2
+    "cooldown": 2,
+    "basePower": 1.4,
+    "scalingFactors": {
+      "ambition": 0.7,
+      "conviction": 0.3
+    }
   },
   {
     "id": "ward_break",
@@ -9806,7 +10346,12 @@
     "resourceCost": {
       "stamina": 30
     },
-    "cooldown": 3
+    "cooldown": 3,
+    "basePower": 1.1,
+    "scalingFactors": {
+      "conviction": 0.4,
+      "ambition": 0.6
+    }
   },
   {
     "id": "cleanse",
@@ -9832,7 +10377,12 @@
     "resourceCost": {
       "mana": 20
     },
-    "cooldown": 2
+    "cooldown": 2,
+    "basePower": 2.5,
+    "scalingFactors": {
+      "conviction": 0.6,
+      "harmony": 0.4
+    }
   },
   {
     "id": "undertow",
@@ -9866,7 +10416,13 @@
     "resourceCost": {
       "mana": 40
     },
-    "cooldown": 4
+    "cooldown": 4,
+    "basePower": 2.5,
+    "scalingFactors": {
+      "conviction": 0.62,
+      "ambition": 0.18,
+      "endurance": 0.2
+    }
   },
   {
     "id": "stone_ward",

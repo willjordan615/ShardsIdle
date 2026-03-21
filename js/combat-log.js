@@ -1335,18 +1335,18 @@ try {
     const xpEntries = Object.entries(rewards.experienceGained || {});
     xpEntries.forEach(([charId, xp]) => console.log(`[REWARDS] XP awarded to ${charId}: ${xp}`));
 
-    // Auto-sync sharing for characters with shareEnabled
+    // Auto-sync sharing for characters with sharing enabled
     for (const [charId, character] of Object.entries(savedCharacters)) {
-        if (!character.shareEnabled) continue;
+        if (!character.shareEnabled && !character.isPublic) continue;
         try {
             await authFetch(`${typeof BACKEND_URL !== 'undefined' ? BACKEND_URL : ''}/api/character/export`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     characterId: charId,
-                    isPublic: true,
-                    buildName: character.buildName || '',
-                    buildDescription: character.buildDescription || '',
+                    isPublic: !!(character.shareEnabled || character.isPublic),
+                    buildName: '',
+                    buildDescription: '',
                     enableSharing: true
                 })
             });

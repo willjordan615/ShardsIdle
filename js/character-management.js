@@ -412,7 +412,7 @@ function renderStatAllocation() {
         <p style="margin-bottom: 1rem; color: #d4af37;">Points Remaining: ${remaining}</p>
         <div class="stat-allocation-grid">
             <div class="stat-allocation-item">
-                <div class="stat-tooltip" data-tooltip="Conviction increases hit chance, critical strike chance, and damage scaling.">Conviction</div>
+                <div class="stat-tooltip" data-tooltip="Raw force of will. Primary damage stat for fighters and fire/arcane/lightning mages. Raises HP, Stamina, and hit chance.">Conviction</div>
                 <div style="display: flex; gap: 0.5rem; align-items: center; justify-content: center;">
                     <button onclick="modifyStat('conviction', -1)" class="mini-btn">−</button>
                     <div class="stat-value" style="min-width: 30px; text-align: center;">${allocated.conviction}</div>
@@ -420,7 +420,7 @@ function renderStatAllocation() {
                 </div>
             </div>
             <div class="stat-allocation-item">
-                <div class="stat-tooltip" data-tooltip="Endurance increases maximum HP, Stamina, and damage mitigation.">Endurance</div>
+                <div class="stat-tooltip" data-tooltip="Durability and staying power. Significantly raises HP and Stamina. Contributes a small bonus to physical damage — not a primary offensive stat.">Endurance</div>
                 <div style="display: flex; gap: 0.5rem; align-items: center; justify-content: center;">
                     <button onclick="modifyStat('endurance', -1)" class="mini-btn">−</button>
                     <div class="stat-value" style="min-width: 30px; text-align: center;">${allocated.endurance}</div>
@@ -428,7 +428,7 @@ function renderStatAllocation() {
                 </div>
             </div>
             <div class="stat-allocation-item">
-                <div class="stat-tooltip" data-tooltip="Ambition improves initiative, retreat success chance, and certain skill effects.">Ambition</div>
+                <div class="stat-tooltip" data-tooltip="Speed and cunning. Primary damage stat for rogues and skirmishers, and for lightning/arcane/shadow mages. Main driver of critical strike chance. Also increases item drop rates.">Ambition</div>
                 <div style="display: flex; gap: 0.5rem; align-items: center; justify-content: center;">
                     <button onclick="modifyStat('ambition', -1)" class="mini-btn">−</button>
                     <div class="stat-value" style="min-width: 30px; text-align: center;">${allocated.ambition}</div>
@@ -436,7 +436,7 @@ function renderStatAllocation() {
                 </div>
             </div>
             <div class="stat-allocation-item">
-                <div class="stat-tooltip" data-tooltip="Harmony boosts maximum Mana, healing power, and group synergy effects.">Harmony</div>
+                <div class="stat-tooltip" data-tooltip="Attunement to magic and nature. Primary stat for ice, holy, and nature/poison mages, and all healers. Raises Mana significantly. Also grants a modest XP bonus (up to +40% at harmony 300). No effect on fire, arcane, lightning, or shadow damage.">Harmony</div>
                 <div style="display: flex; gap: 0.5rem; align-items: center; justify-content: center;">
                     <button onclick="modifyStat('harmony', -1)" class="mini-btn">−</button>
                     <div class="stat-value" style="min-width: 30px; text-align: center;">${allocated.harmony}</div>

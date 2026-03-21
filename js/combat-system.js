@@ -623,24 +623,57 @@ async function loadPublicCompanions() {
                 milestones.centuryOfCombats && { icon: '⚔️', title: 'Century — 100 combats fought' },
             ].filter(Boolean);
 
+            const totalKills = Object.values(stats.enemyKills || {}).reduce((a, b) => a + b, 0);
+            const totalChallenges = Object.keys(stats.challengeCompletions || {}).length;
+            const topSkillId = Object.entries(stats.skillUsage || {}).sort((a,b) => b[1]-a[1])[0]?.[0];
+            const topSkillName = topSkillId && window.gameData?.skills?.find(s => s.id === topSkillId)?.name || topSkillId;
+            const topKillEntry = Object.entries(stats.enemyKills || {}).sort((a,b) => b[1]-a[1])[0];
+
+            const cardId = 'ppc_' + (char.shareCode || Math.random().toString(36).slice(2));
+
             card.innerHTML = `
                 <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:2px;">
                     <span class="card-title" style="margin:0;">${escapeHtml(char.characterName)}</span>
                     ${roleLabel ? `<span style="font-size:0.68rem;color:#d4af37;background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.25);border-radius:8px;padding:1px 6px;">${roleLabel}</span>` : ''}
                 </div>
                 <div class="card-subtitle" style="margin-bottom:0.4rem;">Lv.${char.level} ${escapeHtml(char.race)}</div>
-                <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:4px;margin-bottom:0.35rem;">
+
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:0.35rem;">
                     <div style="background:rgba(10,14,39,0.6);padding:0.2rem;border-radius:4px;text-align:center;">
-                        <div style="color:#8b7355;font-size:0.68rem;">Wins</div>
-                        <div style="color:#4cd964;font-weight:bold;font-size:0.85rem;">${stats.wins || 0}</div>
+                        <div style="color:#8b7355;font-size:0.65rem;">Combats</div>
+                        <div style="color:#ccc;font-weight:bold;font-size:0.82rem;">${stats.totalCombats || 0}</div>
                     </div>
                     <div style="background:rgba(10,14,39,0.6);padding:0.2rem;border-radius:4px;text-align:center;">
-                        <div style="color:#8b7355;font-size:0.68rem;">Win Rate</div>
-                        <div style="color:#d4af37;font-weight:bold;font-size:0.85rem;">${stats.winRate ? (parseFloat(stats.winRate)*100).toFixed(0)+'%' : '—'}</div>
+                        <div style="color:#8b7355;font-size:0.65rem;">Wins</div>
+                        <div style="color:#4cd964;font-weight:bold;font-size:0.82rem;">${stats.wins || 0}</div>
+                    </div>
+                    <div style="background:rgba(10,14,39,0.6);padding:0.2rem;border-radius:4px;text-align:center;">
+                        <div style="color:#8b7355;font-size:0.65rem;">Win Rate</div>
+                        <div style="color:#d4af37;font-weight:bold;font-size:0.82rem;">${stats.winRate ? (parseFloat(stats.winRate)*100).toFixed(0)+'%' : '—'}</div>
+                    </div>
+                    <div style="background:rgba(10,14,39,0.6);padding:0.2rem;border-radius:4px;text-align:center;">
+                        <div style="color:#8b7355;font-size:0.65rem;">Kills</div>
+                        <div style="color:#ff8c8c;font-weight:bold;font-size:0.82rem;">${totalKills}</div>
+                    </div>
+                    <div style="background:rgba(10,14,39,0.6);padding:0.2rem;border-radius:4px;text-align:center;">
+                        <div style="color:#8b7355;font-size:0.65rem;">Crits</div>
+                        <div style="color:#ff6b6b;font-weight:bold;font-size:0.82rem;">${stats.totalCriticalHits || 0}</div>
+                    </div>
+                    <div style="background:rgba(10,14,39,0.6);padding:0.2rem;border-radius:4px;text-align:center;">
+                        <div style="color:#8b7355;font-size:0.65rem;">Challenges</div>
+                        <div style="color:#4a9eff;font-weight:bold;font-size:0.82rem;">${totalChallenges}</div>
                     </div>
                 </div>
-                ${badges.length ? `<div style="margin-bottom:0.3rem;font-size:0.9rem;">${badges.map(b => `<span title="${b.title}" style="cursor:default;">${b.icon}</span>`).join(' ')}</div>` : ''}
-                <div style="color:#8b7355;font-size:0.7rem;margin-bottom:0.4rem;">${char.importCount || 0} imports</div>
+
+                ${topSkillName || topKillEntry ? `
+                <div style="font-size:0.7rem;color:#666;margin-bottom:0.3rem;">
+                    ${topSkillName ? `Sig: <span style="color:#d4af37;">${topSkillName}</span>` : ''}
+                    ${topKillEntry ? ` · <span style="color:#ff8c8c;">${topKillEntry[0].replace(/_/g,' ')} ×${topKillEntry[1]}</span>` : ''}
+                </div>` : ''}
+
+                ${badges.length ? `<div style="margin-bottom:0.3rem;font-size:0.95rem;letter-spacing:2px;">${badges.map(b => `<span title="${b.title}" style="cursor:default;">${b.icon}</span>`).join('')}</div>` : ''}
+
+                <div style="color:#8b7355;font-size:0.68rem;margin-bottom:0.4rem;">${char.importCount || 0} imports</div>
                 <button class="secondary" style="width:100%;font-size:0.82rem;" ${disabled ? 'disabled' : ''}>${disabledLabel || 'Add to Party'}</button>
             `;
 
