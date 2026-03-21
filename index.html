@@ -340,7 +340,7 @@
             <div class="nav-buttons combat-nav">
                 <button onclick="viewCharacterDuringCombat()" class="secondary">👤 View Character</button>
                 <button id="pauseBtn" onclick="toggleCombatPause()" class="secondary" style="margin-left:8px;">⏸ Pause</button>
-                <button id="ffBtn" onclick="toggleCombatFF()" class="secondary" style="margin-left:8px;">⏩ FF</button>
+                <button id="speedBtn" onclick="cycleCombatSpeed()" class="secondary" style="margin-left:8px;">▶ Normal</button>
             </div>
 
             <!-- Stage banner: title + pre-combat result + enemy flash reveal -->
@@ -740,18 +740,6 @@
                             <button class="settings-opt" data-setting="fontSize" data-value="medium">Medium (16px)</button>
                             <button class="settings-opt" data-setting="fontSize" data-value="large">Large (18px)</button>
                             <button class="settings-opt" data-setting="fontSize" data-value="xl">X-Large (20px)</button>
-                        </div>
-                    </div>
-
-                    <div class="settings-group">
-                        <h3>Combat Log Speed</h3>
-                        <p class="settings-desc">How fast the combat playback runs.</p>
-                        <div class="settings-options">
-                            <button class="settings-opt" data-setting="combatSpeed" data-value="0.25">Rapid (0.25x)</button>
-                            <button class="settings-opt" data-setting="combatSpeed" data-value="0.5">Fast (0.5x)</button>
-                            <button class="settings-opt" data-setting="combatSpeed" data-value="1.0">Normal (1x)</button>
-                            <button class="settings-opt" data-setting="combatSpeed" data-value="1.5">Slow (1.5x)</button>
-                            <button class="settings-opt" data-setting="combatSpeed" data-value="2.0">Very Slow (2x)</button>
                         </div>
                     </div>
 

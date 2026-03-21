@@ -10,26 +10,26 @@ window.toggleCombatPause = function() {
     if (btn) btn.textContent = window.combatPaused ? '▶ Resume' : '⏸ Pause';
 };
 
-window._ffActive = false;
-window._preFfSpeed = 1.0;
+// Speed cycle button — steps through Slow → Normal → Fast
+// Multipliers: higher = slower playback (1.2 = Slow, 1.0 = Normal, 0.8 = Fast)
+const _SPEED_STEPS = [
+    { label: '🐢 Slow',   multiplier: 1.2 },
+    { label: '▶ Normal',  multiplier: 1.0 },
+    { label: '⚡ Fast',   multiplier: 0.8 },
+];
+window._speedStepIndex = 1; // default Normal
 
-window.toggleCombatFF = function() {
-    const btn = document.getElementById('ffBtn');
-    if (!window._ffActive) {
-        window._preFfSpeed = window.combatSpeedMultiplier || 1.0;
-        window.combatSpeedMultiplier = 0.05;
-        window._ffActive = true;
-        if (btn) btn.textContent = '⏩ FF (on)';
-        // Also unpause if paused
-        if (window.combatPaused) {
-            window.combatPaused = false;
-            const pauseBtn = document.getElementById('pauseBtn');
-            if (pauseBtn) pauseBtn.textContent = '⏸ Pause';
-        }
-    } else {
-        window.combatSpeedMultiplier = window._preFfSpeed;
-        window._ffActive = false;
-        if (btn) btn.textContent = '⏩ FF';
+window.cycleCombatSpeed = function() {
+    window._speedStepIndex = (window._speedStepIndex + 1) % _SPEED_STEPS.length;
+    const step = _SPEED_STEPS[window._speedStepIndex];
+    window.combatSpeedMultiplier = step.multiplier;
+    const btn = document.getElementById('speedBtn');
+    if (btn) btn.textContent = step.label;
+    // Unpause if paused
+    if (window.combatPaused) {
+        window.combatPaused = false;
+        const pauseBtn = document.getElementById('pauseBtn');
+        if (pauseBtn) pauseBtn.textContent = '⏸ Pause';
     }
 };
 
@@ -127,12 +127,12 @@ async function displayCombatLog(combatData) {
         // Reset pause, FF, and scroll state for new combat
         window.combatPaused = false;
         _userScrolledUp = false;
-        window._ffActive = false;
-        window.combatSpeedMultiplier = parseFloat(window.currentSettings?.combatSpeed) || 1.0;
+        window._speedStepIndex = 1; // Normal
+        window.combatSpeedMultiplier = 1.0;
         const pauseBtn = document.getElementById('pauseBtn');
         if (pauseBtn) pauseBtn.textContent = '⏸ Pause';
-        const ffBtn = document.getElementById('ffBtn');
-        if (ffBtn) ffBtn.textContent = '⏩ FF';
+        const speedBtn = document.getElementById('speedBtn');
+        if (speedBtn) speedBtn.textContent = '▶ Normal';
         const scrollBtn = document.getElementById('scrollResumeBtn');
         if (scrollBtn) scrollBtn.style.display = 'none';
         _initScrollTracking();
