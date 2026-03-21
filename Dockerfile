@@ -1,7 +1,7 @@
 FROM node:18-alpine
 
 # Install build tools needed to compile sqlite3 from source
-RUN apk add --no-cache python3 make g++
+RUN apk add --no-cache python3 python3-dev py3-setuptools make g++
 
 WORKDIR /app
 
