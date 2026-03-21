@@ -1223,7 +1223,7 @@ try {
         await showCharacterDetail(window.currentState.detailCharacterId);
 
         // Roll for traveling merchant on victory runs
-        if (finalResult === 'victory' && typeof rollMerchantAppearance === 'function') {
+        if (combatData.result === 'victory' && typeof rollMerchantAppearance === 'function') {
             const appeared = rollMerchantAppearance();
             if (appeared) {
                 const char = await getCharacter(window.currentState.detailCharacterId);

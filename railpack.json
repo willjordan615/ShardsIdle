@@ -1,0 +1,9 @@
+{
+  "provider": "node",
+  "build": {
+    "cmd": "cd backend && npm install"
+  },
+  "start": {
+    "cmd": "cd backend && node server.js"
+  }
+}
