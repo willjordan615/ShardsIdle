@@ -754,9 +754,10 @@ async function ensureIntrinsicSkill(character) {
 }
 
 
-async function showCharacterDetail(characterId) {
+async function showCharacterDetail(characterId, opts = {}) {
+    const silent = opts.silent === true;
     // Clear any stale merchant offer when navigating to detail manually
-    if (typeof dismissMerchant === 'function') dismissMerchant();
+    if (!silent && typeof dismissMerchant === 'function') dismissMerchant();
     try {
         const character = await getCharacter(characterId);
         if (!character) {
@@ -838,9 +839,11 @@ renderImportBadge(character);
         const msg = document.getElementById('aiProfileSaveMsg');
         if (msg) msg.textContent = '';
 
-        showScreen('detail');
-        // Refresh idle loop status banner whenever character detail is shown
-        if (typeof updateChallengeStatusBanner === 'function') updateChallengeStatusBanner();
+        if (!silent) {
+            showScreen('detail');
+            // Refresh idle loop status banner whenever character detail is shown
+            if (typeof updateChallengeStatusBanner === 'function') updateChallengeStatusBanner();
+        }
     } catch (error) {
         console.error('Error showing character detail:', error);
         showError('Failed to load character details');

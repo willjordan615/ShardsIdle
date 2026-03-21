@@ -1391,7 +1391,15 @@ try {
 
     if (typeof renderRoster === 'function') await renderRoster();
     if (window.currentState?.detailCharacterId && typeof showCharacterDetail === 'function') {
-        await showCharacterDetail(window.currentState.detailCharacterId);
+        // Only navigate to detail screen if the player isn't reviewing the combat log
+        const activeScreen = document.querySelector('.screen.active')?.id || '';
+        const onCombatLog  = activeScreen === 'combatlog' || activeScreen === 'combat';
+        if (!onCombatLog) {
+            await showCharacterDetail(window.currentState.detailCharacterId);
+        } else {
+            // Silently refresh character data without changing the screen
+            await showCharacterDetail(window.currentState.detailCharacterId, { silent: true });
+        }
 
         // Roll for traveling merchant on victory runs
         if (combatData.result === 'victory' && typeof rollMerchantAppearance === 'function') {
