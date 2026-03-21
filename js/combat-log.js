@@ -506,115 +506,125 @@ async function displayCombatLog(combatData) {
         }
 
         // Set result title and countdown text
+        const victorySeconds = parseInt(window.victoryCountdownSeconds) || 7;
+        const untilDismissed = victorySeconds === 0;
+        const defeatSeconds  = 5;
+
         if (finalResult === 'victory') {
             if (titleEl) { titleEl.textContent = 'VICTORY!'; titleEl.style.color = '#4cd964'; }
             if (statusTextEl) {
                 statusTextEl.style.color = '#ffd700';
-                statusTextEl.innerHTML = `Auto-restarting in <span id="countdownTimer" style="font-weight:bold;font-size:1.1rem;">${window.victoryCountdownSeconds || 7}</span>s...`;
+                statusTextEl.innerHTML = untilDismissed
+                    ? `Dismiss to start next run.`
+                    : `Next run in <span id="countdownTimer" style="font-weight:bold;font-size:1.1rem;">${victorySeconds}</span>s...`;
             }
         } else if (finalResult === 'defeat' || finalResult === 'loss') {
             if (titleEl) { titleEl.textContent = 'DEFEATED'; titleEl.style.color = '#d4484a'; }
             const fallbackName = nextId.replace('challenge_', '').replace(/_/g, ' ').toUpperCase();
             if (statusTextEl) {
                 statusTextEl.style.color = '#ffaa00';
-                statusTextEl.innerHTML = `Retreating to ${fallbackName} in <span id="countdownTimer" style="font-weight:bold;font-size:1.1rem;">5</span>s...`;
+                statusTextEl.innerHTML = `Retreating to ${fallbackName} in <span id="countdownTimer" style="font-weight:bold;font-size:1.1rem;">${defeatSeconds}</span>s...`;
             }
         } else {
             if (titleEl) { titleEl.textContent = 'RETREATED'; titleEl.style.color = '#aaa'; }
             if (statusTextEl) statusTextEl.textContent = 'Returning to hub...';
         }
 
-        // Show the modal — but only as a full takeover if the player is watching combat.
-        // If they've navigated away (detail screen, roster, etc.), show a compact corner toast instead.
+        // Show modal only on the combat log screen — toast handles all other screens
         const currentScreen = document.querySelector('.screen.active')?.id || '';
-        const isWatchingCombat = currentScreen === 'combat' || currentScreen === 'party';
+        const onCombatLog   = currentScreen === 'combatlog' || currentScreen === 'combat';
 
-        if (modal) {
-            if (isWatchingCombat) {
-                modal.style.display = 'flex';
-            } else {
-                // Compact toast in bottom-right — doesn't obscure what the player is doing
-                modal.style.display = 'none';
-                _showCombatToast(finalResult);
-            }
-        }
+        if (modal) modal.style.display = onCombatLog ? 'flex' : 'none';
 
-        // Trigger rewards and/or countdown
-        // applyCombatRewards always runs — it handles skill XP on all outcomes.
-        // Character XP and loot only apply on victory (rewards object will be empty otherwise).
+        // Trigger rewards then countdown/toast
+        await applyCombatRewards(combatData);
+
         if (finalResult === 'victory') {
-            await applyCombatRewards(combatData);
-            startCountdown(window.victoryCountdownSeconds || 7, nextId);
+            if (untilDismissed) {
+                // No auto-countdown — player must dismiss modal (or toast spawns paused)
+                window._pendingNextChallengeId = nextId;
+                _setupChallenge(nextId);
+                if (!onCombatLog) {
+                    // Show toast immediately, paused — player controls when next run fires
+                    _showCombatToast(finalResult, combatData, nextId, 0, true);
+                }
+            } else {
+                startCountdown(victorySeconds, nextId, finalResult, combatData);
+                if (!onCombatLog) {
+                    _showCombatToast(finalResult, combatData, nextId, victorySeconds, false);
+                }
+            }
         } else if (finalResult === 'loss' || finalResult === 'defeat') {
-            await applyCombatRewards(combatData);
-            startCountdown(5, nextId);
+            startCountdown(defeatSeconds, nextId, finalResult, combatData);
+            if (!onCombatLog) {
+                _showCombatToast(finalResult, combatData, nextId, defeatSeconds, false);
+            }
         } else if (finalResult === 'retreated') {
-            await applyCombatRewards(combatData);
             setTimeout(() => {
                 if (modal) modal.style.display = 'none';
                 if (typeof returnToHub === 'function') returnToHub();
             }, 2000);
         }
 
-        // Nested helper — closure keeps access to this call's scope
-        function startCountdown(seconds, targetChallengeId) {
-            let counter = seconds;
-            const timerSpan = document.getElementById('countdownTimer');
-
-            if (!window.currentState) {
-                console.error('[IDLE] window.currentState undefined — cannot auto-restart.');
-                return;
-            }
-
-            const newChallengeObj = window.gameData?.challenges?.find(c => c.id === targetChallengeId);
-            if (newChallengeObj) {
+        // Set up the next challenge in state without firing combat
+        function _setupChallenge(targetId) {
+            const newChallengeObj = window.gameData?.challenges?.find(c => c.id === targetId);
+            if (newChallengeObj && window.currentState) {
                 window.currentState.selectedChallenge = newChallengeObj;
-                console.log(`[IDLE] Safety Net: currentState updated to ${targetChallengeId}`);
-            } else {
-                console.error(`[IDLE] Could not find challenge: ${targetChallengeId}`);
             }
+        }
+
+        // Countdown — runs in modal timer span; fires combat when done
+        function startCountdown(seconds, targetChallengeId, result, data) {
+            let counter = seconds;
+            _setupChallenge(targetChallengeId);
 
             const interval = setInterval(() => {
                 counter--;
+                const timerSpan = document.getElementById('countdownTimer');
                 if (timerSpan) timerSpan.textContent = counter;
+                // Keep toast in sync if visible
+                const toastTimer = document.getElementById('combatToastTimer');
+                if (toastTimer) toastTimer.textContent = counter;
 
                 if (counter <= 0) {
                     clearInterval(interval);
-                    const m = document.getElementById('combatResultModal');
-                    if (m) m.style.display = 'none';
-
-                    // Graceful exit: player requested loop stop, current combat already finished
-                    if (window.currentState.pendingLoopExit) {
-                        console.log('[IDLE] Pending exit — stopping loop after this combat.');
-                        window.currentState.idleActive = false;
-                        window.currentState.pendingLoopExit = false;
-                        if (typeof updateChallengeStatusBanner === 'function') updateChallengeStatusBanner();
-                        if (typeof showCharacterDetail === 'function' && window.currentState.detailCharacterId) {
-                            showCharacterDetail(window.currentState.detailCharacterId);
-                        } else if (typeof returnToHub === 'function') {
-                            returnToHub();
-                        }
-                        return;
-                    }
-
-                    if (typeof startCombat === 'function') {
-                        console.log(`[IDLE] Auto-starting: ${targetChallengeId}`);
-                        // Only switch to combat screen if the player is already watching combat.
-                        // If they've navigated to detail/roster, restart silently in the background.
-                        const activeScreen = document.querySelector('.screen.active')?.id || '';
-                        const watchingCombat = activeScreen === 'combat' || activeScreen === 'party';
-                        if (!watchingCombat) {
-                            window._silentCombatRestart = true;
-                        }
-                        startCombat();
-                    } else {
-                        console.error('[IDLE] startCombat not found!');
-                    }
+                    _fireNextCombat(targetChallengeId);
                 }
             }, 1000);
 
             window.currentRestartInterval = interval;
         }
+
+        function _fireNextCombat(targetChallengeId) {
+            const m = document.getElementById('combatResultModal');
+            if (m) m.style.display = 'none';
+            document.getElementById('combatToast')?.remove();
+
+            if (!window.currentState) return;
+
+            if (window.currentState.pendingLoopExit) {
+                window.currentState.idleActive  = false;
+                window.currentState.pendingLoopExit = false;
+                if (typeof updateChallengeStatusBanner === 'function') updateChallengeStatusBanner();
+                if (typeof showCharacterDetail === 'function' && window.currentState.detailCharacterId) {
+                    showCharacterDetail(window.currentState.detailCharacterId);
+                } else if (typeof returnToHub === 'function') {
+                    returnToHub();
+                }
+                return;
+            }
+
+            if (typeof startCombat === 'function') {
+                const activeScreen = document.querySelector('.screen.active')?.id || '';
+                const watching = activeScreen === 'combatlog' || activeScreen === 'combat';
+                if (!watching) window._silentCombatRestart = true;
+                startCombat();
+            }
+        }
+
+        // Expose for dismiss button
+        window._fireNextCombat = _fireNextCombat;
 
     } catch (error) {
         console.error('[COMBAT] FATAL ERROR in displayCombatLog:', error);
@@ -640,58 +650,139 @@ async function displayCombatLog(combatData) {
 } // END: displayCombatLog
 
 // --- GLOBAL MODAL BUTTON HANDLERS ---
-// Attached to window so index.html onclick attributes can reach them.
 
-function _showCombatToast(result) {
-    // Remove any existing toast
-    const existing = document.getElementById('combatToast');
-    if (existing) existing.remove();
-
-    const isVictory = result === 'victory';
-    const toast = document.createElement('div');
-    toast.id = 'combatToast';
-    toast.style.cssText = `
-        position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9998;
-        background: #1a1a2e; border: 1px solid ${isVictory ? '#4cd964' : '#d4484a'};
-        border-radius: 8px; padding: 0.75rem 1rem; max-width: 260px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.6); font-size: 0.85rem;
-        animation: fadeInUp 0.3s ease;
-    `;
-    toast.innerHTML = `
-        <div style="color:${isVictory ? '#4cd964' : '#d4484a'}; font-weight:bold; margin-bottom:4px;">
-            ${isVictory ? '⚔️ Victory' : '💀 Defeated'}
-        </div>
-        <div style="color:#aaa; font-size:0.78rem;">Combat complete. Loop continuing...</div>
-        <button onclick="document.getElementById('combatToast')?.remove(); cancelAutoRestart();"
-            style="margin-top:6px; padding:3px 10px; background:#2a1a1a; border:1px solid #533;
-                   color:#f88; cursor:pointer; border-radius:4px; font-size:0.75rem; width:100%;">
-            Stop Loop
-        </button>
-    `;
-    document.body.appendChild(toast);
-    // Auto-remove after victoryDuration + 2s
-    setTimeout(() => toast?.remove(), ((window.victoryCountdownSeconds || 7) + 2) * 1000);
-}
-
-window.cancelAutoRestart = function() {
-    if (window.currentRestartInterval) clearInterval(window.currentRestartInterval);
+// Dismiss the full modal — spawns the countdown toast
+window.dismissResultModal = function() {
     const modal = document.getElementById('combatResultModal');
     if (modal) modal.style.display = 'none';
-    // Hard stop — only reached if called outside the countdown (e.g. retreat modal)
+
+    // Read remaining time from the modal's timer span
+    const timerSpan = document.getElementById('countdownTimer');
+    const remaining = timerSpan ? parseInt(timerSpan.textContent) || 0 : 0;
+    const untilDismissed = (parseInt(window.victoryCountdownSeconds) || 7) === 0;
+    const nextId = window._pendingNextChallengeId || window.currentState?.selectedChallenge?.id;
+
+    // Spawn toast — paused if "Until Dismissed", otherwise continuing from remaining seconds
+    _showCombatToast(remaining, untilDismissed, nextId);
+};
+
+// Stop the loop entirely
+window.cancelAutoRestart = function() {
+    if (window.currentRestartInterval) clearInterval(window.currentRestartInterval);
+    window.currentRestartInterval = null;
+    const modal = document.getElementById('combatResultModal');
+    if (modal) modal.style.display = 'none';
+    document.getElementById('combatToast')?.remove();
     if (window.currentState) {
-        window.currentState.idleActive = false;
+        window.currentState.idleActive     = false;
         window.currentState.pendingLoopExit = false;
     }
     if (typeof updateChallengeStatusBanner === 'function') updateChallengeStatusBanner();
     if (typeof returnToHub === 'function') returnToHub();
 };
 
-window.forceRestartNow = function() {
-    if (window.currentRestartInterval) clearInterval(window.currentRestartInterval);
-    const modal = document.getElementById('combatResultModal');
-    if (modal) modal.style.display = 'none';
-    if (typeof startCombat === 'function') startCombat();
-};
+// Bottom-right countdown toast with pause/resume and stop loop
+// seconds=0 + paused=true means "Until Dismissed" — won't fire until unpaused
+function _showCombatToast(seconds, startPaused, targetChallengeId) {
+    document.getElementById('combatToast')?.remove();
+
+    let counter  = seconds;
+    let paused   = startPaused;
+    let interval = null;
+
+    const isUntilDismissed = startPaused && seconds === 0;
+
+    const toast = document.createElement('div');
+    toast.id = 'combatToast';
+    toast.style.cssText = `
+        position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9998;
+        background: #1a1a2e; border: 1px solid #d4af37;
+        border-radius: 8px; padding: 0.85rem 1rem; min-width: 220px; max-width: 300px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.7); font-size: 0.85rem;
+        font-family: 'Courier New', monospace;
+        animation: fadeInUp 0.3s ease;
+    `;
+
+    function render() {
+        const timerText = isUntilDismissed
+            ? '—'
+            : paused ? `${counter}s (paused)` : `${counter}s`;
+        const pauseLabel = paused ? '▶ Resume' : '⏸ Pause';
+
+        toast.innerHTML = `
+            <div style="color:#d4af37; font-weight:bold; margin-bottom:6px; font-size:0.9rem;">
+                ⚔️ Next run in: <span id="combatToastTimer" style="color:#ffd700;">${timerText}</span>
+            </div>
+            <div style="display:flex; gap:6px; margin-top:6px;">
+                <button id="toastPauseBtn"
+                    style="flex:1; padding:4px 8px; background:#0a0e27; border:1px solid #d4af37;
+                           color:#d4af37; cursor:pointer; border-radius:4px; font-size:0.75rem;">
+                    ${pauseLabel}
+                </button>
+                <button id="toastStopBtn"
+                    style="flex:1; padding:4px 8px; background:#0a0e27; border:1px solid #533;
+                           color:#f88; cursor:pointer; border-radius:4px; font-size:0.75rem;">
+                    Stop Loop
+                </button>
+            </div>
+        `;
+
+        document.getElementById('toastPauseBtn')?.addEventListener('click', () => {
+            if (isUntilDismissed) {
+                // "Until Dismissed" — unpause fires immediately
+                paused = false;
+                if (interval) clearInterval(interval);
+                clearInterval(window.currentRestartInterval);
+                window._fireNextCombat?.(targetChallengeId);
+                toast.remove();
+                return;
+            }
+            paused = !paused;
+            if (paused) {
+                clearInterval(interval);
+                clearInterval(window.currentRestartInterval);
+                interval = null;
+            } else {
+                startToastInterval();
+            }
+            render();
+        });
+
+        document.getElementById('toastStopBtn')?.addEventListener('click', () => {
+            window.cancelAutoRestart();
+        });
+    }
+
+    function startToastInterval() {
+        interval = setInterval(() => {
+            counter--;
+            const timerEl = document.getElementById('combatToastTimer');
+            if (timerEl) timerEl.textContent = `${counter}s`;
+            // Keep modal timer in sync if still visible
+            const modalTimer = document.getElementById('countdownTimer');
+            if (modalTimer) modalTimer.textContent = counter;
+
+            if (counter <= 0) {
+                clearInterval(interval);
+                clearInterval(window.currentRestartInterval);
+                toast.remove();
+                window._fireNextCombat?.(targetChallengeId);
+            }
+        }, 1000);
+        // Sync with any existing modal interval
+        if (window.currentRestartInterval) {
+            clearInterval(window.currentRestartInterval);
+            window.currentRestartInterval = interval;
+        }
+    }
+
+    render();
+    document.body.appendChild(toast);
+
+    if (!paused && !isUntilDismissed) {
+        startToastInterval();
+    }
+}
 
 // --- TURN RENDERER ---
 
