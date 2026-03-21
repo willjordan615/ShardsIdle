@@ -111,6 +111,11 @@ function updateAuthUI() {
     const { username, isGuest } = window.authState;
     if (isGuest) {
         el.innerHTML = `<span style="color:#888;">Guest</span> <button onclick="showAuthModal('login')" style="font-size:0.75rem; padding:2px 8px; margin-left:6px;">Log In</button>`;
+        // Show modal automatically for guests on first load
+        if (!window._authModalShown) {
+            window._authModalShown = true;
+            setTimeout(() => window.showAuthModal('login'), 300);
+        }
     } else {
         el.innerHTML = `<span style="color:#d4af37;">${username}</span> <button onclick="authLogout()" style="font-size:0.75rem; padding:2px 8px; margin-left:6px; opacity:0.6;">Log Out</button>`;
     }
