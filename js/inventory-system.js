@@ -25,7 +25,7 @@ function _isGear(def)      { return def && GEAR_SLOTS.includes(_itemSlot(def)); 
 function _isConsumable(def){ return def && (_itemSlot(def) === 'consumable' || def.consumable === true); }
 function _itemDef(id)      {
     return window.gameData?.gear?.find(g => g.id === id)
-        || window.gameData?.consumables?.find(g => g.id === id);
+        || window.gameData?.gear?.find(g => g.id === id && g.type === 'consumable');
 }
 function _rarityColor(r)   { return { legendary:'#ffaa00', rare:'#00d4ff', uncommon:'#4eff7f', common:'#aaa' }[r] || '#aaa'; }
 function _statBonuses(def) {

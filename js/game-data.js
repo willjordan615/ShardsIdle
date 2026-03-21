@@ -15,7 +15,7 @@ let gameData = {
     skills: [],
     gear: [],
     challenges: [],
-    consumables: [],
+    consumables: [],  // deprecated — consumable definitions now live in gear (items)
     bots: [],
     statuses: [],
     characters: []
@@ -39,7 +39,6 @@ async function initializeGame() {
         gameData.skills     = dataFromServer.skills     || [];
         gameData.gear       = dataFromServer.gear       || [];
         gameData.challenges = dataFromServer.challenges || [];
-        gameData.consumables = dataFromServer.consumables || [];
         gameData.bots       = dataFromServer.bots       || [];
         gameData.statuses   = dataFromServer.statuses   || [];
 
@@ -122,7 +121,7 @@ function getGearItem(itemId) {
 }
 
 function getConsumable(consumableId) {
-    return gameData.consumables.find(c => c.id === consumableId);
+    return gameData.gear.find(g => g.id === consumableId && g.type === 'consumable');
 }
 
 function getBot(botId) {

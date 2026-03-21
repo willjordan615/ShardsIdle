@@ -15,7 +15,6 @@ function loadGameData() {
         gameData.races = JSON.parse(fs.readFileSync(path.join(dataDir, 'races.json'), 'utf8'));
         gameData.challenges = JSON.parse(fs.readFileSync(path.join(dataDir, 'challenges.json'), 'utf8'));
         gameData.gear = JSON.parse(fs.readFileSync(path.join(dataDir, 'items.json'), 'utf8'));
-        gameData.consumables = JSON.parse(fs.readFileSync(path.join(dataDir, 'consumables.json'), 'utf8'));
         gameData.bots = JSON.parse(fs.readFileSync(path.join(dataDir, 'bots.json'), 'utf8'));
         gameData.statuses = JSON.parse(fs.readFileSync(path.join(dataDir, 'statuses.json'), 'utf8'));
         
@@ -56,9 +55,9 @@ router.get('/gear', (req, res) => {
     res.json(gameData.gear || []);
 });
 
-// GET /api/data/consumables
+// GET /api/data/consumables — returns consumable items from gear for backwards compatibility
 router.get('/consumables', (req, res) => {
-    res.json(gameData.consumables || []);
+    res.json((gameData.gear || []).filter(i => i.type === 'consumable'));
 });
 
 // GET /api/data/bots
