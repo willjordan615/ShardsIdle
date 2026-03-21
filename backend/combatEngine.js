@@ -1458,7 +1458,7 @@ class CombatEngine {
       stageTurnCount,
       lastUsedSkillId:  actor.lastUsedSkillId || null,
       lastHitDamagePct: actor.lastHitDamagePct || 0,
-      suddenDeathActive: stageTurnCount > SUDDEN_DEATH_START,
+      suddenDeathActive: stageTurnCount > 100,
       // Budget ratios only meaningful for players persisting across stages.
       // Enemies respawn fresh each stage so conservation pressure doesn't apply.
       staminaBudgetRatio: actor.type === 'player'
