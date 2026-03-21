@@ -387,30 +387,24 @@ function calculateTotalStats(character) {
  * Mirrors combatEngine.js calculateMaxHP/Mana/Stamina exactly so the
  * character detail screen shows what will actually be used in combat.
  */
+/**
+ * Calculate derived stats (HP, Mana, Stamina) for a character including equipment bonuses.
+ * Matches combatEngine.calculateMaxHP/Mana/Stamina exactly — single source of truth.
+ */
 function calculateDerivedStats(character) {
     const level = character.level || 1;
-    const stats = calculateTotalStats(character); // include equipment bonuses
-    const GROWTH = { hp: 1.12, resource: 1.10 };
+    const stats = calculateTotalStats(character);
 
-    const hp      = Math.floor(50  * Math.pow(GROWTH.hp,       level - 1) * (1 + (stats.endurance || 0) / 300));
-    const mana    = Math.floor(80  * Math.pow(GROWTH.resource, level - 1) * (1 + ((stats.harmony || 0) * 0.7 + (stats.endurance || 0) * 0.3) / 300));
-    const stamina = Math.floor(80  * Math.pow(GROWTH.resource, level - 1) * (1 + ((stats.endurance || 0) * 0.7 + (stats.conviction || 0) * 0.3) / 300));
+    const hp      = Math.floor(50 * Math.pow(1.12, level - 1) * (1 + (stats.endurance || 0) / 300));
+    const mana    = Math.floor(80 * Math.pow(1.10, level - 1) * (1 + ((stats.harmony || 0) * 0.7 + (stats.endurance || 0) * 0.3) / 300));
+    const stamina = Math.floor(80 * Math.pow(1.10, level - 1) * (1 + ((stats.endurance || 0) * 0.7 + (stats.conviction || 0) * 0.3) / 300));
 
     return { hp, mana, stamina };
 }
 
-/**
- * Calculate derived stats including equipment bonuses.
- */
+// Alias — same formula, kept for call-site compatibility
 function calculateDerivedStatsWithEquipment(character) {
-    const level      = character.level || 1;
-    const totalStats = calculateTotalStats(character);
-
-    const hp      = Math.floor((100 + (level - 1) * 20) * (1 + (totalStats.endurance || 0) / 300));
-    const mana    = Math.floor((50  + (level - 1) * 10) * (1 + ((totalStats.harmony || 0) * 0.7 + (totalStats.endurance || 0) * 0.3) / 300));
-    const stamina = Math.floor((75  + (level - 1) * 15) * (1 + ((totalStats.endurance || 0) * 0.7 + (totalStats.conviction || 0) * 0.3) / 300));
-
-    return { hp, mana, stamina };
+    return calculateDerivedStats(character);
 }
 
 /**

@@ -519,13 +519,16 @@ async function startCombat(forcedChallengeId) {
         const combatResult = await response.json();
 
         console.log('[COMBAT] Server response received. Result:', combatResult.result);
-        
-        if (combatResult.nextChallengeId) {
-            console.log('[COMBAT] Server suggests next challenge:', combatResult.nextChallengeId);
-        }
 
-        showScreen('combatlog'); 
-        displayCombatLog(combatResult); 
+        // If the player navigated away during the idle loop, don't drag them back to
+        // the combat screen — just run the log silently and let the toast notify them.
+        const silent = window._silentCombatRestart;
+        window._silentCombatRestart = false;
+
+        if (!silent) {
+            showScreen('combatlog');
+        }
+        displayCombatLog(combatResult);
 
     } catch (error) {
         console.error('Combat error:', error);

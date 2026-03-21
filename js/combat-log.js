@@ -524,8 +524,20 @@ async function displayCombatLog(combatData) {
             if (statusTextEl) statusTextEl.textContent = 'Returning to hub...';
         }
 
-        // Show the modal
-        if (modal) modal.style.display = 'flex';
+        // Show the modal — but only as a full takeover if the player is watching combat.
+        // If they've navigated away (detail screen, roster, etc.), show a compact corner toast instead.
+        const currentScreen = document.querySelector('.screen.active')?.id || '';
+        const isWatchingCombat = currentScreen === 'combat' || currentScreen === 'party';
+
+        if (modal) {
+            if (isWatchingCombat) {
+                modal.style.display = 'flex';
+            } else {
+                // Compact toast in bottom-right — doesn't obscure what the player is doing
+                modal.style.display = 'none';
+                _showCombatToast(finalResult);
+            }
+        }
 
         // Trigger rewards and/or countdown
         // applyCombatRewards always runs — it handles skill XP on all outcomes.
@@ -587,6 +599,13 @@ async function displayCombatLog(combatData) {
 
                     if (typeof startCombat === 'function') {
                         console.log(`[IDLE] Auto-starting: ${targetChallengeId}`);
+                        // Only switch to combat screen if the player is already watching combat.
+                        // If they've navigated to detail/roster, restart silently in the background.
+                        const activeScreen = document.querySelector('.screen.active')?.id || '';
+                        const watchingCombat = activeScreen === 'combat' || activeScreen === 'party';
+                        if (!watchingCombat) {
+                            window._silentCombatRestart = true;
+                        }
                         startCombat();
                     } else {
                         console.error('[IDLE] startCombat not found!');
@@ -622,6 +641,37 @@ async function displayCombatLog(combatData) {
 
 // --- GLOBAL MODAL BUTTON HANDLERS ---
 // Attached to window so index.html onclick attributes can reach them.
+
+function _showCombatToast(result) {
+    // Remove any existing toast
+    const existing = document.getElementById('combatToast');
+    if (existing) existing.remove();
+
+    const isVictory = result === 'victory';
+    const toast = document.createElement('div');
+    toast.id = 'combatToast';
+    toast.style.cssText = `
+        position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9998;
+        background: #1a1a2e; border: 1px solid ${isVictory ? '#4cd964' : '#d4484a'};
+        border-radius: 8px; padding: 0.75rem 1rem; max-width: 260px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.6); font-size: 0.85rem;
+        animation: fadeInUp 0.3s ease;
+    `;
+    toast.innerHTML = `
+        <div style="color:${isVictory ? '#4cd964' : '#d4484a'}; font-weight:bold; margin-bottom:4px;">
+            ${isVictory ? '⚔️ Victory' : '💀 Defeated'}
+        </div>
+        <div style="color:#aaa; font-size:0.78rem;">Combat complete. Loop continuing...</div>
+        <button onclick="document.getElementById('combatToast')?.remove(); cancelAutoRestart();"
+            style="margin-top:6px; padding:3px 10px; background:#2a1a1a; border:1px solid #533;
+                   color:#f88; cursor:pointer; border-radius:4px; font-size:0.75rem; width:100%;">
+            Stop Loop
+        </button>
+    `;
+    document.body.appendChild(toast);
+    // Auto-remove after victoryDuration + 2s
+    setTimeout(() => toast?.remove(), ((window.victoryCountdownSeconds || 7) + 2) * 1000);
+}
 
 window.cancelAutoRestart = function() {
     if (window.currentRestartInterval) clearInterval(window.currentRestartInterval);

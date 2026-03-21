@@ -217,7 +217,10 @@
 
                     <div style="margin-top: 1rem;">
                         <div class="loadout-slot loadout-slot--filled" style="cursor:pointer; position:relative; gap:12px;">
-                            <span class="loadout-slot__label" style="min-width:90px; flex-shrink:0;">Combat Style</span>
+                            <span class="loadout-slot__label" style="min-width:90px; flex-shrink:0;">
+                                Combat Style
+                                <span title="Controls how your character behaves in combat. Affects which skills are prioritised, when consumables are used, and how aggressively resources are spent.&#10;&#10;⚖️ Balanced — Moderate on all fronts. Finishes low-HP enemies, conserves resources between stages.&#10;⚔️ Aggressive — Maximises damage. Almost never buffs or heals. Spends resources freely. Targets lowest-HP enemy.&#10;🛡️ Cautious — Prefers utility, defense, and healing. Buffs early, targets the biggest threat. Tight resource conservation across stages.&#10;💚 Support — Heals and buffs heavily. Rescues low-HP allies first. Rarely attacks.&#10;🌀 Disruptor — Strongly prefers control and debuff skills. Targets the most dangerous enemy.&#10;🗡️ Opportunist — Sets up combos and procs. Hits much harder when the target is already debuffed. Targets the most vulnerable enemy.&#10;&#10;All profiles: buffs are used early in a fight and nearly forbidden by turn 10. Consumables are only used when the fight is genuinely difficult." style="color:#8b7355; font-size:0.75rem; cursor:help; margin-left:4px;">ⓘ</span>
+                            </span>
                             <span class="loadout-slot__item" id="aiProfileBadge"></span>
                             <select id="aiProfileDetailSelect"
                                     onchange="saveAiProfile()"
@@ -233,7 +236,10 @@
                         <p id="aiProfileSaveMsg" style="color:#4cd964; font-size:0.75rem; min-height:1em; text-align:right; margin:2px 4px 0;"></p>
 
                         <div class="loadout-slot loadout-slot--filled" style="cursor:pointer; position:relative; gap:12px; margin-top:6px;">
-                            <span class="loadout-slot__label" style="min-width:90px; flex-shrink:0;">Role</span>
+                            <span class="loadout-slot__label" style="min-width:90px; flex-shrink:0;">
+                                Role
+                                <span title="A display tag that appears on your character's browse card when shared publicly. Helps other players know what role your character plays in a party. Has no mechanical effect." style="color:#8b7355; font-size:0.75rem; cursor:help; margin-left:4px;">ⓘ</span>
+                            </span>
                             <span class="loadout-slot__item" id="roleTagBadge">None</span>
                             <select id="roleTagSelect"
                                     onchange="saveRoleTag()"
@@ -431,6 +437,26 @@
                         <option value="winrate">Sort: Win Rate</option>
                     </select>
                     <input type="text" id="browseSearchFilter" placeholder="Search by name..." oninput="loadBrowseCharacters()">
+                </div>
+                <div class="grid-3" style="margin-top:0.5rem;">
+                    <select id="browseRoleFilter" onchange="loadBrowseCharacters()">
+                        <option value="">Any Role</option>
+                        <option value="Defender">🛡 Defender</option>
+                        <option value="Bruiser">⚔️ Bruiser</option>
+                        <option value="Mage">🔮 Mage</option>
+                        <option value="Healer">💊 Healer</option>
+                        <option value="Support">💚 Support</option>
+                        <option value="Utility">🔧 Utility</option>
+                        <option value="Assassin">🗡️ Assassin</option>
+                    </select>
+                    <select id="browseRaceFilter" onchange="loadBrowseCharacters()">
+                        <option value="">Any Race</option>
+                        <option value="human">Human</option>
+                        <option value="elf">Elf</option>
+                        <option value="dwarf">Dwarf</option>
+                        <option value="orc">Orc</option>
+                        <option value="halfling">Halfling</option>
+                    </select>
                 </div>
             </div>
             

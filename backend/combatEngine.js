@@ -1000,10 +1000,22 @@ class CombatEngine {
 
     const profile = actor.aiProfile || (isEnemy ? 'aggressive' : 'balanced');
     const conservationEnabled = !isEnemy && profile !== 'aggressive';
-    const procPressureBonus   = profile === 'opportunist' ? 1.6 : 1.35;
+
+    // Proc pressure bonus — opportunist is much more proc-hungry
+    const procPressureBonus = profile === 'opportunist' ? 2.0 : profile === 'disruptor' ? 1.2 : 1.35;
 
     // ── Emergency survival (HP critical) ────────────────────────────────────
-    const emergencyHPThreshold = profile === 'cautious' ? 0.4 : 0.2;
+    // Thresholds per profile — cautious and support react earlier
+    const emergencyHPThreshold = {
+      cautious:    0.45,
+      support:     0.40,
+      balanced:    0.25,
+      disruptor:   0.25,
+      opportunist: 0.25,
+      tactical:    0.30,
+      aggressive:  0.15,  // aggressive waits until near death
+      berserker:   0.00,  // berserker never retreats
+    }[profile] ?? 0.25;
     if (profile !== 'berserker' && actor.currentHP <= actor.maxHP * emergencyHPThreshold) {
       const healSkill = isEnemy
         ? this.getEnemySkillByCategory(actor.skills, 'HEALING')
@@ -1022,8 +1034,10 @@ class CombatEngine {
     }
 
     // ── Ally rescue (non-aggressive non-enemy) ───────────────────────────────
-    if (!isEnemy && profile !== 'aggressive') {
-      const allyRescueThreshold = profile === 'support' ? 0.5 : 0.3;
+    if (!isEnemy && profile !== 'aggressive' && profile !== 'berserker') {
+      const allyRescueThreshold = profile === 'support' ? 0.6
+        : profile === 'cautious' ? 0.45
+        : 0.3;
       const lowHPAlly = allies.find(p =>
         !p.defeated && p.id !== actor.id && p.currentHP <= p.maxHP * allyRescueThreshold
       );
@@ -1093,12 +1107,26 @@ class CombatEngine {
       primaryTarget = _weightedRandomTarget(aliveOpponents);
     } else if (tauntTarget) {
       primaryTarget = tauntTarget;
-      //if (isEnemy) console.log(`[TAUNT] ${actor.name} drawn to ${tauntTarget.name}`);
-    } else if (profile === 'tactical') {
+    } else if (profile === 'tactical' || profile === 'disruptor') {
+      // Target the highest-threat enemy
+      primaryTarget = aliveOpponents.reduce((best, p) =>
+        this._threatScore(p) > this._threatScore(best) ? p : best
+      );
+    } else if (profile === 'opportunist') {
+      // Target the most debuffed/vulnerable enemy
+      primaryTarget = aliveOpponents.reduce((best, p) => {
+        const debuffCount = (p.statusEffects || []).filter(e => e.duration > 0).length;
+        const bestDebuffs = (best.statusEffects || []).filter(e => e.duration > 0).length;
+        if (debuffCount !== bestDebuffs) return debuffCount > bestDebuffs ? p : best;
+        return p.currentHP < best.currentHP ? p : best;
+      });
+    } else if (profile === 'cautious') {
+      // Cautious targets highest threat — deal with the most dangerous enemy first
       primaryTarget = aliveOpponents.reduce((best, p) =>
         this._threatScore(p) > this._threatScore(best) ? p : best
       );
     } else {
+      // balanced, aggressive, support — lowest HP (finish them)
       primaryTarget = aliveOpponents.reduce((min, p) => p.currentHP < min.currentHP ? p : min);
     }
 
@@ -1160,11 +1188,11 @@ class CombatEngine {
             : 1.0;
         if (resourceRatio < 0.3) score *= 0.5;
 
-        // Stage budget conservation (players only)
-        if (conservationEnabled && context.stagesRemaining > 0) {
+        // Stage budget conservation (players only) — cautious handles its own tighter version above
+        if (conservationEnabled && profile !== 'cautious' && context.stagesRemaining > 0) {
           const budgetRatio = skill.costType === 'stamina'
             ? context.staminaBudgetRatio : context.manaBudgetRatio;
-          if (budgetRatio < 0.6) score *= profile === 'cautious' ? 0.55 : 0.75;
+          if (budgetRatio < 0.6) score *= 0.75;
         }
 
         // Debuff redundancy
@@ -1223,12 +1251,6 @@ class CombatEngine {
         // AOE value
         if (cat && cat.includes('AOE')) score *= Math.max(1, aliveOpponents.length * 0.5);
 
-        // Turn decay for buffs
-        if (cat === 'BUFF' || cat === 'DEFENSE' || cat === 'UTILITY') {
-          const turn = context.stageTurnCount || 0;
-          score *= Math.max(0.35, 1.0 - (turn * 0.045));
-        }
-
         // Finishing blow
         if (targetCombatant && targetCombatant.currentHP <= targetCombatant.maxHP * 0.25) score *= 1.2;
 
@@ -1237,33 +1259,112 @@ class CombatEngine {
           if (Math.abs(this._threatScore(targetCombatant) - context.highestThreatScore) < 0.01) score *= 1.15;
         }
 
-        // Profile boosts
+        // Profile boosts — genuinely distinct identities
+        if (profile === 'aggressive') {
+          if (cat && cat.includes('DAMAGE')) score *= 1.5;
+          if (cat === 'BUFF' || cat === 'DEFENSE') score *= 0.25;
+          if (cat === 'UTILITY') score *= 0.35;
+          if (cat === 'HEALING' || cat === 'HEALING_AOE') score *= 0.5;
+        }
+        if (profile === 'cautious') {
+          if (cat === 'UTILITY' || cat === 'DEFENSE') score *= 1.6;
+          if (cat === 'BUFF') score *= 1.3;
+          if (cat === 'HEALING' || cat === 'HEALING_AOE') score *= 1.4;
+          if (cat && cat.includes('DAMAGE')) score *= 0.8;
+          if (conservationEnabled && context.stagesRemaining > 0) {
+            const budgetRatio = skill.costType === 'stamina'
+              ? context.staminaBudgetRatio : context.manaBudgetRatio;
+            if (budgetRatio < 0.8) score *= 0.5;
+          }
+        }
         if (profile === 'support') {
-          if (cat === 'HEALING' || cat === 'HEALING_AOE' || cat === 'BUFF') score *= 1.5;
-          if (cat && cat.includes('DAMAGE')) score *= 0.7;
+          if (cat === 'HEALING' || cat === 'HEALING_AOE') score *= 1.8;
+          if (cat === 'BUFF') score *= 1.6;
+          if (cat && cat.includes('DAMAGE')) score *= 0.55;
+          if (cat === 'CONTROL') score *= 1.2;
         }
         if (profile === 'disruptor') {
-          if (cat === 'CONTROL') score *= 1.6;
-          if (cat === 'UTILITY') score *= 1.3;
+          if (cat === 'CONTROL') score *= 2.0;
+          if (cat === 'UTILITY') score *= 1.5;
+          if (cat === 'BUFF' || cat === 'DEFENSE') score *= 0.55;
+          if (cat && cat.includes('DAMAGE')) score *= 0.9;
         }
-        if (profile === 'aggressive') {
-          if (cat && cat.includes('DAMAGE')) score *= 1.3;
-          if (cat === 'BUFF' || cat === 'DEFENSE') score *= 0.5;
+        if (profile === 'opportunist') {
+          if (cat && cat.includes('DAMAGE')) score *= 1.2;
+          if (cat === 'CONTROL' || cat === 'UTILITY') score *= 1.3;
+          if (cat === 'BUFF' || cat === 'DEFENSE') score *= 0.65;
+          if (targetCombatant && (targetCombatant.statusEffects || []).some(e => e.duration > 0)) {
+            if (cat && cat.includes('DAMAGE')) score *= 1.8;
+          }
         }
-        if (profile === 'tactical' && cat === 'CONTROL') score *= 1.4;
+        if (profile === 'tactical') {
+          if (cat === 'CONTROL') score *= 1.4;
+          if (cat === 'UTILITY') score *= 1.2;
+          if (cat && cat.includes('DAMAGE')) score *= 1.1;
+        }
 
-        // Buff window bonus when healthy
-        if ((cat === 'BUFF' || cat === 'DEFENSE') &&
+        // Buff timing curve — universal sharp drop-off
+        if (cat === 'BUFF' || cat === 'DEFENSE' || cat === 'UTILITY') {
+          const turn = context.stageTurnCount || 0;
+          const buffTimingMultiplier = turn <= 3 ? 1.0 : turn <= 6 ? 0.6 : turn <= 9 ? 0.25 : 0.08;
+          score *= buffTimingMultiplier;
+        }
+
+        // Buff window — bonus when healthy, gentler solo penalty
+        if ((cat === 'BUFF' || cat === 'DEFENSE' || cat === 'UTILITY') &&
             actor.currentHP > actor.maxHP * 0.75 && resourceRatio > 0.5) {
           const enemyPressure = aliveOpponents.length > aliveAllies.length;
-          const soloMultiplier = aliveAllies.length <= 1 ? 0.2 : 1.0;
-          score *= soloMultiplier * (enemyPressure ? 0.6 : 1.15);
+          const soloMultiplier = aliveAllies.length <= 1 ? 0.6 : 1.0;  // 0.6 not 0.2
+          score *= soloMultiplier * (enemyPressure ? 0.7 : 1.15);
         }
 
         // AOE healing bonus when 2+ allies hurt
         if (cat === 'HEALING_AOE') {
           const hurtAllies = allies.filter(p => !p.defeated && p.currentHP < p.maxHP * 0.7).length;
           if (hurtAllies >= 2) score *= 1.4;
+          // Solo penalty on AOE heals specifically
+          if (aliveAllies.length <= 1) score *= 0.3;
+        }
+
+        // Consumable use — gated by fight difficulty
+        const isConsumable = cat === 'CONSUMABLE_HEALING' || cat === 'CONSUMABLE_RESTORATION' ||
+                             cat === 'CONSUMABLE_DAMAGE'  || cat === 'CONSUMABLE_ESCAPE';
+        if (isConsumable) {
+          const difficulty = this._assessFightDifficulty(actor, allies, aliveOpponents, context);
+          if (difficulty === 'easy') { score = 0; return { skill, target, score }; }
+
+          const hpPct      = actor.currentHP / actor.maxHP;
+          const staminaPct = actor.currentStamina / actor.maxStamina;
+          const manaPct    = actor.currentMana / actor.maxMana;
+          const tookBigHit = (context.lastHitDamagePct || 0) >= 0.2;
+          const hasBadDebuff = ['silence','blind','weaken','armor_break','exhaustion'].some(d =>
+            actor.statusEffects?.some(e => e.id === d && e.duration > 0));
+          const isBossFight = aliveOpponents.length === 1 && aliveOpponents[0].maxHP > actor.maxHP * 3;
+
+          if (cat === 'CONSUMABLE_HEALING') {
+            const healThreshold = profile === 'cautious' ? 0.50 : profile === 'support' ? 0.45
+              : profile === 'aggressive' ? 0.15 : 0.35;
+            if (hpPct > healThreshold && !tookBigHit) score *= 0.05;
+            else { score *= 1.5; if (tookBigHit) score *= 1.4; if (isBossFight) score *= 1.2; }
+          }
+          if (cat === 'CONSUMABLE_RESTORATION') {
+            const bothLow = staminaPct < 0.20 && manaPct < 0.20;
+            const eligible = profile === 'cautious' ? (staminaPct < 0.25 || manaPct < 0.25) : bothLow;
+            if (!eligible) score *= 0.02;
+            else { score *= 1.3; if (isBossFight) score *= 1.2; }
+          }
+          if (cat === 'CONSUMABLE_DAMAGE') {
+            if (profile === 'aggressive') score *= difficulty === 'hard' ? 1.4 : 0.8;
+            else if (profile === 'opportunist') {
+              const targetDebuffed = targetCombatant &&
+                (targetCombatant.statusEffects || []).some(e => e.duration > 0);
+              score *= (isBossFight || targetDebuffed) ? 1.2 : 0.1;
+            } else score *= 0.05;
+          }
+          if (cat === 'CONSUMABLE_ESCAPE') {
+            score *= hasBadDebuff ? 1.8 : 0.05;
+          }
+          if (difficulty === 'normal') score *= 0.4;
         }
 
         return { skill, target, score };
@@ -1322,6 +1423,7 @@ class CombatEngine {
       highestThreatScore,
       stageTurnCount,
       lastUsedSkillId:  actor.lastUsedSkillId || null,
+      lastHitDamagePct: actor.lastHitDamagePct || 0,
       // Budget ratios only meaningful for players persisting across stages.
       // Enemies respawn fresh each stage so conservation pressure doesn't apply.
       staminaBudgetRatio: actor.type === 'player'
@@ -1445,38 +1547,86 @@ class CombatEngine {
         }
     }
 
-    // ── Profile-specific boosts ──
-    if (profile === 'support') {
-        if (cat === 'HEALING' || cat === 'HEALING_AOE' || cat === 'BUFF') score *= 1.5;
-        if (cat && cat.includes('DAMAGE')) score *= 0.7;
-    }
-    if (profile === 'disruptor') {
-        if (cat === 'CONTROL') score *= 1.6;
-        if (cat === 'UTILITY') score *= 1.3;
-    }
+    // ── Profile-specific scoring ──────────────────────────────────────────────
+    // Each profile has a distinct identity — these are meaningful multipliers, not nudges.
+
     if (profile === 'aggressive') {
-        if (cat && cat.includes('DAMAGE')) score *= 1.3;
-        if (cat === 'BUFF' || cat === 'DEFENSE') score *= 0.5;
+      if (cat && cat.includes('DAMAGE')) score *= 1.5;
+      if (cat === 'BUFF' || cat === 'DEFENSE') score *= 0.25;  // almost never buffs
+      if (cat === 'UTILITY') score *= 0.35;
+      if (cat === 'HEALING' || cat === 'HEALING_AOE') score *= 0.5;  // ignores healing
     }
 
-    // ── Turn decay — buffs lose value as combat extends ──────────────────────
+    if (profile === 'cautious') {
+      if (cat === 'UTILITY' || cat === 'DEFENSE') score *= 1.6;  // Footwork, block, evasion
+      if (cat === 'BUFF') score *= 1.3;
+      if (cat === 'HEALING' || cat === 'HEALING_AOE') score *= 1.4;
+      if (cat && cat.includes('DAMAGE')) score *= 0.8;
+      // Cautious conserves more aggressively across stages
+      if (conservationEnabled && context.stagesRemaining > 0) {
+        const budgetRatio = skill.costType === 'stamina'
+          ? context.staminaBudgetRatio : context.manaBudgetRatio;
+        if (budgetRatio < 0.8) score *= 0.5;  // tighter threshold than other profiles
+      }
+    }
+
+    if (profile === 'support') {
+      if (cat === 'HEALING' || cat === 'HEALING_AOE') score *= 1.8;
+      if (cat === 'BUFF') score *= 1.6;
+      if (cat && cat.includes('DAMAGE')) score *= 0.55;
+      if (cat === 'CONTROL') score *= 1.2;
+    }
+
+    if (profile === 'disruptor') {
+      if (cat === 'CONTROL') score *= 2.0;
+      if (cat === 'UTILITY') score *= 1.5;
+      if (cat === 'BUFF' || cat === 'DEFENSE') score *= 0.55;
+      if (cat && cat.includes('DAMAGE')) score *= 0.9;
+    }
+
+    if (profile === 'opportunist') {
+      if (cat && cat.includes('DAMAGE')) score *= 1.2;
+      if (cat === 'CONTROL' || cat === 'UTILITY') score *= 1.3;  // set up procs
+      if (cat === 'BUFF' || cat === 'DEFENSE') score *= 0.65;
+      // Big bonus when attacking a debuffed target
+      if (targetCombatant && (targetCombatant.statusEffects || []).some(e => e.duration > 0)) {
+        if (cat && cat.includes('DAMAGE')) score *= 1.8;
+      }
+    }
+
+    if (profile === 'balanced') {
+      // Small nudges only — balanced is genuinely neutral
+      if (cat && cat.includes('DAMAGE')) score *= 1.05;
+    }
+
+    if (profile === 'tactical') {
+      if (cat === 'CONTROL') score *= 1.4;
+      if (cat === 'UTILITY') score *= 1.2;
+      if (cat && cat.includes('DAMAGE')) score *= 1.1;
+    }
+
+    // ── Buff timing curve — universal ────────────────────────────────────────
     // Early turns: buffing is smart. Late turns: just deal damage.
-    // Decays from 1.0 at turn 0 to ~0.35 at turn 15+
+    // Turns 1-3: full value. Turns 4-6: 0.6×. Turns 7-9: 0.25×. Turn 10+: 0.08×
     if (cat === 'BUFF' || cat === 'DEFENSE' || cat === 'UTILITY') {
-        const turn = context.stageTurnCount || 0;
-        const decayMultiplier = Math.max(0.35, 1.0 - (turn * 0.045));
-        score *= decayMultiplier;
+      const turn = context.stageTurnCount || 0;
+      const buffTimingMultiplier = turn <= 3  ? 1.0
+        : turn <= 6  ? 0.6
+        : turn <= 9  ? 0.25
+        : 0.08;
+      score *= buffTimingMultiplier;
     }
 
-    // ── Buff window — bonus for buffing when healthy and not outnumbered ──
-    if ((cat === 'BUFF' || cat === 'DEFENSE') &&
+    // ── Buff window — bonus for buffing when healthy ──────────────────────────
+    if ((cat === 'BUFF' || cat === 'DEFENSE' || cat === 'UTILITY') &&
         character.currentHP > character.maxHP * 0.75 &&
         resourceRatio > 0.5) {
-        const aliveAllies = players.filter(p => !p.defeated).length;
-        const enemyPressure = aliveEnemies.length > aliveAllies;
-        // Solo — DEFENSE is nearly worthless, damage coming regardless
-        const soloMultiplier = aliveAllies <= 1 ? 0.2 : 1.0;
-        score *= soloMultiplier * (enemyPressure ? 0.6 : 1.15);
+      const aliveAllies = players.filter(p => !p.defeated).length;
+      const enemyPressure = aliveEnemies.length > aliveAllies;
+      // Solo penalty — gentler than before (0.6× not 0.2×)
+      // HEALING_AOE is the one that's genuinely less useful solo, not utility
+      const soloMultiplier = aliveAllies <= 1 ? 0.6 : 1.0;
+      score *= soloMultiplier * (enemyPressure ? 0.7 : 1.15);
     }
 
     // ── Support profile: HEALING_AOE bonus when 2+ allies are hurt ──
@@ -1485,7 +1635,127 @@ class CombatEngine {
         if (hurtAllies >= 2) score *= 1.4;
     }
 
+    // ── Consumable use — gated by fight difficulty ───────────────────────────
+    const isConsumable = cat === 'CONSUMABLE_HEALING' || cat === 'CONSUMABLE_RESTORATION' ||
+                         cat === 'CONSUMABLE_DAMAGE'  || cat === 'CONSUMABLE_ESCAPE';
+
+    if (isConsumable) {
+      const difficulty = this._assessFightDifficulty(character, players, aliveEnemies, context);
+
+      // Easy fight — never use consumables
+      if (difficulty === 'easy') {
+        score *= 0.0;
+        return score;
+      }
+
+      const hpPct          = character.currentHP / character.maxHP;
+      const staminaPct     = character.currentStamina / character.maxStamina;
+      const manaPct        = character.currentMana / character.maxMana;
+      const tookBigHit     = (context.lastHitDamagePct || 0) >= 0.2;
+      const hasBadDebuff   = ['silence','blind','weaken','armor_break','exhaustion'].some(d =>
+        character.statusEffects?.some(e => e.id === d && e.duration > 0)
+      );
+      const isBossFight    = aliveEnemies.length === 1 &&
+                             aliveEnemies[0].maxHP > (character.maxHP * 3);
+
+      // Per-category base eligibility thresholds
+      if (cat === 'CONSUMABLE_HEALING') {
+        const healThreshold = {
+          cautious:   0.50,
+          support:    0.45,
+          balanced:   0.35,
+          tactical:   0.35,
+          disruptor:  0.30,
+          opportunist:0.30,
+          aggressive: 0.15,
+          berserker:  0.10,
+        }[profile] ?? 0.35;
+
+        if (hpPct > healThreshold && !tookBigHit) {
+          score *= 0.05;  // not eligible yet
+        } else {
+          score *= 1.5;
+          if (tookBigHit) score *= 1.4;  // reactive: just got hit hard
+          if (isBossFight) score *= 1.2;
+        }
+      }
+
+      if (cat === 'CONSUMABLE_RESTORATION') {
+        const bothLow = staminaPct < 0.20 && manaPct < 0.20;
+        const eitherLow = profile === 'cautious'
+          ? (staminaPct < 0.25 || manaPct < 0.25)
+          : bothLow;
+        if (!eitherLow) {
+          score *= 0.02;  // not eligible
+        } else {
+          score *= 1.3;
+          if (isBossFight) score *= 1.2;
+        }
+      }
+
+      if (cat === 'CONSUMABLE_DAMAGE') {
+        // Aggressive and opportunist use damage consumables; others almost never do
+        if (profile === 'aggressive') {
+          score *= difficulty === 'hard' ? 1.4 : 0.8;
+          if (isBossFight) score *= 1.3;
+        } else if (profile === 'opportunist') {
+          // Only in boss fight or when target is debuffed
+          const targetDebuffed = targetCombatant &&
+            (targetCombatant.statusEffects || []).some(e => e.duration > 0);
+          score *= (isBossFight || targetDebuffed) ? 1.2 : 0.1;
+        } else {
+          score *= 0.05;  // other profiles almost never throw damage consumables
+        }
+      }
+
+      // Cleanse consumable — activated by bad debuff regardless of profile
+      if (cat === 'CONSUMABLE_ESCAPE') {
+        score *= hasBadDebuff ? 1.8 : 0.05;
+      }
+
+      // Normal difficulty — additional reluctance multiplier
+      if (difficulty === 'normal') score *= 0.4;
+    }
+
     return score;
+  }
+
+  /**
+   * Assess how difficult the current fight is for the actor.
+   * Returns 'easy', 'normal', or 'hard'.
+   * Used to gate consumable use — nobody wastes consumables on an easy fight.
+   */
+  _assessFightDifficulty(actor, allies, opponents, context) {
+    const aliveEnemies  = opponents.filter(e => !e.defeated);
+    const aliveAllies   = allies.filter(a => !a.defeated);
+
+    // Easy signals — all of these must be absent for anything beyond 'easy'
+    const allEnemiesLow    = aliveEnemies.length > 0 &&
+      aliveEnemies.every(e => e.currentHP / e.maxHP < 0.5);
+    const allAlliesHealthy = aliveAllies.every(a => a.currentHP / a.maxHP > 0.7);
+    const notOutnumbered   = aliveEnemies.length <= aliveAllies.length;
+    const fewTurns         = (context.stageTurnCount || 0) < 6;
+
+    if (allEnemiesLow && allAlliesHealthy && notOutnumbered) return 'easy';
+
+    // Hard signals — any one is enough
+    const actorHpPct      = actor.currentHP / actor.maxHP;
+    const tookBigHit      = (context.lastHitDamagePct || 0) >= 0.2;
+    const lowHP           = actorHpPct < 0.35;
+    const allyLowHP       = aliveAllies.some(a => a.id !== actor.id && a.currentHP / a.maxHP < 0.3);
+    const outnumbered     = aliveEnemies.length > aliveAllies.length + 1;
+    const stalledFight    = !fewTurns && aliveEnemies.every(e => e.currentHP / e.maxHP > 0.8);
+    const hasBadDebuff    = ['silence','blind','weaken','armor_break','exhaustion'].some(d =>
+      actor.statusEffects?.some(e => e.id === d && e.duration > 0)
+    );
+    const bothResourcesLow = (actor.currentStamina / actor.maxStamina) < 0.2 &&
+                             (actor.currentMana    / actor.maxMana)    < 0.2;
+
+    if (tookBigHit || lowHP || allyLowHP || outnumbered || stalledFight || hasBadDebuff || bothResourcesLow) {
+      return 'hard';
+    }
+
+    return 'normal';
   }
 
   /**
@@ -1946,6 +2216,11 @@ class CombatEngine {
         totalDamage += hitDamage;
 
         target.currentHP -= hitDamage;
+        // Track largest single hit for consumable trigger logic
+        if (hitDamage > 0) {
+            target.lastHitDamage = hitDamage;
+            target.lastHitDamagePct = target.maxHP > 0 ? hitDamage / target.maxHP : 0;
+        }
         if (target.currentHP <= 0) {
             target.currentHP = 0;
             target.defeated = true;
