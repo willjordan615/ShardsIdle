@@ -1,6 +1,5 @@
 // js/admin-panel.js
-// In-game admin panel: item browser + editor. Triggered by ~ key + password.
-// Wrapped in an IIFE — no top-level declarations that conflict with game-data.js.
+// In-game admin panel. Triggered by ~ key + password.
 
 (function() {
     'use strict';
@@ -10,7 +9,6 @@
     let isUnlocked    = false;
     const ADMIN_PASSWORD = 'marsh540!vault';
 
-    // ~ key triggers password prompt, then opens panel
     document.addEventListener('keydown', function(e) {
         if (e.key === '`' || e.key === '~') {
             if (!isUnlocked) {
@@ -22,13 +20,11 @@
         }
     });
 
-    // Called by index.html onclick="closeAdminPanel()"
     window.closeAdminPanel = function() {
         const p = document.getElementById('adminPanel');
         if (p) p.style.display = 'none';
     };
 
-    // Called by index.html onclick="openAdminEditor()" and from item rows
     window.openAdminEditor = function(itemId) {
         const item = itemId ? adminItems.find(i => i.id === itemId) : null;
         renderEditor(item);
@@ -53,21 +49,8 @@
 
     // ── List view ─────────────────────────────────────────────────────────────
     function renderList(items) {
-        const wrap = document.querySelector('#adminPanel .admin-panel-container');
-        if (!wrap) return;
-        wrap.innerHTML = `
-            <div class="admin-header">
-                <h2>🔧 Admin Panel</h2>
-                <button onclick="closeAdminPanel()" class="admin-close-btn">Close</button>
-            </div>
-            <div class="admin-search">
-                <input type="text" class="admin-search-input" placeholder="Search items..."
-                       id="adminSearchInput" oninput="adminFilterItems(this.value)">
-                <button class="admin-btn-create" onclick="openAdminEditor()">+ Create Item</button>
-            </div>
-            <div class="admin-items-list" id="adminItemsList"></div>
-            <div class="admin-footer">Admin Panel v1.0 | Shards Idle</div>
-        `;
+        const list = document.getElementById('adminItemsList');
+        if (!list) return;
         fillList(items);
     }
 
@@ -82,14 +65,14 @@
         items.forEach(item => {
             const row = document.createElement('div');
             row.className = 'admin-item-row';
+            const tierBadge = item.tier !== undefined ? `<span style="color:#555;font-size:.75em">T${item.tier}</span> ` : '';
             row.innerHTML = `
                 <div class="admin-item-info">
-                    <div class="admin-item-name">${esc(item.name)} <span style="color:#666;font-size:.8em">[${esc(item.id)}]</span></div>
-                    <div class="admin-item-meta">${esc(item.type||'unknown')} · ${esc(item.rarity||'common')}</div>
+                    <div class="admin-item-name">${tierBadge}${esc(item.name)} <span style="color:#555;font-size:.75em">[${esc(item.id)}]</span></div>
+                    <div class="admin-item-meta">${esc(item.type||'unknown')} · ${esc(item.slot_id1||'—')}</div>
                 </div>
-                <div class="admin-item-stats">
-                    ${item.dmg1 ? 'DMG: '+item.dmg1 : ''}
-                    ${item.armor ? ' ARM: '+item.armor : ''}
+                <div class="admin-item-stats" style="font-size:.8em;color:#888;">
+                    ${item.dmg1 ? `<span style="color:#ff8">DMG ${item.dmg1}</span> ` : ''}${item.armor ? `ARM ${item.armor}` : ''}
                 </div>`;
             row.onclick = () => window.openAdminEditor(item.id);
             list.appendChild(row);
@@ -101,92 +84,110 @@
         fillList(adminItems.filter(i =>
             i.name.toLowerCase().includes(lq) ||
             i.id.toLowerCase().includes(lq) ||
-            (i.type||'').toLowerCase().includes(lq)
+            (i.type||'').toLowerCase().includes(lq) ||
+            String(i.tier||'').includes(lq)
         ));
     };
 
-    // ── Editor view ───────────────────────────────────────────────────────────
+    // ── Item Editor ───────────────────────────────────────────────────────────
     function renderEditor(item) {
         const isNew = !item;
         editingItemId = item ? item.id : null;
-        const wrap = document.querySelector('#adminPanel .admin-panel-container');
+        const wrap = document.getElementById('adminTabContent_items');
         if (!wrap) return;
 
-        const sb = item?.statBonuses || {};
         const v  = (k, fb='') => esc(String(item?.[k] ?? fb));
+        const n  = (k, fb=0)  => item?.[k] ?? fb;
+
+        const SLOT_OPTIONS = ['mainHand','offHand','head','chest','accessory1','accessory2','consumable','']
+            .map(s => `<option value="${s}" ${(item?.slot_id1||'')=== s?'selected':''}>${s||'(none)'}</option>`).join('');
+        const TYPE_OPTIONS = ['sword','dagger','axe','mace','hammer','handaxe','wand','scepter','tome','totem','flute','bell','crossbow','pistol','shield','armor','helmet','accessory','consumable','other']
+            .map(t => `<option value="${t}" ${(item?.type||'')=== t?'selected':''}>${t}</option>`).join('');
+        const DMG_TYPES = ['','Physical','Fire','Ice','Lightning','Holy','Shadow','Nature','Arcane','Poison','Bludgeoning','Slashing','Piercing','Electric']
+            .map(t => `<option value="${t}" ${(item?.dmg_type_1||'')=== t?'selected':''}>${t||'—'}</option>`).join('');
+        const DMG_TYPES2 = ['','Physical','Fire','Ice','Lightning','Holy','Shadow','Nature','Arcane','Poison','Bludgeoning','Slashing','Piercing','Electric']
+            .map(t => `<option value="${t}" ${(item?.dmg_type_2||'')=== t?'selected':''}>${t||'—'}</option>`).join('');
 
         wrap.innerHTML = `
-            <div class="admin-header">
-                <button onclick="adminBackToList()" class="admin-back-btn">← Back</button>
-                <h2>${isNew ? '➕ New Item' : '✏️ ' + esc(item.name)}</h2>
-                <button onclick="closeAdminPanel()" class="admin-close-btn">Close</button>
+        <div style="overflow-y:auto;max-height:65vh;padding:8px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+                <button onclick="adminBackToList()" style="padding:4px 10px;background:#1a2a1a;border:1px solid #3a5a3a;color:#8fa;cursor:pointer;border-radius:4px;">← Back</button>
+                <span style="color:#d4af37;font-size:1em;font-weight:bold;">${isNew ? '➕ New Item' : '✏️ ' + esc(item.name)}</span>
             </div>
-            <div class="admin-editor">
 
-                <div class="admin-editor-section">
-                    <h3>Identity</h3>
-                    <div class="admin-field"><label>ID</label>
-                        <input type="text" id="ae_id" value="${v('id')}" ${isNew?'':'readonly style="opacity:.5"'}></div>
-                    <div class="admin-field"><label>Name</label>
-                        <input type="text" id="ae_name" value="${v('name')}"></div>
-                    <div class="admin-field"><label>Type</label>
-                        <input type="text" id="ae_type" value="${v('type')}"></div>
-                    <div class="admin-field"><label>Rarity</label>
-                        <input type="text" id="ae_rarity" value="${v('rarity','common')}"></div>
-                    <div class="admin-field"><label>Slot</label>
-                        <input type="text" id="ae_slot_id1" value="${v('slot_id1')}"></div>
-                    <div class="admin-field"><label>Description</label>
-                        <textarea id="ae_description">${v('description')}</textarea></div>
-                </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+                <div class="admin-field"><label>ID</label>
+                    <input type="text" id="ae_id" value="${v('id')}" ${isNew?'':'readonly style="opacity:.5"'}></div>
+                <div class="admin-field"><label>Name</label>
+                    <input type="text" id="ae_name" value="${v('name')}"></div>
+                <div class="admin-field"><label>Type</label>
+                    <select id="ae_type">${TYPE_OPTIONS}</select></div>
+                <div class="admin-field"><label>Slot</label>
+                    <select id="ae_slot_id1">${SLOT_OPTIONS}</select></div>
+                <div class="admin-field"><label>Tier</label>
+                    <input type="number" id="ae_tier" value="${n('tier',0)}" min="0" max="8"></div>
+                <div class="admin-field"><label>Armor Value</label>
+                    <input type="number" id="ae_armor" value="${n('armor',0)}"></div>
+                <div class="admin-field"><label>Delay (1=fast 2=normal 3=slow)</label>
+                    <input type="number" id="ae_delay" value="${n('delay',2)}" min="1" max="3"></div>
+                <div class="admin-field" style="grid-column:span 2"><label>Description</label>
+                    <textarea id="ae_description" style="width:100%;height:50px;">${v('description')}</textarea></div>
+            </div>
 
-                <div class="admin-editor-section">
-                    <h3>Damage</h3>
-                    <div class="admin-stats-grid">
-                        <div class="admin-field"><label>DMG 1</label><input type="number" id="ae_dmg1" value="${v('dmg1',0)}"></div>
-                        <div class="admin-field"><label>Type 1</label><input type="text" id="ae_dmg_type_1" value="${v('dmg_type_1')}"></div>
-                        <div class="admin-field"><label>DMG 2</label><input type="number" id="ae_dmg2" value="${v('dmg2',0)}"></div>
-                        <div class="admin-field"><label>Type 2</label><input type="text" id="ae_dmg_type_2" value="${v('dmg_type_2')}"></div>
-                    </div>
-                </div>
+            <div style="color:#8b7355;font-size:.75rem;letter-spacing:1px;text-transform:uppercase;margin:8px 0 4px;">Damage</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px;">
+                <div class="admin-field"><label>DMG 1</label><input type="number" id="ae_dmg1" value="${n('dmg1',0)}"></div>
+                <div class="admin-field"><label>Type 1</label><select id="ae_dmg_type_1">${DMG_TYPES}</select></div>
+                <div class="admin-field"><label>DMG 2</label><input type="number" id="ae_dmg2" value="${n('dmg2',0)}"></div>
+                <div class="admin-field"><label>Type 2</label><select id="ae_dmg_type_2">${DMG_TYPES2}</select></div>
+            </div>
 
-                <div class="admin-editor-section">
-                    <h3>Defense &amp; Stats</h3>
-                    <div class="admin-stats-grid">
-                        <div class="admin-field"><label>Armor</label><input type="number" id="ae_armor" value="${v('armor',0)}"></div>
-                        <div class="admin-field"><label>Delay (1-3)</label><input type="number" id="ae_delay" value="${v('delay',2)}" min="1" max="3"></div>
-                    </div>
-                    <div style="margin-top:10px;color:#888;font-size:.85em">Stat Bonuses</div>
-                    <div class="admin-stats-grid" style="margin-top:6px">
-                        <div class="admin-field"><label>Conv.</label><input type="number" id="ae_sc" value="${sb.conviction||0}"></div>
-                        <div class="admin-field"><label>End.</label><input type="number" id="ae_se" value="${sb.endurance||0}"></div>
-                        <div class="admin-field"><label>Amb.</label><input type="number" id="ae_sa" value="${sb.ambition||0}"></div>
-                        <div class="admin-field"><label>Harm.</label><input type="number" id="ae_sh" value="${sb.harmony||0}"></div>
-                    </div>
-                </div>
+            <div style="color:#8b7355;font-size:.75rem;letter-spacing:1px;text-transform:uppercase;margin:8px 0 4px;">Stat Bonuses</div>
+            <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:8px;">
+                <div class="admin-field"><label>CON</label><input type="number" id="ae_con" value="${n('con',0)}"></div>
+                <div class="admin-field"><label>END</label><input type="number" id="ae_end" value="${n('end',0)}"></div>
+                <div class="admin-field"><label>AMB</label><input type="number" id="ae_amb" value="${n('amb',0)}"></div>
+                <div class="admin-field"><label>HAR</label><input type="number" id="ae_har" value="${n('har',0)}"></div>
+                <div class="admin-field"><label>HP</label><input type="number" id="ae_hp" value="${n('hp',0)}"></div>
+                <div class="admin-field"><label>Mana</label><input type="number" id="ae_mana" value="${n('mana',0)}"></div>
+                <div class="admin-field"><label>Stam</label><input type="number" id="ae_stam" value="${n('stam',0)}"></div>
+            </div>
 
-                <div class="admin-editor-section">
-                    <h3>On-Hit Procs</h3>
-                    <div class="admin-stats-grid">
-                        <div class="admin-field"><label>Skill 1</label><input type="text" id="ae_oh1id" value="${v('onhit_skillid_1')}"></div>
-                        <div class="admin-field"><label>Chance 1 %</label><input type="number" id="ae_oh1ch" value="${v('onhit_skillchance_1',0)}"></div>
-                        <div class="admin-field"><label>Skill 2</label><input type="text" id="ae_oh2id" value="${v('onhit_skillid_2')}"></div>
-                        <div class="admin-field"><label>Chance 2 %</label><input type="number" id="ae_oh2ch" value="${v('onhit_skillchance_2',0)}"></div>
-                    </div>
-                </div>
+            <div style="color:#8b7355;font-size:.75rem;letter-spacing:1px;text-transform:uppercase;margin:8px 0 4px;">On-Hit Procs</div>
+            <div style="display:grid;grid-template-columns:1fr 80px 1fr 80px;gap:8px;margin-bottom:8px;">
+                <div class="admin-field"><label>Proc Skill 1 ID</label><input type="text" id="ae_oh1id" value="${v('onhit_skillid_1')}"></div>
+                <div class="admin-field"><label>Chance %</label><input type="number" id="ae_oh1ch" value="${n('onhit_skillchance_1',0)}"></div>
+                <div class="admin-field"><label>Proc Skill 2 ID</label><input type="text" id="ae_oh2id" value="${v('onhit_skillid_2')}"></div>
+                <div class="admin-field"><label>Chance %</label><input type="number" id="ae_oh2ch" value="${n('onhit_skillchance_2',0)}"></div>
+            </div>
 
-                <div class="admin-actions">
-                    <button class="admin-btn-save" onclick="adminSaveItem(${isNew})">
-                        ${isNew ? '✅ Create' : '💾 Save'}
-                    </button>
-                    ${!isNew ? `<button class="admin-btn-cancel" style="background:#8b2222"
-                        onclick="adminDeleteItem('${editingItemId}')">🗑️ Delete</button>` : ''}
-                    <button class="admin-btn-cancel" onclick="adminBackToList()">Cancel</button>
-                </div>
-            </div>`;
+            <div style="color:#8b7355;font-size:.75rem;letter-spacing:1px;text-transform:uppercase;margin:8px 0 4px;">Flags</div>
+            <div style="display:flex;gap:16px;margin-bottom:12px;font-size:.85em;">
+                <label><input type="checkbox" id="ae_unique" ${item?.unique?'checked':''}> Unique</label>
+                <label><input type="checkbox" id="ae_consumable" ${item?.consumable?'checked':''}> Consumable</label>
+                <label><input type="checkbox" id="ae_stackable" ${item?.stackable?'checked':''}> Stackable</label>
+            </div>
+
+            <div style="display:flex;gap:8px;">
+                <button class="admin-btn-save" onclick="adminSaveItem(${isNew})">${isNew ? '✅ Create' : '💾 Save'}</button>
+                ${!isNew ? `<button class="admin-btn-cancel" style="background:#8b2222;" onclick="adminDeleteItem('${editingItemId}')">🗑️ Delete</button>` : ''}
+                <button class="admin-btn-cancel" onclick="adminBackToList()">Cancel</button>
+            </div>
+        </div>`;
     }
 
     window.adminBackToList = function() {
         editingItemId = null;
+        const wrap = document.getElementById('adminTabContent_items');
+        if (wrap) {
+            wrap.innerHTML = `
+                <div class="admin-search">
+                    <input type="text" class="admin-search-input" placeholder="Search items..."
+                           id="adminSearchInput" oninput="adminFilterItems(this.value)">
+                    <button class="admin-btn-create" onclick="openAdminEditor()">+ Create Item</button>
+                </div>
+                <div class="admin-items-list" id="adminItemsList"></div>`;
+        }
         renderList(adminItems);
     };
 
@@ -195,40 +196,40 @@
         const id = document.getElementById('ae_id')?.value.trim();
         if (!id) { alert('ID is required.'); return; }
 
-        const num = id => { const n = parseFloat(document.getElementById(id)?.value); return isNaN(n)||n===0 ? undefined : n; };
-        const str = id => { const s = document.getElementById(id)?.value.trim(); return s||undefined; };
-
-        const statBonuses = {
-            conviction: parseFloat(document.getElementById('ae_sc')?.value)||0,
-            endurance:  parseFloat(document.getElementById('ae_se')?.value)||0,
-            ambition:   parseFloat(document.getElementById('ae_sa')?.value)||0,
-            harmony:    parseFloat(document.getElementById('ae_sh')?.value)||0,
-        };
+        const num = (eid) => { const n = parseFloat(document.getElementById(eid)?.value); return isNaN(n)||n===0 ? undefined : n; };
+        const str = (eid) => { const s = document.getElementById(eid)?.value?.trim(); return s||undefined; };
+        const chk = (eid) => document.getElementById(eid)?.checked || false;
 
         const payload = {
             id,
             name:               document.getElementById('ae_name')?.value.trim() || id,
             type:               str('ae_type'),
-            rarity:             str('ae_rarity') || 'common',
-            description:        str('ae_description'),
             slot_id1:           str('ae_slot_id1'),
+            tier:               parseInt(document.getElementById('ae_tier')?.value)||0,
+            description:        str('ae_description'),
             dmg1:               num('ae_dmg1'),
             dmg_type_1:         str('ae_dmg_type_1'),
             dmg2:               num('ae_dmg2'),
             dmg_type_2:         str('ae_dmg_type_2'),
             armor:              num('ae_armor'),
             delay:              num('ae_delay'),
+            con:                num('ae_con'),
+            end:                num('ae_end'),
+            amb:                num('ae_amb'),
+            har:                num('ae_har'),
+            hp:                 num('ae_hp'),
+            mana:               num('ae_mana'),
+            stam:               num('ae_stam'),
             onhit_skillid_1:    str('ae_oh1id'),
             onhit_skillchance_1:num('ae_oh1ch'),
             onhit_skillid_2:    str('ae_oh2id'),
             onhit_skillchance_2:num('ae_oh2ch'),
+            unique:             chk('ae_unique') || undefined,
+            consumable:         chk('ae_consumable') || undefined,
+            stackable:          chk('ae_stackable') || undefined,
         };
 
-        // Only include statBonuses if at least one is non-zero
-        if (Object.values(statBonuses).some(v => v !== 0)) payload.statBonuses = statBonuses;
-
-        // Strip undefined
-        Object.keys(payload).forEach(k => { if (payload[k] === undefined) delete payload[k]; });
+        Object.keys(payload).forEach(k => { if (payload[k] === undefined || payload[k] === false) delete payload[k]; });
 
         try {
             const method = isNew ? 'POST' : 'PUT';
@@ -248,7 +249,6 @@
             adminBackToList();
         } catch (err) {
             alert('Save failed: ' + err.message);
-            console.error('[ADMIN]', err);
         }
     };
 
@@ -262,11 +262,9 @@
             adminBackToList();
         } catch (err) {
             alert('Delete failed: ' + err.message);
-            console.error('[ADMIN]', err);
         }
     };
 
-    // ── Utility ───────────────────────────────────────────────────────────────
     function esc(s) {
         return String(s)
             .replace(/&/g,'&amp;').replace(/"/g,'&quot;')
@@ -275,25 +273,30 @@
 
 })();
 
-// ── Skill Tree Tab ────────────────────────────────────────────────────────────
+// ── Tab switcher ──────────────────────────────────────────────────────────────
 
 window.switchAdminTab = function(tab) {
-    const tabs = ['items', 'skills', 'characters', 'snapshots', 'db'];
+    const tabs = ['items', 'skills', 'enemies', 'characters', 'snapshots', 'db'];
     tabs.forEach(t => {
         const content = document.getElementById('adminTabContent_' + t);
         if (content) content.style.display = t === tab ? 'block' : 'none';
-        const btn = document.getElementById('adminTab_' + t) ||
-                    document.getElementById('adminTabItems'); // fallback for items
-        if (btn && btn.id === 'adminTab_' + t) btn.style.background = t === tab ? '' : '#2a3a2a';
     });
-    // items tab button has different ID
+    // Items tab has a different button ID
     const itemsBtn = document.getElementById('adminTabItems');
     if (itemsBtn) itemsBtn.style.background = tab === 'items' ? '' : '#2a3a2a';
+    tabs.filter(t => t !== 'items').forEach(t => {
+        const btn = document.getElementById('adminTab_' + t);
+        if (btn) btn.style.background = t === tab ? '' : '#2a3a2a';
+    });
+
     if (tab === 'skills')     renderAdminSkillTree();
+    if (tab === 'enemies')    loadAdminEnemies();
     if (tab === 'characters') loadAdminCharacters();
     if (tab === 'snapshots')  loadAdminSnapshots();
     if (tab === 'db')         renderAdminDB();
 };
+
+// ── Skill Tree Tab (read-only combo view) ─────────────────────────────────────
 
 window.renderAdminSkillTree = function() {
     const container = document.getElementById('adminSkillTreeContent');
@@ -360,6 +363,201 @@ window.filterSkillTree = function(query) {
     });
 };
 
+// ── Enemies Tab ───────────────────────────────────────────────────────────────
+
+let _adminEnemies = [];
+let _adminEnemyEditing = null;
+
+async function loadAdminEnemies() {
+    const el = document.getElementById('adminTabContent_enemies');
+    if (!el) return;
+    el.innerHTML = '<p style="color:#aaa;padding:12px;">Loading...</p>';
+    try {
+        const res = await fetch(BACKEND_URL + '/api/admin/data/enemies');
+        _adminEnemies = await res.json();
+        renderEnemyList();
+    } catch(e) { el.innerHTML = `<p style="color:#f88;padding:12px;">Error: ${e.message}</p>`; }
+}
+
+function renderEnemyList() {
+    const el = document.getElementById('adminTabContent_enemies');
+    if (!el) return;
+
+    const rows = _adminEnemies.map((e, i) => {
+        const s = e.stats || {};
+        return `<tr style="border-bottom:1px solid #1a1a1a;cursor:pointer;" onclick="openAdminEnemy(${i})">
+            <td style="padding:5px 8px;color:#d4af37;">${e.name}</td>
+            <td style="padding:5px 8px;color:#666;font-size:.8em;">${e.id}</td>
+            <td style="padding:5px 8px;text-align:center;">${s.conviction||0}</td>
+            <td style="padding:5px 8px;text-align:center;">${s.endurance||0}</td>
+            <td style="padding:5px 8px;text-align:center;">${s.ambition||0}</td>
+            <td style="padding:5px 8px;text-align:center;">${s.harmony||0}</td>
+            <td style="padding:5px 8px;text-align:center;">${e.armorValue||0}</td>
+            <td style="padding:5px 8px;color:#888;font-size:.75em;">${(e.availableSkills||[]).slice(0,3).join(', ')}${(e.availableSkills||[]).length>3?'…':''}</td>
+        </tr>`;
+    }).join('');
+
+    el.innerHTML = `
+        <div style="padding:8px;">
+            <div style="display:flex;gap:8px;margin-bottom:8px;">
+                <input type="text" placeholder="Filter enemies..." oninput="filterAdminEnemies(this.value)"
+                    style="flex:1;padding:5px 8px;background:#0f1923;color:#d4af37;border:1px solid #333;border-radius:4px;font-size:.85em;">
+                <button onclick="openAdminEnemy(-1)" style="padding:5px 12px;background:#1a3a1a;border:1px solid #3a6a3a;color:#8fa;cursor:pointer;border-radius:4px;">+ New</button>
+            </div>
+            <div style="overflow-x:auto;">
+            <table style="width:100%;border-collapse:collapse;font-size:.82em;" id="adminEnemyTable">
+                <thead><tr style="color:#8b7355;border-bottom:1px solid #333;font-size:.75em;letter-spacing:.5px;">
+                    <th style="text-align:left;padding:4px 8px;">Name</th>
+                    <th style="text-align:left;padding:4px 8px;">ID</th>
+                    <th style="text-align:center;padding:4px 8px;">CON</th>
+                    <th style="text-align:center;padding:4px 8px;">END</th>
+                    <th style="text-align:center;padding:4px 8px;">AMB</th>
+                    <th style="text-align:center;padding:4px 8px;">HAR</th>
+                    <th style="text-align:center;padding:4px 8px;">ARM</th>
+                    <th style="text-align:left;padding:4px 8px;">Skills</th>
+                </tr></thead>
+                <tbody id="adminEnemyBody">${rows}</tbody>
+            </table></div>
+        </div>`;
+}
+
+window.filterAdminEnemies = function(q) {
+    const lq = q.toLowerCase();
+    document.querySelectorAll('#adminEnemyBody tr').forEach((row, i) => {
+        const e = _adminEnemies[i];
+        if (!e) return;
+        const match = e.name.toLowerCase().includes(lq) || e.id.toLowerCase().includes(lq) ||
+            (e.availableSkills||[]).some(s => s.toLowerCase().includes(lq));
+        row.style.display = match ? '' : 'none';
+    });
+};
+
+window.openAdminEnemy = function(idx) {
+    _adminEnemyEditing = idx;
+    const e = idx >= 0 ? _adminEnemies[idx] : null;
+    const isNew = !e;
+    const el = document.getElementById('adminTabContent_enemies');
+    if (!el) return;
+
+    const s = e?.stats || {};
+    const eq = e?.equipment || {};
+    const v = (k, fb='') => String(e?.[k] ?? fb).replace(/"/g, '&quot;');
+
+    el.innerHTML = `
+        <div style="overflow-y:auto;max-height:65vh;padding:8px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+                <button onclick="loadAdminEnemies()" style="padding:4px 10px;background:#1a2a1a;border:1px solid #3a5a3a;color:#8fa;cursor:pointer;border-radius:4px;">← Back</button>
+                <span style="color:#d4af37;font-weight:bold;">${isNew ? '➕ New Enemy' : '✏️ ' + (e.name||'')}</span>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+                <div class="admin-field"><label>ID</label>
+                    <input type="text" id="ene_id" value="${v('id')}" ${isNew?'':'readonly style="opacity:.5"'}></div>
+                <div class="admin-field"><label>Name</label>
+                    <input type="text" id="ene_name" value="${v('name')}"></div>
+                <div class="admin-field" style="grid-column:span 2"><label>Description</label>
+                    <textarea id="ene_desc" style="width:100%;height:50px;">${v('description')}</textarea></div>
+                <div class="admin-field"><label>AI Profile</label>
+                    <select id="ene_ai">
+                        ${['balanced','aggressive','cautious','support','tactical','berserker'].map(p =>
+                            `<option value="${p}" ${(e?.aiProfile||'balanced')===p?'selected':''}>${p}</option>`).join('')}
+                    </select></div>
+                <div class="admin-field"><label>Armor Value</label>
+                    <input type="number" id="ene_armor" value="${e?.armorValue||0}"></div>
+                <div class="admin-field"><label>Skill Selection Count</label>
+                    <input type="number" id="ene_skillcount" value="${e?.skillSelectionCount||2}" min="1" max="5"></div>
+                <div class="admin-field"><label>Main Hand Weapon ID</label>
+                    <input type="text" id="ene_weapon" value="${eq.mainHand||''}"></div>
+            </div>
+
+            <div style="color:#8b7355;font-size:.75rem;letter-spacing:1px;text-transform:uppercase;margin:8px 0 4px;">Stats</div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:8px;">
+                <div class="admin-field"><label>Conviction</label><input type="number" id="ene_con" value="${s.conviction||0}"></div>
+                <div class="admin-field"><label>Endurance</label><input type="number" id="ene_end" value="${s.endurance||0}"></div>
+                <div class="admin-field"><label>Ambition</label><input type="number" id="ene_amb" value="${s.ambition||0}"></div>
+                <div class="admin-field"><label>Harmony</label><input type="number" id="ene_har" value="${s.harmony||0}"></div>
+            </div>
+
+            <div style="color:#8b7355;font-size:.75rem;letter-spacing:1px;text-transform:uppercase;margin:8px 0 4px;">Available Skills (comma-separated IDs)</div>
+            <div class="admin-field" style="margin-bottom:8px;">
+                <textarea id="ene_skills" style="width:100%;height:60px;font-family:monospace;font-size:.82em;">${(e?.availableSkills||[]).join(', ')}</textarea>
+            </div>
+
+            <div style="color:#8b7355;font-size:.75rem;letter-spacing:1px;text-transform:uppercase;margin:8px 0 4px;">Tags (comma-separated)</div>
+            <div class="admin-field" style="margin-bottom:12px;">
+                <input type="text" id="ene_tags" value="${(e?.tags||[]).join(', ')}">
+            </div>
+
+            <div style="display:flex;gap:8px;">
+                <button class="admin-btn-save" onclick="adminSaveEnemy(${isNew})">${isNew ? '✅ Create' : '💾 Save'}</button>
+                ${!isNew ? `<button class="admin-btn-cancel" style="background:#8b2222;" onclick="adminDeleteEnemy()">🗑️ Delete</button>` : ''}
+                <button class="admin-btn-cancel" onclick="loadAdminEnemies()">Cancel</button>
+            </div>
+        </div>`;
+};
+
+window.adminSaveEnemy = async function(isNew) {
+    const id = document.getElementById('ene_id')?.value.trim();
+    if (!id) { alert('ID is required.'); return; }
+
+    const skillsRaw = document.getElementById('ene_skills')?.value || '';
+    const tagsRaw   = document.getElementById('ene_tags')?.value || '';
+
+    const payload = {
+        id,
+        name:        document.getElementById('ene_name')?.value.trim() || id,
+        description: document.getElementById('ene_desc')?.value.trim() || '',
+        aiProfile:   document.getElementById('ene_ai')?.value || 'balanced',
+        armorValue:  parseInt(document.getElementById('ene_armor')?.value) || 0,
+        skillSelectionCount: parseInt(document.getElementById('ene_skillcount')?.value) || 2,
+        stats: {
+            conviction: parseInt(document.getElementById('ene_con')?.value) || 0,
+            endurance:  parseInt(document.getElementById('ene_end')?.value) || 0,
+            ambition:   parseInt(document.getElementById('ene_amb')?.value) || 0,
+            harmony:    parseInt(document.getElementById('ene_har')?.value) || 0,
+        },
+        equipment: { mainHand: document.getElementById('ene_weapon')?.value.trim() || null },
+        availableSkills: skillsRaw.split(',').map(s => s.trim()).filter(Boolean),
+        tags: tagsRaw.split(',').map(s => s.trim()).filter(Boolean),
+    };
+
+    if (isNew) {
+        _adminEnemies.push(payload);
+    } else {
+        // Merge — preserve fields we don't edit (lootTable, etc.)
+        _adminEnemies[_adminEnemyEditing] = { ..._adminEnemies[_adminEnemyEditing], ...payload };
+    }
+
+    try {
+        const res = await fetch(BACKEND_URL + '/api/admin/data/enemies', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(_adminEnemies)
+        });
+        const data = await res.json();
+        if (data.success) {
+            if (typeof showSuccess === 'function') showSuccess(`Enemy "${payload.name}" saved. Reload game to see changes.`);
+            loadAdminEnemies();
+        } else throw new Error(data.error || 'Save failed');
+    } catch(e) { alert('Save failed: ' + e.message); }
+};
+
+window.adminDeleteEnemy = async function() {
+    if (_adminEnemyEditing < 0) return;
+    const e = _adminEnemies[_adminEnemyEditing];
+    if (!confirm(`Delete "${e.name}"? This cannot be undone.`)) return;
+    _adminEnemies.splice(_adminEnemyEditing, 1);
+    try {
+        await fetch(BACKEND_URL + '/api/admin/data/enemies', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(_adminEnemies)
+        });
+        if (typeof showSuccess === 'function') showSuccess(`Enemy deleted.`);
+        loadAdminEnemies();
+    } catch(e) { alert('Delete failed: ' + e.message); }
+};
+
 // ── Characters Tab ────────────────────────────────────────────────────────────
 
 async function loadAdminCharacters() {
@@ -380,14 +578,14 @@ async function loadAdminCharacters() {
                     <th style="padding:6px;"></th>
                 </tr></thead>
                 <tbody>${rows.map(r => `
-                    <tr style="border-bottom:1px solid #222;" id="char-row-${esc(r.id)}">
-                        <td style="padding:6px;">${esc(r.name)}</td>
-                        <td style="padding:6px;color:#aaa;">${esc(r.race)}</td>
+                    <tr style="border-bottom:1px solid #222;" id="char-row-${r.id}">
+                        <td style="padding:6px;">${r.name}</td>
+                        <td style="padding:6px;color:#aaa;">${r.race}</td>
                         <td style="padding:6px;text-align:center;">${r.level}</td>
                         <td style="padding:6px;text-align:center;">${(r.experience||0).toLocaleString()}</td>
                         <td style="padding:6px;text-align:right;">
-                            <button onclick="adminViewCharacter('${esc(r.id)}')" style="margin-right:4px;padding:2px 8px;background:#1a2a3a;border:1px solid #345;color:#8af;cursor:pointer;border-radius:3px;">View</button>
-                            <button onclick="adminDeleteCharacter('${esc(r.id)}','${esc(r.name)}')" style="padding:2px 8px;background:#2a1a1a;border:1px solid #533;color:#f88;cursor:pointer;border-radius:3px;">Delete</button>
+                            <button onclick="adminViewCharacter('${r.id}')" style="margin-right:4px;padding:2px 8px;background:#1a2a3a;border:1px solid #345;color:#8af;cursor:pointer;border-radius:3px;">View</button>
+                            <button onclick="adminDeleteCharacter('${r.id}','${r.name}')" style="padding:2px 8px;background:#2a1a1a;border:1px solid #533;color:#f88;cursor:pointer;border-radius:3px;">Delete</button>
                         </td>
                     </tr>`).join('')}
                 </tbody>
@@ -437,14 +635,14 @@ async function loadAdminSnapshots() {
                     <th style="padding:6px;"></th>
                 </tr></thead>
                 <tbody>${rows.map(r => `
-                    <tr style="border-bottom:1px solid #222;" id="snap-row-${esc(r.snapshot_id)}">
-                        <td style="padding:6px;">${esc(r.character_name)}</td>
-                        <td style="padding:6px;color:#aaa;font-family:monospace;">${esc(r.share_code)}</td>
+                    <tr style="border-bottom:1px solid #222;" id="snap-row-${r.snapshot_id}">
+                        <td style="padding:6px;">${r.character_name}</td>
+                        <td style="padding:6px;color:#aaa;font-family:monospace;">${r.share_code}</td>
                         <td style="padding:6px;text-align:center;">${r.level}</td>
                         <td style="padding:6px;text-align:center;">${r.is_public ? '✓' : '—'}</td>
                         <td style="padding:6px;text-align:center;">${r.import_count||0}</td>
                         <td style="padding:6px;text-align:right;">
-                            <button onclick="adminDeleteSnapshot('${esc(r.snapshot_id)}','${esc(r.character_name)}')" style="padding:2px 8px;background:#2a1a1a;border:1px solid #533;color:#f88;cursor:pointer;border-radius:3px;">Delete</button>
+                            <button onclick="adminDeleteSnapshot('${r.snapshot_id}','${r.character_name}')" style="padding:2px 8px;background:#2a1a1a;border:1px solid #533;color:#f88;cursor:pointer;border-radius:3px;">Delete</button>
                         </td>
                     </tr>`).join('')}
                 </tbody>
@@ -495,7 +693,7 @@ window.adminRunQuery = async function() {
             body: JSON.stringify({ sql })
         });
         const data = await res.json();
-        if (data.error) { results.innerHTML = `<p style="color:#f88;">${esc(data.error)}</p>`; return; }
+        if (data.error) { results.innerHTML = `<p style="color:#f88;">${data.error}</p>`; return; }
         if (!data.rows.length) { results.innerHTML = '<p style="color:#888;">No results.</p>'; return; }
         const cols = Object.keys(data.rows[0]);
         results.innerHTML = `
@@ -503,11 +701,11 @@ window.adminRunQuery = async function() {
             <div style="overflow-x:auto;">
             <table style="width:100%;border-collapse:collapse;font-size:.8em;">
                 <thead><tr style="color:#aaa;border-bottom:1px solid #333;">
-                    ${cols.map(c => `<th style="text-align:left;padding:4px 8px;">${esc(c)}</th>`).join('')}
+                    ${cols.map(c => `<th style="text-align:left;padding:4px 8px;">${c}</th>`).join('')}
                 </tr></thead>
                 <tbody>${data.rows.map(row => `
                     <tr style="border-bottom:1px solid #1a1a1a;">
-                        ${cols.map(c => `<td style="padding:4px 8px;color:#ccc;">${esc(String(row[c] ?? ''))}</td>`).join('')}
+                        ${cols.map(c => `<td style="padding:4px 8px;color:#ccc;">${String(row[c] ?? '')}</td>`).join('')}
                     </tr>`).join('')}
                 </tbody>
             </table></div>`;
