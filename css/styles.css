@@ -1535,11 +1535,15 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
 }
 
 .stat-total-val {
-    color: #d4af37;
+    color: #8B7355;
     font-size: 1.1rem;
     font-weight: bold;
     min-width: 28px;
     text-align: center;
+}
+
+.stat-total-val.stat-allocated {
+    color: #F0CE60;
 }
 
 .stat-btn {

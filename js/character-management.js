@@ -447,8 +447,8 @@ function renderStatAllocation() {
 
                 <div class="stat-alloc-values">
                     
-                    ${alloc > 0 ? `<span class="stat-alloc-val">+${alloc}</span>` : ''}
-                    <span class="stat-total-val">${total}</span>
+                    <span class="stat-total-val ${alloc > 0 ? 'stat-allocated' : ''}">${total}</span>
+               
                 </div>
 
                 <button class="stat-btn stat-btn-add ${canAdd ? '' : 'stat-btn-disabled'}"

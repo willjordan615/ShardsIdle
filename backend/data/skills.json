@@ -1758,7 +1758,7 @@
     "id": "shove",
     "name": "Shove",
     "category": "DAMAGE_SINGLE",
-    "description": "Push an enemy back with force.",
+    "description": "Push an enemy back with force. Scales with Conviction primarily. Causes the Knockback condition, increasing enemy skill delay.",
     "basePower": 0.8,
     "costType": "stamina",
     "costAmount": 8,
