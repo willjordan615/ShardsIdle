@@ -7275,7 +7275,7 @@
   {
     "id": "neuro_toxin",
     "name": "Neuro Toxin",
-    "description": "Electric shock delivers poison directly to the nervous system.",
+    "description": "Nerve toxin, deals nature damage with a chance to stun and poison.",
     "category": "DAMAGE_MAGIC",
     "parentSkills": [
       "shock",
@@ -7294,7 +7294,7 @@
     "effects": [
       {
         "type": "damage",
-        "damageType": "electric",
+        "damageType": "nature",
         "chance": 1.0
       },
       {
