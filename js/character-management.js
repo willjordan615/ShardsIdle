@@ -9,6 +9,7 @@ function initCharacterCreation() {
     renderSkillSelection();
     renderWeaponSelection();
     renderStatAllocation();
+    if (typeof window.updateCombatStyleDesc === 'function') window.updateCombatStyleDesc();
 }
 
 /**
@@ -399,53 +400,144 @@ function renderWeaponSelection() {
 }
 
 /**
- * Render stat allocation UI
+ * Render stat allocation UI — new layout with inline base value, expand/collapse descriptions
  */
 function renderStatAllocation() {
     const container = document.getElementById('statAllocationContainer');
     if (!container) return;
-    
+
+    const race      = currentState.selectedRace;
     const allocated = currentState.allocatedStats;
     const remaining = currentState.pointsRemaining;
-    
-    container.innerHTML = `
-        <p style="margin-bottom: 1rem; color: #d4af37;">Points Remaining: ${remaining}</p>
-        <div class="stat-allocation-grid">
-            <div class="stat-allocation-item">
-                <div class="stat-tooltip" data-tooltip="Raw force of will. Primary damage stat for fighters and fire/arcane/lightning mages. Raises HP, Stamina, and hit chance.">Conviction</div>
-                <div style="display: flex; gap: 0.5rem; align-items: center; justify-content: center;">
-                    <button onclick="modifyStat('conviction', -1)" class="mini-btn">−</button>
-                    <div class="stat-value" style="min-width: 30px; text-align: center;">${allocated.conviction}</div>
-                    <button onclick="modifyStat('conviction', 1)" class="mini-btn" ${remaining <= 0 ? 'disabled' : ''}>+</button>
+
+    // Update points badge
+    const badge = document.getElementById('pointsRemainingBadge');
+    if (badge) {
+        badge.textContent = remaining > 0
+            ? `${remaining} point${remaining !== 1 ? 's' : ''} remaining`
+            : '✓ All points allocated';
+        badge.style.color = remaining > 0 ? '#d4af37' : '#4cd964';
+    }
+
+    const stats = ['conviction','endurance','ambition','harmony'];
+
+    container.innerHTML = stats.map(stat => {
+        const def       = typeof STAT_DEFINITIONS !== 'undefined' ? STAT_DEFINITIONS[stat] : null;
+        const base      = race?.baseStats?.[stat] ?? 0;
+        const alloc     = allocated[stat] ?? 0;
+        const total     = base + alloc;
+        const canSub    = alloc > 0;
+        const canAdd    = remaining > 0;
+        const effectsHtml = def ? def.effects.map(e =>
+            `<div style="padding:2px 0; font-size:0.82rem; color:#888;">${e}</div>`
+        ).join('') : '';
+
+        return `
+        <div class="stat-alloc-row" id="statrow_${stat}">
+            <div class="stat-alloc-main">
+                <button class="stat-btn stat-btn-sub ${canSub ? '' : 'stat-btn-disabled'}"
+                    data-stat="${stat}" data-dir="-1"
+                    onmousedown="startStatHold('${stat}',-1)"
+                    onmouseup="stopStatHold()"
+                    onmouseleave="stopStatHold()"
+                    ontouchstart="startStatHold('${stat}',-1)"
+                    ontouchend="stopStatHold()"
+                    onclick="modifyStat('${stat}',-1)"
+                    ${canSub ? '' : 'disabled'}>−</button>
+
+                <div class="stat-alloc-values">
+                    <span class="stat-base-val" title="Base from race">${base}</span>
+                    ${alloc > 0 ? `<span class="stat-alloc-val">+${alloc}</span>` : ''}
+                    <span class="stat-total-val">${total}</span>
                 </div>
+
+                <button class="stat-btn stat-btn-add ${canAdd ? '' : 'stat-btn-disabled'}"
+                    data-stat="${stat}" data-dir="1"
+                    onmousedown="startStatHold('${stat}',1)"
+                    onmouseup="stopStatHold()"
+                    onmouseleave="stopStatHold()"
+                    ontouchstart="startStatHold('${stat}',1)"
+                    ontouchend="stopStatHold()"
+                    onclick="modifyStat('${stat}',1)"
+                    ${canAdd ? '' : 'disabled'}>+</button>
+
+                <button class="stat-name-btn" onclick="toggleStatDesc('${stat}')"
+                    style="background:none;border:none;cursor:pointer;text-align:left;padding:0 0 0 0.75rem;flex:1;">
+                    <span style="color:#d4af37;font-weight:bold;font-size:0.95rem;text-decoration:underline dotted;text-underline-offset:3px;">
+                        ${def ? def.name : stat}
+                    </span>
+                    <span id="statarrow_${stat}" style="color:#555;font-size:0.75rem;margin-left:6px;">▶</span>
+                </button>
             </div>
-            <div class="stat-allocation-item">
-                <div class="stat-tooltip" data-tooltip="Durability and staying power. Significantly raises HP and Stamina. Contributes a small bonus to physical damage — not a primary offensive stat.">Endurance</div>
-                <div style="display: flex; gap: 0.5rem; align-items: center; justify-content: center;">
-                    <button onclick="modifyStat('endurance', -1)" class="mini-btn">−</button>
-                    <div class="stat-value" style="min-width: 30px; text-align: center;">${allocated.endurance}</div>
-                    <button onclick="modifyStat('endurance', 1)" class="mini-btn" ${remaining <= 0 ? 'disabled' : ''}>+</button>
-                </div>
+            <div id="statdesc_${stat}" class="stat-desc-block" style="display:none;">
+                <p style="color:#aaa;font-style:italic;font-size:0.85rem;margin:0 0 6px 0;line-height:1.5;">
+                    ${def ? def.description : ''}
+                </p>
+                ${effectsHtml}
             </div>
-            <div class="stat-allocation-item">
-                <div class="stat-tooltip" data-tooltip="Speed and cunning. Primary damage stat for rogues and skirmishers, and for lightning/arcane/shadow mages. Main driver of critical strike chance. Also increases item drop rates.">Ambition</div>
-                <div style="display: flex; gap: 0.5rem; align-items: center; justify-content: center;">
-                    <button onclick="modifyStat('ambition', -1)" class="mini-btn">−</button>
-                    <div class="stat-value" style="min-width: 30px; text-align: center;">${allocated.ambition}</div>
-                    <button onclick="modifyStat('ambition', 1)" class="mini-btn" ${remaining <= 0 ? 'disabled' : ''}>+</button>
-                </div>
-            </div>
-            <div class="stat-allocation-item">
-                <div class="stat-tooltip" data-tooltip="Attunement to magic and nature. Primary stat for ice, holy, and nature/poison mages, and all healers. Raises Mana significantly. Also grants a modest XP bonus (up to +40% at harmony 300). No effect on fire, arcane, lightning, or shadow damage.">Harmony</div>
-                <div style="display: flex; gap: 0.5rem; align-items: center; justify-content: center;">
-                    <button onclick="modifyStat('harmony', -1)" class="mini-btn">−</button>
-                    <div class="stat-value" style="min-width: 30px; text-align: center;">${allocated.harmony}</div>
-                    <button onclick="modifyStat('harmony', 1)" class="mini-btn" ${remaining <= 0 ? 'disabled' : ''}>+</button>
-                </div>
-            </div>
-        </div>
-    `;
+        </div>`;
+    }).join('');
 }
+
+/**
+ * Toggle stat description expand/collapse
+ */
+window.toggleStatDesc = function(stat) {
+    const desc  = document.getElementById('statdesc_' + stat);
+    const arrow = document.getElementById('statarrow_' + stat);
+    if (!desc) return;
+    const open = desc.style.display === 'none';
+    // Collapse all others
+    ['conviction','endurance','ambition','harmony'].forEach(s => {
+        const d = document.getElementById('statdesc_' + s);
+        const a = document.getElementById('statarrow_' + s);
+        if (d) d.style.display = 'none';
+        if (a) a.textContent = '▶';
+    });
+    if (open) {
+        desc.style.display = 'block';
+        if (arrow) arrow.textContent = '▼';
+    }
+};
+
+/**
+ * Press-and-hold for stat buttons
+ */
+let _statHoldTimer = null;
+let _statHoldInterval = null;
+
+window.startStatHold = function(stat, dir) {
+    // Single click fires via onclick — hold starts after 400ms
+    _statHoldTimer = setTimeout(() => {
+        _statHoldInterval = setInterval(() => modifyStat(stat, dir), 80);
+    }, 400);
+};
+
+window.stopStatHold = function() {
+    clearTimeout(_statHoldTimer);
+    clearInterval(_statHoldInterval);
+    _statHoldTimer = null;
+    _statHoldInterval = null;
+};
+
+/**
+ * Combat style descriptions for creation screen
+ */
+const COMBAT_STYLE_DESCS = {
+    balanced:    'Adapts fluidly to the situation — finishes wounded enemies, conserves resources across stages, and buffs early in a fight. A solid choice for any build.',
+    aggressive:  'Maximises damage at all times. Almost never buffs or heals, spends resources freely, and targets the weakest enemy to secure kills fast. High risk, high output.',
+    cautious:    'Prioritises survival and utility. Casts defensive skills early, heals proactively, targets the most dangerous enemy first, and conserves resources carefully across long challenges.',
+    support:     'Focuses on healing and buffing allies first. Rarely deals damage. Rescues low-HP party members before acting offensively. Best paired with a damage dealer.',
+    disruptor:   'Heavily favours control and debuff skills. Targets the most dangerous enemy and locks them down. Deals moderate damage but significantly reduces enemy effectiveness.',
+    opportunist: 'Methodically sets up combos and procs. Hits dramatically harder when the target is already debuffed. Targets the most vulnerable enemy and exploits every weakness.',
+};
+
+window.updateCombatStyleDesc = function() {
+    const sel  = document.getElementById('aiProfileSelect');
+    const desc = document.getElementById('combatStyleDesc');
+    if (!sel || !desc) return;
+    desc.textContent = COMBAT_STYLE_DESCS[sel.value] || '';
+};
 
 /**
  * Modify stat allocation
@@ -453,17 +545,22 @@ function renderStatAllocation() {
 function modifyStat(statName, amount) {
     const allocated = currentState.allocatedStats;
     const newValue = allocated[statName] + amount;
-    
+
     if (newValue < 0) return;
     if (amount > 0 && currentState.pointsRemaining <= 0) return;
-    
+
     allocated[statName] = newValue;
     currentState.pointsRemaining -= amount;
-    
-    updateStatDisplay();
+
     renderStatAllocation();
 }
 
+/**
+ * Update stat display — now a no-op since renderStatAllocation handles everything
+ */
+function updateStatDisplay() {
+    renderStatAllocation();
+}
 /**
  * Create a Character - WITH COMPLETE SAVESTATE FIELDS
  */

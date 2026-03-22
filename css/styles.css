@@ -1500,3 +1500,73 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
     from { opacity: 0; transform: translateY(12px); }
     to   { opacity: 1; transform: translateY(0); }
 }
+
+/* ── Stat Allocation — new layout ───────────────────────────────────────── */
+.stat-alloc-row {
+    margin-bottom: 0.75rem;
+    background: rgba(10,14,39,0.4);
+    border: 1px solid #1a2a3a;
+    border-radius: 6px;
+    padding: 0.6rem 0.75rem;
+}
+
+.stat-alloc-main {
+    display: flex;
+    align-items: center;
+    gap: 0;
+}
+
+.stat-alloc-values {
+    display: flex;
+    align-items: baseline;
+    gap: 0.35rem;
+    min-width: 80px;
+    justify-content: center;
+}
+
+.stat-base-val {
+    color: #555;
+    font-size: 0.85rem;
+}
+
+.stat-alloc-val {
+    color: #4cd964;
+    font-size: 0.82rem;
+}
+
+.stat-total-val {
+    color: #d4af37;
+    font-size: 1.1rem;
+    font-weight: bold;
+    min-width: 28px;
+    text-align: center;
+}
+
+.stat-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    border: 1px solid #2a3a4a;
+    background: #0f1923;
+    color: #d4af37;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.1s;
+}
+
+.stat-btn:hover:not(:disabled) { background: #1a2a3a; }
+.stat-btn-disabled, .stat-btn:disabled {
+    color: #333;
+    border-color: #1a1a2a;
+    cursor: not-allowed;
+}
+
+.stat-desc-block {
+    margin-top: 0.6rem;
+    padding-top: 0.6rem;
+    border-top: 1px solid #1a2a3a;
+}

@@ -41,7 +41,7 @@
             const res  = await fetch(BACKEND_URL + '/api/admin/items');
             const data = await res.json();
             adminItems = data.items || [];
-            renderList(adminItems);
+            window.adminBackToList(); // renders search bar + fills list
         } catch (err) {
             console.error('[ADMIN] load failed:', err);
         }
@@ -786,6 +786,17 @@ window.openAdminSkill = function(idx) {
 
     const isChild = !!(s?.parentSkills?.length === 2);
     const hitCountType = s?.hitCount?.min !== undefined ? 'range' : 'fixed';
+    const hitFixed = s?.hitCount?.fixed ?? 1;
+    const hitMin   = s?.hitCount?.min ?? 1;
+    const hitMax   = s?.hitCount?.max ?? 1;
+
+    // Build parent skill dropdown options
+    const parentOpts = ['', ..._adminSkills.map(sk => sk.id)]
+        .map(id => `<option value="${id}">${id || '— none —'}</option>`).join('');
+    const parentOpts1 = ['', ..._adminSkills.map(sk => sk.id)]
+        .map(id => `<option value="${id}" ${(s?.parentSkills?.[0]||'')=== id?'selected':''}>${id || '— none —'}</option>`).join('');
+    const parentOpts2 = ['', ..._adminSkills.map(sk => sk.id)]
+        .map(id => `<option value="${id}" ${(s?.parentSkills?.[1]||'')=== id?'selected':''}>${id || '— none —'}</option>`).join('');
 
     const CATS = ['DAMAGE_SINGLE','DAMAGE_MAGIC','DAMAGE_AOE','DAMAGE_PROC','HEALING','HEALING_AOE','HEALING_PROC','RESTORATION','BUFF','DEFENSE','DEFENSE_PROC','CONTROL','CONTROL_PROC','UTILITY','UTILITY_PROC','TRAP','CONSUMABLE_HEALING','CONSUMABLE_DAMAGE','CONSUMABLE_RESTORATION','CONSUMABLE_ESCAPE','NO_RESOURCES','WEAPON_SKILL'];
     const catOpts = CATS.map(c => `<option value="${c}" ${v('category') === c ? 'selected' : ''}>${c}</option>`).join('');
@@ -795,8 +806,9 @@ window.openAdminSkill = function(idx) {
             <div style="color:#d4af37;font-weight:bold;margin-bottom:8px;">${isNew ? '➕ New Skill' : '✏️ ' + (s.name || '')}</div>
 
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px;">
-                <div class="admin-field"><label>ID</label>
-                    <input type="text" id="sk_id" value="${v('id')}" ${isNew ? '' : 'readonly style="opacity:.5"'}></div>
+                <div class="admin-field"><label>ID ${isNew ? '<span style="color:#555;font-size:.75em">(auto from name, editable)</span>' : ''}</label>
+                    <input type="text" id="sk_id" value="${v('id')}"
+                        ${isNew ? 'oninput="this.dataset.userEdited=\'true\'"' : 'readonly style="opacity:.5"'}></div>
                 <div class="admin-field"><label>Name</label>
                     <input type="text" id="sk_name" value="${v('name')}" oninput="${isNew ? 'adminAutoSkillId(this.value)' : ''}"></div>
                 <div class="admin-field"><label>Category</label>
@@ -819,12 +831,29 @@ window.openAdminSkill = function(idx) {
                     <input type="number" id="sk_delay" value="${n('delay',1000)}"></div>
             </div>
 
+            <div style="color:#8b7355;font-size:.73rem;letter-spacing:1px;text-transform:uppercase;margin:6px 0 3px;">Hit Count</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:6px;">
+                <div class="admin-field"><label>Hit Type</label>
+                    <select id="sk_hittype" onchange="adminToggleHitCountFields()">
+                        <option value="fixed" ${hitCountType==='fixed'?'selected':''}>Fixed</option>
+                        <option value="range" ${hitCountType==='range'?'selected':''}>Random Range</option>
+                    </select></div>
+                <div class="admin-field" id="sk_hitfixed_wrap"><label>Hit Count</label>
+                    <input type="number" id="sk_hitfixed" value="${hitFixed}" min="1" max="10"></div>
+                <div style="display:${hitCountType==='range'?'grid':'none'};grid-template-columns:1fr 1fr;gap:6px;grid-column:span 2;" id="sk_hitrange_wrap">
+                    <div class="admin-field"><label>Min Hits</label>
+                        <input type="number" id="sk_hitmin" value="${hitMin}" min="1" max="10"></div>
+                    <div class="admin-field"><label>Max Hits</label>
+                        <input type="number" id="sk_hitmax" value="${hitMax}" min="1" max="10"></div>
+                </div>
+            </div>
+
             <div class="admin-field" style="margin-bottom:6px;"><label>Description</label>
                 <textarea id="sk_desc" style="width:100%;height:44px;">${v('description')}</textarea></div>
 
             <div style="color:#8b7355;font-size:.73rem;letter-spacing:1px;text-transform:uppercase;margin:6px 0 3px;">Scaling Factors</div>
             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:6px;">
-                <div class="admin-field"><label>Conviction</label><input type="number" step="0.1" id="sk_sc_con" value="${n('scalingFactors.conviction',0)||s?.scalingFactors?.conviction||0}"></div>
+                <div class="admin-field"><label>Conviction</label><input type="number" step="0.1" id="sk_sc_con" value="${s?.scalingFactors?.conviction||0}"></div>
                 <div class="admin-field"><label>Endurance</label><input type="number" step="0.1" id="sk_sc_end" value="${s?.scalingFactors?.endurance||0}"></div>
                 <div class="admin-field"><label>Ambition</label><input type="number" step="0.1" id="sk_sc_amb" value="${s?.scalingFactors?.ambition||0}"></div>
                 <div class="admin-field"><label>Harmony</label><input type="number" step="0.1" id="sk_sc_har" value="${s?.scalingFactors?.harmony||0}"></div>
@@ -838,10 +867,10 @@ window.openAdminSkill = function(idx) {
             <div id="sk_childFields" style="display:${isChild?'block':'none'};margin-bottom:6px;background:rgba(0,0,0,0.2);padding:8px;border-radius:4px;">
                 <div style="color:#8b7355;font-size:.73rem;text-transform:uppercase;margin-bottom:4px;">Parent Skills</div>
                 <div style="display:grid;grid-template-columns:1fr 1fr 80px;gap:6px;">
-                    <div class="admin-field"><label>Parent 1 ID</label>
-                        <input type="text" id="sk_parent1" value="${s?.parentSkills?.[0]||''}"></div>
-                    <div class="admin-field"><label>Parent 2 ID</label>
-                        <input type="text" id="sk_parent2" value="${s?.parentSkills?.[1]||''}"></div>
+                    <div class="admin-field"><label>Parent 1</label>
+                        <select id="sk_parent1" style="width:100%;background:#0f1923;color:#d4af37;border:1px solid #333;border-radius:4px;padding:4px;">${parentOpts1}</select></div>
+                    <div class="admin-field"><label>Parent 2</label>
+                        <select id="sk_parent2" style="width:100%;background:#0f1923;color:#d4af37;border:1px solid #333;border-radius:4px;padding:4px;">${parentOpts2}</select></div>
                     <div class="admin-field"><label>Proc %</label>
                         <input type="number" step="0.01" id="sk_procchance" value="${n('procChance',0.05)}"></div>
                 </div>
@@ -862,6 +891,14 @@ window.openAdminSkill = function(idx) {
 
     _adminRenderEffectsList();
     el.style.display = 'block';
+};
+
+window.adminToggleHitCountFields = function() {
+    const type = document.getElementById('sk_hittype')?.value;
+    const fixedWrap = document.getElementById('sk_hitfixed_wrap');
+    const rangeWrap = document.getElementById('sk_hitrange_wrap');
+    if (fixedWrap) fixedWrap.style.display = type === 'fixed' ? 'block' : 'none';
+    if (rangeWrap) rangeWrap.style.display  = type === 'range' ? 'grid'  : 'none';
 };
 
 window.adminAutoSkillId = function(name) {
@@ -1000,7 +1037,14 @@ window.adminSaveSkill = async function(isNew) {
         critChance:    parseFloat(document.getElementById('sk_critchance')?.value) || 0.05,
         critMultiplier: parseFloat(document.getElementById('sk_critmult')?.value) || 1.5,
         delay:         parseInt(document.getElementById('sk_delay')?.value) || 1000,
-        hitCount:      { fixed: 1 },
+        hitCount: (() => {
+            const ht = document.getElementById('sk_hittype')?.value || 'fixed';
+            if (ht === 'range') {
+                return { min: parseInt(document.getElementById('sk_hitmin')?.value)||1,
+                         max: parseInt(document.getElementById('sk_hitmax')?.value)||1 };
+            }
+            return { fixed: parseInt(document.getElementById('sk_hitfixed')?.value)||1 };
+        })(),
         scalingFactors: {
             conviction: parseFloat(document.getElementById('sk_sc_con')?.value) || 0,
             endurance:  parseFloat(document.getElementById('sk_sc_end')?.value) || 0,

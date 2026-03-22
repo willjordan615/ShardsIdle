@@ -43,7 +43,9 @@
                         <h3>Character Details</h3>
                         <div class="form-group">
                             <label>Name</label>
-                            <input type="text" id="characterName" placeholder="Enter character name">
+                            <input type="text" id="characterName" placeholder="Enter character name"
+                                maxlength="28"
+                                oninput="this.value = this.value.replace(/[^a-zA-Z '\-]/g, '')">
                         </div>
                         <h3 style="margin-top: 2rem;">Choose Race</h3>
                         <div id="raceSelect"></div>
@@ -63,47 +65,26 @@
 
                     <div class="section">
                         <h3>Combat Style</h3>
-                        <p style="color: #8b7355; margin-bottom: 1rem; font-size: 0.9rem;">How this character approaches combat decisions.</p>
                         <div class="form-group">
-                            <select id="aiProfileSelect" style="width:100%;">
-                                <option value="balanced">⚖️ Balanced — Adapts to the situation</option>
-                                <option value="aggressive">⚔️ Aggressive — Always pushes for the kill</option>
-                                <option value="cautious">🛡️ Cautious — Prioritises survival and defense</option>
-                                <option value="support">💚 Support — Heals and buffs allies first</option>
-                                <option value="disruptor">🌀 Disruptor — Focuses on debuffs and control</option>
-                                <option value="opportunist">🗡️ Opportunist — Exploits weaknesses and procs</option>
+                            <select id="aiProfileSelect" style="width:100%;" onchange="updateCombatStyleDesc()">
+                                <option value="balanced">⚖️ Balanced</option>
+                                <option value="aggressive">⚔️ Aggressive</option>
+                                <option value="cautious">🛡️ Cautious</option>
+                                <option value="support">💚 Support</option>
+                                <option value="disruptor">🌀 Disruptor</option>
+                                <option value="opportunist">🗡️ Opportunist</option>
                             </select>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="section">
-                <h3>Base Statistics</h3>
-                <p style="color: #8b7355; margin-bottom: 1rem; font-size: 0.9rem;">These are your starting stats based on your chosen race.</p>
-                <div class="stat-block">
-                    <div class="stat-item">
-                        <div class="stat-label">Conviction</div>
-                        <div class="stat-value" id="statConviction">—</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-label">Endurance</div>
-                        <div class="stat-value" id="statEndurance">—</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-label">Ambition</div>
-                        <div class="stat-value" id="statAmbition">—</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-label">Harmony</div>
-                        <div class="stat-value" id="statHarmony">—</div>
+                        <p id="combatStyleDesc" style="color:#8b7355; font-size:0.85rem; margin-top:0.5rem; line-height:1.5; min-height:2.5rem;"></p>
                     </div>
                 </div>
             </div>
 
             <div class="section" id="statAllocationSection" style="display: none;">
-                <h3>Allocate 25 Attribute Points</h3>
-                <p style="color: #8b7355; margin-bottom: 1.5rem; font-size: 0.9rem;">Distribute your 25 points among the four attributes to customize your character.</p>
+                <div style="display:flex; align-items:baseline; gap:1rem; margin-bottom:1.25rem;">
+                    <h3 style="margin:0;">Allocate Attribute Points</h3>
+                    <span id="pointsRemainingBadge" style="font-size:0.9rem; color:#d4af37;"></span>
+                </div>
                 <div id="statAllocationContainer"></div>
             </div>
 
@@ -526,11 +507,12 @@
                             style="padding:4px 12px;background:#2a3a2a;border:1px solid #333;color:#888;cursor:pointer;border-radius:4px;font-size:.82em;">🔗 Combo Tree</button>
                     </div>
                     <div id="skillSubContent_edit" style="padding:8px;">
-                        <div style="display:flex;gap:6px;margin-bottom:6px;">
-                            <input type="text" id="adminSkillSearch" placeholder="Search skills..." oninput="adminFilterSkills(this.value)"
-                                style="flex:1;padding:5px 8px;background:#0f1923;color:#d4af37;border:1px solid #333;border-radius:4px;font-size:.82em;">
+                        <div style="display:flex;gap:6px;margin-bottom:6px;align-items:center;">
+                            <input type="text" id="adminSkillSearch" placeholder="Search skills..."
+                                oninput="adminFilterSkills(this.value)"
+                                style="flex:2;min-width:0;padding:5px 8px;background:#0f1923;color:#d4af37;border:1px solid #333;border-radius:4px;font-size:.82em;">
                             <select id="adminSkillCatFilter" onchange="adminFilterSkills()"
-                                style="padding:5px;background:#0f1923;color:#aaa;border:1px solid #333;border-radius:4px;font-size:.82em;">
+                                style="width:160px;flex-shrink:0;padding:5px;background:#0f1923;color:#aaa;border:1px solid #333;border-radius:4px;font-size:.82em;">
                                 <option value="">All Categories</option>
                                 <option>DAMAGE_SINGLE</option><option>DAMAGE_MAGIC</option><option>DAMAGE_AOE</option>
                                 <option>HEALING</option><option>HEALING_AOE</option><option>BUFF</option>
@@ -540,7 +522,7 @@
                                 <option>UTILITY_PROC</option><option>CONSUMABLE_HEALING</option>
                             </select>
                             <button onclick="openAdminSkill(-1)"
-                                style="padding:5px 10px;background:#1a3a1a;border:1px solid #3a6a3a;color:#8fa;cursor:pointer;border-radius:4px;font-size:.82em;">+ New</button>
+                                style="flex-shrink:0;padding:5px 10px;background:#1a3a1a;border:1px solid #3a6a3a;color:#8fa;cursor:pointer;border-radius:4px;font-size:.82em;">+ New</button>
                         </div>
                         <div id="adminSkillCount" style="color:#555;font-size:.75em;margin-bottom:4px;"></div>
                         <select id="adminSkillSelect" onchange="openAdminSkill(parseInt(this.value))" size="14"
@@ -552,6 +534,7 @@
                     </div>
                 </div>
                 <div id="adminTabContent_enemies"    style="display:none; max-height:70vh; overflow-y:auto;"></div>
+                <div id="adminTabContent_characters" style="display:none; max-height:70vh; overflow-y:auto;"></div>
                 <div id="adminTabContent_snapshots"  style="display:none; max-height:70vh; overflow-y:auto;"></div>
                 <div id="adminTabContent_db"         style="display:none; max-height:70vh; overflow-y:auto;"></div>
                 <div class="admin-footer">
