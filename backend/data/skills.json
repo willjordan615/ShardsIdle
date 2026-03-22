@@ -9770,7 +9770,10 @@
     "description": "Tear life force directly from an enemy, healing yourself.",
     "category": "DAMAGE_MAGIC",
     "isStarterSkill": false,
-    "parentSkills": [],
+    "parentSkills": [
+      "bloodlust",
+      "arcane_bolt"
+    ],
     "basePower": 0.9,
     "baseHitChance": 0.9,
     "critChance": 0.05,
@@ -9809,7 +9812,8 @@
     "category": "CONTROL",
     "isStarterSkill": false,
     "parentSkills": [
-      "lifetap"
+      "lifetap",
+      "prayer"
     ],
     "basePower": 2,
     "baseHitChance": 0.9,
@@ -9842,7 +9846,8 @@
     "category": "CONTROL",
     "isStarterSkill": false,
     "parentSkills": [
-      "lifetap"
+      "lifetap",
+      "misdirect"
     ],
     "basePower": 2,
     "baseHitChance": 0.88,
@@ -9876,7 +9881,7 @@
     "category": "CONTROL",
     "isStarterSkill": false,
     "parentSkills": [
-      "lifetap",
+      "blood_letting",
       "apply_siphon_ward"
     ],
     "basePower": 3,
@@ -9897,7 +9902,7 @@
       {
         "type": "apply_debuff",
         "debuff": "cursed_blood",
-        "duration": 4,
+        "duration": 10,
         "magnitude": 1,
         "targets": "single_enemy",
         "chance": 0.75
