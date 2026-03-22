@@ -4,9 +4,9 @@
     "name": "Human",
     "description": "Versatile and adaptable, humans are generally well rounded. Humans tend toward prayer.",
     "baseStats": {
-      "conviction": 85,
+      "conviction": 75,
       "endurance": 80,
-      "ambition": 90,
+      "ambition": 95,
       "harmony": 80
     },
     "intrinsicSkills": [
@@ -18,10 +18,10 @@
     "name": "Dwarf",
     "description": "Stalwart defenders with natural resistance, but less agile than other races. They are defined by their stamina.",
     "baseStats": {
-      "conviction": 70,
-      "endurance": 120,
-      "ambition": 50,
-      "harmony": 80
+      "conviction": 80,
+      "endurance": 115,
+      "ambition": 60,
+      "harmony": 70
     },
     "intrinsicSkills": [
       "restore_stam_minor"
@@ -32,10 +32,10 @@
     "name": "Elf",
     "description": "Swift and graceful, elves excel at magic and precision strikes. Their senses are always keen.",
     "baseStats": {
-      "conviction": 100,
-      "endurance": 60,
+      "conviction": 90,
+      "endurance": 65,
       "ambition": 80,
-      "harmony": 95
+      "harmony": 105
     },
     "intrinsicSkills": [
       "sense"
@@ -47,8 +47,8 @@
     "description": "Savage and powerful, orcs deal tremendous damage but lack finesse. They have a trend toward bloodlust.",
     "baseStats": {
       "conviction": 110,
-      "endurance": 95,
-      "ambition": 70,
+      "endurance": 90,
+      "ambition": 75,
       "harmony": 50
     },
     "intrinsicSkills": [
@@ -60,10 +60,10 @@
     "name": "Halfling",
     "description": "Small but cunning, halflings excel at avoiding danger. They have a knack for remaining hidden.",
     "baseStats": {
-      "conviction": 60,
+      "conviction": 65,
       "endurance": 70,
       "ambition": 100,
-      "harmony": 85
+      "harmony": 95
     },
     "intrinsicSkills": [
       "stalk"
