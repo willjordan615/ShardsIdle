@@ -150,7 +150,7 @@ function renderSkillSelection() {
     // Add instruction text
     const instruction = document.createElement('div');
     instruction.style.cssText = 'margin-bottom: 1rem; padding: 1rem; background: rgba(74, 158, 255, 0.1); border: 1px solid #4a9eff; border-radius: 4px; color: #4a9eff;';
-    instruction.innerHTML = `<strong>Select exactly 2 starting skills:</strong> Choose one skill for each dropdown.`;
+    instruction.innerHTML = `<strong>Select exactly 2 starting skills:</strong> Certain skills used together in combat will reveal new, related skills.`;
     container.appendChild(instruction);
     
     // Create grid for two dropdowns

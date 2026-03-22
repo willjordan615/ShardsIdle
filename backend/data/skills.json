@@ -1757,7 +1757,7 @@
   {
     "id": "shove",
     "name": "Shove",
-    "category": "DAMAGE_SINGLE",
+    "category": "CONTROL",
     "description": "Push an enemy back with force. Scales with Conviction primarily. Causes the Knockback condition, increasing enemy skill delay.",
     "basePower": 0.8,
     "costType": "stamina",
@@ -1771,7 +1771,7 @@
     "baseHitChance": 0.85,
     "critChance": 0.1,
     "isStarterSkill": true,
-    "delay": 800,
+    "delay": 900,
     "hitCount": {
       "fixed": 1
     },
@@ -2469,10 +2469,10 @@
     ]
   },
   {
-    "id": "haymaker",
-    "name": "Haymaker",
+    "id": "strong_attack",
+    "name": "Strong Attack",
     "category": "DAMAGE_SINGLE",
-    "description": "A wild overhand swing. High risk, brutal impact.",
+    "description": "A well placed blow dealing extra damage. Higher miss rate.",
     "isChildSkill": true,
     "isStarterSkill": false,
     "parentSkills": [
@@ -4982,7 +4982,7 @@
     "category": "DAMAGE_AOE",
     "parentSkills": [
       "shocking_blow",
-      "haymaker"
+      "strong_attack"
     ],
     "basePower": 1.6,
     "baseHitChance": 0.8,
