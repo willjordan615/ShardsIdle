@@ -446,7 +446,7 @@ function renderStatAllocation() {
                     ${canSub ? '' : 'disabled'}>−</button>
 
                 <div class="stat-alloc-values">
-                    <span class="stat-base-val" title="Base from race">${base}</span>
+                    
                     ${alloc > 0 ? `<span class="stat-alloc-val">+${alloc}</span>` : ''}
                     <span class="stat-total-val">${total}</span>
                 </div>
