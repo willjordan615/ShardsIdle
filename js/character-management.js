@@ -314,7 +314,7 @@ function renderWeaponSelection() {
     
     const instruction = document.createElement('div');
     instruction.style.cssText = 'margin-bottom: 1rem; padding: 1rem; background: rgba(74, 158, 255, 0.1); border: 1px solid #4a9eff; border-radius: 4px; color: #4a9eff;';
-    instruction.innerHTML = `<strong>Select a starting weapon type:</strong> You'll begin with a tier 0 weapon of this type.`;
+    instruction.innerHTML = `Wapons add to skill damage, and determine physical skill damage type`;
     container.appendChild(instruction);
     
     const dropdownContainer = document.createElement('div');
