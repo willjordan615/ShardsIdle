@@ -175,8 +175,8 @@
     "defaultMagnitude": 1,
     "effects": {
       "statReduction": {
-        "harmony": 0.2,
-        "ambition": 0.2
+        "harmony": 0.4,
+        "ambition": 0.4
       }
     }
   },
@@ -449,7 +449,7 @@
     "description": "Increased agility. Harder to hit, faster actions.",
     "emoji": "\ud83d\udca8",
     "tooltip": "Evasion Boosted \u2014 harder to hit",
-    "defaultDuration": 3,
+    "defaultDuration": 5,
     "defaultMagnitude": 1,
     "effects": {
       "skillDelayMultiplier": 0.85,
@@ -789,7 +789,7 @@
     "defaultDuration": 2,
     "defaultMagnitude": 1,
     "effects": {
-      "damagePerTurn": "magnitude * 4",
+      "damagePerTurn": "magnitude * 2",
       "statReduction": {
         "conviction": 0.1,
         "ambition": 0.1
