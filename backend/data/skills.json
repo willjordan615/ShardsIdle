@@ -3064,7 +3064,7 @@
     "description": "Twists spiritual attunement and deception into a bolt of dark energy.",
     "category": "DAMAGE_MAGIC",
     "parentSkills": [
-      "prayer",
+      "arcane_bolt",
       "misdirect"
     ],
     "basePower": 1.1,
@@ -3150,7 +3150,7 @@
     "category": "HEALING",
     "parentSkills": [
       "attunement",
-      "rest"
+      "shove"
     ],
     "basePower": 1.3,
     "baseHitChance": 1.0,
@@ -8583,7 +8583,7 @@
     "category": "BUFF",
     "parentSkills": [
       "prayer",
-      "shout"
+      "warcry"
     ],
     "basePower": 0,
     "baseHitChance": 1.0,
@@ -8664,21 +8664,21 @@
     }
   },
   {
-    "id": "flaming_shove",
-    "name": "Flaming Shove",
-    "description": "A shove that pushes enemies into a wall of fire.",
+    "id": "flaming_fist",
+    "name": "Flaming Fist",
+    "description": "Channel flames into your fists and pummel the enemy.",
     "category": "DAMAGE_SINGLE",
     "parentSkills": [
-      "shove",
+      "pummel",
       "produce_flame"
     ],
     "basePower": 1.6,
     "baseHitChance": 0.85,
     "critChance": 0.1,
-    "critMultiplier": 1.5,
-    "delay": 1000,
-    "costType": "mana",
-    "costAmount": 16,
+    "critMultiplier": 1.25,
+    "delay": 1200,
+    "costType": "stamina",
+    "costAmount": 18,
     "hitCount": {
       "fixed": 1
     },
@@ -8691,8 +8691,20 @@
       {
         "type": "apply_debuff",
         "debuff": "knockback",
-        "duration": 0,
+        "duration": 1,
         "chance": 0.6
+      },
+            {
+        "type": "apply_debuff",
+        "debuff": "dazed",
+        "duration": 1,
+        "chance": 0.25
+      },
+                  {
+        "type": "apply_debuff",
+        "debuff": "burn",
+        "duration": 2,
+        "chance": 0.1
       }
     ],
     "isChildSkill": true,
