@@ -907,19 +907,30 @@ class CombatEngine {
     };
   }
 
-  /**
-   * Calculate rewards using the challenge object directly
-   */
-  calculateRewards(players, challenge, segments = []) {
-     const rewards = {
+/**
+Calculate rewards using the challenge object directly
+*/
+calculateRewards(players, challenge, segments = []) {
+    const rewards = {
         experienceGained: {},
         lootDropped: [],
         secretPathCompleted: false
     };
-
     const baseXP = challenge?.rewards?.baseXP || 100;
     const baseGold = challenge?.rewards?.baseGold || 50;
-    const lootTable = challenge?.rewards?.lootTable || [];
+
+    // FIX: Initialize lootTable with global rewards, then aggregate completed stage loot
+    const lootTable = [...(challenge?.rewards?.lootTable || [])];
+    
+    if (challenge.stages && segments.length > 0) {
+        challenge.stages.forEach(stage => {
+            // Only include stage loot if the stage was actually completed
+            const segment = segments.find(s => s.stageId === stage.stageId && s.status === 'victory');
+            if (segment && stage.lootTable) {
+                lootTable.push(...stage.lootTable);
+            }
+        });
+    }
 
     // Detect if a secret path stage was completed this run
     const secretStage = challenge?.stages?.find(s => s.secretPath === true);
@@ -932,11 +943,9 @@ class CombatEngine {
     }
 
     // XP with diminishing returns for larger parties
-    // Solo=100%, 2-person=67%, 3-person=50%, 4-person=40%
     const partyScale = 1 / (1 + 0.5 * (players.length - 1));
 
-    // Difficulty scaling — bonus for punching up, penalty for farming easy content
-    // avgLevel vs challenge.recommendedLevel; capped at 200% bonus
+    // Difficulty scaling
     const avgPartyLevel = players.reduce((sum, p) => sum + (p.level || 1), 0) / players.length;
     const recommendedLevel = challenge?.recommendedLevel || 1;
     const levelDelta = avgPartyLevel - recommendedLevel;
@@ -950,7 +959,7 @@ class CombatEngine {
         rewards.experienceGained[player.id] = xpReward;
     });
 
-    // Standard loot
+    // Standard loot (Now includes aggregated stage loot)
     lootTable.forEach(lootItem => {
         const dropChance = (lootItem.dropChance || 0.3) * (1 + (players[0]?.stats?.ambition || 0) / 500);
         if (Math.random() <= dropChance) {
@@ -963,7 +972,7 @@ class CombatEngine {
         }
     });
 
-    // Secret path loot — separate pool, better items
+    // Secret path loot
     if (secretCompleted && challenge?.rewards?.secretLootTable) {
         challenge.rewards.secretLootTable.forEach(lootItem => {
             const dropChance = (lootItem.dropChance || 0.3) * (1 + (players[0]?.stats?.ambition || 0) / 500);
@@ -979,7 +988,7 @@ class CombatEngine {
     }
 
     return rewards;
-  }
+}
 
   /**
    * Unified action selection for players, bots, and enemies.
