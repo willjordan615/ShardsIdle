@@ -500,121 +500,134 @@ function getCharacterClass(character, skills) {
         return 'Death Knight';
     }
 
-    // ─── STEP 3: PURE DAMAGE CLASSES (Weapon Refines, Doesn't Override) ─
-    
-    if (totalDamage > 0) {
-        // Magic Damage Dealers
-        if (categories.damageMagic > categories.damagePhysical) {
-            if (isCasterWeapon) {
-                if (dominantTag === 'fire') {
-                    if (weaponType === 'wand') return 'Pyromancer';
-                    if (weaponType === 'tome') return 'Fire Sage';
-                    return 'Fire Mage';
-                }
-                if (dominantTag === 'cold') {
-                    if (weaponType === 'wand') return 'Cryomancer';
-                    if (weaponType === 'tome') return 'Frost Sage';
-                    return 'Frost Mage';
-                }
-                if (dominantTag === 'lightning') {
-                    if (hasSkill('lightning_chain') || hasSkill('chain_lightning')) return 'Thundercaller';
-                    return 'Storm Mage';
-                }
-                if (dominantTag === 'arcane') {
-                    if (weaponType === 'wand') return 'Arcanist';
-                    if (weaponType === 'tome') return 'Wizard';
-                    return 'Mage';
-                }
-                if (dominantTag === 'holy') {
-                    if (weaponType === 'scepter') return 'Priest';
-                    if (weaponType === 'tome') return 'Divine Scholar';
-                    return 'Holy Caster';
-                }
-                if (dominantTag === 'shadow') {
-                    if (weaponType === 'wand') return 'Warlock';
-                    if (weaponType === 'tome') return 'Shadow Scholar';
-                    return 'Shadow Mage';
-                }
-                if (dominantTag === 'nature') {
-                    if (weaponType === 'totem') return 'Druid';
-                    if (weaponType === 'tome') return 'Nature Sage';
-                    return 'Nature Mage';
-                }
+// ─── PURE DAMAGE CLASSES (Skill-Specific FIRST, Weapon Refines Second) ─
+
+if (totalDamage > 0) {
+    // Magic Damage Dealers
+    if (categories.damageMagic > categories.damagePhysical) {
+        if (isCasterWeapon) {
+            if (dominantTag === 'fire') {
+                if (weaponType === 'wand') return 'Pyromancer';
+                if (weaponType === 'tome') return 'Fire Sage';
+                return 'Fire Mage';
+            }
+            if (dominantTag === 'cold') {
+                if (weaponType === 'wand') return 'Cryomancer';
+                if (weaponType === 'tome') return 'Frost Sage';
+                return 'Frost Mage';
+            }
+            if (dominantTag === 'lightning') {
+                if (hasSkill('lightning_chain') || hasSkill('chain_lightning')) return 'Thundercaller';
+                return 'Storm Mage';
+            }
+            if (dominantTag === 'arcane') {
+                if (weaponType === 'wand') return 'Arcanist';
+                if (weaponType === 'tome') return 'Wizard';
                 return 'Mage';
             }
-            
-            // Hybrid magic melee
-            if (isMeleeWeapon) {
-                if (dominantTag === 'fire') return 'Flame Knight';
-                if (dominantTag === 'cold') return 'Frost Knight';
-                if (dominantTag === 'lightning') return 'Storm Knight';
-                if (dominantTag === 'shadow') return 'Dark Knight';
-                if (dominantTag === 'holy') return 'Templar';
-                return 'Spellblade';
+            if (dominantTag === 'holy') {
+                if (weaponType === 'scepter') return 'Priest';
+                if (weaponType === 'tome') return 'Divine Scholar';
+                return 'Holy Caster';
             }
-            
-            return 'Sorcerer';
+            if (dominantTag === 'shadow') {
+                if (weaponType === 'wand') return 'Warlock';
+                if (weaponType === 'tome') return 'Shadow Scholar';
+                return 'Shadow Mage';
+            }
+            if (dominantTag === 'nature') {
+                if (weaponType === 'totem') return 'Druid';
+                if (weaponType === 'tome') return 'Nature Sage';
+                return 'Nature Mage';
+            }
+            return 'Mage';
         }
         
-        // Physical Damage Dealers - Weapon Specific
-        if (categories.damagePhysical >= categories.damageMagic) {
-            // ✅ KEY SKILL CHECKS BEFORE WEAPON TYPE
-            if (hasSkill('assassinate')) {
-                if (dominantTag === 'shadow') return 'Master Assassin';
-                if (isRangedWeapon) return 'Shadow Hunter';
-                return 'Assassin';
-            }
-            
-            // Sword users
-            if (weaponType === 'sword') {
-                if (dominantTag === 'shadow') return 'Dark Knight';
-                if (dominantTag === 'holy') return 'Templar';
-                if (statRatios.ambition > 0.35) return 'Duelist';
-                if (hasShield && isHeavyArmor) return 'Knight';
-                if (statRatios.conviction > 0.35) return 'Blademaster';
-                return 'Swordsman';
-            }
-            
-            // Dagger users
-            if (weaponType === 'dagger') {
-                if (dominantTag === 'shadow') return 'Shadow Assassin';
-                if (dominantTag === 'poison') return 'Assassin';
-                if (statRatios.ambition > 0.4) return 'Rogue';
-                return 'Thief';
-            }
-            
-            // Axe users
-            if (weaponType === 'axe' || weaponType === 'handaxe') {
-                if (dominantTag === 'fire') return 'Berserker';
-                if (statRatios.conviction > 0.4) return 'Berserker';
-                if (isHeavyArmor) return 'Marauder';
-                return 'Barbarian';
-            }
-            
-            // Hammer/Mace users
-            if (weaponType === 'hammer' || weaponType === 'mace') {
-                if (dominantTag === 'holy') return 'Crusader';
-                if (isHeavyArmor && hasShield) return 'Juggernaut';
-                if (statRatios.endurance > 0.35) return 'Bruiser';
-                return 'Warrior';
-            }
-            
-            // Ranged users
-            if (isRangedWeapon) {
-                if (dominantTag === 'poison') return 'Hunter';
-                if (statRatios.ambition > 0.4) return 'Sniper';
-                if (weaponType === 'crossbow') return 'Crossbowman';
-                if (weaponType === 'pistol') return 'Gunslinger';
-                return 'Ranger';
-            }
-            
-            // Generic physical
-            if (statRatios.conviction > 0.35) return 'Warrior';
-            if (statRatios.ambition > 0.35) return 'Striker';
-            if (totalKills > 100) return 'Veteran';
-            return 'Fighter';
+        // Hybrid magic melee
+        if (isMeleeWeapon) {
+            if (dominantTag === 'fire') return 'Flame Knight';
+            if (dominantTag === 'cold') return 'Frost Knight';
+            if (dominantTag === 'lightning') return 'Storm Knight';
+            if (dominantTag === 'shadow') return 'Dark Knight';
+            if (dominantTag === 'holy') return 'Templar';
+            return 'Spellblade';
         }
+        
+        return 'Sorcerer';
     }
+    
+    // Physical Damage Dealers - SKILL CHECKS FIRST, THEN WEAPON
+    if (categories.damagePhysical >= categories.damageMagic) {
+        // ✅ ASSASSIN CHECK - Before any weapon type!
+        if (hasSkill('assassinate')) {
+            if (dominantTag === 'shadow' || hasSkill('shadow_step')) return 'Master Assassin';
+            if (isRangedWeapon) return 'Shadow Hunter';  // Crossbow assassin
+            if (weaponType === 'dagger') return 'Grand Assassin';
+            return 'Assassin';
+        }
+        
+        // ✅ NECROMANCER CHECK - Before weapon type!
+        if (hasSkill('necromancy') || hasSkill('lifetap')) {
+            if (dominantTag === 'shadow') return 'Necromancer';
+            return 'Dark Priest';
+        }
+        
+        // ✅ BERSERKER CHECK - Before weapon type!
+        if (hasSkill('bloodlust') || hasSkill('frenzy')) {
+            if (statRatios.conviction > 0.4) return 'Berserker';
+            return 'Rager';
+        }
+        
+        // Now check weapon type for remaining characters
+        // Sword users
+        if (weaponType === 'sword') {
+            if (isBleedBuild && statRatios.ambition > 0.35) return 'Duelist';
+            if (hasShield && isHeavyArmor) return 'Knight';
+            if (statRatios.conviction > 0.35) return 'Blademaster';
+            if (statRatios.ambition > 0.35) return 'Swordsman';
+            return 'Warrior';
+        }
+        
+        // Dagger users
+        if (weaponType === 'dagger') {
+            if (isPoisonBuild) return 'Assassin';
+            if (isShadowBuild) return 'Shadow Assassin';
+            if (statRatios.ambition > 0.4) return 'Rogue';
+            return 'Thief';
+        }
+        
+        // Axe users
+        if (weaponType === 'axe' || weaponType === 'handaxe') {
+            if (isBleedBuild && statRatios.conviction > 0.4) return 'Berserker';
+            if (isHeavyArmor) return 'Marauder';
+            if (statRatios.conviction > 0.35) return 'Barbarian';
+            return 'Axeman';
+        }
+        
+        // Hammer/Mace users
+        if (weaponType === 'hammer' || weaponType === 'mace') {
+            if (isHolyBuild) return 'Crusader';
+            if (isHeavyArmor && hasShield) return 'Juggernaut';
+            if (statRatios.endurance > 0.35) return 'Bruiser';
+            return 'Warrior';
+        }
+        
+        // Ranged users
+        if (isRangedWeapon) {
+            if (isPoisonBuild) return 'Hunter';
+            if (statRatios.ambition > 0.4) return 'Sniper';
+            if (weaponType === 'crossbow') return 'Crossbowman';
+            if (weaponType === 'pistol') return 'Gunslinger';
+            return 'Ranger';
+        }
+        
+        // Generic physical
+        if (statRatios.conviction > 0.35) return 'Warrior';
+        if (statRatios.ambition > 0.35) return 'Striker';
+        if (totalKills > 100) return 'Veteran';
+        return 'Fighter';
+    }
+}
 
     // ─── STEP 4: SUPPORT CLASSES ────────────────────────────────────────
     
