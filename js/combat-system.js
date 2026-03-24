@@ -460,6 +460,11 @@ async function addPublicCompanion(shareCode, characterName, level, race) {
  * @param {string} [forcedChallengeId] - Optional ID to override currentState.selectedChallenge (for auto-retry)
  */
 async function startCombat(forcedChallengeId) {
+    if (window._combatStartInFlight) {
+        console.warn('[COMBAT] startCombat called while request already in flight — ignored.');
+        return;
+    }
+    window._combatStartInFlight = true;
     try {
         // ✅ FIX: Handle Forced Challenge ID (for Auto-Retry Loop)
         if (forcedChallengeId) {
@@ -533,6 +538,8 @@ async function startCombat(forcedChallengeId) {
     } catch (error) {
         console.error('Combat error:', error);
         showError('Failed to start combat: ' + error.message);
+    } finally {
+        window._combatStartInFlight = false;
     }
 }
 

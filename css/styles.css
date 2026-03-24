@@ -285,6 +285,52 @@ button.danger:hover:not(:disabled) {
     border-color: #ff6a6c; color: #ff6a6c;
 }
 
+/* ============================================================
+   MEDIA CONTROLS (combat log playback group)
+   ============================================================ */
+.media-controls {
+    display: flex;
+    gap: 0;
+    margin-left: 8px;
+    border: 1px solid var(--gold-dim);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+}
+
+.media-btn {
+    border: none;
+    border-right: 1px solid var(--gold-dim);
+    border-radius: 0;
+    padding: 0.55rem 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.media-btn:last-child {
+    border-right: none;
+}
+
+.media-btn--active {
+    color: var(--gold-bright) !important;
+    border-color: var(--gold-dim) !important;
+    background: linear-gradient(135deg, rgba(212,175,55,0.18) 0%, rgba(212,175,55,0.08) 100%) !important;
+    box-shadow: inset 0 0 10px rgba(212,175,55,0.25);
+}
+
+.media-btn--stop {
+    color: #f88;
+    border-color: var(--gold-dim);
+}
+
+.media-btn--stop:hover:not(:disabled) {
+    color: #ff9999 !important;
+    border-color: #533 !important;
+    box-shadow: 0 0 10px rgba(232,72,74,0.25) !important;
+}
+
 .mini-btn {
     font-family: var(--font-body);
     font-size: 1rem;

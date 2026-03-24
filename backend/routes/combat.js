@@ -5,8 +5,12 @@ const StatusEngine = require('../StatusEngine');
 const db = require('../database');
 const fs = require('fs');
 const path = require('path');
+const { requireAuth } = require('./auth');
 
 const DEFAULT_SAFE_CHALLENGE = 'challenge_goblin_camp';
+
+// Per-user combat lock — prevents concurrent combat instances
+const activeCombats = new Map();
 
 let combatEngine;
 
@@ -32,7 +36,15 @@ function initializeCombatEngine() {
     return combatEngine;
 }
 
-router.post('/start', async (req, res) => {
+router.post('/start', requireAuth, async (req, res) => {
+    const userId = req.userId;
+
+    if (activeCombats.has(userId)) {
+        console.warn(`[COMBAT] Rejected duplicate combat start for user ${userId}`);
+        return res.status(409).json({ error: 'Combat already in progress.' });
+    }
+    activeCombats.set(userId, true);
+
     try {
         initializeCombatEngine();
 
@@ -262,6 +274,8 @@ router.post('/start', async (req, res) => {
     } catch (error) {
         console.error('[COMBAT] Critical error:', error);
         res.status(500).json({ error: 'Combat simulation failed', details: error.message });
+    } finally {
+        activeCombats.delete(userId);
     }
 });
 

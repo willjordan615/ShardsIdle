@@ -19,6 +19,11 @@ function showScreen(screenName) {
     if (header) {
         header.style.display = ['roster', 'create'].includes(screenName) ? '' : 'none';
     }
+
+    // Sync media control highlight when navigating to combat log
+    if (screenName === 'combatlog' && typeof _updateMediaControls === 'function') {
+        _updateMediaControls();
+    }
 }
 
 /**

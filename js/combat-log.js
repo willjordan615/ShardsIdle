@@ -1,37 +1,72 @@
 // combat-log.js
 // Handles combat log display with metered playback and rewards
 
-// Pause state
+// ---------------------------------------------------------------------------
+// COMBAT PLAYBACK CONTROLS
+// Speed persists across loop iterations via localStorage.
+// Multipliers: higher = slower playback (Slow=1.5, Normal=1.0, Fast=0.6)
+// ---------------------------------------------------------------------------
+
+const _SPEED_MAP = {
+    slow:   1.5,
+    normal: 1.0,
+    fast:   0.6,
+};
+
+function _getSavedSpeed() {
+    return localStorage.getItem('combatSpeed') || 'normal';
+}
+
+function _setSavedSpeed(key) {
+    localStorage.setItem('combatSpeed', key);
+}
+
+// Apply a speed key and update the media control highlight
+window.setCombatSpeed = function(key) {
+    _setSavedSpeed(key);
+    window.combatSpeedMultiplier = _SPEED_MAP[key] || 1.0;
+    _updateMediaControls();
+    // Unpause when a speed is selected
+    if (window.combatPaused) {
+        window.combatPaused = false;
+        _updateMediaControls();
+    }
+};
+
 window.combatPaused = false;
 
 window.toggleCombatPause = function() {
     window.combatPaused = !window.combatPaused;
-    const btn = document.getElementById('pauseBtn');
-    if (btn) btn.textContent = window.combatPaused ? '▶ Resume' : '⏸ Pause';
+    _updateMediaControls();
 };
 
-// Speed cycle button — steps through Slow → Normal → Fast
-// Multipliers: higher = slower playback (1.2 = Slow, 1.0 = Normal, 0.8 = Fast)
-const _SPEED_STEPS = [
-    { label: '🐢 Slow',   multiplier: 1.2 },
-    { label: '▶ Normal',  multiplier: 1.0 },
-    { label: '⚡ Fast',   multiplier: 0.8 },
-];
-window._speedStepIndex = 1; // default Normal
-
-window.cycleCombatSpeed = function() {
-    window._speedStepIndex = (window._speedStepIndex + 1) % _SPEED_STEPS.length;
-    const step = _SPEED_STEPS[window._speedStepIndex];
-    window.combatSpeedMultiplier = step.multiplier;
-    const btn = document.getElementById('speedBtn');
-    if (btn) btn.textContent = step.label;
-    // Unpause if paused
-    if (window.combatPaused) {
-        window.combatPaused = false;
-        const pauseBtn = document.getElementById('pauseBtn');
-        if (pauseBtn) pauseBtn.textContent = '⏸ Pause';
+// Sync the active highlight on all media control buttons
+function _updateMediaControls() {
+    const speedKey = _getSavedSpeed();
+    ['slow', 'normal', 'fast'].forEach(key => {
+        const btn = document.getElementById('mediaBtn_' + key);
+        if (!btn) return;
+        if (!window.combatPaused && key === speedKey) {
+            btn.classList.add('media-btn--active');
+        } else {
+            btn.classList.remove('media-btn--active');
+        }
+    });
+    const pauseBtn = document.getElementById('mediaBtn_pause');
+    if (pauseBtn) {
+        if (window.combatPaused) {
+            pauseBtn.classList.add('media-btn--active');
+        } else {
+            pauseBtn.classList.remove('media-btn--active');
+        }
     }
-};
+}
+
+// Initialise speed from localStorage on load
+(function() {
+    const saved = _getSavedSpeed();
+    window.combatSpeedMultiplier = _SPEED_MAP[saved] || 1.0;
+})();
 
 // Scroll tracking — stop auto-scroll when user scrolls up manually
 let _userScrolledUp = false;
@@ -124,15 +159,11 @@ async function displayCombatLog(combatData) {
         const suddenDeathBanner = document.getElementById('suddenDeathBanner');
         if (suddenDeathBanner) suddenDeathBanner.style.display = 'none';
 
-        // Reset pause, FF, and scroll state for new combat
+        // Reset pause state for new combat; speed persists from localStorage
         window.combatPaused = false;
         _userScrolledUp = false;
-        window._speedStepIndex = 1; // Normal
-        window.combatSpeedMultiplier = 1.0;
-        const pauseBtn = document.getElementById('pauseBtn');
-        if (pauseBtn) pauseBtn.textContent = '⏸ Pause';
-        const speedBtn = document.getElementById('speedBtn');
-        if (speedBtn) speedBtn.textContent = '▶ Normal';
+        window.combatSpeedMultiplier = _SPEED_MAP[_getSavedSpeed()] || 1.0;
+        _updateMediaControls();
         const scrollBtn = document.getElementById('scrollResumeBtn');
         if (scrollBtn) scrollBtn.style.display = 'none';
         _initScrollTracking();
@@ -446,10 +477,9 @@ async function displayCombatLog(combatData) {
         }
 
         // --- RESULT MODAL ---
-        // Combat is over — stop pause, hide stats panel
+        // Combat is over — clear pause state
         window.combatPaused = false;
-        const _pauseBtnEnd = document.getElementById('pauseBtn');
-        if (_pauseBtnEnd) _pauseBtnEnd.textContent = '⏸ Pause';
+        _updateMediaControls();
 
         const finalResult  = combatData.result;
         const nextId       = combatData.nextChallengeId || window.lastChallengeId || 'challenge_goblin_camp';
@@ -666,7 +696,7 @@ window.dismissResultModal = function() {
     _showCombatToast(remaining, untilDismissed, nextId);
 };
 
-// Stop the loop entirely
+// Stop the loop entirely — leaves the player where they are
 window.cancelAutoRestart = function() {
     if (window.currentRestartInterval) clearInterval(window.currentRestartInterval);
     window.currentRestartInterval = null;
@@ -678,16 +708,13 @@ window.cancelAutoRestart = function() {
         window.currentState.pendingLoopExit = false;
     }
     if (typeof updateChallengeStatusBanner === 'function') updateChallengeStatusBanner();
-    if (typeof returnToHub === 'function') returnToHub();
 };
 
-// Bottom-right countdown toast with pause/resume and stop loop
-// seconds=0 + paused=true means "Until Dismissed" — won't fire until unpaused
+// Bottom-right countdown toast — notifies player of next queued run when away from combat log
 function _showCombatToast(seconds, startPaused, targetChallengeId) {
     document.getElementById('combatToast')?.remove();
 
     let counter  = seconds;
-    let paused   = startPaused;
     let interval = null;
 
     const isUntilDismissed = startPaused && seconds === 0;
@@ -704,20 +731,16 @@ function _showCombatToast(seconds, startPaused, targetChallengeId) {
     `;
 
     function render() {
-        const timerText = isUntilDismissed
-            ? '—'
-            : paused ? `${counter}s (paused)` : `${counter}s`;
-        const pauseLabel = paused ? '▶ Resume' : '⏸ Pause';
-
+        const timerText = isUntilDismissed ? '—' : `${counter}s`;
         toast.innerHTML = `
             <div style="color:#d4af37; font-weight:bold; margin-bottom:6px; font-size:0.9rem;">
-                ⚔️ Next run in: <span id="combatToastTimer" style="color:#ffd700;">${timerText}</span>
+                Next run in: <span id="combatToastTimer" style="color:#ffd700;">${timerText}</span>
             </div>
             <div style="display:flex; gap:6px; margin-top:6px;">
-                <button id="toastPauseBtn"
+                <button id="toastWatchBtn"
                     style="flex:1; padding:4px 8px; background:#0a0e27; border:1px solid #d4af37;
                            color:#d4af37; cursor:pointer; border-radius:4px; font-size:0.75rem;">
-                    ${pauseLabel}
+                    Watch
                 </button>
                 <button id="toastStopBtn"
                     style="flex:1; padding:4px 8px; background:#0a0e27; border:1px solid #533;
@@ -727,25 +750,9 @@ function _showCombatToast(seconds, startPaused, targetChallengeId) {
             </div>
         `;
 
-        document.getElementById('toastPauseBtn')?.addEventListener('click', () => {
-            if (isUntilDismissed) {
-                // "Until Dismissed" — unpause fires immediately
-                paused = false;
-                if (interval) clearInterval(interval);
-                clearInterval(window.currentRestartInterval);
-                window._fireNextCombat?.(targetChallengeId);
-                toast.remove();
-                return;
-            }
-            paused = !paused;
-            if (paused) {
-                clearInterval(interval);
-                clearInterval(window.currentRestartInterval);
-                interval = null;
-            } else {
-                startToastInterval();
-            }
-            render();
+        document.getElementById('toastWatchBtn')?.addEventListener('click', () => {
+            toast.remove();
+            if (typeof showScreen === 'function') showScreen('combatlog');
         });
 
         document.getElementById('toastStopBtn')?.addEventListener('click', () => {
@@ -758,7 +765,6 @@ function _showCombatToast(seconds, startPaused, targetChallengeId) {
             counter--;
             const timerEl = document.getElementById('combatToastTimer');
             if (timerEl) timerEl.textContent = `${counter}s`;
-            // Keep modal timer in sync if still visible
             const modalTimer = document.getElementById('countdownTimer');
             if (modalTimer) modalTimer.textContent = counter;
 
@@ -769,7 +775,6 @@ function _showCombatToast(seconds, startPaused, targetChallengeId) {
                 window._fireNextCombat?.(targetChallengeId);
             }
         }, 1000);
-        // Sync with any existing modal interval
         if (window.currentRestartInterval) {
             clearInterval(window.currentRestartInterval);
             window.currentRestartInterval = interval;
@@ -779,8 +784,14 @@ function _showCombatToast(seconds, startPaused, targetChallengeId) {
     render();
     document.body.appendChild(toast);
 
-    if (!paused && !isUntilDismissed) {
+    if (!isUntilDismissed) {
         startToastInterval();
+    } else {
+        // Until Dismissed — fire immediately when dismissed via Watch or stop
+        document.getElementById('toastWatchBtn')?.addEventListener('click', () => {
+            clearInterval(window.currentRestartInterval);
+            window._fireNextCombat?.(targetChallengeId);
+        }, { once: true });
     }
 }
 

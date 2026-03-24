@@ -343,9 +343,24 @@
         <!-- COMBAT LOG SCREEN -->
         <div id="combatlog" class="screen">
             <div class="nav-buttons combat-nav">
-                <button onclick="viewCharacterDuringCombat()" class="secondary">👤 View Character</button>
-                <button id="pauseBtn" onclick="toggleCombatPause()" class="secondary" style="margin-left:8px;">⏸ Pause</button>
-                <button id="speedBtn" onclick="cycleCombatSpeed()" class="secondary" style="margin-left:8px;">▶ Normal</button>
+                <button onclick="viewCharacterDuringCombat()" class="secondary">View Character</button>
+                <div class="media-controls">
+                    <button id="mediaBtn_slow"   class="media-btn secondary" onclick="setCombatSpeed('slow')">
+                        <svg viewBox="0 0 18 14" width="18" height="14"><polygon points="9,0 0,7 9,14" fill="currentColor"/><rect x="10" y="0" width="3" height="14" fill="currentColor"/><rect x="14" y="0" width="3" height="14" fill="currentColor"/></svg>
+                    </button>
+                    <button id="mediaBtn_normal" class="media-btn secondary" onclick="setCombatSpeed('normal')">
+                        <svg viewBox="0 0 14 14" width="14" height="14"><polygon points="0,0 14,7 0,14" fill="currentColor"/></svg>
+                    </button>
+                    <button id="mediaBtn_fast"   class="media-btn secondary" onclick="setCombatSpeed('fast')">
+                        <svg viewBox="0 0 18 14" width="18" height="14"><polygon points="0,0 8,7 0,14" fill="currentColor"/><polygon points="9,0 17,7 9,14" fill="currentColor"/></svg>
+                    </button>
+                    <button id="mediaBtn_pause"  class="media-btn secondary" onclick="toggleCombatPause()">
+                        <svg viewBox="0 0 12 14" width="12" height="14"><rect x="0" y="0" width="4" height="14" fill="currentColor"/><rect x="8" y="0" width="4" height="14" fill="currentColor"/></svg>
+                    </button>
+                    <button id="mediaBtn_stop"   class="media-btn media-btn--stop secondary" onclick="cancelAutoRestart()">
+                        <svg viewBox="0 0 14 14" width="14" height="14"><rect x="0" y="0" width="14" height="14" fill="currentColor"/></svg>
+                    </button>
+                </div>
             </div>
 
             <!-- Stage banner: title + pre-combat result + enemy flash reveal -->
