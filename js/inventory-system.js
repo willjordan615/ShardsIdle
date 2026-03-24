@@ -166,17 +166,33 @@ window.closeConsumableManagement = window.closeInventory;
 function _renderGearModal(character, activeSlot) {
     const inner = document.getElementById('inventoryModalInner');
     if (!inner) return;
-
     const inventory = _safeInventory(character);
 
-    // Build inventory gear grouped by slot
-    const bySlot = {};
-    GEAR_SLOTS.forEach(s => bySlot[s] = []);
-    inventory.forEach((inv, idx) => {
-        if (!inv) return;
-        const def = _itemDef(inv.itemID);
-        if (_isGear(def)) bySlot[_itemSlot(def)].push({ inv, idx, def });
-    });
+// Build inventory gear grouped by slot
+const bySlot = {};
+GEAR_SLOTS.forEach(s => bySlot[s] = []);
+const addedToSecondary = new Set(); // Track items added to secondary slot
+
+inventory.forEach((inv, idx) => {
+    if (!inv) return;
+    const def = _itemDef(inv.itemID);
+    if (!_isGear(def)) return;
+    
+    const slot1 = _itemSlot(def);
+    const slot2 = def?.slot_id2;
+    
+    // Always add to primary slot
+    if (slot1 && GEAR_SLOTS.includes(slot1)) {
+        bySlot[slot1].push({ inv, idx, def });
+    }
+    
+    // Add to secondary slot ONLY if it exists and differs from primary
+    if (slot2 && GEAR_SLOTS.includes(slot2) && slot2 !== slot1) {
+        // Use inventory index as unique key (same item in inventory = same index)
+        addedToSecondary.add(idx);
+        bySlot[slot2].push({ inv, idx, def });
+    }
+});
 
     const miscItems = inventory.filter(inv => {
         if (!inv) return false;
@@ -231,7 +247,7 @@ function _renderGearModal(character, activeSlot) {
                         return `<div class="inv-card inv-equipped" onclick="unequipItemNew('${character.id}','${slot}')" title="Click to unequip">
                             <div style="color:#555; font-size:0.68rem;">${SLOT_LABELS[slot]}</div>
                             <div style="color:#d4af37; font-size:0.82rem; font-weight:500;">${def.name}</div>
-                            ${def.dmg1  ? `<div style="color:#ff6b6b; font-size:0.72rem;">${def.dmg1} ${def.dmg_type_1||''}</div>` : ''}
+                            ${def.dmg1 ? `<div style="color:#ff6b6b; font-size:0.72rem;">${def.dmg1} ${def.dmg_type_1||''}</div>` : ''}
                             ${def.armor ? `<div style="color:#4eff7f; font-size:0.72rem;">Armor: ${def.armor}</div>` : ''}
                             ${_statBonuses(def) ? `<div style="color:#aaa; font-size:0.7rem;">${_statBonuses(def)}</div>` : ''}
                             <div style="color:#d44; font-size:0.68rem; margin-top:2px;">↩ Unequip</div>
@@ -259,7 +275,7 @@ function _renderGearModal(character, activeSlot) {
                     return header + items.map(({inv, idx, def}) =>
                         `<div class="inv-card inv-gear" onclick="equipItemNew('${character.id}','${inv.itemID}',${idx})" title="Click to equip">
                             <div style="color:${_rarityColor(inv.rarity)}; font-size:0.82rem; font-weight:500;">${def?.name || inv.itemID}</div>
-                            ${def?.dmg1  ? `<div style="color:#ff6b6b; font-size:0.72rem;">${def.dmg1} ${def.dmg_type_1||''}</div>` : ''}
+                            ${def?.dmg1 ? `<div style="color:#ff6b6b; font-size:0.72rem;">${def.dmg1} ${def.dmg_type_1||''}</div>` : ''}
                             ${def?.armor ? `<div style="color:#4eff7f; font-size:0.72rem;">Armor: ${def.armor}</div>` : ''}
                             ${_statBonuses(def) ? `<div style="color:#aaa; font-size:0.7rem;">${_statBonuses(def)}</div>` : ''}
                             <div style="color:#4a9eff; font-size:0.68rem; margin-top:2px;">↑ Equip</div>
@@ -268,7 +284,7 @@ function _renderGearModal(character, activeSlot) {
                 }).join('')}
                 ${!activeSlot && miscItems.map(inv => {
                     const def = _itemDef(inv.itemID);
-                    const ri  = inventory.indexOf(inv);
+                    const ri = inventory.indexOf(inv);
                     return `<div class="inv-card" style="border-color:#333;">
                         <div style="color:#aaa; font-size:0.82rem;">${def?.name || inv.itemID}</div>
                         <div style="color:#555; font-size:0.7rem; font-style:italic;">Quest item</div>
@@ -290,9 +306,9 @@ function _renderGearModal(character, activeSlot) {
                     return !activeSlot || _itemSlot(def) === activeSlot;
                 }).map(inv => {
                     const def = _itemDef(inv.itemID);
-                    const ri  = inventory.indexOf(inv);
-                    const g   = _goldValue(def);
-                    const d   = _dustYield(g);
+                    const ri = inventory.indexOf(inv);
+                    const g = _goldValue(def);
+                    const d = _dustYield(g);
                     return `<div class="inv-card" style="border-color:#2a3a2a;">
                         <div style="color:${_rarityColor(inv.rarity)}; font-size:0.8rem; font-weight:500;">${def?.name || inv.itemID}</div>
                         <div style="color:#666; font-size:0.7rem;">${g}g · ${d.toFixed(2)} dust</div>
