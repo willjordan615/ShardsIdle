@@ -1241,13 +1241,20 @@ calculateRewards(players, challenge, segments = []) {
           if (primaryDebuff && this._targetHasDebuff(targetCombatant, primaryDebuff)) score *= 0.55;
         }
 
-        // Buff redundancy + active buff penalty
-        if (cat === 'BUFF' || cat === 'DEFENSE') {
+        // Buff redundancy + active buff penalty — covers UTILITY (e.g. Shadow Step) too
+        if (cat === 'BUFF' || cat === 'DEFENSE' || cat === 'UTILITY') {
           const primaryBuff = skill.effects?.find(e => e.type === 'apply_buff')?.buff;
           if (primaryBuff && this._targetHasDebuff(actor, primaryBuff)) score *= 0.15;
           const activeBuffCount = (actor.statusEffects || []).filter(e => e.duration > 0).length;
           if (activeBuffCount >= 1) score *= 0.4;
           if (activeBuffCount >= 2) score *= 0.3;
+        }
+
+        // HP pressure — when the actor is hurting, threat removal trumps buffs/utility
+        if (cat === 'BUFF' || cat === 'DEFENSE' || cat === 'UTILITY') {
+          const hpRatio = actor.currentHP / actor.maxHP;
+          if (hpRatio < 0.25) score *= 0.05;
+          else if (hpRatio < 0.5) score *= 0.2;
         }
 
         // Buff cooldown
@@ -1531,17 +1538,22 @@ calculateRewards(players, challenge, segments = []) {
         }
     }
 
-    // ── Buff redundancy penalty — don't reapply a buff already active on self ──
-    if (cat === 'BUFF' || cat === 'DEFENSE') {
+    // ── Buff redundancy penalty — covers UTILITY (e.g. Shadow Step) too ──
+    if (cat === 'BUFF' || cat === 'DEFENSE' || cat === 'UTILITY') {
         const primaryBuff = skill.effects?.find(e => e.type === 'apply_buff')?.buff;
         if (primaryBuff && this._targetHasDebuff(character, primaryBuff)) {
-            score *= 0.15; // very low — almost never reapply an active buff
+            score *= 0.15;
         }
-        // Broader penalty: if the character already has ANY active buff, 
-        // deprioritize adding more — deal damage instead
         const activeBuffCount = (character.statusEffects || []).filter(e => e.duration > 0).length;
         if (activeBuffCount >= 1) score *= 0.4;
-        if (activeBuffCount >= 2) score *= 0.3; // stacks — heavily penalize buff stacking
+        if (activeBuffCount >= 2) score *= 0.3;
+    }
+
+    // ── HP pressure — when hurting, threat removal trumps buffs/utility ──
+    if (cat === 'BUFF' || cat === 'DEFENSE' || cat === 'UTILITY') {
+        const hpRatio = character.currentHP / character.maxHP;
+        if (hpRatio < 0.25) score *= 0.05;
+        else if (hpRatio < 0.5) score *= 0.2;
     }
 
     // ── Buff cooldown — penalize reusing a buff skill too soon after last use ──
