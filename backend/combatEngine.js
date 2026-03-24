@@ -320,6 +320,13 @@ class CombatEngine {
       action: {
         type: isFallback ? 'pre_combat_fallback' : 'pre_combat_skill',
         skillID: checkType === 'item_and_stat' ? `[item:${op.requiredItemID}+stat:${op.checkStat}]` : op.requiredSkillTag ? `[tag:${op.requiredSkillTag}]` : op.requiredSkillIDs ? op.requiredSkillIDs.join('/') : (op.requiredSkillID || null),
+        // The actual skill ID the best actor used — for XP awarding in the frontend
+        resolvedSkillID: checkType === 'skill' && bestActor
+          ? (() => {
+              const pool = this.getAugmentedSkillPool(bestActor);
+              return requiredSkills.find(id => pool.has(id)) || null;
+            })()
+          : null,
         name: op.name
       },
       roll: { hitChance: highestChance, rolled, hit: isSuccess },
@@ -1338,10 +1345,16 @@ calculateRewards(players, challenge, segments = []) {
           if (cat && cat.includes('DAMAGE')) score *= 1.1;
         }
 
-        // Buff timing curve — universal sharp drop-off
+        // Turn 1 priority: if the actor has no active buffs, heavily favour casting one
+        if ((cat === 'BUFF' || cat === 'DEFENSE') && (context.stageTurnCount || 0) <= 1) {
+          const activeBuffCount = (actor.statusEffects || []).filter(e => e.duration > 0).length;
+          if (activeBuffCount === 0) score *= 4.0;
+        }
+
+        // Buff timing curve — decays over time but floors at 0.35 so buffs stay viable
         if (cat === 'BUFF' || cat === 'DEFENSE' || cat === 'UTILITY') {
           const turn = context.stageTurnCount || 0;
-          const buffTimingMultiplier = turn <= 3 ? 1.0 : turn <= 6 ? 0.6 : turn <= 9 ? 0.25 : 0.08;
+          const buffTimingMultiplier = turn <= 3 ? 1.0 : turn <= 6 ? 0.6 : turn <= 9 ? 0.35 : 0.35;
           score *= buffTimingMultiplier;
         }
 
@@ -1650,14 +1663,19 @@ calculateRewards(players, challenge, segments = []) {
     }
 
     // ── Buff timing curve — universal ────────────────────────────────────────
+    // Turn 1 priority: if the actor has no active buffs, heavily favour casting one
+    if ((cat === 'BUFF' || cat === 'DEFENSE') && (context.stageTurnCount || 0) <= 1) {
+      const activeBuffCount = (actor.statusEffects || []).filter(e => e.duration > 0).length;
+      if (activeBuffCount === 0) score *= 4.0;
+    }
+
     // Early turns: buffing is smart. Late turns: just deal damage.
-    // Turns 1-3: full value. Turns 4-6: 0.6×. Turns 7-9: 0.25×. Turn 10+: 0.08×
+    // Floors at 0.35 so buffs remain viable throughout combat.
     if (cat === 'BUFF' || cat === 'DEFENSE' || cat === 'UTILITY') {
       const turn = context.stageTurnCount || 0;
       const buffTimingMultiplier = turn <= 3  ? 1.0
         : turn <= 6  ? 0.6
-        : turn <= 9  ? 0.25
-        : 0.08;
+        : 0.35;
       score *= buffTimingMultiplier;
     }
 

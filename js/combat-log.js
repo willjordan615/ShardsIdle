@@ -645,7 +645,7 @@ async function displayCombatLog(combatData) {
                 return;
             }
 
-            if (typeof startCombat === 'function') {
+            if (typeof startCombat === 'function' && window.currentState?.idleActive) {
                 const activeScreen = document.querySelector('.screen.active')?.id || '';
                 const watching = activeScreen === 'combatlog' || activeScreen === 'combat';
                 if (!watching) window._silentCombatRestart = true;
@@ -1178,7 +1178,11 @@ try {
             
             if (!isRegularSkill && !isPreCombatSkill) return;
 
-            const skillID = turn.action.skillID;
+            // Pre-combat turns carry a synthetic skillID (tag string, slash-joined IDs).
+            // resolvedSkillID is the actual skill the best actor used — prefer that for XP.
+            const skillID = (isPreCombatSkill && turn.action?.resolvedSkillID)
+                ? turn.action.resolvedSkillID
+                : turn.action?.skillID;
             if (!skillID) return;
 
             // Find the skill in the character's owned list (now includes injected discoveries)
