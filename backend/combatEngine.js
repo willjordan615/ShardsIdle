@@ -124,6 +124,7 @@ class CombatEngine {
 
     const preCombatTurns = [];
     let currentTurnCount = globalTurnCount;
+    let requiredSkills = []; // populated in the 'skill' checkType branch; used by resolvedSkillID
 
     // ── Step 1: Filter by spawn chance ──────────────────────────────────
     // Each opportunity has an optional `spawnChance` (0–1, default 1.0).
@@ -157,7 +158,7 @@ class CombatEngine {
       // Support both requiredSkillID (string), requiredSkillIDs (array), and requiredSkillTag (element tag)
       // Checks against EQUIPPED skills only (intrinsics + 2 slots) — not the full discovered list.
       // A character must have the skill equipped to use it in pre-combat opportunities.
-      let requiredSkills = [];
+      requiredSkills = [];
       if (op.requiredSkillTag) {
         requiredSkills = this.skills
           .filter(s => s.tags && s.tags.includes(op.requiredSkillTag))
