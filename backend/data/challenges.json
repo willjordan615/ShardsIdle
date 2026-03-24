@@ -281,7 +281,7 @@
           "dropChance": 0.35,
           "rarity": "common"
         },
-                {
+        {
           "itemID": "sword_steel_tier0",
           "dropChance": 0.01,
           "rarity": "common"
@@ -323,7 +323,7 @@
     "name": "Stone Tooth Pass",
     "description": "A narrow mountain defile locked in a four-year dwarven succession war. Two degraded armies and a band of stranded merchants fight over the only safe route through the Godspine range. The party must choose a path through the pass \u2014 and deal with whoever controls it.",
     "difficulty": 3,
-    "recommendedLevel": 5,
+    "recommendedLevel": 7,
     "minPartySize": 1,
     "maxPartySize": 4,
     "stages": [
@@ -801,7 +801,7 @@
     "name": "Sunken Sanctum of Aethelgard",
     "description": "Three hundred years ago the city of Aethelgard sank in a single night, cursed by a ritual meant to bind a water spirit to human will. The survivors made a religion of the disaster. They still live beneath the lake, breathing through ancient wards, and they mean to drown the rest of the world.",
     "difficulty": 7,
-    "recommendedLevel": 9,
+    "recommendedLevel": 30,
     "minPartySize": 1,
     "maxPartySize": 4,
     "stages": [
@@ -816,7 +816,7 @@
               3,
               5
             ],
-            "level": 7
+            "level": 22
           }
         ],
         "preCombatOpportunities": [
@@ -875,7 +875,7 @@
               2,
               3
             ],
-            "level": 8
+            "level": 27
           },
           {
             "enemyTypeID": "barnacle_guard",
@@ -883,7 +883,7 @@
               1,
               2
             ],
-            "level": 8
+            "level": 26
           },
           {
             "enemyTypeID": "deep_chanter",
@@ -891,7 +891,7 @@
               1,
               2
             ],
-            "level": 8
+            "level": 26
           }
         ],
         "preCombatOpportunities": [
@@ -955,7 +955,7 @@
               1,
               2
             ],
-            "level": 9
+            "level": 26
           },
           {
             "enemyTypeID": "archbishop_malacor",
@@ -963,7 +963,7 @@
               1,
               1
             ],
-            "level": 9
+            "level": 31
           }
         ],
         "preCombatOpportunities": [],
@@ -1396,7 +1396,7 @@
     "name": "The Moonlit Ferry Crossing",
     "description": "A mist-shrouded river crossing where the ferry still runs \u2014 crewed by those who never left. The toll has not changed. The patience of the crew has.",
     "difficulty": 2,
-    "recommendedLevel": 3,
+    "recommendedLevel": 4,
     "minPartySize": 1,
     "maxPartySize": 4,
     "lore": [
@@ -2089,7 +2089,7 @@
     "name": "The Blighted Orchard of Elder's Rest",
     "description": "A hillside apple orchard blessed by the Order of the Verdant Word two centuries ago, now slowly consuming itself. The caretakers remain. They are not themselves anymore.",
     "difficulty": 2,
-    "recommendedLevel": 4,
+    "recommendedLevel": 5,
     "minPartySize": 1,
     "maxPartySize": 4,
     "lore": [
@@ -2396,7 +2396,7 @@
     "name": "The Broken Axle Crossing",
     "description": "The only stone bridge across the ravine on the western trade road. The Goldcrown Usurpers hold it. Everything that moves between the mountains and the valley floor passes through their hands first.",
     "difficulty": 3,
-    "recommendedLevel": 6,
+    "recommendedLevel": 7,
     "minPartySize": 1,
     "maxPartySize": 4,
     "lore": [
@@ -3176,7 +3176,7 @@
     "name": "The Kennels of Wolf's Head",
     "description": "A Royal Guard war-dog breeding compound on the Vale's northern edge. The garrison was recalled five years ago. The dogs were not secured. The keepers who stayed behind have made arrangements.",
     "difficulty": 3,
-    "recommendedLevel": 6,
+    "recommendedLevel": 7,
     "minPartySize": 1,
     "maxPartySize": 4,
     "lore": [
@@ -3569,7 +3569,7 @@
     "name": "The Sealed Excavation",
     "description": "A collapsed mining shaft at the base of Stone Tooth Pass cliffs where Goldcrown Usurpers breached a Verdant Word ward ten years ago. They are still extracting crystals from the breach. The ward spirits are still trying to stop them. Neither side has made meaningful progress.",
     "difficulty": 4,
-    "recommendedLevel": 10,
+    "recommendedLevel": 9,
     "minPartySize": 1,
     "maxPartySize": 4,
     "lore": [
@@ -3607,7 +3607,7 @@
               2,
               3
             ],
-            "level": 5
+            "level": 7
           },
           {
             "enemyTypeID": "excavation_wardbreaker",
@@ -3615,7 +3615,7 @@
               1,
               2
             ],
-            "level": 5
+            "level": 7
           }
         ],
         "preCombatOpportunities": [
@@ -3699,7 +3699,7 @@
               1,
               2
             ],
-            "level": 6
+            "level": 9
           },
           {
             "enemyTypeID": "crystal_sentinel",
@@ -3707,7 +3707,7 @@
               1,
               2
             ],
-            "level": 6
+            "level": 9
           }
         ],
         "preCombatOpportunities": [
@@ -3792,7 +3792,7 @@
               1,
               1
             ],
-            "level": 7
+            "level": 8
           }
         ],
         "preCombatOpportunities": [
@@ -3869,7 +3869,7 @@
               1,
               2
             ],
-            "level": 7
+            "level": 9
           },
           {
             "enemyTypeID": "ward_core_spirit",
@@ -3877,7 +3877,7 @@
               1,
               1
             ],
-            "level": 8
+            "level": 10
           }
         ],
         "preCombatOpportunities": [],
@@ -3989,7 +3989,7 @@
     "name": "The Guildhall of Silent Trade",
     "description": "The Merchant Guild locked the Guildhall four years ago when the Royal Guard withdrew and the Verdant Word dissolved. The wealth inside is real. So is the starvation outside. The Guild considers this a negotiating position.",
     "difficulty": 5,
-    "recommendedLevel": 25,
+    "recommendedLevel": 15,
     "minPartySize": 1,
     "maxPartySize": 4,
     "lore": [
@@ -4023,7 +4023,7 @@
               2,
               3
             ],
-            "level": 5
+            "level": 12
           },
           {
             "enemyTypeID": "guild_verdant_auditor",
@@ -4031,7 +4031,7 @@
               1,
               2
             ],
-            "level": 5
+            "level": 12
           }
         ],
         "preCombatOpportunities": [
@@ -4111,7 +4111,7 @@
               2,
               3
             ],
-            "level": 6
+            "level": 13
           },
           {
             "enemyTypeID": "guild_verdant_auditor",
@@ -4119,7 +4119,7 @@
               1,
               2
             ],
-            "level": 5
+            "level": 11
           }
         ],
         "preCombatOpportunities": [
@@ -4197,7 +4197,7 @@
               1,
               2
             ],
-            "level": 6
+            "level": 13
           },
           {
             "enemyTypeID": "guildmaster_vane",
@@ -4205,7 +4205,7 @@
               1,
               1
             ],
-            "level": 7
+            "level": 16
           }
         ],
         "preCombatOpportunities": [
@@ -4304,7 +4304,7 @@
               1,
               2
             ],
-            "level": 6
+            "level": 13
           },
           {
             "enemyTypeID": "guildmaster_vane",
@@ -4312,7 +4312,7 @@
               1,
               1
             ],
-            "level": 7
+            "level": 15
           }
         ],
         "preCombatOpportunities": [],
@@ -4414,7 +4414,7 @@
     "name": "The Shrine of the First Oath",
     "description": "The island shrine where the halfling elders first signed the pact with Lyra three hundred years ago. The runes are fading. The spirits maintaining them have stopped understanding the difference between repair and harm.",
     "difficulty": 5,
-    "recommendedLevel": 25,
+    "recommendedLevel": 17,
     "minPartySize": 1,
     "maxPartySize": 4,
     "lore": [
@@ -4448,7 +4448,7 @@
               2,
               4
             ],
-            "level": 5
+            "level": 14
           },
           {
             "enemyTypeID": "shrine_oath_warden",
@@ -4456,7 +4456,7 @@
               1,
               2
             ],
-            "level": 5
+            "level": 13
           }
         ],
         "preCombatOpportunities": [
@@ -4535,7 +4535,7 @@
               1,
               2
             ],
-            "level": 6
+            "level": 14
           },
           {
             "enemyTypeID": "shrine_oath_warden",
@@ -4543,7 +4543,7 @@
               1,
               2
             ],
-            "level": 5
+            "level": 13
           }
         ],
         "preCombatOpportunities": [
@@ -4620,7 +4620,7 @@
               1,
               2
             ],
-            "level": 5
+            "level": 13
           },
           {
             "enemyTypeID": "high_keeper_elara",
@@ -4628,7 +4628,7 @@
               1,
               1
             ],
-            "level": 6
+            "level": 17
           }
         ],
         "preCombatOpportunities": [
@@ -4695,7 +4695,7 @@
               1,
               2
             ],
-            "level": 6
+            "level": 14
           },
           {
             "enemyTypeID": "high_keeper_elara",
@@ -4703,7 +4703,7 @@
               1,
               1
             ],
-            "level": 7
+            "level": 19
           }
         ],
         "preCombatOpportunities": [],
@@ -4800,7 +4800,7 @@
     "name": "The Ancestral Forge",
     "description": "The foundry where the Forge-Kings of Khaz-Morad crafted the ancestral weapons and bound the spirits of master smiths into the walls. Both dwarven factions broke the seals simultaneously four years ago. The forge's defenses woke up. Nobody has left.",
     "difficulty": 6,
-    "recommendedLevel": 40,
+    "recommendedLevel": 22,
     "minPartySize": 1,
     "maxPartySize": 4,
     "lore": [
@@ -4834,7 +4834,7 @@
               1,
               2
             ],
-            "level": 6
+            "level": 16
           },
           {
             "enemyTypeID": "crossing_pike_brother",
@@ -4842,7 +4842,7 @@
               1,
               2
             ],
-            "level": 6
+            "level": 21
           }
         ],
         "preCombatOpportunities": [
@@ -4921,7 +4921,7 @@
               1,
               2
             ],
-            "level": 7
+            "level": 20
           },
           {
             "enemyTypeID": "ironvein_conscript",
@@ -4929,7 +4929,7 @@
               1,
               2
             ],
-            "level": 6
+            "level": 15
           }
         ],
         "preCombatOpportunities": [
@@ -5006,7 +5006,7 @@
               1,
               2
             ],
-            "level": 7
+            "level": 19
           },
           {
             "enemyTypeID": "forge_awakened_foreman",
@@ -5014,7 +5014,7 @@
               1,
               1
             ],
-            "level": 8
+            "level": 22
           }
         ],
         "preCombatOpportunities": [
@@ -5086,7 +5086,7 @@
               1,
               2
             ],
-            "level": 7
+            "level": 19
           },
           {
             "enemyTypeID": "forge_awakened_foreman",
@@ -5094,7 +5094,7 @@
               1,
               1
             ],
-            "level": 8
+            "level": 22
           }
         ],
         "preCombatOpportunities": [],
@@ -5191,7 +5191,7 @@
     "name": "The Watchtower of the Northern Lights",
     "description": "A joint Ironvein-Goldcrown monitoring post above the Sunken Sanctum crater lake. Five years ago the Tidebound Penitents came up from the water. The dwarves who were here sent a warning to the Capital. The Capital did not respond. The warning was accurate.",
     "difficulty": 6,
-    "recommendedLevel": 40,
+    "recommendedLevel": 24,
     "minPartySize": 1,
     "maxPartySize": 4,
     "lore": [
@@ -5225,7 +5225,7 @@
               2,
               3
             ],
-            "level": 6
+            "level": 17
           },
           {
             "enemyTypeID": "watch_tide_warden",
@@ -5233,7 +5233,7 @@
               1,
               2
             ],
-            "level": 6
+            "level": 19
           }
         ],
         "preCombatOpportunities": [
@@ -5342,7 +5342,7 @@
               1,
               2
             ],
-            "level": 6
+            "level": 23
           },
           {
             "enemyTypeID": "watch_tide_warden",
@@ -5350,7 +5350,7 @@
               1,
               2
             ],
-            "level": 6
+            "level": 18
           }
         ],
         "preCombatOpportunities": [
@@ -5427,7 +5427,7 @@
               1,
               2
             ],
-            "level": 6
+            "level": 23
           },
           {
             "enemyTypeID": "watch_commander_thrain",
@@ -5435,7 +5435,7 @@
               1,
               1
             ],
-            "level": 8
+            "level": 26
           }
         ],
         "preCombatOpportunities": [
@@ -5507,7 +5507,7 @@
               1,
               2
             ],
-            "level": 7
+            "level": 23
           },
           {
             "enemyTypeID": "watch_commander_thrain",
@@ -5515,7 +5515,7 @@
               1,
               1
             ],
-            "level": 8
+            "level": 24
           }
         ],
         "preCombatOpportunities": [],
@@ -5612,7 +5612,7 @@
     "name": "The Salt-Wept Beacon",
     "description": "A lighthouse at the mouth of the Silverstream where it meets the Northern Sea, maintained for centuries as a shrine to Lyra. Five years ago the fishing village at its base performed a forbidden ritual to bind Lyra's power to their nets. The catches improved. The light changed. Ships followed it onto the rocks.",
     "difficulty": 4,
-    "recommendedLevel": 15,
+    "recommendedLevel": 13,
     "minPartySize": 1,
     "maxPartySize": 4,
     "lore": [
@@ -5646,7 +5646,7 @@
               2,
               3
             ],
-            "level": 5
+            "level": 9
           },
           {
             "enemyTypeID": "beacon_salt_singer",
@@ -5654,7 +5654,7 @@
               1,
               2
             ],
-            "level": 5
+            "level": 11
           }
         ],
         "preCombatOpportunities": [
@@ -5733,7 +5733,7 @@
               1,
               2
             ],
-            "level": 6
+            "level": 13
           },
           {
             "enemyTypeID": "beacon_salt_singer",
@@ -5741,7 +5741,7 @@
               1,
               2
             ],
-            "level": 5
+            "level": 9
           }
         ],
         "preCombatOpportunities": [
@@ -5818,7 +5818,7 @@
               1,
               1
             ],
-            "level": 6
+            "level": 13
           },
           {
             "enemyTypeID": "beacon_the_keeper",
@@ -5826,7 +5826,7 @@
               1,
               1
             ],
-            "level": 6
+            "level": 14
           }
         ],
         "preCombatOpportunities": [
@@ -5898,7 +5898,7 @@
               1,
               2
             ],
-            "level": 6
+            "level": 9
           },
           {
             "enemyTypeID": "beacon_lyra_fragment",
@@ -5906,7 +5906,7 @@
               1,
               1
             ],
-            "level": 7
+            "level": 13
           }
         ],
         "preCombatOpportunities": [],
@@ -6003,7 +6003,7 @@
     "name": "The Whispering Athenaeum",
     "description": "The Verdant Word's primary archive, housed inside a hollow sequoia deep in the Whispering Woods. Fifty years ago a preservation ritual used blood-contaminated ink and the scribes died in their seats. They are still working.",
     "difficulty": 4,
-    "recommendedLevel": 15,
+    "recommendedLevel": 14,
     "minPartySize": 1,
     "maxPartySize": 4,
     "lore": [
@@ -6041,7 +6041,7 @@
               2,
               4
             ],
-            "level": 5
+            "level": 11
           },
           {
             "enemyTypeID": "athenaeum_editor",
@@ -6049,7 +6049,7 @@
               1,
               2
             ],
-            "level": 5
+            "level": 10
           }
         ],
         "preCombatOpportunities": [
@@ -6147,7 +6147,7 @@
               1,
               2
             ],
-            "level": 6
+            "level": 12
           },
           {
             "enemyTypeID": "athenaeum_editor",
@@ -6155,7 +6155,7 @@
               1,
               2
             ],
-            "level": 5
+            "level": 11
           }
         ],
         "preCombatOpportunities": [
@@ -6232,7 +6232,7 @@
               1,
               2
             ],
-            "level": 6
+            "level": 12
           },
           {
             "enemyTypeID": "grand_archivist",
@@ -6240,7 +6240,7 @@
               1,
               1
             ],
-            "level": 6
+            "level": 15
           }
         ],
         "preCombatOpportunities": [
@@ -6312,7 +6312,7 @@
               1,
               2
             ],
-            "level": 6
+            "level": 13
           },
           {
             "enemyTypeID": "athenaeum_true_record",
@@ -6320,7 +6320,7 @@
               1,
               1
             ],
-            "level": 7
+            "level": 16
           }
         ],
         "preCombatOpportunities": [],
@@ -6417,7 +6417,7 @@
     "name": "The Bastion of the Fractured Ward",
     "description": "A Royal Guard fortress on the Capital's outskirts where the Verdant Word was performing a protective ward when the order dissolved. The priests fled mid-ritual. The soldiers who were guarding them did not survive the fracture. The cultists who arrived afterward to exploit the unstable magic have not improved the situation.",
     "difficulty": 5,
-    "recommendedLevel": 25,
+    "recommendedLevel": 19,
     "minPartySize": 1,
     "maxPartySize": 4,
     "lore": [
@@ -6451,7 +6451,7 @@
               2,
               4
             ],
-            "level": 6
+            "level": 18
           },
           {
             "enemyTypeID": "bastion_ward_breaker",
@@ -6459,7 +6459,7 @@
               1,
               2
             ],
-            "level": 6
+            "level": 13
           }
         ],
         "preCombatOpportunities": [
@@ -6538,7 +6538,7 @@
               2,
               3
             ],
-            "level": 6
+            "level": 17
           },
           {
             "enemyTypeID": "bastion_ward_breaker",
@@ -6546,7 +6546,7 @@
               1,
               2
             ],
-            "level": 6
+            "level": 15
           }
         ],
         "preCombatOpportunities": [
@@ -6623,7 +6623,7 @@
               1,
               2
             ],
-            "level": 6
+            "level": 16
           },
           {
             "enemyTypeID": "bastion_ward_captain",
@@ -6631,7 +6631,7 @@
               1,
               1
             ],
-            "level": 7
+            "level": 17
           }
         ],
         "preCombatOpportunities": [
@@ -6703,7 +6703,7 @@
               1,
               1
             ],
-            "level": 7
+            "level": 18
           },
           {
             "enemyTypeID": "bastion_fractured_ward",
@@ -6711,7 +6711,7 @@
               1,
               1
             ],
-            "level": 8
+            "level": 21
           }
         ],
         "preCombatOpportunities": [],
@@ -6808,7 +6808,7 @@
     "name": "The Marsh of Broken Oaths",
     "description": "The wetland where the Verdant Word first attempted the water-spirit binding three hundred years ago. The attempt failed. The corruption from that failure is still here. The Tidebound Vanguard moved in five years ago to use it as a staging ground. The three remaining Sealkeepers of the Verdant Word are still trying to contain it.",
     "difficulty": 6,
-    "recommendedLevel": 40,
+    "recommendedLevel": 21,
     "minPartySize": 1,
     "maxPartySize": 4,
     "lore": [
@@ -6846,7 +6846,7 @@
               2,
               4
             ],
-            "level": 6
+            "level": 17
           },
           {
             "enemyTypeID": "marsh_mist_weaver",
@@ -6854,7 +6854,7 @@
               1,
               2
             ],
-            "level": 7
+            "level": 15
           }
         ],
         "preCombatOpportunities": [
@@ -6938,7 +6938,7 @@
               1,
               2
             ],
-            "level": 7
+            "level": 18
           },
           {
             "enemyTypeID": "marsh_mist_weaver",
@@ -6946,7 +6946,7 @@
               1,
               2
             ],
-            "level": 7
+            "level": 17
           }
         ],
         "preCombatOpportunities": [
@@ -7046,7 +7046,7 @@
               1,
               2
             ],
-            "level": 7
+            "level": 19
           },
           {
             "enemyTypeID": "high_chanter_malacor",
@@ -7054,7 +7054,7 @@
               1,
               1
             ],
-            "level": 8
+            "level": 22
           }
         ],
         "preCombatOpportunities": [
@@ -7126,7 +7126,7 @@
               1,
               2
             ],
-            "level": 7
+            "level": 17
           },
           {
             "enemyTypeID": "high_chanter_malacor",
@@ -7134,7 +7134,7 @@
               1,
               1
             ],
-            "level": 8
+            "level": 21
           }
         ],
         "preCombatOpportunities": [],
@@ -7241,7 +7241,7 @@
     "name": "The Spire of Silent Conviction",
     "description": "The conclave seat of the Verdant Word's High Council, sealed by the Capital's mages fifty years ago after the Council disappeared mid-session. The seal has held. The echoes of what the Council was debating when the dissolution happened have not.",
     "difficulty": 7,
-    "recommendedLevel": 60,
+    "recommendedLevel": 28,
     "minPartySize": 1,
     "maxPartySize": 4,
     "lore": [
@@ -7279,7 +7279,7 @@
               2,
               4
             ],
-            "level": 7
+            "level": 21
           },
           {
             "enemyTypeID": "spire_muted_judge",
@@ -7287,7 +7287,7 @@
               1,
               2
             ],
-            "level": 7
+            "level": 20
           }
         ],
         "preCombatOpportunities": [
@@ -7371,7 +7371,7 @@
               2,
               3
             ],
-            "level": 7
+            "level": 20
           },
           {
             "enemyTypeID": "spire_ward_keeper",
@@ -7379,7 +7379,7 @@
               1,
               2
             ],
-            "level": 8
+            "level": 24
           }
         ],
         "preCombatOpportunities": [
@@ -7484,7 +7484,7 @@
               1,
               2
             ],
-            "level": 8
+            "level": 25
           },
           {
             "enemyTypeID": "high_speaker_valerius",
@@ -7492,7 +7492,7 @@
               1,
               1
             ],
-            "level": 9
+            "level": 30
           }
         ],
         "preCombatOpportunities": [
@@ -7569,7 +7569,7 @@
               1,
               2
             ],
-            "level": 8
+            "level": 20
           },
           {
             "enemyTypeID": "spire_true_record",
@@ -7577,7 +7577,7 @@
               1,
               1
             ],
-            "level": 9
+            "level": 30
           }
         ],
         "preCombatOpportunities": [],
@@ -7714,7 +7714,7 @@
     "name": "The Hall of Ancestral Echoes",
     "description": "The coronation cathedral beneath Khaz-Morad, where the Forge-Kings received ancestral blessing. The succession crisis disturbed the ancestors. They rose. They have been conducting a trial ever since. Both factions sent delegations. Neither delegation returned with a favorable verdict.",
     "difficulty": 7,
-    "recommendedLevel": 60,
+    "recommendedLevel": 29,
     "minPartySize": 1,
     "maxPartySize": 4,
     "lore": [
@@ -7748,7 +7748,7 @@
               2,
               4
             ],
-            "level": 7
+            "level": 22
           },
           {
             "enemyTypeID": "hall_ancestor_shade",
@@ -7756,7 +7756,7 @@
               1,
               2
             ],
-            "level": 7
+            "level": 22
           }
         ],
         "preCombatOpportunities": [
@@ -7840,7 +7840,7 @@
               1,
               3
             ],
-            "level": 7
+            "level": 25
           },
           {
             "enemyTypeID": "hall_the_disowned",
@@ -7848,7 +7848,7 @@
               1,
               2
             ],
-            "level": 8
+            "level": 26
           }
         ],
         "preCombatOpportunities": [
@@ -7930,7 +7930,7 @@
               1,
               2
             ],
-            "level": 7
+            "level": 23
           },
           {
             "enemyTypeID": "high_judge_thorgrim",
@@ -7938,7 +7938,7 @@
               1,
               1
             ],
-            "level": 9
+            "level": 31
           }
         ],
         "preCombatOpportunities": [
@@ -8038,7 +8038,7 @@
               1,
               2
             ],
-            "level": 8
+            "level": 27
           },
           {
             "enemyTypeID": "high_judge_thorgrim",
@@ -8046,7 +8046,7 @@
               1,
               1
             ],
-            "level": 9
+            "level": 30
           }
         ],
         "preCombatOpportunities": [],
@@ -8173,7 +8173,7 @@
     "name": "The Stone-Tusk Forward Camp",
     "description": "A fortified Orcish mercenary encampment on the Red Plains beyond the Northern Highlands. The Stone-Tusk Clan was hired by the Goldcrown Usurpers five years ago and never paid. They seized this valley as collateral. They are still here.",
     "difficulty": 7,
-    "recommendedLevel": 60,
+    "recommendedLevel": 26,
     "minPartySize": 1,
     "maxPartySize": 4,
     "lore": [
@@ -8207,7 +8207,7 @@
               2,
               4
             ],
-            "level": 6
+            "level": 19
           },
           {
             "enemyTypeID": "stonetusk_tusk_brother",
@@ -8215,7 +8215,7 @@
               1,
               2
             ],
-            "level": 7
+            "level": 21
           }
         ],
         "preCombatOpportunities": [
@@ -8319,7 +8319,7 @@
               1,
               2
             ],
-            "level": 7
+            "level": 23
           },
           {
             "enemyTypeID": "stonetusk_bone_guard",
@@ -8327,7 +8327,7 @@
               1,
               2
             ],
-            "level": 7
+            "level": 24
           }
         ],
         "preCombatOpportunities": [
@@ -8404,7 +8404,7 @@
               1,
               2
             ],
-            "level": 7
+            "level": 24
           },
           {
             "enemyTypeID": "chieftain_krog",
@@ -8412,7 +8412,7 @@
               1,
               1
             ],
-            "level": 8
+            "level": 26
           }
         ],
         "preCombatOpportunities": [
@@ -8484,7 +8484,7 @@
               1,
               2
             ],
-            "level": 7
+            "level": 19
           },
           {
             "enemyTypeID": "chieftain_krog",
@@ -8492,7 +8492,7 @@
               1,
               1
             ],
-            "level": 8
+            "level": 27
           }
         ],
         "preCombatOpportunities": [],
@@ -8604,7 +8604,7 @@
     "name": "The Gallery of Fractured Light",
     "description": "A sealed elven sanctuary deep in the Whispering Woods, accessible from the Whispering Willow Shrine's root-bridges. The Luminary Exiles sealed these bridges fifty years ago when the Verdant Word dissolved. They are not defending the Gallery from enemies. They are quarantining it from the Fraying \u2014 the magical residue of every broken oath in the Vale. The party carries that residue with them. The elves know.",
     "difficulty": 8,
-    "recommendedLevel": 70,
+    "recommendedLevel": 35,
     "minPartySize": 1,
     "maxPartySize": 4,
     "lore": [
@@ -8638,7 +8638,7 @@
               2,
               3
             ],
-            "level": 7
+            "level": 27
           },
           {
             "enemyTypeID": "gallery_silence_weaver",
@@ -8646,7 +8646,7 @@
               1,
               2
             ],
-            "level": 7
+            "level": 25
           }
         ],
         "preCombatOpportunities": [
@@ -8725,7 +8725,7 @@
               1,
               2
             ],
-            "level": 8
+            "level": 31
           },
           {
             "enemyTypeID": "gallery_fraying_touched",
@@ -8733,7 +8733,7 @@
               1,
               2
             ],
-            "level": 7
+            "level": 26
           }
         ],
         "preCombatOpportunities": [
@@ -8829,7 +8829,7 @@
               1,
               2
             ],
-            "level": 8
+            "level": 32
           },
           {
             "enemyTypeID": "elara_preservation_core",
@@ -8837,7 +8837,7 @@
               1,
               1
             ],
-            "level": 9
+            "level": 37
           }
         ],
         "preCombatOpportunities": [
@@ -8909,7 +8909,7 @@
               1,
               2
             ],
-            "level": 8
+            "level": 27
           },
           {
             "enemyTypeID": "elara_preservation_core",
@@ -8917,7 +8917,7 @@
               1,
               1
             ],
-            "level": 9
+            "level": 36
           }
         ],
         "preCombatOpportunities": [],
