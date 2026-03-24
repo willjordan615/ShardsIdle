@@ -8704,7 +8704,7 @@
         "type": "apply_debuff",
         "debuff": "burn",
         "duration": 2,
-        "chance": 0.1
+        "chance": 0.25
       }
     ],
     "isChildSkill": true,

@@ -295,27 +295,258 @@ function getMentality(stats) {
 }
 
 /**
- * Determine class based on primary skills.
- */
+Determine character class based on skills, equipment, stats, and combat history.
+Returns a descriptive archetype that reflects actual playstyle.
+*/
 function getCharacterClass(character, skills) {
-    if (!character.skills || character.skills.length === 0) return 'Novice';
-
-    let damageCount = 0;
-    let healCount   = 0;
-    let buffCount   = 0;
-
-    character.skills.forEach(skillEntry => {
+    // ── SAFETY CHECKS ─────────────────────────────────────────────────────
+    if (!character || !skills || !Array.isArray(skills)) return 'Adventurer';
+    
+    const charSkills = character.skills || [];
+    if (!charSkills.length) return 'Novice';
+    
+    const equipment = character.equipment || {};
+    const stats = character.stats || {};
+    const combatStats = character.combatStats || {};
+    const milestones = combatStats.milestones || {};
+    
+    // ── CATEGORY COUNTING ─────────────────────────────────────────────────
+    const categories = {
+        DAMAGE: 0,
+        HEALING: 0,
+        BUFF: 0,
+        DEFENSE: 0,
+        CONTROL: 0,
+        UTILITY: 0,
+        RESTORATION: 0
+    };
+    
+    let damageTypes = { physical: 0, magic: 0 };
+    let topSkillCategory = null;
+    let skillCount = 0;
+    
+    // Analyze equipped skills (non-intrinsic only for class determination)
+    charSkills.forEach(skillEntry => {
+        if (skillEntry.intrinsic) return; // Skip racial abilities
+        if (!skillEntry.learned || (skillEntry.skillLevel || 0) < 1) return;
+        
         const skill = skills.find(s => s.id === skillEntry.skillID);
-        if (skill) {
-            if (skill.category.includes('DAMAGE'))  damageCount++;
-            if (skill.category.includes('HEALING')) healCount++;
-            if (skill.category.includes('BUFF'))    buffCount++;
+        if (!skill || !skill.category) return;
+        
+        skillCount++;
+        
+        // Map skill categories
+        const cat = skill.category.toUpperCase();
+        if (cat.includes('DAMAGE')) {
+            categories.DAMAGE++;
+            // Track damage type from skill effects
+            if (skill.effects) {
+                skill.effects.forEach(effect => {
+                    if (effect.type === 'damage' && effect.damageType) {
+                        const dtype = effect.damageType.toLowerCase();
+                        const magicTypes = ['fire', 'cold', 'lightning', 'arcane', 'holy', 'shadow', 'nature', 'poison'];
+                        if (magicTypes.includes(dtype)) {
+                            damageTypes.magic++;
+                        } else {
+                            damageTypes.physical++;
+                        }
+                    }
+                });
+            }
         }
+        if (cat.includes('HEALING')) categories.HEALING++;
+        if (cat.includes('BUFF')) categories.BUFF++;
+        if (cat.includes('DEFENSE')) categories.DEFENSE++;
+        if (cat.includes('CONTROL')) categories.CONTROL++;
+        if (cat.includes('UTILITY')) categories.UTILITY++;
+        if (cat.includes('RESTORATION')) categories.RESTORATION++;
     });
-
-    if (healCount > damageCount && healCount > buffCount) return 'Healer';
-    if (buffCount > damageCount && buffCount > healCount) return 'Support';
-    return 'Warrior';
+    
+    if (skillCount === 0) return 'Novice';
+    
+    // ── WEAPON ANALYSIS ───────────────────────────────────────────────────
+    const weaponId = equipment.mainHand;
+    const weapon = weaponId ? window.gameData?.gear?.find(g => g.id === weaponId) : null;
+    const weaponType = weapon?.type?.toLowerCase() || '';
+    const weaponDamageType = weapon?.dmg_type_1?.toLowerCase() || 'physical';
+    
+    // ── STAT DISTRIBUTION ─────────────────────────────────────────────────
+    const totalStats = (stats.conviction || 0) + (stats.endurance || 0) + 
+                       (stats.ambition || 0) + (stats.harmony || 0);
+    const statRatios = totalStats > 0 ? {
+        conviction: (stats.conviction || 0) / totalStats,
+        endurance:  (stats.endurance || 0) / totalStats,
+        ambition:   (stats.ambition || 0) / totalStats,
+        harmony:    (stats.harmony || 0) / totalStats
+    } : { conviction: 0.25, endurance: 0.25, ambition: 0.25, harmony: 0.25 };
+    
+    // ── COMBAT PERFORMANCE ────────────────────────────────────────────────
+    const totalHealing = combatStats.totalHealingDone || 0;
+    const totalDamage = combatStats.totalDamageDealt || 0;
+    const totalKills = Object.values(combatStats.enemyKills || {}).reduce((a, b) => a + b, 0);
+    const winRate = combatStats.wins && combatStats.totalCombats 
+        ? combatStats.wins / combatStats.totalCombats 
+        : 0;
+    
+    // ── ARCHETYPE DETERMINATION ───────────────────────────────────────────
+    // Check hybrid archetypes first (combinations), then pure archetypes
+    
+    const hasDamage = categories.DAMAGE > 0;
+    const hasHealing = categories.HEALING > 0;
+    const hasBuff = categories.BUFF > 0;
+    const hasDefense = categories.DEFENSE > 0;
+    const hasControl = categories.CONTROL > 0;
+    const hasUtility = categories.UTILITY > 0;
+    
+    // ─── HYBRID ARCHETYPES ───────────────────────────────────────────────
+    
+    // Spellblade: Magic damage + melee weapon
+    if (damageTypes.magic > damageTypes.physical && 
+        ['sword', 'dagger', 'axe'].includes(weaponType)) {
+        return 'Spellblade';
+    }
+    
+    // Battle Cleric: Healing + Damage (healing focused)
+    if (hasHealing && hasDamage && categories.HEALING >= categories.DAMAGE) {
+        if (weaponType.includes('mace') || weaponType.includes('hammer')) {
+            return 'War Priest';
+        }
+        return 'Battle Cleric';
+    }
+    
+    // Paladin: Defense + Healing + Damage
+    if (hasDefense && hasHealing && hasDamage) {
+        return 'Paladin';
+    }
+    
+    // Shadow Assassin: Control + Damage + stealthy weapon
+    if (hasControl && hasDamage && ['dagger', 'knife'].includes(weaponType)) {
+        return 'Shadow Assassin';
+    }
+    
+    // Warden: Defense + Control (tank who locks down enemies)
+    if (hasDefense && hasControl && categories.DEFENSE >= categories.DAMAGE) {
+        return 'Warden';
+    }
+    
+    // Enchanter: Buff + Utility (pure support buffer)
+    if (hasBuff && hasUtility && !hasDamage && !hasHealing) {
+        return 'Enchanter';
+    }
+    
+    // Spellsword: Magic damage + sword
+    if (damageTypes.magic > 0 && weaponType.includes('sword')) {
+        return 'Spellsword';
+    }
+    
+    // ─── PURE ARCHETYPES ─────────────────────────────────────────────────
+    
+    // Find dominant category
+    const maxCategoryCount = Math.max(...Object.values(categories));
+    if (maxCategoryCount === 0) return 'Adventurer';
+    
+    // Healer variants
+    if (categories.HEALING === maxCategoryCount && categories.HEALING > 0) {
+        if (totalHealing > 10000 || milestones.masterHealer) {
+            return 'High Priest';
+        }
+        if (hasBuff) return 'Disciple';  // Healing + Buff hybrid
+        if (weaponType.includes('staff') || weaponType.includes('wand')) {
+            return 'Divine Caster';
+        }
+        return 'Healer';
+    }
+    
+    // Support variants
+    if (categories.BUFF === maxCategoryCount && categories.BUFF > 0) {
+        if (hasHealing) return 'Disciple';
+        if (hasUtility) return 'Tactician';
+        if (statRatios.harmony > 0.35) return 'Channeler';
+        return 'Support';
+    }
+    
+    // Tank variants
+    if (categories.DEFENSE === maxCategoryCount && categories.DEFENSE > 0) {
+        if (statRatios.endurance > 0.35) {
+            if (weaponType.includes('shield')) return 'Shieldbearer';
+            return 'Guardian';
+        }
+        if (hasControl) return 'Warden';
+        return 'Defender';
+    }
+    
+    // Control variants
+    if (categories.CONTROL === maxCategoryCount && categories.CONTROL > 0) {
+        if (hasDamage) {
+            if (weaponType.includes('dagger')) return 'Shadow Assassin';
+            if (damageTypes.magic > 0) return 'Hexer';
+            return 'Skirmisher';
+        }
+        if (statRatios.ambition > 0.35) return 'Manipulator';
+        return 'Controller';
+    }
+    
+    // Damage variants (most common)
+    if (categories.DAMAGE === maxCategoryCount && categories.DAMAGE > 0) {
+        // Magic damage dealers
+        if (damageTypes.magic > damageTypes.physical) {
+            if (weaponType.includes('wand') || weaponType.includes('scepter')) {
+                return 'Mage';
+            }
+            if (weaponType.includes('staff') || weaponType.includes('tome')) {
+                return 'Wizard';
+            }
+            if (weaponType.includes('dagger')) return 'Spellblade';
+            return 'Sorcerer';
+        }
+        
+        // Physical damage dealers - weapon specific
+        if (weaponType.includes('sword')) {
+            if (statRatios.conviction > 0.35) return 'Blademaster';
+            if (statRatios.ambition > 0.35) return 'Duelist';
+            return 'Swordsman';
+        }
+        if (weaponType.includes('axe') || weaponType.includes('handaxe')) {
+            if (statRatios.conviction > 0.35) return 'Berserker';
+            return 'Marauder';
+        }
+        if (weaponType.includes('dagger') || weaponType.includes('knife')) {
+            if (statRatios.ambition > 0.35) return 'Assassin';
+            if (hasControl) return 'Shadow Assassin';
+            return 'Rogue';
+        }
+        if (weaponType.includes('bow') || weaponType.includes('crossbow')) {
+            if (statRatios.ambition > 0.35) return 'Sniper';
+            return 'Ranger';
+        }
+        if (weaponType.includes('hammer') || weaponType.includes('mace')) {
+            if (statRatios.endurance > 0.35) return 'Crusader';
+            return 'Bruiser';
+        }
+        if (weaponType.includes('pistol')) return 'Gunslinger';
+        if (weaponType.includes('spear')) return 'Lancer';
+        
+        // Generic damage dealers
+        if (statRatios.conviction > 0.35) return 'Warrior';
+        if (statRatios.ambition > 0.35) return 'Striker';
+        if (totalKills > 100 || milestones.hundredKills) return 'Veteran';
+        return 'Fighter';
+    }
+    
+    // Utility/Restoration specialists
+    if (categories.UTILITY >= 1 || categories.RESTORATION >= 1) {
+        if (statRatios.harmony > 0.35) return 'Monk';
+        if (hasBuff) return 'Tactician';
+        return 'Specialist';
+    }
+    
+    // Fallback based on stats
+    if (statRatios.conviction > 0.35) return 'Warrior';
+    if (statRatios.endurance > 0.35) return 'Guardian';
+    if (statRatios.ambition > 0.35) return 'Rogue';
+    if (statRatios.harmony > 0.35) return 'Mystic';
+    
+    return 'Adventurer';
 }
 
 // --- Lookup helpers ---
