@@ -60,6 +60,15 @@ function _updateMediaControls() {
             pauseBtn.classList.remove('media-btn--active');
         }
     }
+    // Stop highlights while a graceful loop exit is pending
+    const stopBtn = document.getElementById('mediaBtn_stop');
+    if (stopBtn) {
+        if (window.currentState?.pendingLoopExit) {
+            stopBtn.classList.add('media-btn--active');
+        } else {
+            stopBtn.classList.remove('media-btn--active');
+        }
+    }
 }
 
 // Initialise speed from localStorage on load
@@ -576,18 +585,18 @@ async function displayCombatLog(combatData) {
                 _setupChallenge(nextId);
                 if (!onCombatLog) {
                     // Show toast immediately, paused — player controls when next run fires
-                    _showCombatToast(finalResult, combatData, nextId, 0, true);
+                    _showCombatToast(0, true, nextId);
                 }
             } else {
                 startCountdown(victorySeconds, nextId, finalResult, combatData);
                 if (!onCombatLog) {
-                    _showCombatToast(finalResult, combatData, nextId, victorySeconds, false);
+                    _showCombatToast(victorySeconds, false, nextId);
                 }
             }
         } else if (finalResult === 'loss' || finalResult === 'defeat') {
             startCountdown(defeatSeconds, nextId, finalResult, combatData);
             if (!onCombatLog) {
-                _showCombatToast(finalResult, combatData, nextId, defeatSeconds, false);
+                _showCombatToast(defeatSeconds, false, nextId);
             }
         } else if (finalResult === 'retreated') {
             setTimeout(() => {
@@ -708,6 +717,19 @@ window.cancelAutoRestart = function() {
         window.currentState.pendingLoopExit = false;
     }
     if (typeof updateChallengeStatusBanner === 'function') updateChallengeStatusBanner();
+    _updateMediaControls();
+};
+
+// Stop button in media controls: request graceful loop exit (highlights while pending).
+// Clicking again while pending cancels the request.
+window.toggleLoopStop = function() {
+    if (!window.currentState?.idleActive) return;
+    if (window.currentState.pendingLoopExit) {
+        if (typeof cancelLoopExit === 'function') cancelLoopExit();
+    } else {
+        if (typeof requestLoopExit === 'function') requestLoopExit();
+    }
+    _updateMediaControls();
 };
 
 // Bottom-right countdown toast — notifies player of next queued run when away from combat log

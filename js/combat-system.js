@@ -763,6 +763,7 @@ function requestLoopExit() {
     if (!currentState.idleActive) return;
     currentState.pendingLoopExit = true;
     updateChallengeStatusBanner();
+    if (typeof _updateMediaControls === 'function') _updateMediaControls();
     console.log('[IDLE] Loop exit requested — will stop after current combat.');
 }
 
@@ -774,5 +775,6 @@ function cancelLoopExit() {
     if (!currentState.idleActive) return;
     currentState.pendingLoopExit = false;
     updateChallengeStatusBanner();
+    if (typeof _updateMediaControls === 'function') _updateMediaControls();
     console.log('[IDLE] Loop exit cancelled — continuing idle loop.');
 }
