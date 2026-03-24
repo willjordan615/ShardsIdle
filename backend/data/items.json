@@ -16865,7 +16865,12 @@
     "rarity": "unique",
     "value": 0,
     "onhit_skillid_1": "proc_chilled",
-    "onhit_skillchance_1": 20
+    "onhit_skillchance_1": 20,
+    "type": "scepter",
+    "dmg1": 8,
+    "dmg_type_1": "Cold",
+    "dmg2": 4,
+    "dmg_type_2": "Electric"
   },
   {
     "id": "weapon_tidebound_harpoon",
@@ -16876,7 +16881,12 @@
     "rarity": "unique",
     "value": 0,
     "onhit_skillid_1": "proc_electrified",
-    "onhit_skillchance_1": 25
+    "onhit_skillchance_1": 25,
+    "type": "spear",
+    "dmg1": 9,
+    "dmg_type_1": "Piercing",
+    "dmg2": 4,
+    "dmg_type_2": "Electric"
   },
   {
     "id": "weapon_fraying_natural",
@@ -16887,7 +16897,12 @@
     "rarity": "unique",
     "value": 0,
     "onhit_skillid_1": "proc_shadowed",
-    "onhit_skillchance_1": 18
+    "onhit_skillchance_1": 18,
+    "type": "claw",
+    "dmg1": 8,
+    "dmg_type_1": "Slashing",
+    "dmg2": 5,
+    "dmg_type_2": "Nature"
   },
   {
     "id": "weapon_ashen_fist",
@@ -16898,7 +16913,12 @@
     "rarity": "unique",
     "value": 0,
     "onhit_skillid_1": "proc_burn",
-    "onhit_skillchance_1": 12
+    "onhit_skillchance_1": 12,
+    "type": "fist",
+    "dmg1": 6,
+    "dmg_type_1": "Fire",
+    "dmg2": 3,
+    "dmg_type_2": "Bludgeoning"
   },
   {
     "id": "weapon_alpha_bite",
@@ -16909,7 +16929,12 @@
     "rarity": "unique",
     "value": 0,
     "onhit_skillid_1": "proc_disorient",
-    "onhit_skillchance_1": 15
+    "onhit_skillchance_1": 15,
+    "type": "bite",
+    "dmg1": 10,
+    "dmg_type_1": "Piercing",
+    "dmg2": 3,
+    "dmg_type_2": "Physical"
   },
   {
     "id": "weapon_ancestral_hammer",
@@ -16920,7 +16945,12 @@
     "rarity": "unique",
     "value": 0,
     "onhit_skillid_1": "proc_stun",
-    "onhit_skillchance_1": 20
+    "onhit_skillchance_1": 20,
+    "type": "hammer",
+    "dmg1": 14,
+    "dmg_type_1": "Bludgeoning",
+    "dmg2": 4,
+    "dmg_type_2": "Holy"
   },
   {
     "id": "weapon_purifying_touch",
@@ -16931,6 +16961,11 @@
     "rarity": "unique",
     "value": 0,
     "onhit_skillid_1": "proc_silence",
-    "onhit_skillchance_1": 30
+    "onhit_skillchance_1": 30,
+    "type": "scepter",
+    "dmg1": 12,
+    "dmg_type_1": "Holy",
+    "dmg2": 8,
+    "dmg_type_2": "Arcane"
   }
 ]
