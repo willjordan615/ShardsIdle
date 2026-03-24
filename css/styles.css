@@ -16,6 +16,8 @@
     --gold-glow:      rgba(212,175,55,0.15);
     --gold-border:    rgba(212,175,55,0.28);
 
+    --game-background: url('./backend/data/assets/ai_flavor.jpg');
+
     --ink-deep:       #070a18;
     --ink-dark:       #0d1128;
     --ink-mid:        #121830;
@@ -85,6 +87,10 @@ body {
     line-height: 1.6;
     color: var(--text-primary);
     background-color: var(--ink-deep);
+    background-image: var(--game-background);
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
     min-height: 100vh;
     overflow-x: hidden;
 }
