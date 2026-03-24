@@ -381,26 +381,50 @@ window.clearBeltSlot = async function(characterId, itemId) {
 };
 
 // ── Equip / Unequip ───────────────────────────────────────────────────────────
-
 async function equipItemNew(characterId, itemId, inventoryIndex) {
     if (typeof destroyGearTooltip === 'function') destroyGearTooltip();
+    
     const character = await getCharacter(characterId);
     if (!character) return;
-
+    
     const def = _itemDef(itemId);
     if (!def) return;
 
+    // 1. Determine primary slot from item definition
     let targetSlot = _itemSlot(def);
-    if (!GEAR_SLOTS.includes(targetSlot)) {
+    const slotId2 = def?.slot_id2;
+
+    // 2. If item supports a secondary slot (e.g. accessories), check occupancy
+    if (slotId2 && GEAR_SLOTS.includes(slotId2)) {
+        // If primary slot is occupied...
+        if (character.equipment?.[targetSlot]) {
+            // ...check if secondary slot is free
+            if (!character.equipment?.[slotId2]) {
+                targetSlot = slotId2; // Equip to secondary
+            } else {
+                // Both slots occupied
+                if (typeof showError === 'function') showError('Both accessory slots are occupied.');
+                return; // Stop execution
+            }
+        }
+    } 
+    // 3. Fallback for items with invalid slot definitions (legacy support)
+    else if (!GEAR_SLOTS.includes(targetSlot)) {
         targetSlot = character.equipment?.accessory1 ? 'accessory2' : 'accessory1';
     }
 
+    // 4. Perform Swap (Move current equipment to inventory)
     const currentId = character.equipment?.[targetSlot];
-    if (currentId) _safeInventory(character).push({ itemID: currentId, rarity: 'common', acquiredAt: Date.now() });
+    if (currentId) {
+        _safeInventory(character).push({ itemID: currentId, rarity: 'common', acquiredAt: Date.now() });
+    }
+
+    // 5. Equip New Item
     _safeInventory(character).splice(inventoryIndex, 1);
     character.equipment[targetSlot] = itemId;
     character.lastModified = Date.now();
 
+    // 6. Save & Refresh
     await saveCharacterToServer(character);
     await showCharacterDetail(character.id);
     _renderGearModal(character, _activeGearSlot);
