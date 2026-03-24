@@ -296,10 +296,10 @@ function getMentality(stats) {
 
 /**
 Determine character class based on:
-1. Key Skills (40% weight) - Deep unlocks like assassinate, mass_heal, meteor
-2. Skill Tags/Elements (30% weight) - Fire, shadow, holy, nature specialization
-3. Weapon Type (20% weight) - Modifies the title, doesn't override it
-4. Stats/Armor (10% weight) - Final fallback refinement
+1. Key Skills (50% weight) - Deep unlocks like assassinate, mass_heal, meteor
+2. Skill Tags/Elements (25% weight) - Fire, shadow, holy, nature specialization
+3. Equipment (15% weight) - Weapon/armor refines but doesn't override skills
+4. Performance (10% weight) - Prestige titles from winrate & milestones
 */
 function getCharacterClass(character, skills) {
     if (!character || !character.skills || !skills || !Array.isArray(skills)) {
@@ -336,13 +336,19 @@ function getCharacterClass(character, skills) {
     const isRangedWeapon = ['bow', 'crossbow', 'pistol'].includes(weaponType);
     const isCasterWeapon = ['wand', 'scepter', 'tome', 'totem', 'bell', 'flute'].includes(weaponType);
 
-    // ── SKILL ANALYSIS ───────────────────────────────────────────────────
+    // ── SKILL CATEGORY COUNTING ───────────────────────────────────────────
     const categories = {
         damagePhysical: 0, damageMagic: 0, healing: 0, buff: 0,
         defense: 0, control: 0, utility: 0, restoration: 0
     };
-    const damageTypes = { physical: 0, fire: 0, cold: 0, lightning: 0, arcane: 0, holy: 0, shadow: 0, nature: 0, poison: 0 };
-    const tags = { beast: 0, arcane: 0, holy: 0, shadow: 0, nature: 0, fire: 0, cold: 0, lightning: 0, poison: 0 };
+    const damageTypes = {
+        physical: 0, fire: 0, cold: 0, lightning: 0, arcane: 0,
+        holy: 0, shadow: 0, nature: 0, poison: 0
+    };
+    const tags = {
+        beast: 0, arcane: 0, holy: 0, shadow: 0, nature: 0,
+        fire: 0, cold: 0, lightning: 0, poison: 0
+    };
 
     charSkills.forEach(skillEntry => {
         const skill = skills.find(s => s.id === skillEntry.skillID);
@@ -353,12 +359,21 @@ function getCharacterClass(character, skills) {
         
         if (category.includes('DAMAGE')) {
             const effects = skill.effects || [];
-            const hasPhysical = effects.some(e => e.damageType && ['physical', 'slashing', 'piercing', 'bludgeoning'].includes(e.damageType.toLowerCase()));
-            const hasMagic = effects.some(e => e.damageType && ['fire', 'cold', 'lightning', 'electric', 'arcane', 'holy', 'shadow', 'nature', 'poison'].includes(e.damageType.toLowerCase())) || category.includes('MAGIC');
+            const hasPhysical = effects.some(e => 
+                e.damageType && ['physical', 'slashing', 'piercing', 'bludgeoning'].includes(e.damageType.toLowerCase())
+            );
+            const hasMagic = effects.some(e => 
+                e.damageType && ['fire', 'cold', 'lightning', 'electric', 'arcane', 'holy', 'shadow', 'nature', 'poison'].includes(e.damageType.toLowerCase())
+            ) || category.includes('MAGIC');
             
-            if (hasPhysical && hasMagic) { categories.damageMagic++; categories.damagePhysical++; }
-            else if (hasMagic) { categories.damageMagic++; }
-            else { categories.damagePhysical++; }
+            if (hasPhysical && hasMagic) {
+                categories.damageMagic++;
+                categories.damagePhysical++;
+            } else if (hasMagic) {
+                categories.damageMagic++;
+            } else {
+                categories.damagePhysical++;
+            }
             
             effects.forEach(effect => {
                 if (effect.type === 'damage' && effect.damageType) {
@@ -375,70 +390,79 @@ function getCharacterClass(character, skills) {
         if (category === 'UTILITY') categories.utility++;
         if (category === 'RESTORATION') categories.restoration++;
         
-        skillTags.forEach(tag => { if (tags[tag] !== undefined) tags[tag]++; });
+        skillTags.forEach(tag => {
+            if (tags[tag] !== undefined) tags[tag]++;
+        });
     });
 
     const totalDamage = categories.damagePhysical + categories.damageMagic;
     const totalSkills = charSkills.length;
+
+    // ── HELPER: Check for specific skill ─────────────────────────────────
     const hasSkill = (skillId) => charSkills.some(s => s.skillID === skillId);
-    
-    const dominantTag = Object.entries(tags).filter(([_, count]) => count > 0).sort((a, b) => b[1] - a[1])[0]?.[0] || null;
-    
-    const totalStats = (stats.conviction || 0) + (stats.endurance || 0) + (stats.ambition || 0) + (stats.harmony || 0);
+
+    // ── HELPER: Dominant tag ─────────────────────────────────────────────
+    const dominantTag = Object.entries(tags)
+        .filter(([_, count]) => count > 0)
+        .sort((a, b) => b[1] - a[1])[0]?.[0] || null;
+
+    // ── HELPER: Stat ratio calculation ───────────────────────────────────
+    const totalStats = (stats.conviction || 0) + (stats.endurance || 0) + 
+                        (stats.ambition || 0) + (stats.harmony || 0);
     const statRatios = totalStats > 0 ? {
         conviction: (stats.conviction || 0) / totalStats,
-        endurance: (stats.endurance || 0) / totalStats,
-        ambition: (stats.ambition || 0) / totalStats,
-        harmony: (stats.harmony || 0) / totalStats
+        endurance:  (stats.endurance || 0) / totalStats,
+        ambition:   (stats.ambition || 0) / totalStats,
+        harmony:    (stats.harmony || 0) / totalStats
     } : { conviction: 0.25, endurance: 0.25, ambition: 0.25, harmony: 0.25 };
 
+    // ── COMBAT PERFORMANCE ───────────────────────────────────────────────
+    const lifetimeDamageDealt = combatStats.totalDamageDealt || 0;
     const totalHealing = combatStats.totalHealingDone || 0;
     const totalKills = Object.values(combatStats.enemyKills || {}).reduce((a, b) => a + b, 0);
-    const winRate = combatStats.wins && combatStats.totalCombats ? combatStats.wins / combatStats.totalCombats : 0;
+    const winRate = combatStats.wins && combatStats.totalCombats 
+        ? combatStats.wins / combatStats.totalCombats 
+        : 0;
 
     // ═══════════════════════════════════════════════════════════════════
-    // CLASS DETERMINATION - SKILLS FIRST, WEAPON SECOND
+    // CLASS DETERMINATION LOGIC - SKILLS FIRST, WEAPON SECOND
     // ═══════════════════════════════════════════════════════════════════
 
-    // ─── STEP 1: KEY SKILL CHECKS (Highest Priority) ───────────────────
-    // These represent deep build investment and should ALWAYS take precedence
+    // ─── STEP 1: KEY SKILL CHECKS (Highest Priority - 50% weight) ───────
+    // These represent deep build investment and ALWAYS take precedence
     
     // Assassin Build - Requires shadow_step + assassinate (deep combo)
-    if (hasSkill('assassinate') && (hasSkill('shadow_step') || dominantTag === 'shadow')) {
-        if (weaponType === 'dagger') return 'Master Assassin';
-        if (isRangedWeapon) return 'Shadow Hunter';
+    if (hasSkill('assassinate')) {
+        if (dominantTag === 'shadow') return 'Master Assassin';
+        if (isRangedWeapon) return 'Shadow Hunter';  // Crossbow assassin
+        if (weaponType === 'dagger') return 'Grand Assassin';
         return 'Assassin';
     }
     
-    // Necromancer - Shadow + healing + lifetap/necromancy
-    if (hasSkill('necromancy') || (hasSkill('lifetap') && dominantTag === 'shadow' && categories.healing > 0)) {
+    // Necromancer - Shadow damage + healing (lifetap)
+    if (hasSkill('necromancy') || (hasSkill('lifetap') && dominantTag === 'shadow')) {
         return 'Necromancer';
     }
     
     // High Priest - Mass heal + holy word (deep healing combo)
     if (hasSkill('mass_heal') && hasSkill('holy_word')) {
-        if (weaponType === 'tome') return 'High Priest';
-        if (weaponType === 'scepter') return 'Hierophant';
         return 'High Priest';
     }
     
-    // Archmage - Meteor + fireball + chain_lightning (deep magic combo)
-    if (hasSkill('meteor') && (hasSkill('fireball') || hasSkill('chain_lightning'))) {
+    // Archmage - Meteor + fireball/chain_lightning (deep magic combo)
+    if (hasSkill('meteor')) {
         if (dominantTag === 'fire') return 'Archmage';
         if (dominantTag === 'lightning') return 'Storm Lord';
-        if (dominantTag === 'cold') return 'Archmage';
         return 'Archmage';
     }
     
     // Druid - Nature touch + entangle + regrowth (deep nature combo)
-    if (hasSkill('nature_touch') && hasSkill('entangle') && categories.healing > 0) {
-        if (weaponType === 'totem') return 'Archdruid';
+    if (hasSkill('entangle') && hasSkill('nature_touch') && categories.healing > 0) {
         return 'Druid';
     }
     
-    // Paladin - Holy smite + holy light + heavy armor
-    if (hasSkill('holy_smite') && hasSkill('holy_light') && isHeavyArmor) {
-        if (hasShield) return 'Shield Paladin';
+    // Paladin - Holy smite + holy light + defense
+    if (hasSkill('holy_smite') && hasSkill('holy_light') && categories.defense > 0) {
         return 'Paladin';
     }
     
@@ -447,82 +471,127 @@ function getCharacterClass(character, skills) {
         return 'Warlock';
     }
 
-    // ─── STEP 2: SKILL TAG/ELEMENT SPECIALIZATION ──────────────────────
-    // Secondary priority - what element does the build focus on?
+    // ─── STEP 2: HYBRID ARCHETYPES (Skill + Element Synergy) ────────────
+    
+    // Spellblade: Magic damage + melee weapon
+    if (categories.damageMagic > 0 && isMeleeWeapon) {
+        if (dominantTag === 'fire') return 'Fire Blade';
+        if (dominantTag === 'cold') return 'Frost Blade';
+        if (dominantTag === 'lightning') return 'Storm Blade';
+        if (dominantTag === 'shadow') return 'Shadow Blade';
+        if (dominantTag === 'holy') return 'Holy Blade';
+        if (dominantTag === 'arcane') return 'Arcane Blade';
+        return 'Spellblade';
+    }
+    
+    // Battle Cleric / War Priest: Healing + Damage
+    if (categories.healing > 0 && totalDamage > 0) {
+        if (dominantTag === 'holy' && isMeleeWeapon) {
+            if (isHeavyArmor) return 'War Priest';
+            return 'Battle Cleric';
+        }
+        if (dominantTag === 'nature') return 'Circle Warden';
+        if (categories.healing > totalDamage) return 'Combat Healer';
+        return 'Skirmisher';
+    }
+    
+    // Death Knight: Shadow damage + heavy armor + bleed/poison
+    if (dominantTag === 'shadow' && isHeavyArmor && totalDamage > 0) {
+        return 'Death Knight';
+    }
+
+    // ─── STEP 3: PURE DAMAGE CLASSES (Weapon Refines, Doesn't Override) ─
     
     if (totalDamage > 0) {
-        // Magic Damage - Element first, weapon modifies
+        // Magic Damage Dealers
         if (categories.damageMagic > categories.damagePhysical) {
-            if (dominantTag === 'fire') {
-                if (hasSkill('meteor')) return 'Pyromancer';
-                if (weaponType === 'totem') return 'Fire Sage';
-                if (weaponType === 'tome') return 'Fire Sage';
-                return 'Fire Mage';
-            }
-            if (dominantTag === 'cold') {
-                if (hasSkill('absolute_zero') || hasSkill('blizzard')) return 'Cryomancer';
-                if (weaponType === 'totem') return 'Frost Sage';
-                if (weaponType === 'tome') return 'Frost Sage';
-                return 'Frost Mage';
-            }
-            if (dominantTag === 'lightning') {
-                if (hasSkill('chain_lightning') || hasSkill('lightning_chain')) return 'Thundercaller';
-                if (weaponType === 'totem') return 'Storm Sage';
-                return 'Storm Mage';
-            }
-            if (dominantTag === 'shadow') {
-                if (weaponType === 'wand') return 'Warlock';
-                if (weaponType === 'tome') return 'Shadow Scholar';
-                return 'Shadow Mage';
-            }
-            if (dominantTag === 'holy') {
-                if (weaponType === 'scepter') return 'Priest';
-                if (weaponType === 'tome') return 'Divine Scholar';
-                return 'Holy Caster';
-            }
-            if (dominantTag === 'nature') {
-                if (weaponType === 'totem') return 'Druid';
-                if (weaponType === 'tome') return 'Nature Sage';
-                return 'Nature Mage';
-            }
-            if (dominantTag === 'arcane') {
-                if (weaponType === 'wand') return 'Arcanist';
-                if (weaponType === 'tome') return 'Wizard';
+            if (isCasterWeapon) {
+                if (dominantTag === 'fire') {
+                    if (weaponType === 'wand') return 'Pyromancer';
+                    if (weaponType === 'tome') return 'Fire Sage';
+                    return 'Fire Mage';
+                }
+                if (dominantTag === 'cold') {
+                    if (weaponType === 'wand') return 'Cryomancer';
+                    if (weaponType === 'tome') return 'Frost Sage';
+                    return 'Frost Mage';
+                }
+                if (dominantTag === 'lightning') {
+                    if (hasSkill('lightning_chain') || hasSkill('chain_lightning')) return 'Thundercaller';
+                    return 'Storm Mage';
+                }
+                if (dominantTag === 'arcane') {
+                    if (weaponType === 'wand') return 'Arcanist';
+                    if (weaponType === 'tome') return 'Wizard';
+                    return 'Mage';
+                }
+                if (dominantTag === 'holy') {
+                    if (weaponType === 'scepter') return 'Priest';
+                    if (weaponType === 'tome') return 'Divine Scholar';
+                    return 'Holy Caster';
+                }
+                if (dominantTag === 'shadow') {
+                    if (weaponType === 'wand') return 'Warlock';
+                    if (weaponType === 'tome') return 'Shadow Scholar';
+                    return 'Shadow Mage';
+                }
+                if (dominantTag === 'nature') {
+                    if (weaponType === 'totem') return 'Druid';
+                    if (weaponType === 'tome') return 'Nature Sage';
+                    return 'Nature Mage';
+                }
                 return 'Mage';
             }
-            // Fallback for magic
-            if (isCasterWeapon) return 'Mage';
-            if (isMeleeWeapon) return 'Spellblade';
+            
+            // Hybrid magic melee
+            if (isMeleeWeapon) {
+                if (dominantTag === 'fire') return 'Flame Knight';
+                if (dominantTag === 'cold') return 'Frost Knight';
+                if (dominantTag === 'lightning') return 'Storm Knight';
+                if (dominantTag === 'shadow') return 'Dark Knight';
+                if (dominantTag === 'holy') return 'Templar';
+                return 'Spellblade';
+            }
+            
             return 'Sorcerer';
         }
         
-        // Physical Damage - Key skills checked, now weapon modifies
+        // Physical Damage Dealers - Weapon Specific
         if (categories.damagePhysical >= categories.damageMagic) {
-            // Already handled assassinate above, now weapon-specific with skill awareness
+            // ✅ KEY SKILL CHECKS BEFORE WEAPON TYPE
+            if (hasSkill('assassinate')) {
+                if (dominantTag === 'shadow') return 'Master Assassin';
+                if (isRangedWeapon) return 'Shadow Hunter';
+                return 'Assassin';
+            }
+            
+            // Sword users
             if (weaponType === 'sword') {
-                if (hasSkill('assassinate')) return 'Assassin';  // Skill overrides weapon
                 if (dominantTag === 'shadow') return 'Dark Knight';
                 if (dominantTag === 'holy') return 'Templar';
                 if (statRatios.ambition > 0.35) return 'Duelist';
                 if (hasShield && isHeavyArmor) return 'Knight';
+                if (statRatios.conviction > 0.35) return 'Blademaster';
                 return 'Swordsman';
             }
             
+            // Dagger users
             if (weaponType === 'dagger') {
-                if (hasSkill('assassinate')) return 'Master Assassin';
                 if (dominantTag === 'shadow') return 'Shadow Assassin';
                 if (dominantTag === 'poison') return 'Assassin';
                 if (statRatios.ambition > 0.4) return 'Rogue';
                 return 'Thief';
             }
             
+            // Axe users
             if (weaponType === 'axe' || weaponType === 'handaxe') {
-                if (hasSkill('bloodlust') || hasSkill('frenzy')) return 'Berserker';
+                if (dominantTag === 'fire') return 'Berserker';
+                if (statRatios.conviction > 0.4) return 'Berserker';
                 if (isHeavyArmor) return 'Marauder';
-                if (statRatios.conviction > 0.35) return 'Barbarian';
-                return 'Axeman';
+                return 'Barbarian';
             }
             
+            // Hammer/Mace users
             if (weaponType === 'hammer' || weaponType === 'mace') {
                 if (dominantTag === 'holy') return 'Crusader';
                 if (isHeavyArmor && hasShield) return 'Juggernaut';
@@ -530,12 +599,8 @@ function getCharacterClass(character, skills) {
                 return 'Warrior';
             }
             
+            // Ranged users
             if (isRangedWeapon) {
-                // KEY FIX: Check for assassin skills BEFORE weapon type
-                if (hasSkill('assassinate') || hasSkill('shadow_step')) {
-                    if (dominantTag === 'shadow') return 'Shadow Hunter';
-                    return 'Assassin';
-                }
                 if (dominantTag === 'poison') return 'Hunter';
                 if (statRatios.ambition > 0.4) return 'Sniper';
                 if (weaponType === 'crossbow') return 'Crossbowman';
@@ -551,7 +616,8 @@ function getCharacterClass(character, skills) {
         }
     }
 
-    // ─── STEP 3: SUPPORT/TANK CLASSES ──────────────────────────────────
+    // ─── STEP 4: SUPPORT CLASSES ────────────────────────────────────────
+    
     if (categories.healing >= 2 || (categories.healing >= 1 && categories.buff >= 1)) {
         if (isLightArmor) {
             if (dominantTag === 'holy') {
@@ -567,6 +633,7 @@ function getCharacterClass(character, skills) {
             if (categories.buff >= 2) return 'Support';
             return 'Healer';
         }
+        
         if (isHeavyArmor && categories.healing > 0) return 'War Priest';
     }
 
@@ -576,6 +643,8 @@ function getCharacterClass(character, skills) {
         return 'Buffer';
     }
 
+    // ─── STEP 5: TANK CLASSES ───────────────────────────────────────────
+    
     if (categories.defense >= 2 || (categories.defense >= 1 && hasShield)) {
         if (isHeavyArmor) {
             if (hasShield) return 'Shieldbearer';
@@ -586,6 +655,8 @@ function getCharacterClass(character, skills) {
         return 'Defender';
     }
 
+    // ─── STEP 6: CONTROL/SPECIALIST CLASSES ─────────────────────────────
+    
     if (categories.control >= 2) {
         if (dominantTag === 'shadow') return 'Warlock';
         if (dominantTag === 'nature') return 'Druid';
@@ -599,7 +670,8 @@ function getCharacterClass(character, skills) {
         return 'Specialist';
     }
 
-    // ─── STEP 4: FALLBACKS ─────────────────────────────────────────────
+    // ─── STEP 7: FALLBACKS ──────────────────────────────────────────────
+    
     if (isHeavyArmor && totalDamage > 0) {
         if (dominantTag === 'holy') return 'Crusader';
         if (dominantTag === 'shadow') return 'Dark Knight';
