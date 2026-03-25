@@ -192,3 +192,92 @@ function escapeHtml(str) {
         .replace(/>/g, '&gt;');
 }
 
+
+/**
+ * Position a tooltip element near the cursor, clamped to the viewport.
+ * Used by all JS-created tooltips (skill, gear, stat).
+ * A 10px safe margin is maintained on all four edges.
+ */
+function positionTooltip(tooltip, event) {
+    const margin = 10;
+    const tw = tooltip.offsetWidth  || 300;
+    const th = tooltip.offsetHeight || 100;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    let left = event.clientX + 15;
+    let top  = event.clientY + 15;
+
+    // Clamp right edge
+    if (left + tw > vw - margin) left = event.clientX - tw - 15;
+    // Clamp left edge
+    if (left < margin) left = margin;
+    // Clamp bottom edge
+    if (top + th > vh - margin) top = event.clientY - th - 15;
+    // Clamp top edge
+    if (top < margin) top = margin;
+
+    tooltip.style.left = left + 'px';
+    tooltip.style.top  = top  + 'px';
+}
+
+/**
+ * Shared JS tooltip for elements using data-tooltip attribute.
+ * Replaces the CSS ::after approach so tooltips can be viewport-clamped.
+ * Applied via event delegation on document — no per-element wiring needed.
+ */
+(function initDataTooltip() {
+    let _tip = null;
+    let _tipTimeout = null;
+
+    const STYLE = [
+        'position:fixed',
+        'background:rgba(7,10,24,0.97)',
+        'color:var(--text-primary, #c8cfe0)',
+        'padding:0.5rem 0.8rem',
+        'border-radius:4px',
+        'border:1px solid rgba(74,74,138,0.55)',
+        'font-size:0.78rem',
+        'font-family:var(--font-body, sans-serif)',
+        'max-width:280px',
+        'white-space:normal',
+        'line-height:1.5',
+        'pointer-events:none',
+        'z-index:10000',
+        'box-shadow:0 8px 24px rgba(0,0,0,0.6)',
+        'word-wrap:break-word',
+        'box-sizing:border-box',
+    ].join(';');
+
+    function show(text, event) {
+        hide();
+        _tip = document.createElement('div');
+        _tip.style.cssText = STYLE;
+        _tip.textContent = text;
+        document.body.appendChild(_tip);
+        positionTooltip(_tip, event);
+    }
+
+    function hide() {
+        clearTimeout(_tipTimeout);
+        if (_tip) { _tip.remove(); _tip = null; }
+    }
+
+    document.addEventListener('mouseover', function(e) {
+        const el = e.target.closest('[data-tooltip]');
+        if (!el) return;
+        clearTimeout(_tipTimeout);
+        _tipTimeout = setTimeout(() => show(el.dataset.tooltip, e), 120);
+    });
+
+    document.addEventListener('mousemove', function(e) {
+        if (_tip) positionTooltip(_tip, e);
+    });
+
+    document.addEventListener('mouseout', function(e) {
+        if (!e.target.closest('[data-tooltip]')) return;
+        hide();
+    });
+
+    document.addEventListener('touchstart', hide, { passive: true });
+})();

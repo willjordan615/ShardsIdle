@@ -1495,28 +1495,6 @@ async function deleteCharacter(characterId) {
 // ============================================================================
 
 /**
- * Position tooltip near cursor
- */
-function positionTooltip(tooltip, event) {
-    const xOffset = 15;
-    const yOffset = 15;
-    
-    let left = event.clientX + xOffset;
-    let top = event.clientY + yOffset;
-    
-    // Prevent tooltip from going off-screen
-    if (left + tooltip.offsetWidth > window.innerWidth) {
-        left = event.clientX - tooltip.offsetWidth - xOffset;
-    }
-    if (top + tooltip.offsetHeight > window.innerHeight) {
-        top = event.clientY - tooltip.offsetHeight - yOffset;
-    }
-    
-    tooltip.style.left = left + 'px';
-    tooltip.style.top = top + 'px';
-}
-
-/**
  * Create and show a tooltip for a skill
  */
 function createSkillTooltip(skill) {
