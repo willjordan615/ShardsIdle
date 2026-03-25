@@ -1484,6 +1484,38 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
     /* ── Buttons globally ─────────────────────────────────── */
     button { padding: 0.45rem 1rem; font-size: 0.65rem; }
     button.secondary { padding: 0.4rem 0.8rem; }
+
+    /* ── Victory / result modal ───────────────────────────── */
+    .result-modal-inner {
+        padding: 0.85rem 0.75rem !important;
+        max-height: 88vh !important;
+        width: 94% !important;
+        border-radius: 8px !important;
+    }
+    #resultModalTitle {
+        font-size: 1.15rem !important;
+        margin-bottom: 0.6rem !important;
+        letter-spacing: 2px !important;
+    }
+    .result-modal-section {
+        padding: 0.5rem 0.6rem !important;
+        margin-bottom: 0.4rem !important;
+        border-radius: 5px !important;
+    }
+    .result-modal-label {
+        font-size: 0.7rem !important;
+        margin-bottom: 0.2rem !important;
+    }
+    #lootList, #charXPList { font-size: 0.75rem !important; }
+    #skillXPList            { font-size: 0.7rem !important; }
+    .result-modal-footer {
+        padding-top: 0.5rem !important;
+    }
+    #autoRestartText {
+        font-size: 0.72rem !important;
+        margin-bottom: 0.4rem !important;
+    }
+    #countdownTimer { font-size: 0.9rem !important; }
 }
 
 @media (max-width:480px) {
