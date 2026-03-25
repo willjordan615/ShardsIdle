@@ -255,12 +255,23 @@ function renderBotsSelection() {
 
         const roleColor = roleColors[bot.role] || '#aaa';
 
+        const botClass = (typeof getCharacterClass === 'function' && bot.skills)
+            ? getCharacterClass(bot, window.gameData?.skills || [])
+            : null;
+        const botActiveSkills = (bot.skills || [])
+            .filter(s => !s.intrinsic)
+            .sort((a, b) => (b.skillLevel || 0) - (a.skillLevel || 0))
+            .slice(0, 2)
+            .map(s => window.gameData?.skills?.find(sk => sk.id === s.skillID)?.name)
+            .filter(Boolean);
+
         card.innerHTML = `
             <div class="card-title">${bot.characterName}</div>
-            <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
-                <span class="card-subtitle" style="margin:0;">Lv.${bot.level}</span>
+            <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px; flex-wrap:wrap;">
+                <span class="card-subtitle" style="margin:0;">Lv.${bot.level}${botClass ? ' · ' + botClass : ''}</span>
                 ${bot.role ? `<span style="font-size:0.7rem; color:${roleColor}; background:rgba(255,255,255,0.06); border:1px solid ${roleColor}44; border-radius:4px; padding:1px 6px;">${bot.role}</span>` : ''}
             </div>
+            ${botActiveSkills.length ? `<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;">${botActiveSkills.map(n => `<span style="font-size:0.7rem;color:#d4af37;background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.2);border-radius:3px;padding:1px 6px;">${n}</span>`).join('')}</div>` : ''}
             <div class="card-description" style="margin-bottom: 0.75rem;">
                 HP: ${formatNumber(derivedStats.hp)}
             </div>
@@ -543,55 +554,57 @@ async function startCombat(forcedChallengeId) {
     }
 }
 
+// Public companions pagination state
+let _publicCompanionsSearchTimeout = null;
+
 /**
- * Load public characters for companion selection
+ * Debounced wrapper for public companion text inputs.
  */
-async function loadPublicCompanions() {
+function loadPublicCompanionsDebounced() {
+    clearTimeout(_publicCompanionsSearchTimeout);
+    _publicCompanionsSearchTimeout = setTimeout(() => loadPublicCompanions(1), 350);
+}
+
+/**
+ * Load public characters for companion selection, server-side paginated.
+ */
+async function loadPublicCompanions(page) {
+    if (page === undefined) page = 1;
     const container = document.getElementById('publicCompanionsList');
     if (!container) return;
-    
-    container.innerHTML = '<div class="card" style="text-align: center; color: #8b7355; grid-column: 1 / -1;">Loading...</div>';
-    
-    try {
-        const levelFilter = document.getElementById('publicLevelFilter');
-        const sortFilter = document.getElementById('publicSortFilter');
-        const searchFilter = document.getElementById('publicSearchFilter');
 
-        const level = levelFilter ? levelFilter.value : '';
-        const sortBy = sortFilter ? sortFilter.value : 'imports';
-        const search = searchFilter ? searchFilter.value : '';
-        
-        // FIX #3: Only append 'level' if it has a value, to avoid sending
-        // an empty level= param that may cause unintended server-side filtering.
-        const params = new URLSearchParams({ sortBy, limit: '20' });
-        if (level) params.append('level', level);
+    container.innerHTML = '<div class="card" style="text-align: center; color: #8b7355; grid-column: 1 / -1;">Loading...</div>';
+
+    try {
+        const level  = document.getElementById('publicLevelFilter')?.value?.trim();
+        const sortBy = document.getElementById('publicSortFilter')?.value || 'imports';
+        const search = document.getElementById('publicSearchFilter')?.value?.trim();
+
+        const params = new URLSearchParams({ sortBy, page, limit: '6' });
+        if (level && parseInt(level) > 0) params.append('level', parseInt(level));
+        if (search) params.append('search', search);
+
         const response = await authFetch(`${BACKEND_URL}/api/character/browse?${params}`);
-        
         if (!response.ok) throw new Error('Failed to load');
-        
+
         const data = await response.json();
-        
-        let characters = data.characters;
-        if (search) {
-            const searchLower = search.toLowerCase();
-            characters = characters.filter(c => 
-                c.characterName.toLowerCase().includes(searchLower) ||
-                c.buildName?.toLowerCase().includes(searchLower)
-            );
-        }
-        
+        const characters = data.characters || [];
+        const pagination = data.pagination || { page: 1, totalPages: 1, total: 0 };
+
         if (characters.length === 0) {
             container.innerHTML = '<div class="card" style="text-align: center; color: #8b7355; grid-column: 1 / -1;">No characters found</div>';
             return;
         }
-        
+
         const authUserId = window.authState?.userId;
+        const ROLE_LABELS = {
+            Defender:'🛡 Defender', Bruiser:'⚔️ Bruiser', Mage:'🔮 Mage',
+            Healer:'💊 Healer', Support:'💚 Support', Utility:'🔧 Utility', Assassin:'🗡️ Assassin'
+        };
 
         container.innerHTML = '';
         characters.forEach(char => {
             const stats = char.combatStats || {};
-            // Use server-side isOwn flag (set by browse route using auth token)
-            // Fall back to client-side check against authState for cases where flag is missing
             const isOwn = char.isOwn || (authUserId && char.ownerUserId && char.ownerUserId === authUserId);
             const alreadyAdded = currentState.currentParty.some(m => m.originalCharacterId === char.originalCharacterId);
             const disabled = isOwn || alreadyAdded;
@@ -619,18 +632,24 @@ async function loadPublicCompanions() {
                 });
             }
 
-            const ROLE_LABELS = {
-                Defender:'🛡 Defender', Bruiser:'⚔️ Bruiser', Mage:'🔮 Mage',
-                Healer:'💊 Healer', Support:'💚 Support', Utility:'🔧 Utility', Assassin:'🗡️ Assassin'
-            };
             const roleLabel = char.roleTag ? ROLE_LABELS[char.roleTag] : null;
+            const charClass = (typeof getCharacterClass === 'function' && char.skills)
+                ? getCharacterClass(char, window.gameData?.skills || [])
+                : null;
+            const activeSkillNames = (char.skills || [])
+                .filter(s => !s.intrinsic)
+                .sort((a, b) => (b.skillLevel || 0) - (a.skillLevel || 0))
+                .slice(0, 2)
+                .map(s => window.gameData?.skills?.find(sk => sk.id === s.skillID)?.name)
+                .filter(Boolean);
+
             const milestones = stats.milestones || {};
             const badges = [
-                milestones.firstBlood       && { icon: '🩸', title: 'First Blood — Won their first combat' },
+                milestones.firstBlood       && { icon: '🩸', title: 'First Blood' },
                 milestones.hundredKills     && { icon: '💀', title: '100 Kills' },
-                milestones.masterHealer     && { icon: '✨', title: 'Master Healer — 10,000 healing done' },
-                milestones.undefeated       && { icon: '🏆', title: 'Undefeated — 10+ wins, no losses' },
-                milestones.centuryOfCombats && { icon: '⚔️', title: 'Century — 100 combats fought' },
+                milestones.masterHealer     && { icon: '✨', title: 'Master Healer' },
+                milestones.undefeated       && { icon: '🏆', title: 'Undefeated' },
+                milestones.centuryOfCombats && { icon: '⚔️', title: 'Century' },
             ].filter(Boolean);
 
             const totalKills = Object.values(stats.enemyKills || {}).reduce((a, b) => a + b, 0);
@@ -639,14 +658,13 @@ async function loadPublicCompanions() {
             const topSkillName = topSkillId && window.gameData?.skills?.find(s => s.id === topSkillId)?.name || topSkillId;
             const topKillEntry = Object.entries(stats.enemyKills || {}).sort((a,b) => b[1]-a[1])[0];
 
-            const cardId = 'ppc_' + (char.shareCode || Math.random().toString(36).slice(2));
-
             card.innerHTML = `
                 <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:2px;">
                     <span class="card-title" style="margin:0;">${escapeHtml(char.characterName)}</span>
                     ${roleLabel ? `<span style="font-size:0.68rem;color:#d4af37;background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.25);border-radius:8px;padding:1px 6px;">${roleLabel}</span>` : ''}
                 </div>
-                <div class="card-subtitle" style="margin-bottom:0.4rem;">Lv.${char.level} ${escapeHtml(char.race)}</div>
+                <div class="card-subtitle" style="margin-bottom:0.3rem;">Lv.${char.level} ${escapeHtml(char.race)}${charClass ? ' · ' + charClass : ''}</div>
+                ${activeSkillNames.length ? `<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:0.35rem;">${activeSkillNames.map(n => `<span style="font-size:0.7rem;color:#d4af37;background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.2);border-radius:3px;padding:1px 6px;">${n}</span>`).join('')}</div>` : ''}
 
                 <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:0.35rem;">
                     <div style="background:rgba(10,14,39,0.6);padding:0.2rem;border-radius:4px;text-align:center;">
@@ -689,7 +707,20 @@ async function loadPublicCompanions() {
 
             container.appendChild(card);
         });
-        
+
+        // Pagination controls
+        const { totalPages, total } = pagination;
+        if (totalPages > 1) {
+            const nav = document.createElement('div');
+            nav.style.cssText = 'grid-column:1/-1;display:flex;justify-content:center;align-items:center;gap:12px;margin-top:1rem;';
+            nav.innerHTML = `
+                <button onclick="loadPublicCompanions(${page - 1})" ${page <= 1 ? 'disabled' : ''} class="secondary" style="padding:4px 14px;">← Prev</button>
+                <span style="color:#8b7355;font-size:0.85rem;">Page ${page} of ${totalPages} <span style="color:#555;">(${total} total)</span></span>
+                <button onclick="loadPublicCompanions(${page + 1})" ${page >= totalPages ? 'disabled' : ''} class="secondary" style="padding:4px 14px;">Next →</button>
+            `;
+            container.appendChild(nav);
+        }
+
     } catch (error) {
         console.error('Load public companions error:', error);
         container.innerHTML = '<div class="card" style="text-align: center; color: #d4484a; grid-column: 1 / -1;">Failed to load public characters</div>';

@@ -315,19 +315,14 @@
                         <!-- ADDED: Public Characters Tab -->
                         <div id="publicCompanionsDisplay" style="display: none;">
                             <div class="grid-3" style="margin-bottom: 1rem;">
-                                <select id="publicLevelFilter" onchange="loadPublicCompanions()">
-                                    <option value="">Any Level</option>
-                                    <option value="1">Level 1+</option>
-                                    <option value="5">Level 5+</option>
-                                    <option value="10">Level 10+</option>
-                                </select>
-                                <select id="publicSortFilter" onchange="loadPublicCompanions()">
+                                <input type="number" id="publicLevelFilter" placeholder="Min Level (1–99)" min="1" max="99" oninput="loadPublicCompanionsDebounced()">
+                                <select id="publicSortFilter" onchange="loadPublicCompanions(1)">
                                     <option value="imports">Sort: Most Imported</option>
                                     <option value="wins">Sort: Wins</option>
                                     <option value="combats">Sort: Total Combats</option>
                                     <option value="winrate">Sort: Win Rate</option>
                                 </select>
-                                <input type="text" id="publicSearchFilter" placeholder="Search..." oninput="loadPublicCompanions()">
+                                <input type="text" id="publicSearchFilter" placeholder="Search..." oninput="loadPublicCompanionsDebounced()">
                             </div>
                             <div id="publicCompanionsList" class="grid-3">
                                 <div class="card" style="text-align: center; color: #8b7355; grid-column: 1 / -1;">
