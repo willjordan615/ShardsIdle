@@ -902,7 +902,7 @@ async function ensureIntrinsicSkill(character) {
 async function showCharacterDetail(characterId, opts = {}) {
     const silent = opts.silent === true;
     // Clear any stale merchant offer when navigating to detail manually
-    if (!silent && typeof dismissMerchant === 'function') dismissMerchant();
+
     try {
         const character = await getCharacter(characterId);
         if (!character) {
@@ -1074,10 +1074,36 @@ async function renderCharacterSkills(character) {
             if (skillDef) {
                 // Content
                 const contentDiv = document.createElement('div');
+
+                const comboHints = typeof getComboHints === 'function'
+                    ? getComboHints(character, skillRecord.skillID)
+                    : [];
+                const hintHTML = comboHints.length > 0
+                    ? `<div style="margin-top:0.5rem; font-size:0.78em; color:#c8a84b; border-top:1px solid rgba(200,168,75,0.25); padding-top:0.4rem;">
+                           ⚗ May combine with a ${comboHints.join(' or ')} skill
+                       </div>`
+                    : '';
+
+                const skillLevel = skillRecord.skillLevel || 1;
+                const skillXP = skillRecord.skillXP || 0;
+                const xpThreshold = skillLevel < 1 ? 120 : Math.round(100 * skillLevel * 1.2);
+                const xpPct = Math.min(100, Math.floor((skillXP / xpThreshold) * 100));
+                const xpBarHTML = `
+                    <div style="margin-top:0.5rem;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:3px;">
+                            <span style="color:#888; font-size:0.72em;">XP</span>
+                            <span style="color:#888; font-size:0.72em;">${skillXP.toFixed(0)} / ${xpThreshold}</span>
+                        </div>
+                        <div style="background:#0f0f1e; border-radius:3px; height:4px; overflow:hidden;">
+                            <div style="background:linear-gradient(90deg,#d4af37,#ffe066); width:${xpPct}%; height:100%; transition:width 0.3s;"></div>
+                        </div>
+                    </div>`;
+
                 contentDiv.innerHTML = `
                     <div class="card-title" style="color:#ffd700;">${skillDef.name}</div>
-                    <div class="card-description">Level ${skillRecord.skillLevel || 1}</div>
-                    <div class="card-description" style="margin-top: 0.5rem; font-size:0.8em; color:#aaa;">XP: ${skillRecord.skillXP ? skillRecord.skillXP.toFixed(2) : '0'}</div>
+                    <div class="card-description">Level ${skillLevel}</div>
+                    ${xpBarHTML}
+                    ${hintHTML}
                 `;
                 card.appendChild(contentDiv);
                 
@@ -1752,7 +1778,7 @@ function renderGearUpgradeBadge(character) {
         return _gearScore(itemDef) > equippedScores[slot];
     });
 
-    badge.style.display = hasUpgrade ? 'inline' : 'none';
+    badge.style.display = hasUpgrade ? 'inline-flex' : 'none';
 }
 
 function renderExportButton(character) {
