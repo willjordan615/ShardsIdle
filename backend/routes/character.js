@@ -23,15 +23,30 @@ function ownsCharacter(character, userId) {
 
 /**
  * GET /api/characters
- * Returns only the characters owned by the authenticated user.
+ * Returns paginated characters owned by the authenticated user.
+ * Query params: page (1-based, default 1), limit (default 6, max 20)
  */
 router.get('/', requireAuth, async (req, res) => {
     try {
+        const page  = Math.max(1, parseInt(req.query.page)  || 1);
+        const limit = Math.min(20, Math.max(1, parseInt(req.query.limit) || 6));
+        const offset = (page - 1) * limit;
+
         const rawDb = db.getDatabase();
+
+        const totalRow = await new Promise((resolve, reject) => {
+            rawDb.get(
+                `SELECT COUNT(*) as count FROM characters WHERE ownerUserId = ?`,
+                [req.userId],
+                (err, row) => { if (err) reject(err); else resolve(row); }
+            );
+        });
+        const total = totalRow?.count || 0;
+
         const rows = await new Promise((resolve, reject) => {
             rawDb.all(
-                `SELECT * FROM characters WHERE ownerUserId = ?`,
-                [req.userId],
+                `SELECT * FROM characters WHERE ownerUserId = ? ORDER BY lastModified DESC LIMIT ? OFFSET ?`,
+                [req.userId, limit, offset],
                 (err, rows) => { if (err) reject(err); else resolve(rows || []); }
             );
         });
@@ -78,7 +93,16 @@ router.get('/', requireAuth, async (req, res) => {
             aiProfile:        row.aiProfile || 'balanced',
         }));
 
-        res.json({ success: true, characters: parsed });
+        res.json({
+            success: true,
+            characters: parsed,
+            pagination: {
+                page,
+                limit,
+                total,
+                totalPages: Math.ceil(total / limit),
+            }
+        });
     } catch (error) {
         console.error('Error fetching characters:', error);
         res.status(500).json({ success: false, error: error.message });

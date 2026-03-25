@@ -1661,8 +1661,29 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
     font-size: 0.72rem;
 }
 
-.roster-card__weapon  { color: var(--text-muted); }
 .roster-card__profile { color: var(--text-secondary); }
+
+.roster-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-lg);
+    margin-top: var(--space-lg);
+    padding-bottom: var(--space-lg);
+}
+.roster-pagination__info {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+.roster-pagination__total {
+    color: var(--text-muted);
+}
+.roster-pagination__btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+    pointer-events: none;
+}
 
 @keyframes fadeInUp {
     from { opacity: 0; transform: translateY(12px); }

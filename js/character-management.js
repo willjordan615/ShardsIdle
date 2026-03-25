@@ -732,41 +732,54 @@ async function createCharacter() {
     }, 1500);
 }
 
+// Roster pagination state
+const _rosterPaging = { page: 1, totalPages: 1 };
+
 /**
- * Render the character roster from server database
+ * Render the character roster from server database, paginated (6 per page).
  */
-async function renderRoster() {
+async function renderRoster(page) {
+    if (page === undefined) page = _rosterPaging.page;
+    _rosterPaging.page = page;
+
     try {
-        const response = await authFetch(`${BACKEND_URL}/api/characters`);
+        const response = await authFetch(`${BACKEND_URL}/api/characters?page=${page}&limit=6`);
         if (!response.ok) {
             throw new Error('Failed to load characters');
         }
-        
+
         const data = await response.json();
         const characters = data.characters;
-        
+        const pagination = data.pagination || {};
+        _rosterPaging.totalPages = pagination.totalPages || 1;
+
+        // Keep current page slice in gameData.characters for aiProfile local cache
+        gameData.characters = characters;
+
         const container = document.getElementById('rosterContainer');
         if (!container) return;
-        
+
         container.innerHTML = '';
-        
-        if (characters.length === 0) {
+
+        if (characters.length === 0 && page === 1) {
             container.innerHTML = '<p style="color: #8b7355; grid-column: 1 / -1; text-align: center;">No characters yet. Create one to begin your adventure.</p>';
+            _renderRosterPagination(pagination);
             return;
         }
-        
+
+        const profileLabels = {
+            balanced:'⚖️ Balanced', aggressive:'⚔️ Aggressive', cautious:'🛡️ Cautious',
+            support:'💚 Support', disruptor:'🌀 Disruptor', opportunist:'🗡️ Opportunist'
+        };
+
         characters.forEach(character => {
             const race = getRace(character.race);
-            const mentality = getMentality(character.stats);
             const characterClass = getCharacterClass(character, gameData.skills);
-            
-            const card = document.createElement('div');
-            card.className = 'card roster-card';
-            card.onclick = async () => await showCharacterDetail(character.id);
 
-            // Top 3 non-intrinsic skills
-            const skillNames = character.skills
+            // Top 3 active (non-intrinsic) skills, highest level first
+            const skillNames = (character.skills || [])
                 .filter(s => !s.intrinsic)
+                .sort((a, b) => (b.skillLevel || 0) - (a.skillLevel || 0))
                 .slice(0, 3)
                 .map(s => {
                     const skill = gameData.skills.find(sk => sk.id === s.skillID);
@@ -774,16 +787,11 @@ async function renderRoster() {
                 })
                 .filter(Boolean);
 
-            // Equipped weapon
-            const weaponId = character.equipment?.mainHand;
-            const weaponDef = weaponId ? gameData.gear?.find(g => g.id === weaponId) : null;
-
-            // AI profile label
-            const profileLabels = {
-                balanced:'⚖️ Balanced', aggressive:'⚔️ Aggressive', cautious:'🛡️ Cautious',
-                support:'💚 Support', disruptor:'🌀 Disruptor', opportunist:'🗡️ Opportunist'
-            };
             const profileLabel = profileLabels[character.aiProfile] || '⚖️ Balanced';
+
+            const card = document.createElement('div');
+            card.className = 'card roster-card';
+            card.onclick = async () => await showCharacterDetail(character.id);
 
             card.innerHTML = `
                 <div class="roster-card__header">
@@ -796,16 +804,56 @@ async function renderRoster() {
                     ${skillNames.map(n => `<span class="roster-card__skill-tag">${n}</span>`).join('')}
                 </div>` : ''}
                 <div class="roster-card__footer">
-                    <span class="roster-card__weapon">${weaponDef ? '⚔ ' + weaponDef.name : '⚔ Unarmed'}</span>
                     <span class="roster-card__profile">${profileLabel}</span>
                 </div>
             `;
             container.appendChild(card);
         });
+
+        _renderRosterPagination(pagination);
+
     } catch (error) {
         console.error('Error rendering roster:', error);
         showError('Failed to load characters: ' + error.message);
     }
+}
+
+/**
+ * Render pagination controls below the roster grid.
+ * Mounts into #rosterPagination, creating the element if absent.
+ */
+function _renderRosterPagination(pagination) {
+    const page       = pagination.page       || 1;
+    const totalPages = pagination.totalPages || 1;
+    const total      = pagination.total      || 0;
+
+    let nav = document.getElementById('rosterPagination');
+    if (!nav) {
+        nav = document.createElement('div');
+        nav.id = 'rosterPagination';
+        const roster = document.getElementById('roster');
+        if (roster) roster.appendChild(nav);
+    }
+
+    if (totalPages <= 1) {
+        nav.innerHTML = '';
+        return;
+    }
+
+    nav.innerHTML = `
+        <div class="roster-pagination">
+            <button class="secondary roster-pagination__btn"
+                    ${page <= 1 ? 'disabled' : ''}
+                    onclick="renderRoster(${page - 1})">← Prev</button>
+            <span class="roster-pagination__info">
+                Page ${page} of ${totalPages}
+                <span class="roster-pagination__total">(${total} characters)</span>
+            </span>
+            <button class="secondary roster-pagination__btn"
+                    ${page >= totalPages ? 'disabled' : ''}
+                    onclick="renderRoster(${page + 1})">Next →</button>
+        </div>
+    `;
 }
 
 /**
