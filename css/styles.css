@@ -1670,6 +1670,10 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
 }
 
 /* Header top bar — auth + settings row above title */
+body:has(#combatlog.active) #headerTopBar {
+    display: none;
+}
+
 #headerTopBar {
     display: flex;
     align-items: center;
