@@ -75,6 +75,7 @@ let currentMerchantStock = [];
  * Returns true if a merchant appeared.
  */
 function rollMerchantAppearance() {
+  if (currentMerchant) return false; // existing merchant stays until dismissed
   if (Math.random() > 0.30) return false;
 
   const merchant = MERCHANTS[Math.floor(Math.random() * MERCHANTS.length)];
@@ -83,6 +84,10 @@ function rollMerchantAppearance() {
 
   currentMerchant = merchant;
   currentMerchantStock = stock;
+
+  const notifier = document.getElementById('merchantNotifier');
+  if (notifier) notifier.style.display = '';
+
   return true;
 }
 
@@ -204,4 +209,6 @@ function dismissMerchant() {
   currentMerchantStock = [];
   const slot = document.getElementById('merchantSlot');
   if (slot) { slot.innerHTML = ''; slot.style.display = 'none'; }
+  const notifier = document.getElementById('merchantNotifier');
+  if (notifier) notifier.style.display = 'none';
 }

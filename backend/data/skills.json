@@ -135,7 +135,7 @@
       "endurance": 0.18
     },
     "baseHitChance": 0.9,
-    "critChance": 0.20,
+    "critChance": 0.2,
     "isStarterSkill": true,
     "delay": 1200,
     "hitCount": {
@@ -556,6 +556,9 @@
         "chance": 0.6,
         "duration": 1
       }
+    ],
+    "tags": [
+      "control"
     ]
   },
   {
@@ -2663,7 +2666,8 @@
       }
     ],
     "tags": [
-      "lightning"
+      "lightning",
+      "control"
     ]
   },
   {
@@ -2816,7 +2820,8 @@
       }
     ],
     "tags": [
-      "cold"
+      "cold",
+      "control"
     ]
   },
   {
@@ -3537,7 +3542,8 @@
     ],
     "isChildSkill": true,
     "tags": [
-      "arcane"
+      "arcane",
+      "control"
     ],
     "scalingFactors": {
       "conviction": 0.4,
@@ -4534,7 +4540,8 @@
     ],
     "isChildSkill": true,
     "tags": [
-      "physical"
+      "physical",
+      "control"
     ],
     "scalingFactors": {
       "conviction": 0.62,
@@ -5020,7 +5027,8 @@
     ],
     "isChildSkill": true,
     "tags": [
-      "lightning"
+      "lightning",
+      "control"
     ],
     "scalingFactors": {
       "conviction": 0.62,
@@ -5569,7 +5577,8 @@
     ],
     "isChildSkill": true,
     "tags": [
-      "physical"
+      "physical",
+      "control"
     ],
     "scalingFactors": {
       "conviction": 0.62,
@@ -5792,7 +5801,8 @@
     ],
     "isChildSkill": true,
     "tags": [
-      "physical"
+      "physical",
+      "control"
     ],
     "scalingFactors": {
       "conviction": 0.62,
@@ -6079,7 +6089,8 @@
     ],
     "isChildSkill": true,
     "tags": [
-      "cold"
+      "cold",
+      "control"
     ],
     "scalingFactors": {
       "conviction": 0.3,
@@ -6122,7 +6133,8 @@
     ],
     "isChildSkill": true,
     "tags": [
-      "lightning"
+      "lightning",
+      "control"
     ],
     "scalingFactors": {
       "conviction": 0.4,
@@ -6339,7 +6351,8 @@
     ],
     "isChildSkill": true,
     "tags": [
-      "physical"
+      "physical",
+      "control"
     ],
     "scalingFactors": {
       "conviction": 0.62,
@@ -6722,7 +6735,8 @@
     ],
     "isChildSkill": true,
     "tags": [
-      "cold"
+      "cold",
+      "control"
     ],
     "scalingFactors": {
       "conviction": 0.3,
@@ -6766,7 +6780,8 @@
     ],
     "isChildSkill": true,
     "tags": [
-      "lightning"
+      "lightning",
+      "control"
     ],
     "scalingFactors": {
       "conviction": 0.4,
@@ -7312,7 +7327,8 @@
     ],
     "isChildSkill": true,
     "tags": [
-      "lightning"
+      "lightning",
+      "control"
     ],
     "scalingFactors": {
       "conviction": 0.4,
@@ -7776,7 +7792,8 @@
     "isChildSkill": true,
     "tags": [
       "shadow",
-      "poison"
+      "poison",
+      "control"
     ],
     "scalingFactors": {
       "ambition": 0.7,
@@ -8694,13 +8711,13 @@
         "duration": 1,
         "chance": 0.6
       },
-            {
+      {
         "type": "apply_debuff",
         "debuff": "dazed",
         "duration": 1,
         "chance": 0.25
       },
-                  {
+      {
         "type": "apply_debuff",
         "debuff": "burn",
         "duration": 2,
@@ -9003,7 +9020,8 @@
     ],
     "isChildSkill": true,
     "tags": [
-      "arcane"
+      "arcane",
+      "control"
     ],
     "scalingFactors": {
       "conviction": 0.62,
@@ -10233,7 +10251,8 @@
     ],
     "tags": [
       "cold",
-      "water"
+      "water",
+      "control"
     ],
     "enemyUsable": true,
     "effects": [
@@ -10416,7 +10435,8 @@
     ],
     "tags": [
       "cold",
-      "water"
+      "water",
+      "control"
     ],
     "enemyUsable": true,
     "effects": [

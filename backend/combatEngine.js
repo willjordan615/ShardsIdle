@@ -1366,6 +1366,33 @@ calculateRewards(players, challenge, segments = []) {
           score *= buffTimingMultiplier;
         }
 
+        // Control/debuff timing — turns 2-5 are the prime debilitation window.
+        // Turn 1 is reserved for buffs. Value decays as the fight progresses.
+        // Suppressed against dying targets where the debuff duration is largely wasted.
+        // Also applies to damage skills tagged 'control' (hard CC as secondary effect).
+        const isControlTagged = !isEnemy && (skill.tags || []).includes('control');
+        if (cat === 'CONTROL' || isControlTagged) {
+          const turn = context.stageTurnCount || 0;
+          const targetHP = targetCombatant ? targetCombatant.currentHP / targetCombatant.maxHP : 1.0;
+
+          if (turn === 0 || turn === 1) {
+            score *= 0.5;
+          } else if (turn <= 5) {
+            const targetDebuffed = targetCombatant &&
+              (targetCombatant.statusEffects || []).some(e => e.duration > 0);
+            // Pure CONTROL gets full bonus; tagged damage skills get a softer boost
+            score *= targetDebuffed ? 1.2 : (cat === 'CONTROL' ? 2.0 : 1.4);
+          } else if (turn <= 10) {
+            score *= 0.8;
+          } else {
+            score *= 0.5;
+          }
+
+          // Dying target suppression — control is wasted on enemies near death
+          if (targetHP < 0.3) score *= 0.15;
+          else if (targetHP < 0.5) score *= 0.5;
+        }
+
         // Buff window — bonus when healthy, gentler solo penalty
         if ((cat === 'BUFF' || cat === 'DEFENSE' || cat === 'UTILITY') &&
             actor.currentHP > actor.maxHP * 0.75 && resourceRatio > 0.5) {
@@ -2939,20 +2966,12 @@ calculateRewards(players, challenge, segments = []) {
                 if (chestItem?.armor) enemyArmor += chestItem.armor;
             }
 
-            const statScale = 1 + (enemyLevel - 1) * 0.04;
-            const scaledStats = {
-                conviction: Math.round((enemyType.stats?.conviction || 0) * statScale),
-                endurance:  Math.round((enemyType.stats?.endurance  || 0) * statScale),
-                ambition:   Math.round((enemyType.stats?.ambition   || 0) * statScale),
-                harmony:    Math.round((enemyType.stats?.harmony    || 0) * statScale),
-            };
-
             enemies.push({
                 id: `enemy_${enemyType.id.trim()}_${String(globalEnemyIndex).padStart(3, '0')}`,
                 name: enemyType.name.trim(),
                 type: 'enemy',
                 level: enemyLevel,
-                stats: scaledStats,
+                stats: { ...enemyType.stats },
                 maxHP: maxHP, currentHP: maxHP,
                 maxMana: maxMana, currentMana: maxMana,
                 maxStamina: maxStamina, currentStamina: maxStamina,

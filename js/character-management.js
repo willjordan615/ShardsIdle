@@ -901,8 +901,7 @@ async function ensureIntrinsicSkill(character) {
 
 async function showCharacterDetail(characterId, opts = {}) {
     const silent = opts.silent === true;
-    // Clear any stale merchant offer when navigating to detail manually
-    if (!silent && typeof dismissMerchant === 'function') dismissMerchant();
+
     try {
         const character = await getCharacter(characterId);
         if (!character) {
@@ -1751,7 +1750,7 @@ function renderGearUpgradeBadge(character) {
         return _gearScore(itemDef) > equippedScores[slot];
     });
 
-    badge.style.display = hasUpgrade ? 'inline-flex' : 'none';
+    badge.style.display = hasUpgrade ? 'inline' : 'none';
 }
 
 function renderExportButton(character) {
