@@ -953,11 +953,33 @@ calculateRewards(players, challenge, segments = []) {
     // XP with diminishing returns for larger parties
     const partyScale = 1 / (1 + 0.5 * (players.length - 1));
 
-    // Difficulty scaling
+    // Difficulty scaling — steep penalty for overlevelled parties.
+    // 0-5 over recommended: gentle reduction
+    // 6-10 over: steep drop
+    // 11-20 over: near zero
+    // 20+ over: effectively nothing (1%)
     const avgPartyLevel = players.reduce((sum, p) => sum + (p.level || 1), 0) / players.length;
     const recommendedLevel = challenge?.recommendedLevel || 1;
     const levelDelta = avgPartyLevel - recommendedLevel;
-    const difficultyScale = Math.min(2.0, 1 / Math.max(0.1, 1 + levelDelta * 0.15));
+    let difficultyScale;
+    if (levelDelta <= 0) {
+        // Under or at recommended level — bonus XP for punching up, capped at 2×
+        difficultyScale = Math.min(2.0, 1 / Math.max(0.5, 1 + levelDelta * 0.15));
+    } else if (levelDelta <= 5) {
+        // 1-5 over: gentle reduction (1.0 down to ~0.57)
+        difficultyScale = 1 / (1 + levelDelta * 0.12);
+    } else if (levelDelta <= 10) {
+        // 6-10 over: steep drop (~0.5 down to ~0.15)
+        const base = 1 / (1 + 5 * 0.12);
+        difficultyScale = base * Math.pow(0.6, levelDelta - 5);
+    } else if (levelDelta <= 20) {
+        // 11-20 over: near zero (~0.09 down to ~0.01)
+        const base = (1 / (1 + 5 * 0.12)) * Math.pow(0.6, 5);
+        difficultyScale = base * Math.pow(0.75, levelDelta - 10);
+    } else {
+        // 20+ over: effectively nothing
+        difficultyScale = 0.01;
+    }
 
     // Secret path bonus: 2x XP
     const secretXPMultiplier = secretCompleted ? 2.0 : 1.0;
@@ -1364,33 +1386,6 @@ calculateRewards(players, challenge, segments = []) {
           const turn = context.stageTurnCount || 0;
           const buffTimingMultiplier = turn <= 3 ? 1.0 : turn <= 6 ? 0.6 : turn <= 9 ? 0.35 : 0.35;
           score *= buffTimingMultiplier;
-        }
-
-        // Control/debuff timing — turns 2-5 are the prime debilitation window.
-        // Turn 1 is reserved for buffs. Value decays as the fight progresses.
-        // Suppressed against dying targets where the debuff duration is largely wasted.
-        // Also applies to damage skills tagged 'control' (hard CC as secondary effect).
-        const isControlTagged = !isEnemy && (skill.tags || []).includes('control');
-        if (cat === 'CONTROL' || isControlTagged) {
-          const turn = context.stageTurnCount || 0;
-          const targetHP = targetCombatant ? targetCombatant.currentHP / targetCombatant.maxHP : 1.0;
-
-          if (turn === 0 || turn === 1) {
-            score *= 0.5;
-          } else if (turn <= 5) {
-            const targetDebuffed = targetCombatant &&
-              (targetCombatant.statusEffects || []).some(e => e.duration > 0);
-            // Pure CONTROL gets full bonus; tagged damage skills get a softer boost
-            score *= targetDebuffed ? 1.2 : (cat === 'CONTROL' ? 2.0 : 1.4);
-          } else if (turn <= 10) {
-            score *= 0.8;
-          } else {
-            score *= 0.5;
-          }
-
-          // Dying target suppression — control is wasted on enemies near death
-          if (targetHP < 0.3) score *= 0.15;
-          else if (targetHP < 0.5) score *= 0.5;
         }
 
         // Buff window — bonus when healthy, gentler solo penalty
