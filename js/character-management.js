@@ -901,7 +901,8 @@ async function ensureIntrinsicSkill(character) {
 
 async function showCharacterDetail(characterId, opts = {}) {
     const silent = opts.silent === true;
-
+    // Clear any stale merchant offer when navigating to detail manually
+    if (!silent && typeof dismissMerchant === 'function') dismissMerchant();
     try {
         const character = await getCharacter(characterId);
         if (!character) {
@@ -954,6 +955,7 @@ async function showCharacterDetail(characterId, opts = {}) {
 renderImportBadge(character);
         renderCombatHistory(characterId);
         renderGearUpgradeBadge(character);
+        if (typeof renderMerchant === 'function') renderMerchant(character);
 
         // Populate Combat Style section
         const profile = character.aiProfile || 'balanced';
