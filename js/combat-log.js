@@ -347,12 +347,24 @@ async function displayCombatLog(combatData) {
         function showStageBanner(title, subtext) {
             if (!stageBanner) return;
             stageBanner.style.display = 'block';
-            stageBannerTitle.innerHTML = title
-                + (subtext ? `<div style="font-size:0.7rem; font-weight:normal; color:#aaa; letter-spacing:1px; text-transform:none; margin-top:4px; font-style:italic;">${subtext}</div>` : '');
-            stageBannerPre.innerHTML = '';
-            stageBanner.classList.remove('banner-fade-in');
-            void stageBanner.offsetWidth; // force reflow
+            stageBannerTitle.innerHTML = title;
+            // Put subtext in its own element so mobile CSS can hide/show it independently
+            stageBannerPre.innerHTML = subtext
+                ? `<div style="font-size:0.84rem; font-style:italic; line-height:1.6; color:var(--text-secondary);">${subtext}</div>`
+                : '';
+            stageBanner.classList.remove('banner-fade-in', 'banner-expanded');
+            void stageBanner.offsetWidth;
             stageBanner.classList.add('banner-fade-in');
+        }
+
+        // Mobile: tap banner to expand/collapse lore
+        if (!stageBanner._tapInitialized) {
+            stageBanner._tapInitialized = true;
+            stageBanner.addEventListener('click', function() {
+                if (window.innerWidth <= 768) {
+                    stageBanner.classList.toggle('banner-expanded');
+                }
+            });
         }
 
         function hideStageBanner() {

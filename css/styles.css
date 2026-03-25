@@ -1186,7 +1186,7 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
     #combatlog .combat-col-left .combatant-group > h3 {
         display: none;
     }
-    #partyStatus {
+    #combatlog #partyStatus {
         display: flex !important;
         flex-direction: row;
         gap: 0.5rem;
@@ -1196,8 +1196,8 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
     }
-    #partyStatus::-webkit-scrollbar { display: none; }
-    #partyStatus .combatant {
+    #combatlog #partyStatus::-webkit-scrollbar { display: none; }
+    #combatlog #partyStatus .combatant {
         flex: 0 0 210px;
         margin-bottom: 0;
     }
@@ -1214,6 +1214,75 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
         padding: 0 var(--space-md) var(--space-sm);
         margin-top: 0;
     }
+
+    /* Media controls: compact */
+    #combatlog .nav-buttons.combat-nav {
+        gap: 0.4rem;
+    }
+    #combatlog .media-btn {
+        padding: 0.35rem 0.55rem;
+    }
+    #combatlog .media-btn svg {
+        width: 11px;
+        height: 11px;
+    }
+    #combatlog .nav-buttons button:not(.media-btn) {
+        padding: 0.35rem 0.75rem;
+        font-size: 0.62rem;
+    }
+
+    /* Stage banner: title only by default, lore hidden until tapped */
+    #stageBanner {
+        margin: 0 var(--space-md) 0;
+        cursor: pointer;
+    }
+    #stageBannerTitle {
+        font-size: 0.82rem !important;
+        padding: 0.4rem var(--space-md) !important;
+        letter-spacing: 0.1em !important;
+        border-bottom: none;
+    }
+    #stageBannerPreCombat {
+        font-size: 0.75rem;
+        padding: 0 var(--space-md) 0.4rem;
+        display: none;
+    }
+    #stageBanner.banner-expanded #stageBannerPreCombat {
+        display: block;
+    }
+    #stageBanner.banner-expanded #stageBannerTitle {
+        border-bottom: 1px solid rgba(212,175,55,0.14) !important;
+        padding-bottom: 0.4rem !important;
+    }
+
+    /* Combatant cards: slim down on mobile */
+    .combatant {
+        padding: 0.35rem 0.5rem;
+        margin-bottom: 0.35rem;
+    }
+    .combatant-name {
+        font-size: 0.72rem;
+    }
+    .bar-row {
+        gap: 3px;
+    }
+    .health-bar, .mana-bar, .stamina-bar {
+        height: 10px !important;
+    }
+    .bar-overlay-text, .health-bar-text {
+        font-size: 0.48rem !important;
+    }
+    .bar-label {
+        font-size: 0.52rem;
+        width: 14px;
+    }
+    .combatant-stats {
+        min-width: 48px;
+        padding-left: 0.35rem;
+    }
+    .cstat-label { font-size: 0.48rem; }
+    .cstat-val   { font-size: 0.62rem; }
+    .status-effects { font-size: 0.8rem; }
 }
 @media (max-width:768px) {
     .grid-2, .grid-3, .combatants-display { grid-template-columns:1fr; }
