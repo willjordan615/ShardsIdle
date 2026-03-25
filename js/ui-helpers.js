@@ -178,3 +178,17 @@ function returnToHub() {
         showScreen('roster');
     }
 }
+
+/**
+ * Escape a string for safe insertion into HTML attribute values and content.
+ * Prevents XSS via crafted character names or other user-supplied strings.
+ */
+function escapeHtml(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+

@@ -23,20 +23,6 @@ if (typeof window.currentState === 'undefined') {
 var currentState = window.currentState;
 
 /**
- * Escape a string for safe use in HTML attribute values and content.
- * FIX #4: Replaces the old single-quote-only escape with full HTML escaping
- * to prevent XSS via crafted character names or race values.
- */
-function escapeHtml(str) {
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-}
-
-/**
  * Render available challenges
  */
 async function renderChallenges() {

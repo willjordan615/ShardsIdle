@@ -277,24 +277,6 @@ async function initializeGame() {
 }
 
 /**
- * Determine mentality type based on stat distribution.
- */
-function getMentality(stats) {
-    const total = stats.conviction + stats.endurance + stats.ambition + stats.harmony;
-    if (total === 0) return 'Balanced';
-    const convictionRatio = stats.conviction / total;
-    const enduranceRatio  = stats.endurance  / total;
-    const ambitionRatio   = stats.ambition   / total;
-    const harmonyRatio    = stats.harmony    / total;
-
-    if (convictionRatio > 0.35) return 'Aggressive';
-    if (enduranceRatio  > 0.35) return 'Defensive';
-    if (ambitionRatio   > 0.35) return 'Ambitious';
-    if (harmonyRatio    > 0.35) return 'Peaceful';
-    return 'Balanced';
-}
-
-/**
 Determine character class based on skills, equipment, stats, and combat history.
 Comprehensive system that prioritizes skill investment over equipment,
 while recognizing weapon synergy, stat alignment, and performance achievements.
