@@ -1058,6 +1058,57 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
    RESPONSIVE
    ============================================================ */
 
+
+/* ── Session loot drawer (mobile) & panel (desktop) ────────────────────────── */
+#sessionLootTab {
+    display: none; /* shown only on mobile via media query */
+}
+
+#sessionLootDrawer {
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    pointer-events: none;
+}
+#sessionLootDrawerBackdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    pointer-events: all;
+}
+#sessionLootDrawerPanel {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-height: 60vh;
+    background: linear-gradient(135deg, #1a2240 0%, #10162d 100%);
+    border-top: 1px solid var(--gold-border);
+    border-radius: 12px 12px 0 0;
+    display: flex;
+    flex-direction: column;
+    pointer-events: all;
+    animation: slideUpDrawer 0.25s cubic-bezier(0.16,1,0.3,1);
+}
+#sessionLootDrawerHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 0.85rem;
+    border-bottom: 1px solid rgba(139,115,85,0.2);
+    font-family: var(--font-display);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--gold);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+@keyframes slideUpDrawer {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+}
+
 /* ============================================================
    COMBAT LOG — MOBILE LAYOUT (≤768px)
    Order: nav → stage banner (capped) → enemies → battle log → party strip
@@ -1316,6 +1367,31 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
     #combatlog .turn-header   { font-size: 0.7rem; }
     #combatlog .turn-message  { font-size: 0.72rem; }
     #combatlog .turn-damage   { font-size: 0.68rem; margin-top: 1px; }
+
+    /* Session loot panel — hidden on mobile (use drawer instead) */
+    #sessionLootPanel { display: none !important; }
+
+    /* Loot tab button — shown on mobile when there's session loot */
+    #sessionLootTab {
+        display: flex !important;
+        position: absolute;
+        bottom: 4px;
+        right: var(--space-md);
+        z-index: 20;
+        background: rgba(212,175,55,0.15);
+        border: 1px solid var(--gold-border);
+        border-radius: 20px;
+        padding: 3px 10px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        align-items: center;
+        gap: 4px;
+    }
+    #sessionLootTab::after {
+        content: attr(data-count);
+        font-size: 0.6rem;
+        color: var(--text-muted);
+    }
 
     /* Combat result */
     #combatResult {

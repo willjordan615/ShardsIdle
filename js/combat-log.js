@@ -4,6 +4,94 @@
 // ---------------------------------------------------------------------------
 // PANEL COLLAPSE TOGGLES
 // ---------------------------------------------------------------------------
+// ── Session loot log ─────────────────────────────────────────────────────────
+// Accumulates loot across all iterations of an idle loop run.
+// Cleared when the loop stops or the player manually clears it.
+const _sessionLoot = [];   // { run, challengeName, items: [{name, qty, type}] }
+let   _sessionLootRun = 0; // increments each combat
+
+function _appendSessionLoot(challengeId, lootLines, soldLines) {
+    if (!lootLines.length && !soldLines.length) return;
+    _sessionLootRun++;
+
+    const challenges = window.gameData?.challenges || [];
+    const challenge  = challenges.find(c => c.id === challengeId);
+    const name       = challenge?.name || (challengeId?.replace('challenge_','').replace(/_/g,' ') || 'Unknown');
+
+    _sessionLoot.push({
+        run:  _sessionLootRun,
+        name,
+        loot: lootLines,
+        sold: soldLines,
+    });
+
+    _renderSessionLoot();
+}
+
+function _sessionLootHTML() {
+    return [..._sessionLoot].reverse().map(entry => {
+        const lootHtml = entry.loot.length
+            ? entry.loot.map(l => `<div style="color:var(--text-primary);">• ${l}</div>`).join('')
+            : '';
+        const soldHtml = entry.sold.length
+            ? entry.sold.map(s => `<div style="color:var(--text-muted);">• ${s}</div>`).join('')
+            : '';
+        const noLoot = !entry.loot.length && !entry.sold.length
+            ? `<div style="color:var(--text-muted); font-style:italic;">Nothing dropped</div>`
+            : '';
+        return `
+            <div style="padding:0.4rem 0; border-bottom:1px solid rgba(139,115,85,0.12);">
+                <div style="color:var(--gold-dim); font-size:0.72rem; font-weight:600; margin-bottom:3px; text-transform:uppercase; letter-spacing:0.06em;">
+                    Run ${entry.run} — ${entry.name}
+                </div>
+                ${lootHtml}${soldHtml}${noLoot}
+            </div>`;
+    }).join('');
+}
+
+function _renderSessionLoot() {
+    const isMobile  = window.innerWidth <= 768;
+    const countText = `(${_sessionLoot.length} run${_sessionLoot.length !== 1 ? 's' : ''})`;
+    const html      = _sessionLootHTML();
+
+    // Desktop panel
+    const panel   = document.getElementById('sessionLootPanel');
+    const list    = document.getElementById('sessionLootList');
+    const countEl = document.getElementById('sessionLootCount');
+    if (panel) panel.style.display = _sessionLoot.length === 0 ? 'none' : '';
+    if (list)  list.innerHTML = html;
+    if (countEl) countEl.textContent = _sessionLoot.length ? countText : '';
+
+    // Mobile drawer list (kept in sync so it's ready when opened)
+    const drawerList    = document.getElementById('sessionLootListDrawer');
+    const drawerCount   = document.getElementById('sessionLootCountDrawer');
+    if (drawerList)  drawerList.innerHTML = html;
+    if (drawerCount) drawerCount.textContent = _sessionLoot.length ? countText : '';
+
+    // Mobile tab button
+    const tab = document.getElementById('sessionLootTab');
+    if (tab) {
+        tab.style.display = (_sessionLoot.length > 0) ? '' : 'none';
+        tab.setAttribute('data-count', _sessionLoot.length ? ` ${_sessionLoot.length}` : '');
+    }
+}
+
+window.openSessionLootDrawer = function() {
+    const drawer = document.getElementById('sessionLootDrawer');
+    if (drawer) drawer.style.display = 'block';
+};
+
+window.closeSessionLootDrawer = function() {
+    const drawer = document.getElementById('sessionLootDrawer');
+    if (drawer) drawer.style.display = 'none';
+};
+
+window.clearSessionLoot = function() {
+    _sessionLoot.length = 0;
+    _sessionLootRun = 0;
+    _renderSessionLoot();
+};
+
 window.toggleCombatPanel = function(panelId, chevronId) {
     const panel   = document.getElementById(panelId);
     const chevron = document.getElementById(chevronId);
@@ -777,6 +865,8 @@ window.cancelAutoRestart = function() {
     }
     if (typeof updateChallengeStatusBanner === 'function') updateChallengeStatusBanner();
     _updateMediaControls();
+    // Clear session loot when loop stops
+    window.clearSessionLoot();
 };
 
 // Stop button in media controls: request graceful loop exit (highlights while pending).
@@ -1464,6 +1554,10 @@ try {
                     const parts = [];
                     if (lootLines.length)  parts.push(lootLines.join(', '));
                     if (soldLines.length)  parts.push(`Auto-sold: ${soldLines.join(', ')} (+${goldGained}g, +${dustGained.toFixed(2)} dust)`);
+
+                    // Append to session loot log
+                    const soldDisplay = soldLines.map(s => `${s} (auto-sold)`);
+                    _appendSessionLoot(combatData.challengeID || combatData.challengeId, lootLines, soldDisplay);
 
                     await saveCharacterToServer(character);
 

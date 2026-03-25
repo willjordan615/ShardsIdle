@@ -390,6 +390,16 @@
                         </h3>
                         <div class="combat-log" id="combatLogDisplay"></div>
                     </div>
+
+                    <!-- Session loot log -->
+                    <div class="section" id="sessionLootPanel" style="display:none;">
+                        <h3 class="collapsible-header" onclick="toggleCombatPanel('sessionLootList', 'chevron-loot')">
+                            Session Loot <span id="sessionLootCount" style="color:var(--text-muted); font-size:0.7rem; font-weight:400; margin-left:4px;"></span>
+                            <span id="chevron-loot" class="panel-chevron">▾</span>
+                            <button onclick="event.stopPropagation(); clearSessionLoot()" style="margin-left:auto; padding:1px 8px; font-size:0.65rem; background:rgba(139,115,85,0.15); color:var(--text-muted); border:1px solid rgba(139,115,85,0.3); border-radius:3px; cursor:pointer;">Clear</button>
+                        </h3>
+                        <div id="sessionLootList" style="max-height:220px; overflow-y:auto; font-size:0.8rem;"></div>
+                    </div>
                 </div>
 
                 <!-- Right column: enemies -->
@@ -404,6 +414,24 @@
             </div>
 
             <div id="combatResult" style="margin-top: 2rem;"></div>
+
+            <!-- Mobile loot drawer -->
+            <div id="sessionLootDrawer" style="display:none;">
+                <div id="sessionLootDrawerBackdrop" onclick="closeSessionLootDrawer()"></div>
+                <div id="sessionLootDrawerPanel">
+                    <div id="sessionLootDrawerHeader">
+                        <span>Session Loot <span id="sessionLootCountDrawer" style="color:var(--text-muted); font-size:0.7rem; font-weight:400;"></span></span>
+                        <div style="display:flex; gap:6px;">
+                            <button onclick="clearSessionLoot()" style="padding:2px 8px; font-size:0.65rem; background:rgba(139,115,85,0.15); color:var(--text-muted); border:1px solid rgba(139,115,85,0.3); border-radius:3px; cursor:pointer;">Clear</button>
+                            <button onclick="closeSessionLootDrawer()" style="padding:2px 8px; font-size:0.65rem; background:rgba(139,115,85,0.15); color:var(--text-muted); border:1px solid rgba(139,115,85,0.3); border-radius:3px; cursor:pointer;">✕</button>
+                        </div>
+                    </div>
+                    <div id="sessionLootListDrawer" style="overflow-y:auto; flex:1; font-size:0.8rem; padding:0.5rem;"></div>
+                </div>
+            </div>
+
+            <!-- Mobile loot tab button -->
+            <button id="sessionLootTab" onclick="openSessionLootDrawer()" style="display:none;">🎒</button>
         </div>
 
         <!-- ========================================== -->
