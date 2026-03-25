@@ -743,10 +743,16 @@ async function displayCombatLog(combatData) {
 
 // --- GLOBAL MODAL BUTTON HANDLERS ---
 
-// Dismiss the full modal — spawns the countdown toast
+// Dismiss the full modal — spawns the countdown toast only when not watching combat log
 window.dismissResultModal = function() {
     const modal = document.getElementById('combatResultModal');
     if (modal) modal.style.display = 'none';
+
+    const activeScreen = document.querySelector('.screen.active')?.id || '';
+    const onCombatLog  = activeScreen === 'combatlog' || activeScreen === 'combat';
+
+    // Don't spawn toast while on the combat log — the next run fires directly
+    if (onCombatLog) return;
 
     // Read remaining time from the modal's timer span
     const timerSpan = document.getElementById('countdownTimer');
@@ -1215,7 +1221,6 @@ try {
         }
 
         if (character.level > oldLevel) {
-            showSafeSuccess(`${character.name} leveled up to Level ${character.level}!`);
         }
 
         // --- CRITICAL FIX: AGGRESSIVE DISCOVERY INJECTION ---
@@ -1341,7 +1346,6 @@ try {
                     if (skillRef.skillLevel === 1 && skillRef.discovered) {
                         newUnlocks.push({ skillID, skillDef });
                     } else {
-                        showSafeSuccess(`${turn.action.name || skillID} leveled up to ${skillRef.skillLevel}!`);
                     }
                     console.log(`[XP] 🎉 ${skillID} reached Level ${skillRef.skillLevel}!`);
                 } else if (skillRef.skillLevel < 1) {
@@ -1461,7 +1465,6 @@ try {
                     const parts = [];
                     if (lootLines.length)  parts.push(lootLines.join(', '));
                     if (soldLines.length)  parts.push(`Auto-sold: ${soldLines.join(', ')} (+${goldGained}g, +${dustGained.toFixed(2)} dust)`);
-                    if (parts.length) showSafeSuccess(parts.join(' | '));
 
                     await saveCharacterToServer(character);
 
@@ -1571,7 +1574,6 @@ try {
         }
         // Toast for each unlock
         newUnlocks.forEach(u => {
-            showSafeSuccess(`✨ ${u.skillDef?.name || u.skillID} unlocked and ready to equip!`);
         });
     }
 
