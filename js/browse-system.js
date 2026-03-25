@@ -3,33 +3,38 @@
 // NOTE: BACKEND_URL is defined in game-data.js - do not redeclare
  
 // Browse pagination state
-let _browseAllChars = [];
-let _browsePage = 0;
-const _BROWSE_PAGE_SIZE = 8;
+let _browsePagination = { page: 1, totalPages: 1, total: 0 };
+let _browseSearchTimeout = null;
 
 /**
- * Load and display browse results with pagination
+ * Load browse results for the given page. Filters are read from the DOM.
+ * All filtering and pagination happens server-side.
  */
-async function loadBrowseCharacters() {
-    _browsePage = 0;
+async function loadBrowseCharacters(page) {
+    if (page === undefined) page = 1;
+    _browsePagination.page = page;
+
     const container = document.getElementById('browseResults');
-    const loading = document.getElementById('browseLoading');
+    const loading   = document.getElementById('browseLoading');
 
     if (container) container.innerHTML = '';
-    if (loading) loading.style.display = 'block';
+    if (loading)   loading.style.display = 'block';
 
     try {
         const params = new URLSearchParams();
-        const level  = document.getElementById('browseLevelFilter')?.value;
+        const level  = document.getElementById('browseLevelFilter')?.value?.trim();
         const race   = document.getElementById('browseRaceFilter')?.value;
         const sortBy = document.getElementById('browseSortFilter')?.value;
-        const search = document.getElementById('browseSearchFilter')?.value;
+        const search = document.getElementById('browseSearchFilter')?.value?.trim();
         const role   = document.getElementById('browseRoleFilter')?.value;
 
-        if (level)  params.append('level', level);
-        if (race)   params.append('race', race);
+        if (level  && parseInt(level) > 0) params.append('level',  parseInt(level));
+        if (race)   params.append('race',   race);
         if (sortBy) params.append('sortBy', sortBy);
-        params.append('limit', '100');
+        if (search) params.append('search', search);
+        if (role)   params.append('role',   role);
+        params.append('page',  page);
+        params.append('limit', '8');
 
         const response = await authFetch(`${BACKEND_URL}/api/character/browse?${params}`);
         if (!response.ok) throw new Error('Browse failed');
@@ -38,21 +43,32 @@ async function loadBrowseCharacters() {
         if (loading) loading.style.display = 'none';
         if (!container) return;
 
-        let characters = data.characters;
+        const characters   = data.characters || [];
+        _browsePagination  = data.pagination  || { page: 1, totalPages: 1, total: 0 };
 
-        // Client-side filters
-        if (search) {
-            const q = search.toLowerCase();
-            characters = characters.filter(c =>
-                c.characterName.toLowerCase().includes(q)
-            );
-        }
-        if (role) {
-            characters = characters.filter(c => c.roleTag === role);
+        if (characters.length === 0) {
+            container.innerHTML = `
+                <div style="grid-column:1/-1;text-align:center;padding:3rem;color:#888;">
+                    <h3>No Characters Found</h3>
+                    <p>Try adjusting your filters or be the first to share a character!</p>
+                </div>`;
+            return;
         }
 
-        _browseAllChars = characters;
-        _renderBrowsePage();
+        characters.forEach(char => container.appendChild(createBrowseCard(char)));
+
+        // Pagination controls
+        const { totalPages, total } = _browsePagination;
+        if (totalPages > 1) {
+            const nav = document.createElement('div');
+            nav.style.cssText = 'grid-column:1/-1;display:flex;justify-content:center;align-items:center;gap:12px;margin-top:1rem;';
+            nav.innerHTML = `
+                <button onclick="loadBrowseCharacters(${page - 1})" ${page <= 1 ? 'disabled' : ''} class="secondary" style="padding:4px 14px;">← Prev</button>
+                <span style="color:#8b7355;font-size:0.85rem;">Page ${page} of ${totalPages} <span style="color:#555;">(${total} total)</span></span>
+                <button onclick="loadBrowseCharacters(${page + 1})" ${page >= totalPages ? 'disabled' : ''} class="secondary" style="padding:4px 14px;">Next →</button>
+            `;
+            container.appendChild(nav);
+        }
 
     } catch (error) {
         console.error('Browse error:', error);
@@ -68,48 +84,13 @@ async function loadBrowseCharacters() {
     }
 }
 
-function _renderBrowsePage() {
-    const container = document.getElementById('browseResults');
-    if (!container) return;
-
-    const total = _browseAllChars.length;
-    const start = _browsePage * _BROWSE_PAGE_SIZE;
-    const end   = Math.min(start + _BROWSE_PAGE_SIZE, total);
-    const page  = _browseAllChars.slice(start, end);
-
-    container.innerHTML = '';
-
-    if (total === 0) {
-        container.innerHTML = `
-            <div style="grid-column:1/-1;text-align:center;padding:3rem;color:#888;">
-                <h3>No Characters Found</h3>
-                <p>Try adjusting your filters or be the first to share a character!</p>
-            </div>`;
-        return;
-    }
-
-    page.forEach(char => container.appendChild(createBrowseCard(char)));
-
-    // Pagination controls
-    if (total > _BROWSE_PAGE_SIZE) {
-        const totalPages = Math.ceil(total / _BROWSE_PAGE_SIZE);
-        const nav = document.createElement('div');
-        nav.style.cssText = 'grid-column:1/-1;display:flex;justify-content:center;align-items:center;gap:12px;margin-top:1rem;';
-        nav.innerHTML = `
-            <button onclick="browsePrevPage()" ${_browsePage === 0 ? 'disabled' : ''} class="secondary" style="padding:4px 14px;">← Prev</button>
-            <span style="color:#8b7355;font-size:0.85rem;">Page ${_browsePage + 1} of ${totalPages} <span style="color:#555;">(${total} total)</span></span>
-            <button onclick="browseNextPage()" ${end >= total ? 'disabled' : ''} class="secondary" style="padding:4px 14px;">Next →</button>
-        `;
-        container.appendChild(nav);
-    }
+/**
+ * Debounced wrapper for text input — avoids a fetch on every keystroke.
+ */
+function loadBrowseCharactersDebounced() {
+    clearTimeout(_browseSearchTimeout);
+    _browseSearchTimeout = setTimeout(() => loadBrowseCharacters(1), 350);
 }
-
-window.browsePrevPage = function() {
-    if (_browsePage > 0) { _browsePage--; _renderBrowsePage(); }
-};
-window.browseNextPage = function() {
-    if ((_browsePage + 1) * _BROWSE_PAGE_SIZE < _browseAllChars.length) { _browsePage++; _renderBrowsePage(); }
-};
 
 
 /**
@@ -143,6 +124,16 @@ function createBrowseCard(char) {
     };
     const roleLabel = char.roleTag ? ROLE_LABELS[char.roleTag] : null;
     const profileEmoji = profileLabels[char.aiProfile] || '⚖️';
+    const characterClass = (typeof getCharacterClass === 'function' && char.skills)
+        ? getCharacterClass(char, window.gameData?.skills || [])
+        : null;
+    // Top 2 active (non-intrinsic) skills by level
+    const activeSkillNames = (char.skills || [])
+        .filter(s => !s.intrinsic)
+        .sort((a, b) => (b.skillLevel || 0) - (a.skillLevel || 0))
+        .slice(0, 2)
+        .map(s => window.gameData?.skills?.find(sk => sk.id === s.skillID)?.name)
+        .filter(Boolean);
 
     // Milestone badges with tooltips
     const badges = [];
@@ -165,7 +156,8 @@ function createBrowseCard(char) {
                     <h3 style="margin:0;color:#4eff7f;font-size:1rem;">${char.characterName}</h3>
                     ${roleLabel ? `<span style="font-size:0.72rem;color:#d4af37;background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.3);border-radius:10px;padding:1px 7px;">${roleLabel}</span>` : ''}
                 </div>
-                <div style="color:#888;font-size:0.8rem;margin-top:2px;">Lv.${char.level} ${char.race} ${profileEmoji}</div>
+                <div style="color:#888;font-size:0.8rem;margin-top:2px;">Lv.${char.level} ${char.race}${characterClass ? ' · ' + characterClass : ''} ${profileEmoji}</div>
+                ${activeSkillNames.length ? `<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;">${activeSkillNames.map(n => `<span style="font-size:0.7rem;color:#d4af37;background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.2);border-radius:3px;padding:1px 6px;">${n}</span>`).join('')}</div>` : ''}
             </div>
             <div style="text-align:right;flex-shrink:0;">
                 <code style="color:#4eff7f;font-size:0.85rem;letter-spacing:1px;">${char.shareCode}</code>

@@ -16,7 +16,7 @@
     --gold-glow:      rgba(212,175,55,0.15);
     --gold-border:    rgba(212,175,55,0.28);
 
-    --game-background: url('./assets/AI_FLAVOR.jpg');
+    --game-background: url('../assets/AI_FLAVOR.jpg');
 
     --ink-deep:       #070a18;
     --ink-dark:       #0d1128;
@@ -96,7 +96,7 @@ body {
 }
 
 body::before {
-    opacity: 0.7;
+    opacity: 0.92;
     content:'';
     position:fixed;
     inset:0;
@@ -183,6 +183,8 @@ p { color: var(--text-secondary); font-size: 0.93rem; line-height: 1.65; }
     max-width: 1440px;
     margin: 0 auto;
     padding: var(--space-xl) var(--space-lg);
+    position: relative;
+    z-index: 0;
 }
 
 header {
@@ -355,7 +357,7 @@ button.danger:hover:not(:disabled) {
    SECTIONS & SURFACES
    ============================================================ */
 .section {
-    background: linear-gradient(135deg, rgba(26,34,64,0.7) 0%, rgba(16,22,45,0.88) 100%);
+    background: linear-gradient(135deg, #1a2240 0%, #10162d 100%);
     border: 1px solid var(--gold-border);
     border-radius: var(--radius-md);
     padding: var(--space-xl);
@@ -374,7 +376,7 @@ button.danger:hover:not(:disabled) {
    CARDS
    ============================================================ */
 .card {
-    background: linear-gradient(135deg, rgba(26,34,64,0.65) 0%, rgba(16,22,45,0.82) 100%);
+    background: linear-gradient(135deg, #1a2240 0%, #10162d 100%);
     border: 1px solid var(--gold-border);
     border-radius: var(--radius-md);
     padding: var(--space-lg);
@@ -395,7 +397,7 @@ button.danger:hover:not(:disabled) {
 .card:hover::after { opacity:1; }
 .card.selected {
     border-color: var(--green);
-    background: linear-gradient(135deg, rgba(30,70,30,0.5) 0%, rgba(16,40,16,0.82) 100%);
+    background: linear-gradient(135deg, #1e461e 0%, #102810 100%);
     box-shadow: 0 0 24px rgba(76,217,100,0.18), var(--shadow-depth);
 }
 

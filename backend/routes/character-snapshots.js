@@ -255,114 +255,135 @@ router.get('/import/:shareCode', optionalAuth, async (req, res) => {
  */
 router.get('/browse', optionalAuth, async (req, res) => {
     try {
-        const { level, race, sortBy, orderBy, limit } = req.query;
+        const { race, sortBy, role } = req.query;
+        const level  = parseInt(req.query.level)  || null;
+        const search = (req.query.search || '').trim();
+        const page   = Math.max(1, parseInt(req.query.page)  || 1);
+        const limit  = Math.min(20, Math.max(1, parseInt(req.query.limit) || 8));
+        const offset = (page - 1) * limit;
+
         const rawDb = db.getDatabase();
-        
-        let query = `
-        SELECT 
-        cs.*,
-        c.combatStats as live_combat_stats,
-        c.partyStats as live_party_stats
-        FROM character_snapshots cs
-        INNER JOIN characters c ON cs.character_id = c.id
-        WHERE cs.is_public = 1
-`;
+
+        // Build WHERE clause — all filters applied in SQL
+        let where = 'WHERE cs.is_public = 1';
         const params = [];
 
         if (level) {
-            query += ` AND level >= ?`;
-            params.push(parseInt(level));
+            where += ' AND cs.level >= ?';
+            params.push(level);
         }
-
         if (race) {
-            query += ` AND race = ?`;
+            where += ' AND cs.race = ?';
             params.push(race);
         }
-
-        // ORDER BY is independent of the race filter — was incorrectly chained as else-if
-        if (sortBy === 'combats') {
-            query += ` ORDER BY json_extract(combat_stats, '$.totalCombats') DESC`;
-        } else if (sortBy === 'kills') {
-            query += ` ORDER BY json_extract(combat_stats, '$.enemyKills') DESC`;
-        } else if (sortBy === 'completions') {
-            query += ` ORDER BY json_extract(combat_stats, '$.challengeCompletions') DESC`;
-        } else if (sortBy === 'winrate') {
-            query += ` ORDER BY json_extract(combat_stats, '$.winRate') DESC`;
-        } else if (sortBy === 'crits') {
-            query += ` ORDER BY json_extract(combat_stats, '$.totalCriticalHits') DESC`;
-        } else {
-            query += ` ORDER BY import_count DESC`;
+        if (search) {
+            where += ' AND cs.character_name LIKE ?';
+            params.push(`%${search}%`);
+        }
+        if (role) {
+            where += ' AND c.roleTag = ?';
+            params.push(role);
         }
 
-        const resultLimit = Math.min(parseInt(limit) || 50, 100);
-        query += ` LIMIT ?`;
-        params.push(resultLimit);
+        // ORDER BY
+        let orderBy;
+        if      (sortBy === 'combats')     orderBy = "json_extract(cs.combat_stats, '$.totalCombats') DESC";
+        else if (sortBy === 'wins')        orderBy = "json_extract(cs.combat_stats, '$.wins') DESC";
+        else if (sortBy === 'kills')       orderBy = "json_extract(cs.combat_stats, '$.totalKills') DESC";
+        else if (sortBy === 'damage')      orderBy = "json_extract(cs.combat_stats, '$.totalDamageDealt') DESC";
+        else if (sortBy === 'completions') orderBy = "json_extract(cs.combat_stats, '$.challengeCompletions') DESC";
+        else if (sortBy === 'winrate')     orderBy = "json_extract(cs.combat_stats, '$.winRate') DESC";
+        else if (sortBy === 'crits')       orderBy = "json_extract(cs.combat_stats, '$.totalCriticalHits') DESC";
+        else if (sortBy === 'level')       orderBy = 'cs.level DESC';
+        else                               orderBy = 'cs.import_count DESC';
 
+        const baseQuery = `
+            FROM character_snapshots cs
+            INNER JOIN characters c ON cs.character_id = c.id
+            ${where}`;
+
+        // Total count for pagination
+        const countRow = await new Promise((resolve, reject) => {
+            rawDb.get(
+                `SELECT COUNT(*) as count ${baseQuery}`,
+                params,
+                (err, row) => { if (err) reject(err); else resolve(row); }
+            );
+        });
+        const total = countRow?.count || 0;
+
+        // Paged results
         const snapshots = await new Promise((resolve, reject) => {
-    rawDb.all(query, params, (err, rows) => {
-        if (err) reject(err);
-        else resolve(rows);
-    });
-});
-
-// ===== NEW: Post-process to merge live stats =====
-// Pre-fetch the requesting user's character IDs once for self-import detection
-let userCharacterIds = new Set();
-if (req.userId) {
-    try {
-        const userChars = await new Promise((resolve, reject) => {
             rawDb.all(
-                `SELECT id FROM characters WHERE ownerUserId = ?`,
-                [req.userId],
+                `SELECT cs.*, c.combatStats as live_combat_stats, c.partyStats as live_party_stats
+                 ${baseQuery}
+                 ORDER BY ${orderBy}
+                 LIMIT ? OFFSET ?`,
+                [...params, limit, offset],
                 (err, rows) => { if (err) reject(err); else resolve(rows || []); }
             );
         });
-        userCharacterIds = new Set(userChars.map(r => r.id));
-    } catch (e) { /* non-fatal */ }
-}
 
-const characters = await Promise.all(snapshots.map(async (s) => {
-    let liveCombatStats = {};
-    let liveChar = null;
-    try {
-        liveChar = await db.getCharacter(s.character_id);
-        if (liveChar?.combatStats) {
-            liveCombatStats = liveChar.combatStats;
+        // Pre-fetch requesting user's character IDs for self-import detection
+        let userCharacterIds = new Set();
+        if (req.userId) {
+            try {
+                const userChars = await new Promise((resolve, reject) => {
+                    rawDb.all(
+                        `SELECT id FROM characters WHERE ownerUserId = ?`,
+                        [req.userId],
+                        (err, rows) => { if (err) reject(err); else resolve(rows || []); }
+                    );
+                });
+                userCharacterIds = new Set(userChars.map(r => r.id));
+            } catch (e) { /* non-fatal */ }
         }
-    } catch (e) {
-        console.log(`[BROWSE] Using snapshot stats for ${s.character_name}:`, e.message);
-    }
 
-    const isOwn = !!(req.userId && (
-        (s.owner_user_id && req.userId === s.owner_user_id) ||
-        userCharacterIds.has(s.character_id)
-    ));
+        const characters = await Promise.all(snapshots.map(async (s) => {
+            let liveCombatStats = {};
+            let liveChar = null;
+            try {
+                liveChar = await db.getCharacter(s.character_id);
+                if (liveChar?.combatStats) liveCombatStats = liveChar.combatStats;
+            } catch (e) {
+                console.log(`[BROWSE] Using snapshot stats for ${s.character_name}:`, e.message);
+            }
 
-    return {
-        shareCode: s.share_code,
-        originalCharacterId: s.character_id,
-        characterName: s.character_name,
-        level: s.level,
-        race: s.race,
-        combatStats: liveCombatStats,
-        partyStats: JSON.parse(s.party_stats || '{}'),
-        importCount: s.import_count,
-        ownerUserId: s.owner_user_id,
-        isOwn,
-        avatarId: s.avatar_id,
-        title: s.title,
-        lastActiveAt: s.last_active_at,
-        aiProfile: s.ai_profile || 'balanced',
-        roleTag: liveChar?.roleTag || null,
-    };
-}));
-// ===============================================
+            const isOwn = !!(req.userId && (
+                (s.owner_user_id && req.userId === s.owner_user_id) ||
+                userCharacterIds.has(s.character_id)
+            ));
 
-res.json({
-    characters: characters,  // ← Use the post-processed array
-    total: snapshots.length,
-    filters: { level, race, sortBy, orderBy }
-});
+            return {
+                shareCode:           s.share_code,
+                originalCharacterId: s.character_id,
+                characterName:       s.character_name,
+                level:               s.level,
+                race:                s.race,
+                skills:              JSON.parse(s.skills    || '[]'),
+                equipment:           JSON.parse(s.equipment || '{}'),
+                combatStats:         liveCombatStats,
+                partyStats:          JSON.parse(s.party_stats || '{}'),
+                importCount:         s.import_count,
+                ownerUserId:         s.owner_user_id,
+                isOwn,
+                avatarId:            s.avatar_id,
+                title:               s.title,
+                lastActiveAt:        s.last_active_at,
+                aiProfile:           s.ai_profile || 'balanced',
+                roleTag:             liveChar?.roleTag || null,
+            };
+        }));
+
+        res.json({
+            characters,
+            pagination: {
+                page,
+                limit,
+                total,
+                totalPages: Math.ceil(total / limit),
+            },
+        });
 
     } catch (error) {
         console.error('[BROWSE] Error:', error);

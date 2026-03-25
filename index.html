@@ -420,24 +420,20 @@
             
             <div class="section">
                 <div class="grid-3">
-                    <select id="browseLevelFilter" onchange="loadBrowseCharacters()">
-                        <option value="">Any Level</option>
-                        <option value="1">Level 1+</option>
-                        <option value="5">Level 5+</option>
-                        <option value="10">Level 10+</option>
-                    </select>
-                    <select id="browseSortFilter" onchange="loadBrowseCharacters()">
+                    <input type="number" id="browseLevelFilter" placeholder="Min Level (1–99)" min="1" max="99" oninput="loadBrowseCharactersDebounced()">
+                    <select id="browseSortFilter" onchange="loadBrowseCharacters(1)">
+                        <option value="imports">Sort: Most Imported</option>
                         <option value="level">Sort: Level</option>
                         <option value="combats">Sort: Total Combats</option>
                         <option value="wins">Sort: Wins</option>
                         <option value="damage">Sort: Damage Dealt</option>
-                        <option value="imports">Sort: Most Imported</option>
                         <option value="winrate">Sort: Win Rate</option>
+                        <option value="crits">Sort: Crits</option>
                     </select>
-                    <input type="text" id="browseSearchFilter" placeholder="Search by name..." oninput="loadBrowseCharacters()">
+                    <input type="text" id="browseSearchFilter" placeholder="Search by name..." oninput="loadBrowseCharactersDebounced()">
                 </div>
                 <div class="grid-3" style="margin-top:0.5rem;">
-                    <select id="browseRoleFilter" onchange="loadBrowseCharacters()">
+                    <select id="browseRoleFilter" onchange="loadBrowseCharacters(1)">
                         <option value="">Any Role</option>
                         <option value="Defender">🛡 Defender</option>
                         <option value="Bruiser">⚔️ Bruiser</option>
@@ -447,7 +443,7 @@
                         <option value="Utility">🔧 Utility</option>
                         <option value="Assassin">🗡️ Assassin</option>
                     </select>
-                    <select id="browseRaceFilter" onchange="loadBrowseCharacters()">
+                    <select id="browseRaceFilter" onchange="loadBrowseCharacters(1)">
                         <option value="">Any Race</option>
                         <option value="human">Human</option>
                         <option value="elf">Elf</option>
