@@ -1103,3 +1103,97 @@ function getXPToNextLevel(level) {
     // Level 100 requires D14-D16 endgame content over months.
     return Math.max(1, Math.floor(7300 * Math.pow(1.15, level - 1)));
 }
+/**
+ * Returns hint descriptors for undiscovered skill combinations involving skillID.
+ * A hint fires when:
+ *   - The skill is at level >= 3
+ *   - A child skill exists with this skill as one parent
+ *   - The other parent is in the character's known skills (level >= 1 or starter)
+ *   - The child skill has not yet been discovered
+ *
+ * Returns an array of unique descriptor strings (e.g. ["fire", "defensive"])
+ * suitable for display as combination hints.
+ */
+function getComboHints(character, skillID) {
+    if (!window.gameData?.skills) return [];
+
+    const skillRecord = (character.skills || []).find(r => r.skillID === skillID);
+    if (!skillRecord || (skillRecord.skillLevel || 0) < 3) return [];
+
+    const TAG_DISPLAY = {
+        physical:    'physical',
+        fire:        'fire',
+        cold:        'cold',
+        shadow:      'shadow',
+        holy:        'holy',
+        arcane:      'arcane',
+        nature:      'nature',
+        lightning:   'lightning',
+        poison:      'poison',
+        healing:     'healing',
+        beast:       'primal',
+        water:       'water',
+    };
+
+    const CATEGORY_DISPLAY = {
+        DEFENSE:      'defensive',
+        RESTORATION:  'restorative',
+        BUFF:         'empowering',
+        CONTROL:      'control',
+        UTILITY:      'utility',
+        DAMAGE_SINGLE:'offensive',
+        DAMAGE_AOE:   'offensive',
+        DAMAGE_MAGIC: 'arcane',
+    };
+
+    const knownIDs = new Set(
+        (character.skills || [])
+            .filter(r => r.isStarterSkill || (r.skillLevel || 0) >= 1)
+            .map(r => r.skillID)
+    );
+
+    // Also include starter skills from gameData even if not in character.skills yet
+    window.gameData.skills
+        .filter(s => s.isStarterSkill)
+        .forEach(s => knownIDs.add(s.id));
+
+    const discoveredIDs = new Set(
+        (character.skills || [])
+            .filter(r => r.discovered && (r.skillLevel || 0) >= 1)
+            .map(r => r.skillID)
+    );
+
+    const hints = new Set();
+
+    const children = window.gameData.skills.filter(s => {
+        const parents = s.parentSkills;
+        return parents && parents.includes(skillID);
+    });
+
+    for (const child of children) {
+        // Skip already discovered children
+        if (discoveredIDs.has(child.id)) continue;
+
+        const otherParentID = child.parentSkills.find(p => p !== skillID);
+        if (!otherParentID) continue;
+
+        // Other parent must be known to this character
+        if (!knownIDs.has(otherParentID)) continue;
+
+        const otherParent = window.gameData.skills.find(s => s.id === otherParentID);
+        if (!otherParent) continue;
+
+        // Derive descriptor from other parent's tags, falling back to category
+        const tags = otherParent.tags || [];
+        const usableTag = tags.find(t => TAG_DISPLAY[t]);
+        if (usableTag) {
+            hints.add(TAG_DISPLAY[usableTag]);
+        } else {
+            const cat = otherParent.category || '';
+            const catKey = Object.keys(CATEGORY_DISPLAY).find(k => cat.startsWith(k));
+            if (catKey) hints.add(CATEGORY_DISPLAY[catKey]);
+        }
+    }
+
+    return [...hints];
+}
