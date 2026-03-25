@@ -438,3 +438,185 @@ function openImportModal() {
     
     modal.style.display = 'flex';
 }
+// ── Party formation: public companion list ───────────────────────────────────
+// Rendering and pagination for the public companions panel in party formation.
+// Lives here rather than combat-system.js because it is browse/display logic.
+// addPublicCompanion() (party mutation) stays in combat-system.js.
+
+// Public companions pagination state
+let _publicCompanionsSearchTimeout = null;
+
+/**
+ * Debounced wrapper for public companion text inputs.
+ */
+function loadPublicCompanionsDebounced() {
+    clearTimeout(_publicCompanionsSearchTimeout);
+    _publicCompanionsSearchTimeout = setTimeout(() => loadPublicCompanions(1), 350);
+}
+
+/**
+ * Load public characters for companion selection, server-side paginated.
+ */
+async function loadPublicCompanions(page) {
+    if (page === undefined) page = 1;
+    const container = document.getElementById('publicCompanionsList');
+    if (!container) return;
+
+    container.innerHTML = '<div class="card" style="text-align: center; color: #8b7355; grid-column: 1 / -1;">Loading...</div>';
+
+    try {
+        const level  = document.getElementById('publicLevelFilter')?.value?.trim();
+        const sortBy = document.getElementById('publicSortFilter')?.value || 'imports';
+        const search = document.getElementById('publicSearchFilter')?.value?.trim();
+
+        const params = new URLSearchParams({ sortBy, page, limit: '6' });
+        if (level && parseInt(level) > 0) params.append('level', parseInt(level));
+        if (search) params.append('search', search);
+
+        const response = await authFetch(`${BACKEND_URL}/api/character/browse?${params}`);
+        if (!response.ok) throw new Error('Failed to load');
+
+        const data = await response.json();
+        const characters = data.characters || [];
+        const pagination = data.pagination || { page: 1, totalPages: 1, total: 0 };
+
+        if (characters.length === 0) {
+            container.innerHTML = '<div class="card" style="text-align: center; color: #8b7355; grid-column: 1 / -1;">No characters found</div>';
+            return;
+        }
+
+        const authUserId = window.authState?.userId;
+        const ROLE_LABELS = {
+            Defender:'🛡 Defender', Bruiser:'⚔️ Bruiser', Mage:'🔮 Mage',
+            Healer:'💊 Healer', Support:'💚 Support', Utility:'🔧 Utility', Assassin:'🗡️ Assassin'
+        };
+
+        container.innerHTML = '';
+        characters.forEach(char => {
+            const stats = char.combatStats || {};
+            const isOwn = char.isOwn || (authUserId && char.ownerUserId && char.ownerUserId === authUserId);
+            const alreadyAdded = currentState.currentParty.some(m => m.originalCharacterId === char.originalCharacterId);
+            const disabled = isOwn || alreadyAdded;
+            const disabledLabel = isOwn ? 'Your Character' : alreadyAdded ? 'Already in Party' : null;
+
+            const card = document.createElement('div');
+            card.className = 'card';
+
+            if (disabled) {
+                card.style.opacity = '0.45';
+                card.style.cursor = 'not-allowed';
+            } else {
+                card.style.cursor = 'pointer';
+                card.dataset.shareCode = char.shareCode;
+                card.dataset.characterName = char.characterName;
+                card.dataset.level = char.level;
+                card.dataset.race = char.race;
+                card.addEventListener('click', () => {
+                    addPublicCompanion(
+                        card.dataset.shareCode,
+                        card.dataset.characterName,
+                        Number(card.dataset.level),
+                        card.dataset.race
+                    );
+                });
+            }
+
+            const roleLabel = char.roleTag ? ROLE_LABELS[char.roleTag] : null;
+            const charClass = (typeof getCharacterClass === 'function' && char.skills)
+                ? getCharacterClass(char, window.gameData?.skills || [])
+                : null;
+            const activeSkillNames = (char.skills || [])
+                .filter(s => !s.intrinsic)
+                .sort((a, b) => (b.skillLevel || 0) - (a.skillLevel || 0))
+                .slice(0, 2)
+                .map(s => window.gameData?.skills?.find(sk => sk.id === s.skillID)?.name)
+                .filter(Boolean);
+
+            const milestones = stats.milestones || {};
+            const badges = [
+                milestones.firstBlood       && { icon: '🩸', title: 'First Blood' },
+                milestones.hundredKills     && { icon: '💀', title: '100 Kills' },
+                milestones.masterHealer     && { icon: '✨', title: 'Master Healer' },
+                milestones.undefeated       && { icon: '🏆', title: 'Undefeated' },
+                milestones.centuryOfCombats && { icon: '⚔️', title: 'Century' },
+            ].filter(Boolean);
+
+            const totalKills = Object.values(stats.enemyKills || {}).reduce((a, b) => a + b, 0);
+            const totalChallenges = Object.keys(stats.challengeCompletions || {}).length;
+            const topSkillId = Object.entries(stats.skillUsage || {}).sort((a,b) => b[1]-a[1])[0]?.[0];
+            const topSkillName = topSkillId && window.gameData?.skills?.find(s => s.id === topSkillId)?.name || topSkillId;
+            const topKillEntry = Object.entries(stats.enemyKills || {}).sort((a,b) => b[1]-a[1])[0];
+
+            card.innerHTML = `
+                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:2px;">
+                    <span class="card-title" style="margin:0;">${escapeHtml(char.characterName)}</span>
+                    ${roleLabel ? `<span style="font-size:0.68rem;color:#d4af37;background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.25);border-radius:8px;padding:1px 6px;">${roleLabel}</span>` : ''}
+                </div>
+                <div class="card-subtitle" style="margin-bottom:0.3rem;">Lv.${char.level} ${escapeHtml(char.race)}${charClass ? ' · ' + charClass : ''}</div>
+                ${activeSkillNames.length ? `<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:0.35rem;">${activeSkillNames.map(n => `<span style="font-size:0.7rem;color:#d4af37;background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.2);border-radius:3px;padding:1px 6px;">${n}</span>`).join('')}</div>` : ''}
+
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:0.35rem;">
+                    <div style="background:rgba(10,14,39,0.6);padding:0.2rem;border-radius:4px;text-align:center;">
+                        <div style="color:#8b7355;font-size:0.65rem;">Combats</div>
+                        <div style="color:#ccc;font-weight:bold;font-size:0.82rem;">${stats.totalCombats || 0}</div>
+                    </div>
+                    <div style="background:rgba(10,14,39,0.6);padding:0.2rem;border-radius:4px;text-align:center;">
+                        <div style="color:#8b7355;font-size:0.65rem;">Wins</div>
+                        <div style="color:#4cd964;font-weight:bold;font-size:0.82rem;">${stats.wins || 0}</div>
+                    </div>
+                    <div style="background:rgba(10,14,39,0.6);padding:0.2rem;border-radius:4px;text-align:center;">
+                        <div style="color:#8b7355;font-size:0.65rem;">Win Rate</div>
+                        <div style="color:#d4af37;font-weight:bold;font-size:0.82rem;">${stats.winRate ? (parseFloat(stats.winRate)*100).toFixed(0)+'%' : '—'}</div>
+                    </div>
+                    <div style="background:rgba(10,14,39,0.6);padding:0.2rem;border-radius:4px;text-align:center;">
+                        <div style="color:#8b7355;font-size:0.65rem;">Kills</div>
+                        <div style="color:#ff8c8c;font-weight:bold;font-size:0.82rem;">${totalKills}</div>
+                    </div>
+                    <div style="background:rgba(10,14,39,0.6);padding:0.2rem;border-radius:4px;text-align:center;">
+                        <div style="color:#8b7355;font-size:0.65rem;">Crits</div>
+                        <div style="color:#ff6b6b;font-weight:bold;font-size:0.82rem;">${stats.totalCriticalHits || 0}</div>
+                    </div>
+                    <div style="background:rgba(10,14,39,0.6);padding:0.2rem;border-radius:4px;text-align:center;">
+                        <div style="color:#8b7355;font-size:0.65rem;">Challenges</div>
+                        <div style="color:#4a9eff;font-weight:bold;font-size:0.82rem;">${totalChallenges}</div>
+                    </div>
+                </div>
+
+                ${topSkillName || topKillEntry ? `
+                <div style="font-size:0.7rem;color:#666;margin-bottom:0.3rem;">
+                    ${topSkillName ? `Sig: <span style="color:#d4af37;">${topSkillName}</span>` : ''}
+                    ${topKillEntry ? ` · <span style="color:#ff8c8c;">${topKillEntry[0].replace(/_/g,' ')} ×${topKillEntry[1]}</span>` : ''}
+                </div>` : ''}
+
+                ${badges.length ? `<div style="margin-bottom:0.3rem;font-size:0.95rem;letter-spacing:2px;">${badges.map(b => `<span title="${b.title}" style="cursor:default;">${b.icon}</span>`).join('')}</div>` : ''}
+
+                <div style="color:#8b7355;font-size:0.68rem;margin-bottom:0.4rem;">${char.importCount || 0} imports</div>
+                <button class="secondary" style="width:100%;font-size:0.82rem;" ${disabled ? 'disabled' : ''}>${disabledLabel || 'Add to Party'}</button>
+            `;
+
+            container.appendChild(card);
+        });
+
+        // Pagination controls
+        const { totalPages, total } = pagination;
+        if (totalPages > 1) {
+            const nav = document.createElement('div');
+            nav.style.cssText = 'grid-column:1/-1;display:flex;justify-content:center;align-items:center;gap:12px;margin-top:1rem;';
+            nav.innerHTML = `
+                <button onclick="loadPublicCompanions(${page - 1})" ${page <= 1 ? 'disabled' : ''} class="secondary" style="padding:4px 14px;">← Prev</button>
+                <span style="color:#8b7355;font-size:0.85rem;">Page ${page} of ${totalPages} <span style="color:#555;">(${total} total)</span></span>
+                <button onclick="loadPublicCompanions(${page + 1})" ${page >= totalPages ? 'disabled' : ''} class="secondary" style="padding:4px 14px;">Next →</button>
+            `;
+            container.appendChild(nav);
+        }
+
+        // Scroll the companion panel into view without jumping to the top of the page
+        if (page > 1) {
+            container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+    } catch (error) {
+        console.error('Load public companions error:', error);
+        container.innerHTML = '<div class="card" style="text-align: center; color: #d4484a; grid-column: 1 / -1;">Failed to load public characters</div>';
+    }
+}
