@@ -87,6 +87,8 @@ router.post('/start', requireAuth, async (req, res) => {
             console.log(`[COMBAT] Locks acquired for: ${ownedCharacterIds.join(', ')}`);
         }
 
+        const rawDb = db.getDatabase();
+
         // Stamp a session ID on each owned character so other devices can detect the takeover
         const combatSessionId = crypto.randomUUID();
         for (const charId of ownedCharacterIds) {
@@ -104,8 +106,6 @@ router.post('/start', requireAuth, async (req, res) => {
         if (!challenge) {
             return res.status(404).json({ error: `Challenge not found: ${challengeID}` });
         }
-
-        const rawDb = db.getDatabase();
 
         // 1. Hydrate imported character snapshots
         // Imported characters carry only minimal data from the frontend.
