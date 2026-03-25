@@ -1481,6 +1481,30 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
     /* ── Browse cards ─────────────────────────────────────── */
     #browseResults { gap: 0.5rem; }
 
+    /* ── Header top bar ───────────────────────────────────── */
+    header {
+        padding: 0.4rem 0 0.4rem;
+        margin-bottom: 0.5rem;
+    }
+    #headerTopBar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        padding: 0.25rem 0;
+        margin-bottom: 0.3rem;
+        border-bottom: 1px solid rgba(139,115,85,0.2);
+    }
+    #authUserDisplay {
+        position: static !important;
+        font-size: 0.68rem !important;
+    }
+    .settings-btn {
+        position: static !important;
+        padding: 0.25rem 0.55rem !important;
+        font-size: 0.58rem !important;
+    }
+
     /* ── Buttons globally ─────────────────────────────────── */
     button { padding: 0.45rem 1rem; font-size: 0.65rem; }
     button.secondary { padding: 0.4rem 0.8rem; }
@@ -1517,6 +1541,7 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
     }
     #countdownTimer { font-size: 0.9rem !important; }
 }
+
 
 @media (max-width:480px) {
     :root {
@@ -1558,6 +1583,11 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
     font-size: 0.7rem;
     padding: 0.5rem 0.9rem;
     letter-spacing: 0.06em;
+}
+
+/* Header top bar — auth + settings row above title */
+#headerTopBar {
+    display: none; /* hidden on desktop — desktop uses absolute positioning */
 }
 
 /* Tab bar */
