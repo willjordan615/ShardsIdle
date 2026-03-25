@@ -2939,12 +2939,20 @@ calculateRewards(players, challenge, segments = []) {
                 if (chestItem?.armor) enemyArmor += chestItem.armor;
             }
 
+            const statScale = 1 + (enemyLevel - 1) * 0.04;
+            const scaledStats = {
+                conviction: Math.round((enemyType.stats?.conviction || 0) * statScale),
+                endurance:  Math.round((enemyType.stats?.endurance  || 0) * statScale),
+                ambition:   Math.round((enemyType.stats?.ambition   || 0) * statScale),
+                harmony:    Math.round((enemyType.stats?.harmony    || 0) * statScale),
+            };
+
             enemies.push({
                 id: `enemy_${enemyType.id.trim()}_${String(globalEnemyIndex).padStart(3, '0')}`,
                 name: enemyType.name.trim(),
                 type: 'enemy',
                 level: enemyLevel,
-                stats: { ...enemyType.stats },
+                stats: scaledStats,
                 maxHP: maxHP, currentHP: maxHP,
                 maxMana: maxMana, currentMana: maxMana,
                 maxStamina: maxStamina, currentStamina: maxStamina,
