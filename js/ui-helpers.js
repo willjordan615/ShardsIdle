@@ -194,27 +194,38 @@ function escapeHtml(str) {
 
 
 /**
- * Position a tooltip element near the cursor, clamped to the viewport.
- * Used by all JS-created tooltips (skill, gear, stat).
+ * Position a tooltip element near the cursor or element, clamped to the viewport.
+ * On touch devices, positions relative to the target element instead of cursor.
  * A 10px safe margin is maintained on all four edges.
  */
-function positionTooltip(tooltip, event) {
+function positionTooltip(tooltip, event, targetEl) {
     const margin = 10;
     const tw = tooltip.offsetWidth  || 300;
     const th = tooltip.offsetHeight || 100;
     const vw = window.innerWidth;
     const vh = window.innerHeight;
 
-    let left = event.clientX + 15;
-    let top  = event.clientY + 15;
+    let left, top;
 
-    // Clamp right edge
-    if (left + tw > vw - margin) left = event.clientX - tw - 15;
-    // Clamp left edge
+    if (targetEl) {
+        // Touch path — position relative to the element
+        const rect = targetEl.getBoundingClientRect();
+        left = rect.left + (rect.width / 2) - (tw / 2);
+        top  = rect.bottom + 8;
+        // Flip above if it would go off the bottom
+        if (top + th > vh - margin) top = rect.top - th - 8;
+    } else {
+        // Mouse path
+        left = event.clientX + 15;
+        top  = event.clientY + 15;
+        if (left + tw > vw - margin) left = event.clientX - tw - 15;
+        if (top + th > vh - margin)  top  = event.clientY - th - 15;
+    }
+
+    // Clamp to viewport on all edges
+    if (left + tw > vw - margin) left = vw - tw - margin;
     if (left < margin) left = margin;
-    // Clamp bottom edge
-    if (top + th > vh - margin) top = event.clientY - th - 15;
-    // Clamp top edge
+    if (top + th > vh - margin) top = vh - th - margin;
     if (top < margin) top = margin;
 
     tooltip.style.left = left + 'px';
@@ -249,13 +260,13 @@ function positionTooltip(tooltip, event) {
         'box-sizing:border-box',
     ].join(';');
 
-    function show(text, event) {
+    function show(text, event, targetEl) {
         hide();
         _tip = document.createElement('div');
         _tip.style.cssText = STYLE;
         _tip.textContent = text;
         document.body.appendChild(_tip);
-        positionTooltip(_tip, event);
+        positionTooltip(_tip, event, targetEl);
     }
 
     function hide() {
@@ -267,11 +278,11 @@ function positionTooltip(tooltip, event) {
         const el = e.target.closest('[data-tooltip]');
         if (!el) return;
         clearTimeout(_tipTimeout);
-        _tipTimeout = setTimeout(() => show(el.dataset.tooltip, e), 120);
+        _tipTimeout = setTimeout(() => show(el.dataset.tooltip, e, null), 120);
     });
 
     document.addEventListener('mousemove', function(e) {
-        if (_tip) positionTooltip(_tip, e);
+        if (_tip) positionTooltip(_tip, e, null);
     });
 
     document.addEventListener('mouseout', function(e) {
@@ -279,5 +290,17 @@ function positionTooltip(tooltip, event) {
         hide();
     });
 
-    document.addEventListener('touchstart', hide, { passive: true });
+    document.addEventListener('touchstart', function(e) {
+        const el = e.target.closest('[data-tooltip]');
+        if (!el) { hide(); return; }
+        e.preventDefault();
+        clearTimeout(_tipTimeout);
+        show(el.dataset.tooltip, null, el);
+        // Auto-dismiss after 2.5s on touch
+        _tipTimeout = setTimeout(hide, 2500);
+    }, { passive: false });
+
+    document.addEventListener('touchend', function(e) {
+        // Don't hide immediately — let the auto-dismiss handle it
+    }, { passive: true });
 })();

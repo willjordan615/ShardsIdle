@@ -105,23 +105,26 @@ function addStatTooltip(element, statKey, delay = 400) {
         element.style.cursor = 'help';
         tooltipTimeout = setTimeout(() => {
             tooltip = createStatTooltip(statKey);
-            if (tooltip) {
-                positionTooltip(tooltip, e);
-            }
+            if (tooltip) positionTooltip(tooltip, e, null);
         }, delay);
     });
     
     element.addEventListener('mousemove', (e) => {
-        if (tooltip) {
-            positionTooltip(tooltip, e);
-        }
+        if (tooltip) positionTooltip(tooltip, e, null);
     });
     
     element.addEventListener('mouseleave', () => {
         if (tooltipTimeout) clearTimeout(tooltipTimeout);
-        if (tooltip) {
-            tooltip.remove();
-            tooltip = null;
-        }
+        if (tooltip) { tooltip.remove(); tooltip = null; }
     });
+
+    element.addEventListener('touchstart', (e) => {
+        if (tooltipTimeout) clearTimeout(tooltipTimeout);
+        if (tooltip) { tooltip.remove(); tooltip = null; }
+        tooltip = createStatTooltip(statKey);
+        if (tooltip) positionTooltip(tooltip, null, element);
+        tooltipTimeout = setTimeout(() => {
+            if (tooltip) { tooltip.remove(); tooltip = null; }
+        }, 2500);
+    }, { passive: true });
 }

@@ -116,22 +116,34 @@ function createGearTooltip(item) {
 }
 
 /**
- * Position tooltip near mouse cursor
+ * Position tooltip near mouse cursor or element (touch)
  */
-function positionTooltip(tooltip, event) {
+function positionTooltip(tooltip, event, targetEl) {
     const padding = 10;
-    let x = event.clientX + padding;
-    let y = event.clientY + padding;
-    
-    // Keep tooltip in viewport
-    const rect = tooltip.getBoundingClientRect();
-    if (x + rect.width > window.innerWidth) {
-        x = event.clientX - rect.width - padding;
+    const tw = tooltip.offsetWidth || tooltip.getBoundingClientRect().width || 300;
+    const th = tooltip.offsetHeight || tooltip.getBoundingClientRect().height || 100;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    let x, y;
+
+    if (targetEl) {
+        const rect = targetEl.getBoundingClientRect();
+        x = rect.left + (rect.width / 2) - (tw / 2);
+        y = rect.bottom + 8;
+        if (y + th > vh - padding) y = rect.top - th - 8;
+    } else {
+        x = event.clientX + padding;
+        y = event.clientY + padding;
+        if (x + tw > vw - padding) x = event.clientX - tw - padding;
+        if (y + th > vh - padding) y = event.clientY - th - padding;
     }
-    if (y + rect.height > window.innerHeight) {
-        y = event.clientY - rect.height - padding;
-    }
-    
+
+    if (x + tw > vw - padding) x = vw - tw - padding;
+    if (x < padding) x = padding;
+    if (y + th > vh - padding) y = vh - th - padding;
+    if (y < padding) y = padding;
+
     tooltip.style.left = x + 'px';
     tooltip.style.top = y + 'px';
 }
@@ -157,22 +169,28 @@ function addGearCardTooltip(cardElement, item) {
     cardElement.addEventListener('mouseenter', (e) => {
         tooltipTimeout = setTimeout(() => {
             tooltip = createGearTooltip(item);
-            positionTooltip(tooltip, e);
-        }, 300);  // Show after 300ms
+            positionTooltip(tooltip, e, null);
+        }, 300);
     });
 
     cardElement.addEventListener('mousemove', (e) => {
-        if (tooltip) {
-            positionTooltip(tooltip, e);
-        }
+        if (tooltip) positionTooltip(tooltip, e, null);
     });
 
     cardElement.addEventListener('mouseleave', () => {
         if (tooltipTimeout) clearTimeout(tooltipTimeout);
-        if (tooltip) {
-            tooltip.remove();
-            tooltip = null;
-        }
+        if (tooltip) { tooltip.remove(); tooltip = null; }
+    });
+
+    cardElement.addEventListener('touchstart', (e) => {
+        if (tooltipTimeout) clearTimeout(tooltipTimeout);
+        if (tooltip) { tooltip.remove(); tooltip = null; }
+        tooltip = createGearTooltip(item);
+        positionTooltip(tooltip, null, cardElement);
+        tooltipTimeout = setTimeout(() => {
+            if (tooltip) { tooltip.remove(); tooltip = null; }
+        }, 2500);
+    }, { passive: true });
     });
     
     // Note: We do NOT define destroyGearTooltip here anymore. 
