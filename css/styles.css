@@ -1060,20 +1060,21 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
 
 /* ============================================================
    COMBAT LOG — MOBILE LAYOUT (≤768px)
-   Stacks as: nav → enemies (scrollable) → battle log → party strip
+   Order: nav → stage banner (capped) → enemies → battle log → party strip
    ============================================================ */
 @media (max-width: 768px) {
 
-    /* Screen becomes a flex column filling the viewport */
+    /* Screen is a fixed-height flex column — no page scroll */
     #combatlog.screen {
-        display: flex;
-        flex-direction: column;
-        height: 100dvh;
-        overflow: hidden;
-        padding: 0;
+        display: flex !important;
+        flex-direction: column !important;
+        height: 100svh;
+        max-height: 100svh;
+        overflow: hidden !important;
+        padding: 0 !important;
     }
 
-    /* Nav bar: compact, doesn't grow */
+    /* Nav bar */
     #combatlog .nav-buttons.combat-nav {
         flex-shrink: 0;
         padding: 0.4rem var(--space-md);
@@ -1082,48 +1083,71 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
         border-bottom: 1px solid rgba(139,115,85,0.2);
     }
 
-    /* Stage banner */
+    /* Stage banner: capped so it can't eat the screen */
     #stageBanner {
         flex-shrink: 0;
+        max-height: 22vh;
+        overflow-y: auto;
+        margin: 0 var(--space-md);
+        font-size: 0.78rem;
+    }
+    #stageBannerTitle {
+        font-size: 0.9rem !important;
     }
 
-    /* Wide layout becomes a plain flex column */
-    .combat-wide-layout {
-        display: flex;
-        flex-direction: column;
-        flex: 1;
+    /* Sudden death banner */
+    #suddenDeathBanner {
+        flex-shrink: 0;
+    }
+
+    /* Wide layout: flex column, fills remaining height */
+    #combatlog .combat-wide-layout {
+        display: flex !important;
+        flex-direction: column !important;
+        flex: 1 !important;
         min-height: 0;
         overflow: hidden;
+        gap: 0;
     }
 
-    /* Enemy column: top, scrollable, capped height */
-    .combat-col-right {
+    /* Enemies: top, scrollable, capped */
+    #combatlog .combat-col-right {
         order: 1;
         flex-shrink: 0;
-        max-height: 28vh;
+        max-height: 22vh;
         overflow-y: auto;
-        padding: 0.4rem var(--space-md) 0;
+        -webkit-overflow-scrolling: touch;
+        padding: 0.3rem var(--space-md) 0;
+        border-bottom: 1px solid rgba(139,115,85,0.15);
     }
-
-    .combat-col-right .combatant-group {
-        margin-bottom: 0;
-        border: none;
+    #combatlog .combat-col-right .combatant-group {
         background: none;
+        border: none;
         box-shadow: none;
         padding: 0;
+        margin-bottom: 0;
+    }
+    #combatlog .combat-col-right .combatant-group h3 {
+        font-size: 0.62rem;
+        margin-bottom: 0.3rem;
+        padding-bottom: 0.2rem;
+    }
+    #enemyStatus .combatant {
+        padding: 0.35rem 0.5rem;
+        margin-bottom: 0.3rem;
     }
 
-    /* Battle log: center, fills remaining space */
-    .combat-col-center {
+    /* Battle log: middle, takes all remaining space */
+    #combatlog .combat-col-center {
         order: 2;
-        flex: 1;
+        flex: 1 !important;
         min-height: 0;
-        padding: 0 var(--space-md);
-        display: flex;
+        display: flex !important;
         flex-direction: column;
+        padding: 0 var(--space-md);
+        overflow: hidden;
     }
-
-    .combat-col-center .section {
+    #combatlog .combat-col-center .section {
         flex: 1;
         min-height: 0;
         display: flex;
@@ -1131,38 +1155,39 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
         margin-bottom: 0;
         padding: 0.5rem 0.75rem;
     }
-
-    .combat-col-center .combat-log {
-        flex: 1;
+    #combatlog .combat-col-center .combat-log {
+        flex: 1 !important;
         height: auto !important;
         min-height: 0;
         margin-bottom: 0;
     }
+    /* Force battle log open on mobile regardless of saved collapse state */
+    #combatlog #combatLogDisplay.panel-collapsed {
+        display: block !important;
+    }
+    #combatlog #chevron-log {
+        display: none;
+    }
 
     /* Party strip: bottom, horizontal scroll */
-    .combat-col-left {
+    #combatlog .combat-col-left {
         order: 3;
         flex-shrink: 0;
         padding: 0.4rem var(--space-md);
         border-top: 1px solid rgba(139,115,85,0.2);
     }
-
-    .combat-col-left .combatant-group {
-        margin-bottom: 0;
-        border: none;
+    #combatlog .combat-col-left .combatant-group {
         background: none;
+        border: none;
         box-shadow: none;
         padding: 0;
+        margin-bottom: 0;
     }
-
-    /* Hide the "Party" heading on mobile to save space */
-    .combat-col-left .combatant-group > h3 {
+    #combatlog .combat-col-left .combatant-group > h3 {
         display: none;
     }
-
-    /* Horizontal scrolling strip */
     #partyStatus {
-        display: flex;
+        display: flex !important;
         flex-direction: row;
         gap: 0.5rem;
         overflow-x: auto;
@@ -1172,29 +1197,21 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
         scrollbar-width: none;
     }
     #partyStatus::-webkit-scrollbar { display: none; }
-
-    /* Each party card: fixed width, no bottom margin */
     #partyStatus .combatant {
-        flex: 0 0 220px;
+        flex: 0 0 210px;
         margin-bottom: 0;
     }
-
-    /* Enemy cards: slightly more compact */
-    #enemyStatus .combatant {
-        margin-bottom: 0.4rem;
-        padding: 0.4rem 0.6rem;
+    /* Also force party panel open */
+    #combatlog #partyStatus.panel-collapsed {
+        display: flex !important;
     }
+    #combatlog #chevron-party { display: none; }
+    #combatlog #chevron-enemies { display: none; }
 
-    /* Hide sudden death banner chevrons on enemy/party headers to save space */
-    .combat-col-right .panel-chevron,
-    .combat-col-left .panel-chevron {
-        display: none;
-    }
-
-    /* Combat result at bottom */
+    /* Combat result */
     #combatResult {
         flex-shrink: 0;
-        padding: 0 var(--space-md) var(--space-md);
+        padding: 0 var(--space-md) var(--space-sm);
         margin-top: 0;
     }
 }
