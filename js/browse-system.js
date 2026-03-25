@@ -496,8 +496,10 @@ async function loadPublicCompanions(page) {
             const stats = char.combatStats || {};
             const isOwn = char.isOwn || (authUserId && char.ownerUserId && char.ownerUserId === authUserId);
             const alreadyAdded = currentState.currentParty.some(m => m.originalCharacterId === char.originalCharacterId);
-            const disabled = isOwn || alreadyAdded;
-            const disabledLabel = isOwn ? 'Your Character' : alreadyAdded ? 'Already in Party' : null;
+            const maxSize = window.currentState?.selectedChallenge?.maxPartySize || 4;
+            const partyFull = currentState.currentParty.length >= maxSize;
+            const disabled = isOwn || alreadyAdded || partyFull;
+            const disabledLabel = isOwn ? 'Your Character' : alreadyAdded ? 'Already in Party' : partyFull ? 'Party Full' : null;
 
             const card = document.createElement('div');
             card.className = 'card';

@@ -1435,8 +1435,7 @@ try {
                         const slot = itemDef?.slot_id1 || itemDef?.slot || '';
 
                         if (slot === 'consumable' || itemDef?.consumable === true) {
-                            // Consumables → stash
-                            character.consumableStash[loot.itemID] = (character.consumableStash[loot.itemID] || 0) + 1;
+                            // Consumables stacked server-side — just record for display
                             lootLines.push(`${itemName} → stash`);
 
                         } else if (slot && ['mainHand','offHand','head','chest','accessory1','accessory2'].includes(slot)) {

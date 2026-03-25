@@ -522,6 +522,22 @@ async function startCombat(forcedChallengeId) {
 
         console.log('[COMBAT] Server response received. Result:', combatResult.result);
 
+        // Store the session ID this device stamped — used to detect displacement
+        if (combatResult.combatSessionId) {
+            window._combatSessionId = combatResult.combatSessionId;
+        }
+
+        // Another device ran a combat with this character and took over — stop the loop
+        if (combatResult.loopDisplaced) {
+            console.warn('[COMBAT] Loop displaced by another device — stopping idle loop.');
+            if (window.currentState) {
+                window.currentState.idleActive     = false;
+                window.currentState.pendingLoopExit = false;
+            }
+            if (typeof updateChallengeStatusBanner === 'function') updateChallengeStatusBanner();
+            if (typeof _updateMediaControls === 'function') _updateMediaControls();
+        }
+
         // If the player navigated away during the idle loop, don't drag them back to
         // the combat screen — just run the log silently and let the toast notify them.
         const silent = window._silentCombatRestart;

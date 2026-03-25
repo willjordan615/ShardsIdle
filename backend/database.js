@@ -220,6 +220,19 @@ async function initializeCharacterSnapshotsTable() {
         );
     });
 
+    // Migration: add combatSessionId — used to detect when another device takes over a character
+    await new Promise((resolve) => {
+        db.run(
+            `ALTER TABLE characters ADD COLUMN combatSessionId TEXT DEFAULT NULL`,
+            (err) => {
+                if (err && !err.message.includes('duplicate column')) {
+                    console.warn('[DATABASE] Migration note:', err.message);
+                }
+                resolve();
+            }
+        );
+    });
+
     // Migration: add consumableStash, gold, arcaneDust, beltOrder columns
     for (const [col, def] of [
         ['consumableStash', "TEXT NOT NULL DEFAULT '{}'"],

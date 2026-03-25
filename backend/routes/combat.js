@@ -5,12 +5,38 @@ const StatusEngine = require('../StatusEngine');
 const db = require('../database');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 const { requireAuth } = require('./auth');
 
 const DEFAULT_SAFE_CHALLENGE = 'challenge_goblin_camp';
 
-// Per-user combat lock — prevents concurrent combat instances
-const activeCombats = new Map();
+// Per-character combat queue — serialises concurrent requests for the same character.
+// Each entry is a Promise that resolves when the current combat for that character finishes.
+// A second request waits on that promise, then runs its own combat when the lock is free.
+const characterLocks = new Map();
+
+/**
+ * Acquire a lock for a set of character IDs.
+ * Returns a release function — call it in finally to free the lock.
+ * If any character is already locked, waits for that combat to finish first.
+ */
+async function acquireCharacterLocks(characterIds) {
+    for (const id of characterIds) {
+        const existing = characterLocks.get(id);
+        if (existing) {
+            console.log(`[COMBAT] Character ${id} busy — queuing request`);
+            await existing;
+        }
+    }
+    // Set new locks for all characters simultaneously
+    let releaseFn;
+    const lockPromise = new Promise(resolve => { releaseFn = resolve; });
+    characterIds.forEach(id => characterLocks.set(id, lockPromise));
+    return () => {
+        characterIds.forEach(id => characterLocks.delete(id));
+        releaseFn();
+    };
+}
 
 let combatEngine;
 
@@ -38,12 +64,7 @@ function initializeCombatEngine() {
 
 router.post('/start', requireAuth, async (req, res) => {
     const userId = req.userId;
-
-    if (activeCombats.has(userId)) {
-        console.warn(`[COMBAT] Rejected duplicate combat start for user ${userId}`);
-        return res.status(409).json({ error: 'Combat already in progress.' });
-    }
-    activeCombats.set(userId, true);
+    let releaseLocks = null;
 
     try {
         initializeCombatEngine();
@@ -55,6 +76,29 @@ router.post('/start', requireAuth, async (req, res) => {
                 error: 'Missing required fields: partySnapshots, challengeID, challenges'
             });
         }
+
+        // Acquire per-character locks for all owned (non-imported, non-bot) characters
+        const ownedCharacterIds = partySnapshots
+            .map(s => s.characterID)
+            .filter(id => id && !id.startsWith('import_') && !id.startsWith('bot_'));
+
+        if (ownedCharacterIds.length > 0) {
+            releaseLocks = await acquireCharacterLocks(ownedCharacterIds);
+            console.log(`[COMBAT] Locks acquired for: ${ownedCharacterIds.join(', ')}`);
+        }
+
+        // Stamp a session ID on each owned character so other devices can detect the takeover
+        const combatSessionId = crypto.randomUUID();
+        for (const charId of ownedCharacterIds) {
+            await new Promise((resolve, reject) => {
+                rawDb.run(
+                    `UPDATE characters SET combatSessionId = ? WHERE id = ?`,
+                    [combatSessionId, charId],
+                    (err) => { if (err) reject(err); else resolve(); }
+                );
+            });
+        }
+        console.log(`[COMBAT] Session ${combatSessionId} stamped on: ${ownedCharacterIds.join(', ')}`);
 
         const challenge = challenges.find(c => c.id === challengeID);
         if (!challenge) {
@@ -154,6 +198,19 @@ router.post('/start', requireAuth, async (req, res) => {
             const character = await db.getCharacter(targetId);
 
             if (character) {
+                // Check if another device took over this character mid-combat
+                const currentSession = await new Promise((resolve, reject) => {
+                    rawDb.get(
+                        `SELECT combatSessionId FROM characters WHERE id = ?`,
+                        [targetId],
+                        (err, row) => { if (err) reject(err); else resolve(row?.combatSessionId); }
+                    );
+                });
+                if (currentSession !== combatSessionId) {
+                    console.warn(`[COMBAT] Session mismatch for ${targetId} — another device took over. Saving result but marking loop displaced.`);
+                    // Still save the result so no data is lost, but flag the response
+                    result._loopDisplaced = true;
+                }
             // --- PATCH START: SAFE SKILL MERGE LOGIC ---
             
             // 1. Create a map of incoming skills from the engine result for quick lookup
@@ -235,6 +292,25 @@ router.post('/start', requireAuth, async (req, res) => {
             // 4. Update aggregate stats (wins, losses, etc.)
             combatEngine.updateCombatStats(character, result, challenge);
 
+            // 4b. Stack consumable loot into consumableStash — done server-side so the
+            // per-character lock guarantees no concurrent read-modify-write between devices.
+            if (result.rewards?.lootDropped?.length > 0) {
+                if (!character.consumableStash) character.consumableStash = {};
+                result.rewards.lootDropped.forEach(loot => {
+                    if (!loot?.itemID) return;
+                    // Only process loot assigned to this character
+                    if (loot.characterID && loot.characterID !== targetId) return;
+                    const itemDef = combatEngine.gear.find(g => g.id === loot.itemID);
+                    const isConsumable = itemDef?.slot_id1 === 'consumable'
+                        || itemDef?.slot === 'consumable'
+                        || itemDef?.consumable === true;
+                    if (isConsumable) {
+                        character.consumableStash[loot.itemID] = (character.consumableStash[loot.itemID] || 0) + 1;
+                        console.log(`[LOOT] Stacked ${loot.itemID} → stash[${character.consumableStash[loot.itemID]}] for ${character.name}`);
+                    }
+                });
+            }
+
             // 5. SAVE TO DATABASE
             await db.saveCharacter(character);
             console.log(`[DB SAVE] ✅ Successfully saved ${character.name} (Skills Count: ${character.skills.length})`);
@@ -259,23 +335,25 @@ router.post('/start', requireAuth, async (req, res) => {
 
         // 6. Respond
         res.json({
-            combatID:      result.combatID,
-            result:        result.result,
-            totalTurns:    result.totalTurns,
-            turns:         result.turns,
-            segments:      result.segments,
-            participants:  result.participants,
-            rewards:       result.rewards,
-            shouldPersist: result.shouldPersist,
-            retreated:     result.result === 'retreated',
-            nextChallengeId
+            combatID:       result.combatID,
+            result:         result.result,
+            totalTurns:     result.totalTurns,
+            turns:          result.turns,
+            segments:       result.segments,
+            participants:   result.participants,
+            rewards:        result.rewards,
+            shouldPersist:  result.shouldPersist,
+            retreated:      result.result === 'retreated',
+            nextChallengeId,
+            combatSessionId,
+            loopDisplaced:  result._loopDisplaced || false,
         });
 
     } catch (error) {
         console.error('[COMBAT] Critical error:', error);
         res.status(500).json({ error: 'Combat simulation failed', details: error.message });
     } finally {
-        activeCombats.delete(userId);
+        if (releaseLocks) releaseLocks();
     }
 });
 
