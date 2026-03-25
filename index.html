@@ -250,6 +250,8 @@
                 <button onclick="deleteCharacter(currentState.detailCharacterId)" class="danger">🗑 Delete Character</button>
                 <button id="exportCharacterBtn" onclick="toggleCharacterSharing()" class="secondary">📤 Sharing: Off</button>
             </div>
+            <!-- Mobile tooltip hint -->
+            <div id="tooltipHint" style="display:none;"></div>
 
         </div><!-- end #detail screen -->
 
@@ -341,7 +343,6 @@
         <div id="combatlog" class="screen">
             <div class="nav-buttons combat-nav">
                 <button onclick="viewCharacterDuringCombat()" class="secondary">View Character</button>
-                <button id="merchantNotifier" onclick="viewCharacterDuringCombat()" style="display:none;" class="secondary merchant-notifier">🛒 Merchant</button>
                 <div class="media-controls">
                     <button id="mediaBtn_slow"   class="media-btn secondary" onclick="setCombatSpeed('slow')">
                         <svg viewBox="0 0 18 14" width="18" height="14"><polygon points="9,0 0,7 9,14" fill="currentColor"/><rect x="10" y="0" width="3" height="14" fill="currentColor"/><rect x="14" y="0" width="3" height="14" fill="currentColor"/></svg>

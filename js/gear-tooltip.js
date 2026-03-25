@@ -183,13 +183,22 @@ function addGearCardTooltip(cardElement, item) {
     });
 
     cardElement.addEventListener('touchstart', (e) => {
-        if (tooltipTimeout) clearTimeout(tooltipTimeout);
-        if (tooltip) { tooltip.remove(); tooltip = null; }
-        tooltip = createGearTooltip(item);
-        positionTooltip(tooltip, null, cardElement);
         tooltipTimeout = setTimeout(() => {
             if (tooltip) { tooltip.remove(); tooltip = null; }
-        }, 2500);
+            tooltip = createGearTooltip(item);
+            positionTooltip(tooltip, null, cardElement);
+            setTimeout(() => {
+                if (tooltip) { tooltip.remove(); tooltip = null; }
+            }, 2500);
+        }, 400);
+    }, { passive: true });
+
+    cardElement.addEventListener('touchend', () => {
+        clearTimeout(tooltipTimeout);
+    }, { passive: true });
+
+    cardElement.addEventListener('touchmove', () => {
+        clearTimeout(tooltipTimeout);
     }, { passive: true });
     });
     

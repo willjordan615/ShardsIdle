@@ -118,13 +118,24 @@ function addStatTooltip(element, statKey, delay = 400) {
         if (tooltip) { tooltip.remove(); tooltip = null; }
     });
 
+    let touchLongPress = null;
+
     element.addEventListener('touchstart', (e) => {
-        if (tooltipTimeout) clearTimeout(tooltipTimeout);
-        if (tooltip) { tooltip.remove(); tooltip = null; }
-        tooltip = createStatTooltip(statKey);
-        if (tooltip) positionTooltip(tooltip, null, element);
-        tooltipTimeout = setTimeout(() => {
+        touchLongPress = setTimeout(() => {
             if (tooltip) { tooltip.remove(); tooltip = null; }
-        }, 2500);
+            tooltip = createStatTooltip(statKey);
+            if (tooltip) positionTooltip(tooltip, null, element);
+            setTimeout(() => {
+                if (tooltip) { tooltip.remove(); tooltip = null; }
+            }, 2500);
+        }, 400);
+    }, { passive: true });
+
+    element.addEventListener('touchend', () => {
+        clearTimeout(touchLongPress);
+    }, { passive: true });
+
+    element.addEventListener('touchmove', () => {
+        clearTimeout(touchLongPress);
     }, { passive: true });
 }

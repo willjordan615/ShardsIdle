@@ -956,6 +956,7 @@ renderImportBadge(character);
         renderCombatHistory(characterId);
         renderGearUpgradeBadge(character);
         if (typeof renderMerchant === 'function') renderMerchant(character);
+        _renderTooltipHint();
 
         // Populate Combat Style section
         const profile = character.aiProfile || 'balanced';
@@ -1982,3 +1983,23 @@ function renderImportBadge(character) {
 
 // exportCharacter, browseCharacters, importCharacter, and getProgressPercent
 // are defined in browse-system.js and ui-helpers.js — do not duplicate here.
+/**
+ * Mobile tooltip hint — shown each session until permanently dismissed.
+ * Only renders on touch devices (mobile). Stored flag: 'tooltipHintDismissed'.
+ */
+function _renderTooltipHint() {
+    if (window.innerWidth > 768) return;
+    if (localStorage.getItem('tooltipHintDismissed') === 'true') return;
+
+    const el = document.getElementById('tooltipHint');
+    if (!el) return;
+
+    el.style.cssText = 'display:flex; align-items:center; justify-content:space-between; gap:0.5rem; padding:0.6rem 0.9rem; margin-top:1rem; background:rgba(212,175,55,0.07); border:1px solid rgba(212,175,55,0.25); border-radius:6px; font-size:0.72rem; color:#8b7355;';
+    el.innerHTML = `
+        <span>💡 Long press skills or gear for details</span>
+        <button onclick="
+            localStorage.setItem('tooltipHintDismissed','true');
+            document.getElementById('tooltipHint').style.display='none';
+        " style="background:none; border:none; color:#8b7355; cursor:pointer; font-size:0.72rem; white-space:nowrap; padding:0;">Dismiss forever</button>
+    `;
+}

@@ -290,17 +290,25 @@ function positionTooltip(tooltip, event, targetEl) {
         hide();
     });
 
+    let _touchLongPressTimer = null;
+
     document.addEventListener('touchstart', function(e) {
         const el = e.target.closest('[data-tooltip]');
-        if (!el) { hide(); return; }
-        e.preventDefault();
-        clearTimeout(_tipTimeout);
-        show(el.dataset.tooltip, null, el);
-        // Auto-dismiss after 2.5s on touch
-        _tipTimeout = setTimeout(hide, 2500);
-    }, { passive: false });
+        if (!el) return;
+        _touchLongPressTimer = setTimeout(() => {
+            e.preventDefault();
+            show(el.dataset.tooltip, null, el);
+            _tipTimeout = setTimeout(hide, 2500);
+        }, 400);
+    }, { passive: true });
 
     document.addEventListener('touchend', function(e) {
-        // Don't hide immediately — let the auto-dismiss handle it
+        clearTimeout(_touchLongPressTimer);
+        _touchLongPressTimer = null;
+    }, { passive: true });
+
+    document.addEventListener('touchmove', function(e) {
+        clearTimeout(_touchLongPressTimer);
+        _touchLongPressTimer = null;
     }, { passive: true });
 })();
