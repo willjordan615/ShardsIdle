@@ -1304,6 +1304,19 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
     #combatlog #chevron-party { display: none; }
     #combatlog #chevron-enemies { display: none; }
 
+    /* Battle log: tighter font and spacing */
+    #combatlog {
+        --log-font-size:      0.75rem;
+        --log-line-height:    1.45;
+        --log-padding:        0.5rem 0.6rem;
+        --turn-margin-bottom: 0.35rem;
+        --turn-padding:       0.25rem 0.4rem;
+    }
+    #combatlog .combat-log::-webkit-scrollbar { width: 4px; }
+    #combatlog .turn-header   { font-size: 0.7rem; }
+    #combatlog .turn-message  { font-size: 0.72rem; }
+    #combatlog .turn-damage   { font-size: 0.68rem; margin-top: 1px; }
+
     /* Combat result */
     #combatResult {
         flex-shrink: 0;
