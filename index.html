@@ -371,16 +371,13 @@
 
             <!-- Wide-screen: 3-column grid wrapper -->
             <div class="combat-wide-layout">
-                <!-- Left column: party + stats -->
+                <!-- Left column: party -->
                 <div class="combat-col-left">
                     <div class="combatant-group">
-                        <h3>Party</h3>
+                        <h3 class="collapsible-header" onclick="toggleCombatPanel('partyStatus', 'chevron-party')">
+                            Party <span id="chevron-party" class="panel-chevron">▾</span>
+                        </h3>
                         <div id="partyStatus"></div>
-                    </div>
-                    <!-- Live combat statistics -->
-                    <div id="combatStatsPanel" style="margin:0.75rem 0; padding:0.75rem 1rem; background:rgba(20,30,50,0.6); border:1px solid rgba(212,175,55,0.2); border-radius:6px; display:none;">
-                        <div style="font-size:0.75rem; color:#888; letter-spacing:1px; text-transform:uppercase; margin-bottom:0.5rem;">Combat Stats</div>
-                        <div id="combatStatsContent" style="display:flex; flex-wrap:wrap; gap:1rem; font-size:0.85rem;"></div>
                     </div>
                 </div>
 
@@ -390,7 +387,10 @@
                         ⚠ Sudden Death — All combatants take escalating damage each round
                     </div>
                     <div class="section">
-                        <h3>Battle Log <button id="scrollResumeBtn" onclick="resumeCombatScroll()" style="display:none; margin-left:8px; padding:2px 8px; font-size:0.75rem; background:#2a4a6a; color:#fff; border:1px solid #4a6a8a; border-radius:3px; cursor:pointer;">↓ Latest</button></h3>
+                        <h3 class="collapsible-header" onclick="toggleCombatPanel('combatLogDisplay', 'chevron-log')">
+                            Battle Log <span id="chevron-log" class="panel-chevron">▾</span>
+                            <button id="scrollResumeBtn" onclick="event.stopPropagation(); resumeCombatScroll()" style="display:none; margin-left:8px; padding:2px 8px; font-size:0.75rem; background:#2a4a6a; color:#fff; border:1px solid #4a6a8a; border-radius:3px; cursor:pointer;">↓ Latest</button>
+                        </h3>
                         <div class="combat-log" id="combatLogDisplay"></div>
                     </div>
                 </div>
@@ -398,7 +398,9 @@
                 <!-- Right column: enemies -->
                 <div class="combat-col-right">
                     <div class="combatant-group">
-                        <h3>Enemies</h3>
+                        <h3 class="collapsible-header" onclick="toggleCombatPanel('enemyStatus', 'chevron-enemies')">
+                            Enemies <span id="chevron-enemies" class="panel-chevron">▾</span>
+                        </h3>
                         <div id="enemyStatus"></div>
                     </div>
                 </div>

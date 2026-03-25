@@ -2,7 +2,30 @@
 // Handles combat log display with metered playback and rewards
 
 // ---------------------------------------------------------------------------
-// COMBAT PLAYBACK CONTROLS
+// PANEL COLLAPSE TOGGLES
+// ---------------------------------------------------------------------------
+window.toggleCombatPanel = function(panelId, chevronId) {
+    const panel   = document.getElementById(panelId);
+    const chevron = document.getElementById(chevronId);
+    if (!panel) return;
+    const collapsed = panel.classList.toggle('panel-collapsed');
+    if (chevron) chevron.textContent = collapsed ? '▸' : '▾';
+    try { localStorage.setItem('combatPanel_' + panelId, collapsed ? '1' : '0'); } catch(e) {}
+};
+
+function _restorePanelStates() {
+    ['partyStatus', 'enemyStatus', 'combatLogDisplay'].forEach(id => {
+        const chevronMap = { partyStatus: 'chevron-party', enemyStatus: 'chevron-enemies', combatLogDisplay: 'chevron-log' };
+        try {
+            if (localStorage.getItem('combatPanel_' + id) === '1') {
+                const panel   = document.getElementById(id);
+                const chevron = document.getElementById(chevronMap[id]);
+                if (panel)   panel.classList.add('panel-collapsed');
+                if (chevron) chevron.textContent = '▸';
+            }
+        } catch(e) {}
+    });
+}
 // Speed persists across loop iterations via localStorage.
 // Multipliers: higher = slower playback (Slow=1.5, Normal=1.0, Fast=0.6)
 // ---------------------------------------------------------------------------
@@ -176,28 +199,24 @@ async function displayCombatLog(combatData) {
         const scrollBtn = document.getElementById('scrollResumeBtn');
         if (scrollBtn) scrollBtn.style.display = 'none';
         _initScrollTracking();
+        _restorePanelStates();
 
         // Init live stats tracking
         const _stats = {}; // characterID -> { name, dmgDealt, dmgTaken, healed }
         combatData.participants.playerCharacters.forEach(pc => {
             _stats[pc.characterID] = { name: pc.characterName, dmgDealt: 0, dmgTaken: 0, healed: 0 };
         });
-        const statsPanel  = document.getElementById('combatStatsPanel');
-        const statsContent = document.getElementById('combatStatsContent');
-        if (statsPanel) statsPanel.style.display = 'block';
 
-        function _updateStatsDisplay() {
-            if (!statsContent) return;
-            statsContent.innerHTML = Object.values(_stats).map(s =>
-                `<div style="min-width:160px; padding:4px 8px; background:rgba(255,255,255,0.04); border-radius:4px;">
-                    <div style="color:#d4af37; font-weight:500; margin-bottom:2px;">${s.name}</div>
-                    <div style="color:#ff6b6b;">DMG dealt: ${s.dmgDealt}</div>
-                    <div style="color:#aaa;">DMG taken: ${s.dmgTaken}</div>
-                    <div style="color:#4eff7f;">Healed: ${s.healed}</div>
-                </div>`
-            ).join('');
+        function _updateCardStats(charId) {
+            const s = _stats[charId];
+            if (!s) return;
+            const dmgEl  = document.getElementById(`cstat-dmg-${charId}`);
+            const rcvdEl = document.getElementById(`cstat-rcvd-${charId}`);
+            const healEl = document.getElementById(`cstat-heal-${charId}`);
+            if (dmgEl)  dmgEl.textContent  = s.dmgDealt.toLocaleString();
+            if (rcvdEl) rcvdEl.textContent = s.dmgTaken.toLocaleString();
+            if (healEl) healEl.textContent = s.healed.toLocaleString();
         }
-        _updateStatsDisplay();
 
         function _trackTurnStats(turn) {
             if (!turn.result) return;
@@ -206,6 +225,7 @@ async function displayCombatLog(combatData) {
             // Damage dealt by this actor
             if (turn.result.damageDealt > 0 && _stats[actorId]) {
                 _stats[actorId].dmgDealt += turn.result.damageDealt;
+                _updateCardStats(actorId);
             }
 
             // Damage taken — any party member appearing in targets[]
@@ -213,12 +233,12 @@ async function displayCombatLog(combatData) {
                 turn.result.targets.forEach(t => {
                     if (_stats[t.targetId] && t.damage > 0) {
                         _stats[t.targetId].dmgTaken += t.damage;
+                        _updateCardStats(t.targetId);
                     }
                 });
             }
 
             // Heals — non-damage turns where a party member's HP went up
-            // hpCurrent tracks live HP; if hpAfter > hpCurrent the target was healed
             if (turn.result.damageDealt === 0 && turn.result.targets) {
                 turn.result.targets.forEach(t => {
                     if (!_stats[t.targetId]) return;
@@ -226,13 +246,10 @@ async function displayCombatLog(combatData) {
                     const prev = hpCurrent[t.targetId];
                     if (prev !== undefined && t.hpAfter > prev) {
                         _stats[t.targetId].healed += (t.hpAfter - prev);
+                        _updateCardStats(t.targetId);
                     }
                 });
             }
-
-            // Self-heals via status ticks (heal targets may not appear in targets[])
-            // Covered by the status turn handler — hpCurrent is updated by updateHealthBars
-            // before _trackTurnStats is called, so delta is already applied.
         }
 
         // HP tracking maps
@@ -254,14 +271,40 @@ async function displayCombatLog(combatData) {
             div.id = `party-${pc.characterID}`;
             div.innerHTML = `
                 <div class="combatant-inner">
-                <div class="combatant-name">${pc.characterName}</div>
-                <div class="combatant-hp">HP: <span class="hp-value">${pc.maxHP}</span> / ${pc.maxHP}</div>
-                <div class="status-effects" id="statuses-${pc.characterID}"></div>
-                <div class="health-bar"><div class="health-bar-fill" style="width:100%"></div><div class="health-bar-text">100%</div></div>
-                <div class="combatant-mana">Mana: <span class="mana-value">${pc.maxMana || 0}</span> / ${pc.maxMana || 0}</div>
-                <div class="mana-bar" style="background:#1a1a2e;border:1px solid #0f3460;height:12px;margin:2px 0;"><div class="mana-bar-fill" style="background:linear-gradient(90deg,#00d4ff,#0084d1);width:100%;height:100%;"></div></div>
-                <div class="combatant-stamina">Stamina: <span class="stamina-value">${pc.maxStamina || 0}</span> / ${pc.maxStamina || 0}</div>
-                <div class="stamina-bar" style="background:#1a1a2e;border:1px solid #0f3460;height:12px;margin:2px 0;"><div class="stamina-bar-fill" style="background:linear-gradient(90deg,#ffd700,#ff8c00);width:100%;height:100%;"></div></div>
+                    <div class="combatant-header">
+                        <div class="combatant-name">${pc.characterName}</div>
+                        <div class="status-effects" id="statuses-${pc.characterID}"></div>
+                    </div>
+                    <div class="combatant-body">
+                        <div class="combatant-bars">
+                            <div class="bar-row">
+                                <div class="bar-label">HP</div>
+                                <div class="health-bar" style="flex:1;">
+                                    <div class="health-bar-fill" style="width:100%"></div>
+                                    <div class="health-bar-text"><span class="hp-value">${pc.maxHP}</span>/${pc.maxHP}</div>
+                                </div>
+                            </div>
+                            <div class="bar-row">
+                                <div class="bar-label">MP</div>
+                                <div class="mana-bar" style="flex:1; background:#1a1a2e; border:1px solid #0f3460; height:12px; border-radius:2px; position:relative; overflow:hidden;">
+                                    <div class="mana-bar-fill" style="background:linear-gradient(90deg,#00d4ff,#0084d1); width:100%; height:100%;"></div>
+                                    <div class="bar-overlay-text"><span class="mana-value">${pc.maxMana || 0}</span>/${pc.maxMana || 0}</div>
+                                </div>
+                            </div>
+                            <div class="bar-row">
+                                <div class="bar-label">ST</div>
+                                <div class="stamina-bar" style="flex:1; background:#1a1a2e; border:1px solid #0f3460; height:12px; border-radius:2px; position:relative; overflow:hidden;">
+                                    <div class="stamina-bar-fill" style="background:linear-gradient(90deg,#ffd700,#ff8c00); width:100%; height:100%;"></div>
+                                    <div class="bar-overlay-text"><span class="stamina-value">${pc.maxStamina || 0}</span>/${pc.maxStamina || 0}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="combatant-stats" id="cstats-${pc.characterID}">
+                            <div class="cstat"><span class="cstat-label">DMG</span><span class="cstat-val" id="cstat-dmg-${pc.characterID}">0</span></div>
+                            <div class="cstat"><span class="cstat-label">RCVD</span><span class="cstat-val" id="cstat-rcvd-${pc.characterID}">0</span></div>
+                            <div class="cstat"><span class="cstat-label">HEAL</span><span class="cstat-val" id="cstat-heal-${pc.characterID}">0</span></div>
+                        </div>
+                    </div>
                 </div>
             `;
             partyStatus.appendChild(div);
@@ -403,7 +446,6 @@ async function displayCombatLog(combatData) {
                     renderTurn(turn, logDisplay, hpMaxes, hpCurrent);
                     updateHealthBars(turn, hpMaxes, hpCurrent);
                     if (turn.playerResourceStates) updateResourceBars(turn.playerResourceStates);
-                    _updateStatsDisplay();
 
                     // Animate attacker lunge + target hit/defeat — unified targets[] format
                     if (turn.result?.damageDealt > 0 && turn.actor && turn.action?.type === 'skill') {
@@ -479,7 +521,6 @@ async function displayCombatLog(combatData) {
                 renderTurn(turn, logDisplay, hpMaxes, hpCurrent);
                 updateHealthBars(turn, hpMaxes, hpCurrent);
                 if (turn.playerResourceStates) updateResourceBars(turn.playerResourceStates);
-                _updateStatsDisplay();
                 await sleep(turnDelay);
             }
             overallResult = combatData.result;
@@ -1018,14 +1059,20 @@ function updateSingleHealthBar(targetId, newHP, hpMaxes, hpCurrent, type) {
     if (el) {
         const maxHP         = hpMaxes[targetId] || 100;
         const healthPercent = Math.max(0, (newHP / maxHP) * 100);
+        const clampedHP     = Math.max(0, newHP);
 
         const hpValueEl = el.querySelector('.hp-value');
         const fillEl    = el.querySelector('.health-bar-fill');
         const textEl    = el.querySelector('.health-bar-text');
 
-        if (hpValueEl) hpValueEl.textContent = Math.max(0, newHP);
+        if (hpValueEl) hpValueEl.textContent = clampedHP;
         if (fillEl)    fillEl.style.width     = `${healthPercent}%`;
-        if (textEl)    textEl.textContent     = `${Math.max(0, Math.floor(healthPercent))}%`;
+        // Party cards show "current/max" overlay; enemy cards show percentage
+        if (textEl) {
+            textEl.textContent = type === 'party'
+                ? `${clampedHP}/${maxHP}`
+                : `${Math.max(0, Math.floor(healthPercent))}%`;
+        }
 
         hpCurrent[targetId] = newHP;
         return true;
@@ -1074,20 +1121,18 @@ function updateResourceBars(resourceStates) {
 
         const staVal  = actorEl.querySelector('.stamina-value');
         const staBar  = actorEl.querySelector('.stamina-bar-fill');
-        const staText = actorEl.querySelector('.combatant-stamina');
-        if (staVal && staBar && staText) {
-            const max = parseInt(staText.textContent.split(' / ')[1]);
-            const pct = Math.max(0, (state.currentStamina / max) * 100);
+        if (staVal && staBar) {
+            const maxSta = parseInt(staVal.closest('.bar-row')?.querySelector('.bar-overlay-text')?.textContent?.split('/')?.[1]) || state.currentStamina;
+            const pct = Math.max(0, (state.currentStamina / (maxSta || 1)) * 100);
             staVal.textContent = state.currentStamina;
             staBar.style.width = `${pct}%`;
         }
 
         const manVal  = actorEl.querySelector('.mana-value');
         const manBar  = actorEl.querySelector('.mana-bar-fill');
-        const manText = actorEl.querySelector('.combatant-mana');
-        if (manVal && manBar && manText) {
-            const max = parseInt(manText.textContent.split(' / ')[1]);
-            const pct = Math.max(0, (state.currentMana / max) * 100);
+        if (manVal && manBar) {
+            const maxMana = parseInt(manVal.closest('.bar-row')?.querySelector('.bar-overlay-text')?.textContent?.split('/')?.[1]) || state.currentMana;
+            const pct = Math.max(0, (state.currentMana / (maxMana || 1)) * 100);
             manVal.textContent = state.currentMana;
             manBar.style.width = `${pct}%`;
         }
