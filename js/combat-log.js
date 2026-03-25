@@ -7,72 +7,68 @@
 // ── Session loot log ─────────────────────────────────────────────────────────
 // Accumulates loot across all iterations of an idle loop run.
 // Cleared when the loop stops or the player manually clears it.
-const _sessionLoot = [];   // { run, challengeName, items: [{name, qty, type}] }
-let   _sessionLootRun = 0; // increments each combat
+// Aggregated session loot: maps display string → count
+const _sessionLootAgg  = { loot: {}, sold: {} };
+let   _sessionLootRun  = 0; // total combats this session
 
 function _appendSessionLoot(challengeId, lootLines, soldLines) {
     if (!lootLines.length && !soldLines.length) return;
     _sessionLootRun++;
 
-    const challenges = window.gameData?.challenges || [];
-    const challenge  = challenges.find(c => c.id === challengeId);
-    const name       = challenge?.name || (challengeId?.replace('challenge_','').replace(/_/g,' ') || 'Unknown');
-
-    _sessionLoot.push({
-        run:  _sessionLootRun,
-        name,
-        loot: lootLines,
-        sold: soldLines,
-    });
+    for (const line of lootLines) {
+        _sessionLootAgg.loot[line] = (_sessionLootAgg.loot[line] || 0) + 1;
+    }
+    for (const line of soldLines) {
+        _sessionLootAgg.sold[line] = (_sessionLootAgg.sold[line] || 0) + 1;
+    }
 
     _renderSessionLoot();
 }
 
 function _sessionLootHTML() {
-    return [..._sessionLoot].reverse().map(entry => {
-        const lootHtml = entry.loot.length
-            ? entry.loot.map(l => `<div style="color:var(--text-primary);">• ${l}</div>`).join('')
-            : '';
-        const soldHtml = entry.sold.length
-            ? entry.sold.map(s => `<div style="color:var(--text-muted);">• ${s}</div>`).join('')
-            : '';
-        const noLoot = !entry.loot.length && !entry.sold.length
-            ? `<div style="color:var(--text-muted); font-style:italic;">Nothing dropped</div>`
-            : '';
-        return `
-            <div style="padding:0.4rem 0; border-bottom:1px solid rgba(139,115,85,0.12);">
-                <div style="color:var(--gold-dim); font-size:0.72rem; font-weight:600; margin-bottom:3px; text-transform:uppercase; letter-spacing:0.06em;">
-                    Run ${entry.run} — ${entry.name}
-                </div>
-                ${lootHtml}${soldHtml}${noLoot}
-            </div>`;
-    }).join('');
+    const lootEntries = Object.entries(_sessionLootAgg.loot);
+    const soldEntries = Object.entries(_sessionLootAgg.sold);
+
+    if (!lootEntries.length && !soldEntries.length) return '';
+
+    const lootHtml = lootEntries
+        .map(([line, count]) => `<div style="color:var(--text-primary);">• ${line}${count > 1 ? ` <span style="color:var(--text-muted);">×${count}</span>` : ''}</div>`)
+        .join('');
+    const soldHtml = soldEntries
+        .map(([line, count]) => `<div style="color:var(--text-muted);">• ${line}${count > 1 ? ` <span style="color:var(--text-muted);">×${count}</span>` : ''}</div>`)
+        .join('');
+
+    const runs = _sessionLootRun;
+    const header = runs === 1 ? 'Received this run:' : `Received over ${runs} runs:`;
+
+    return `<div style="color:var(--gold-dim); font-size:0.72rem; font-weight:600; margin-bottom:5px; text-transform:uppercase; letter-spacing:0.06em;">${header}</div>${lootHtml}${soldHtml}`;
 }
 
 function _renderSessionLoot() {
     const isMobile  = window.innerWidth <= 768;
-    const countText = `(${_sessionLoot.length} run${_sessionLoot.length !== 1 ? 's' : ''})`;
+    const hasLoot   = _sessionLootRun > 0;
+    const countText = `(${_sessionLootRun} run${_sessionLootRun !== 1 ? 's' : ''})`;
     const html      = _sessionLootHTML();
 
     // Desktop panel
     const panel   = document.getElementById('sessionLootPanel');
     const list    = document.getElementById('sessionLootList');
     const countEl = document.getElementById('sessionLootCount');
-    if (panel) panel.style.display = _sessionLoot.length === 0 ? 'none' : '';
+    if (panel) panel.style.display = hasLoot ? '' : 'none';
     if (list)  list.innerHTML = html;
-    if (countEl) countEl.textContent = _sessionLoot.length ? countText : '';
+    if (countEl) countEl.textContent = hasLoot ? countText : '';
 
     // Mobile drawer list (kept in sync so it's ready when opened)
     const drawerList    = document.getElementById('sessionLootListDrawer');
     const drawerCount   = document.getElementById('sessionLootCountDrawer');
     if (drawerList)  drawerList.innerHTML = html;
-    if (drawerCount) drawerCount.textContent = _sessionLoot.length ? countText : '';
+    if (drawerCount) drawerCount.textContent = hasLoot ? countText : '';
 
     // Mobile tab button
     const tab = document.getElementById('sessionLootTab');
     if (tab) {
-        tab.style.display = (_sessionLoot.length > 0) ? '' : 'none';
-        tab.setAttribute('data-count', _sessionLoot.length ? ` ${_sessionLoot.length}` : '');
+        tab.style.display = hasLoot ? '' : 'none';
+        tab.setAttribute('data-count', hasLoot ? ` ${_sessionLootRun}` : '');
     }
 }
 
@@ -87,7 +83,8 @@ window.closeSessionLootDrawer = function() {
 };
 
 window.clearSessionLoot = function() {
-    _sessionLoot.length = 0;
+    _sessionLootAgg.loot = {};
+    _sessionLootAgg.sold = {};
     _sessionLootRun = 0;
     _renderSessionLoot();
 };
