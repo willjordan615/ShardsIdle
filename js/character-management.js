@@ -565,37 +565,48 @@ function updateStatDisplay() {
  * Create a Character - WITH COMPLETE SAVESTATE FIELDS
  */
 async function createCharacter() {
+    if (createCharacter._inProgress) return;
+    createCharacter._inProgress = true;
+
+    const createBtn = document.querySelector('#create button[onclick*="createCharacter"]');
+    if (createBtn) { createBtn.disabled = true; createBtn.textContent = 'Creating…'; }
+
     const name = document.getElementById('characterName').value.trim();
     const messagesDiv = document.getElementById('creationMessages');
+
+    const _unlock = () => {
+        createCharacter._inProgress = false;
+        if (createBtn) { createBtn.disabled = false; createBtn.textContent = 'Create Character'; }
+    };
     
     // Validation 1: Character name
     if (!name) {
         messagesDiv.innerHTML = '<p style="color: #ff6b6b;">Please enter a character name.</p>';
-        return;
+        _unlock(); return;
     }
     
     // Validation 2: Race selected
     if (!currentState.selectedRace) {
         messagesDiv.innerHTML = '<p style="color: #ff6b6b;">Please select a race.</p>';
-        return;
+        _unlock(); return;
     }
     
     // Validation 3: Exactly 2 skills selected
     if (currentState.selectedSkills.length !== 2) {
         messagesDiv.innerHTML = '<p style="color: #ff6b6b;">You must select exactly 2 starting skills.</p>';
-        return;
+        _unlock(); return;
     }
     
     // Validation 4: Weapon type selected
     if (!currentState.selectedWeaponType) {
         messagesDiv.innerHTML = '<p style="color: #ff6b6b;">Please select a starting weapon type.</p>';
-        return;
+        _unlock(); return;
     }
     
     // Validation 5: All stat points allocated
     if (currentState.pointsRemaining > 0) {
         messagesDiv.innerHTML = '<p style="color: #ff6b6b;">You must allocate all your stat points.</p>';
-        return;
+        _unlock(); return;
     }
     
     // Get tier 0 weapon for selected type
@@ -606,7 +617,7 @@ async function createCharacter() {
     
     if (!tier0Weapon) {
         messagesDiv.innerHTML = '<p style="color: #ff6b6b;">Could not find starting weapon. Please select a different weapon type.</p>';
-        return;
+        _unlock(); return;
     }
     
     // ===== COMPLETE CHARACTER OBJECT WITH ALL SAVESTATE FIELDS =====
@@ -708,10 +719,11 @@ async function createCharacter() {
     const saved = await saveCharacter(character);
     if (!saved) {
         messagesDiv.innerHTML = '<p style="color: #ff6b6b;">Failed to save character. Check console for details.</p>';
-        return;
+        _unlock(); return;
     }
     
     messagesDiv.innerHTML = '<p style="color: #4eff7f;">Character created successfully!</p>';
+    _unlock();
     
     setTimeout(() => {
         document.getElementById('characterName').value = '';
@@ -1297,6 +1309,9 @@ async function openSkillSwapModal(character, slotIndex) {
  * Handles the logic of swapping the skill and saving to server.
  */
 async function confirmSkillSwap(character, slotIndex, newSkillID) {
+    if (confirmSkillSwap._inProgress) return;
+    confirmSkillSwap._inProgress = true;
+
     const modal = document.getElementById('skillSwapModal');
     if (modal) modal.style.display = 'none';
 
@@ -1373,6 +1388,8 @@ async function confirmSkillSwap(character, slotIndex, newSkillID) {
     } catch (err) {
         if (typeof showSafeError === 'function') showSafeError('Failed to save skills: ' + err.message);
         console.error(err);
+    } finally {
+        confirmSkillSwap._inProgress = false;
     }
 }
 
@@ -1500,7 +1517,9 @@ async function saveRoleTag() {
 }
 
 async function deleteCharacter(characterId) {
+    if (deleteCharacter._inProgress) return;
     if (confirm('Are you sure you want to delete this character? This cannot be undone.')) {
+        deleteCharacter._inProgress = true;
         try {
             const response = await authFetch(`${BACKEND_URL}/api/characters/${characterId}`, {
                 method: 'DELETE',
@@ -1515,6 +1534,8 @@ async function deleteCharacter(characterId) {
         } catch (error) {
             console.error('Error deleting character:', error);
             showError('Failed to delete character: ' + error.message);
+        } finally {
+            deleteCharacter._inProgress = false;
         }
     }
 }
