@@ -622,3 +622,148 @@ async function loadPublicCompanions(page) {
         container.innerHTML = '<div class="card" style="text-align: center; color: #d4484a; grid-column: 1 / -1;">Failed to load public characters</div>';
     }
 }
+
+// ── Bot companion selection: rendering and pagination ────────────────────────
+// Party mutation (addBotToParty, removeBotFromParty) stays in combat-system.js.
+
+// Bot selection pagination state
+const _botsPaging = { page: 1, totalPages: 1 };
+
+const BOT_PAGE_SIZE = 6;
+
+/**
+ * Render available bots for selection, paginated.
+ * Shows only bots at or below the player's level, sorted by level descending
+ * so the strongest relevant bots appear first.
+ */
+function renderBotsSelection(page) {
+    if (page === undefined) page = _botsPaging.page;
+    _botsPaging.page = page;
+
+    const container = document.getElementById('botsDisplay');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    const challenge = currentState.selectedChallenge;
+    if (!challenge || !window.gameData || !window.gameData.bots) return;
+
+    // Determine player level from the first owned character in the party
+    const playerChar = currentState.currentParty.find(m =>
+        !m.characterID?.startsWith('bot_') && !m.characterID?.startsWith('import_')
+    );
+    const playerLevel = playerChar?.level || 1;
+
+    // Show bots at or below player level, sorted strongest-first
+    const eligibleBots = window.gameData.bots
+        .filter(b => b.level <= playerLevel)
+        .sort((a, b) => b.level - a.level);
+
+    _botsPaging.totalPages = Math.max(1, Math.ceil(eligibleBots.length / BOT_PAGE_SIZE));
+
+    // Clamp page in case removal shrinks the list
+    if (_botsPaging.page > _botsPaging.totalPages) _botsPaging.page = _botsPaging.totalPages;
+
+    if (eligibleBots.length === 0) {
+        container.innerHTML = '<div style="color:#555; font-style:italic; padding:1rem;">No companions available yet.</div>';
+        return;
+    }
+
+    const start = (_botsPaging.page - 1) * BOT_PAGE_SIZE;
+    const pageSlice = eligibleBots.slice(start, start + BOT_PAGE_SIZE);
+
+    const roleColors = {
+        Defender:  '#4a9eff',
+        Bruiser:   '#ff6b6b',
+        Mage:      '#c77dff',
+        Support:   '#4cd964',
+        Utility:   '#ffd700',
+        Assassin:  '#ff9f43',
+    };
+
+    pageSlice.forEach(bot => {
+        const isSelected = currentState.currentParty.some(m => m.characterID === bot.characterID);
+        const canAdd = currentState.currentParty.length < challenge.maxPartySize && !isSelected;
+
+        const derivedStats = calculateDerivedStats(bot);
+        const card = document.createElement('div');
+        card.className = 'card';
+        if (isSelected) card.classList.add('selected');
+
+        const roleColor = roleColors[bot.role] || '#aaa';
+
+        const botClass = (typeof getCharacterClass === 'function' && bot.skills)
+            ? getCharacterClass(bot, window.gameData?.skills || [])
+            : null;
+        const botActiveSkills = (bot.skills || [])
+            .filter(s => !s.intrinsic)
+            .sort((a, b) => (b.skillLevel || 0) - (a.skillLevel || 0))
+            .slice(0, 2)
+            .map(s => window.gameData?.skills?.find(sk => sk.id === s.skillID)?.name)
+            .filter(Boolean);
+
+        card.innerHTML = `
+            <div class="card-title">${bot.characterName}</div>
+            <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px; flex-wrap:wrap;">
+                <span class="card-subtitle" style="margin:0;">Lv.${bot.level}${botClass ? ' · ' + botClass : ''}</span>
+                ${bot.role ? `<span style="font-size:0.7rem; color:${roleColor}; background:rgba(255,255,255,0.06); border:1px solid ${roleColor}44; border-radius:4px; padding:1px 6px;">${bot.role}</span>` : ''}
+            </div>
+            ${botActiveSkills.length ? `<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;">${botActiveSkills.map(n => `<span style="font-size:0.7rem;color:#d4af37;background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.2);border-radius:3px;padding:1px 6px;">${n}</span>`).join('')}</div>` : ''}
+            <div class="card-description" style="margin-bottom: 0.75rem;">
+                HP: ${formatNumber(derivedStats.hp)}
+            </div>
+        `;
+
+        if (canAdd) {
+            card.style.cursor = 'pointer';
+            card.onclick = () => addBotToParty(bot);
+        } else if (isSelected) {
+            card.style.cursor = 'pointer';
+            card.onclick = () => removeBotFromParty(bot.characterID);
+        } else {
+            card.style.opacity = '0.5';
+            card.style.cursor = 'not-allowed';
+        }
+
+        container.appendChild(card);
+    });
+
+    _renderBotsPagination(eligibleBots.length);
+}
+
+/**
+ * Render pagination controls below the bots grid.
+ * Mounts into #botsPagination, creating the element if absent.
+ */
+function _renderBotsPagination(total) {
+    const page       = _botsPaging.page;
+    const totalPages = _botsPaging.totalPages;
+
+    let nav = document.getElementById('botsPagination');
+    if (!nav) {
+        nav = document.createElement('div');
+        nav.id = 'botsPagination';
+        const botsDisplay = document.getElementById('botsDisplay');
+        if (botsDisplay) botsDisplay.parentNode.insertBefore(nav, botsDisplay.nextSibling);
+    }
+
+    if (totalPages <= 1) {
+        nav.innerHTML = '';
+        return;
+    }
+
+    nav.innerHTML = `
+        <div class="roster-pagination">
+            <button class="secondary roster-pagination__btn"
+                    ${page <= 1 ? 'disabled' : ''}
+                    onclick="renderBotsSelection(${page - 1})">← Prev</button>
+            <span class="roster-pagination__info">
+                Page ${page} of ${totalPages}
+                <span class="roster-pagination__total">(${total} bots)</span>
+            </span>
+            <button class="secondary roster-pagination__btn"
+                    ${page >= totalPages ? 'disabled' : ''}
+                    onclick="renderBotsSelection(${page + 1})">Next →</button>
+        </div>
+    `;
+}
