@@ -704,7 +704,7 @@
   {
     "id": "taunt",
     "name": "Taunt",
-    "type": "buff",
+    "type": "debuff",
     "description": "Drawing enemy attention. Enemies are forced to target you.",
     "emoji": "\ud83d\ude24",
     "tooltip": "Taunting \u2014 enemies are compelled to attack you",

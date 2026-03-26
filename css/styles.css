@@ -1591,6 +1591,8 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
         padding: 0.25rem 0.55rem !important;
         font-size: 0.58rem !important;
     }
+    .status-effects { font-size: 0.8rem; flex-direction: row; flex-wrap: wrap; }
+    .status-pip { width: 18px; height: 18px; font-size: 0.65rem; }
 
     /* ── Buttons globally ─────────────────────────────────── */
     button { padding: 0.45rem 1rem; font-size: 0.65rem; }

@@ -1503,6 +1503,7 @@ async function deleteCharacter(characterId) {
     if (confirm('Are you sure you want to delete this character? This cannot be undone.')) {
         try {
             const response = await authFetch(`${BACKEND_URL}/api/characters/${characterId}`, {
+                method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' }
             });
             
@@ -1547,11 +1548,7 @@ function createSkillTooltip(skill) {
     
     let content = `<div style="font-weight: bold; margin-bottom: 0.5rem; font-size: 0.95rem;">${skill.name}</div>`;
     content += `<div style="color: #aaa; font-size: 0.8rem; margin-bottom: 0.5rem;">${skill.category}</div>`;
-
-    if (skill.tags && skill.tags.length > 0) {
-        content += `<div style="color: #a0c4ff; font-size: 0.75rem; margin-bottom: 0.5rem;">${skill.tags.join(', ')}</div>`;
-    }
-
+    
     if (skill.description) {
         content += `<div style="color: #aaa; margin-bottom: 0.75rem; font-size: 0.85rem;">${skill.description}</div>`;
     }
