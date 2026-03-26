@@ -202,7 +202,7 @@
                         <div class="loadout-slot loadout-slot--filled" style="cursor:pointer; position:relative; gap:12px;">
                             <span class="loadout-slot__label" style="min-width:90px; flex-shrink:0;">
                                 Combat Style
-                                <span title="Controls how your character behaves in combat. Affects which skills are prioritised, when consumables are used, and how aggressively resources are spent.&#10;&#10;⚖️ Balanced — Moderate on all fronts. Finishes low-HP enemies, conserves resources between stages.&#10;⚔️ Aggressive — Maximises damage. Almost never buffs or heals. Spends resources freely. Targets lowest-HP enemy.&#10;🛡️ Cautious — Prefers utility, defense, and healing. Buffs early, targets the biggest threat. Tight resource conservation across stages.&#10;💚 Support — Heals and buffs heavily. Rescues low-HP allies first. Rarely attacks.&#10;🌀 Disruptor — Strongly prefers control and debuff skills. Targets the most dangerous enemy.&#10;🗡️ Opportunist — Sets up combos and procs. Hits much harder when the target is already debuffed. Targets the most vulnerable enemy.&#10;&#10;All profiles: buffs are used early in a fight and nearly forbidden by turn 10. Consumables are only used when the fight is genuinely difficult." style="color:#8b7355; font-size:0.75rem; cursor:help; margin-left:4px;">ⓘ</span>
+                                <span title="Controls how your character behaves in combat. Affects which skills are prioritised, when consumables are used, and how aggressively resources are spent.&#10;&#10;⚖️ Balanced — Moderate on all fronts. Finishes low-HP enemies, conserves resources between stages.&#10;⚔️ Aggressive — Maximises damage. Almost never buffs or heals. Spends resources freely. Targets lowest-HP enemy.&#10;🛡️ Cautious — Prefers utility, defense, and healing. Buffs early, targets the biggest threat. Tight resource conservation across stages.&#10;💚 Support — Heals and buffs heavily. Rescues low-HP allies first. Rarely attacks.&#10;🌀 Disruptor — Strongly prefers control and debuff skills. Targets the most dangerous enemy.&#10;🗡️ Opportunist — Sets up combos and procs. Hits much harder when the target is already debuffed. Targets the most vulnerable enemy.&#10;&#10;All profiles: buffs are used early in a fight and nearly forbidden by turn 10. Consumables are only used when the fight is genuinely difficult." style="color:#8b7355; font-size:0.75rem; cursor:help; margin-left:4px; position:relative; z-index:2;">ⓘ</span>
                             </span>
                             <span class="loadout-slot__item" id="aiProfileBadge"></span>
                             <select id="aiProfileDetailSelect"
@@ -221,7 +221,7 @@
                         <div class="loadout-slot loadout-slot--filled" style="cursor:pointer; position:relative; gap:12px; margin-top:6px;">
                             <span class="loadout-slot__label" style="min-width:90px; flex-shrink:0;">
                                 Role
-                                <span title="A display tag that appears on your character's browse card when shared publicly. Helps other players know what role your character plays in a party. Has no mechanical effect." style="color:#8b7355; font-size:0.75rem; cursor:help; margin-left:4px;">ⓘ</span>
+                                <span title="A display tag that appears on your character's browse card when shared publicly. Helps other players know what role your character plays in a party. Has no mechanical effect." style="color:#8b7355; font-size:0.75rem; cursor:help; margin-left:4px; position:relative; z-index:2;">ⓘ</span>
                             </span>
                             <span class="loadout-slot__item" id="roleTagBadge">None</span>
                             <select id="roleTagSelect"
@@ -753,23 +753,56 @@
                         </div>
                     </div>
 
+                    <div class="settings-group">
+                        <h3>Background Hue</h3>
+                        <p class="settings-desc">The colour tint of the UI background.</p>
+                        <div class="settings-options">
+                            <button class="settings-opt" data-setting="bgHue" data-value="navy">
+                                <span class="theme-swatch" style="background:#0c1028;"></span>Navy
+                            </button>
+                            <button class="settings-opt" data-setting="bgHue" data-value="dungeon">
+                                <span class="theme-swatch" style="background:#0c1210;"></span>Dungeon
+                            </button>
+                            <button class="settings-opt" data-setting="bgHue" data-value="crimson">
+                                <span class="theme-swatch" style="background:#1e0a0e;"></span>Crimson
+                            </button>
+                            <button class="settings-opt" data-setting="bgHue" data-value="arcane">
+                                <span class="theme-swatch" style="background:#110a1e;"></span>Arcane
+                            </button>
+                            <button class="settings-opt" data-setting="bgHue" data-value="verdant">
+                                <span class="theme-swatch" style="background:#0a1a0c;"></span>Verdant
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>UI Text Size</h3>
+                        <p class="settings-desc">Base font size for the interface. Larger sizes help readability on mobile.</p>
+                        <div class="settings-options">
+                            <button class="settings-opt" data-setting="uiFontSize" data-value="small">Small (14px)</button>
+                            <button class="settings-opt" data-setting="uiFontSize" data-value="medium">Medium (16px)</button>
+                            <button class="settings-opt" data-setting="uiFontSize" data-value="large">Large (18px)</button>
+                            <button class="settings-opt" data-setting="uiFontSize" data-value="xl">X-Large (20px)</button>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>Combat Log Text Size</h3>
+                        <p class="settings-desc">Font size inside the combat log. Set independently from the main UI.</p>
+                        <div class="settings-options">
+                            <button class="settings-opt" data-setting="logFontSize" data-value="small">Small (14px)</button>
+                            <button class="settings-opt" data-setting="logFontSize" data-value="medium">Medium (16px)</button>
+                            <button class="settings-opt" data-setting="logFontSize" data-value="large">Large (18px)</button>
+                            <button class="settings-opt" data-setting="logFontSize" data-value="xl">X-Large (20px)</button>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
             <!-- GAMEPLAY TAB -->
             <div class="settings-tab-content" id="settings-tab-gameplay" style="display:none;">
                 <div class="settings-grid">
-
-                    <div class="settings-group">
-                        <h3>Text Size</h3>
-                        <p class="settings-desc">Base font size throughout the interface.</p>
-                        <div class="settings-options">
-                            <button class="settings-opt" data-setting="fontSize" data-value="small">Small (14px)</button>
-                            <button class="settings-opt" data-setting="fontSize" data-value="medium">Medium (16px)</button>
-                            <button class="settings-opt" data-setting="fontSize" data-value="large">Large (18px)</button>
-                            <button class="settings-opt" data-setting="fontSize" data-value="xl">X-Large (20px)</button>
-                        </div>
-                    </div>
 
                     <div class="settings-group">
                         <h3>Victory Screen Duration</h3>
@@ -798,25 +831,6 @@
                             <button class="settings-opt" data-setting="combatAnimations" data-value="full">Full</button>
                             <button class="settings-opt" data-setting="combatAnimations" data-value="reduced">Reduced</button>
                             <button class="settings-opt" data-setting="combatAnimations" data-value="off">Off</button>
-                        </div>
-                    </div>
-
-                    <div class="settings-group settings-group-stub">
-                        <h3>Loot Notification Style <span class="stub-badge">Coming Soon</span></h3>
-                        <p class="settings-desc">How item drops are shown after combat.</p>
-                        <div class="settings-options">
-                            <button class="settings-opt" disabled>Toast Only</button>
-                            <button class="settings-opt" disabled>Modal Panel</button>
-                            <button class="settings-opt" disabled>Both</button>
-                        </div>
-                    </div>
-
-                    <div class="settings-group settings-group-stub">
-                        <h3>Auto-Challenge <span class="stub-badge">Coming Soon</span></h3>
-                        <p class="settings-desc">Automatically re-run the last challenge on login.</p>
-                        <div class="settings-options">
-                            <button class="settings-opt" disabled>Off</button>
-                            <button class="settings-opt" disabled>On</button>
                         </div>
                     </div>
 
@@ -892,10 +906,12 @@
     // ============================================================
 
     const SETTINGS_DEFAULTS = {
-        fontSize:          'medium',
+        uiFontSize:        'medium',
+        logFontSize:       'medium',
         density:           'comfortable',
         theme:             'gold',
         background:        'dark',
+        bgHue:             'navy',
         combatSpeed:       '1.0',
         victoryDuration:   '7',
         displayFont:       'cinzel',
@@ -966,6 +982,16 @@
         midnight: { '--ink-deep': '#050010', '--ink-dark': '#0a0020', '--ink-mid': '#100030' },
     };
 
+    // Hue offsets applied on top of background darkness tokens.
+    // Values are HSL-based replacements for the ink CSS variables.
+    const BG_HUE_TOKENS = {
+        navy:    { '--ink-deep': '#07091a', '--ink-dark': '#0c1028', '--ink-mid': '#111730' },
+        dungeon: { '--ink-deep': '#070a08', '--ink-dark': '#0c1210', '--ink-mid': '#101814' },
+        crimson: { '--ink-deep': '#120508', '--ink-dark': '#1e0a0e', '--ink-mid': '#260e12' },
+        arcane:  { '--ink-deep': '#0a0612', '--ink-dark': '#110a1e', '--ink-mid': '#160e28' },
+        verdant: { '--ink-deep': '#060e08', '--ink-dark': '#0a1a0c', '--ink-mid': '#0e2210' },
+    };
+
     const FONT_SIZE_SCALE = {
         small:  { base: '14px', logFont: '0.82rem', statVal: '1.2rem',  derivedVal: '1.5rem' },
         medium: { base: '16px', logFont: '0.95rem', statVal: '1.35rem', derivedVal: '1.7rem' },
@@ -1007,10 +1033,13 @@
     function applySettings(settings) {
         const root = document.documentElement;
 
-        // Font size
-        const fs = FONT_SIZE_SCALE[settings.fontSize] || FONT_SIZE_SCALE.medium;
-        document.body.style.fontSize = fs.base;
-        root.style.setProperty('--log-font-size', fs.logFont);
+        // UI font size
+        const uiFs = FONT_SIZE_SCALE[settings.uiFontSize] || FONT_SIZE_SCALE.medium;
+        document.body.style.fontSize = uiFs.base;
+
+        // Combat log font size (independent)
+        const logFs = FONT_SIZE_SCALE[settings.logFontSize] || FONT_SIZE_SCALE.medium;
+        root.style.setProperty('--log-font-size', logFs.logFont);
 
         // Density
         const d = DENSITY_SCALE[settings.density] || DENSITY_SCALE.comfortable;
@@ -1024,9 +1053,19 @@
         root.style.setProperty('--log-accent', t['--gold']);
         root.style.setProperty('--log-header', t['--gold-bright']);
 
-        // Background
+        // Background darkness
         const bg = BACKGROUND_TOKENS[settings.background] || BACKGROUND_TOKENS.dark;
         Object.entries(bg).forEach(([k, v]) => root.style.setProperty(k, v));
+
+        // Background hue (overrides ink vars with hue-shifted equivalents, scaled to darkness)
+        const hue = BG_HUE_TOKENS[settings.bgHue] || BG_HUE_TOKENS.navy;
+        const darknessScale = { dark: 1.0, darker: 0.65, darkest: 0.35, midnight: 0.5 }[settings.background] || 1.0;
+        Object.entries(hue).forEach(([k, v]) => {
+            // Parse hex, scale toward black by darknessScale, re-apply
+            const r = parseInt(v.slice(1,3),16), g = parseInt(v.slice(3,5),16), b = parseInt(v.slice(5,7),16);
+            const rs = Math.round(r * darknessScale), gs = Math.round(g * darknessScale), bs = Math.round(b * darknessScale);
+            root.style.setProperty(k, `rgb(${rs},${gs},${bs})`);
+        });
 
         // Display font
         root.style.setProperty('--font-display', FONT_STACKS.displayFont[settings.displayFont] || FONT_STACKS.displayFont.cinzel);

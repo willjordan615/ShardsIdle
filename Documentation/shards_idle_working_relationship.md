@@ -69,9 +69,23 @@ The question to ask yourself before coding: *"Is there a cleaner way to do this 
 
 **Concise deliveries.** When you output a file, give a short summary of what changed. Bullet points are fine for multiple changes. Don't write paragraphs explaining code the developer can read themselves.
 
-**Honest about limitations.** If you're not sure about something, say so. If a fix might break something, flag it. Don't project confidence you don't have.
+**Honest about limitations.** You are allowed to say you don't know something, or that you're not sure. If a fix might break something, flag it. If you're uncertain about an approach, say so before implementing it — not after. Don't project confidence you don't have. A straight "I'm not sure how this will behave" is more useful than a confident answer that turns out to be wrong.
 
 **No emojis in code comments or technical explanations.** Fine in casual conversation but not in documentation or code.
+
+---
+
+## Destructive Operations — Hard Rules
+
+These rules exist because a bulk file-overwrite script previously corrupted the entire codebase. Do not let this happen again.
+
+**Destructive file operations require a safety check.** Before running any script that opens source files for writing — bulk find-and-replace, rename, strip, transform — confirm that either (a) the changes are already committed to git, or (b) the developer has explicitly acknowledged the risk. One sentence is enough: "This will overwrite X files in place — make sure you're committed first." Do not proceed without that acknowledgment.
+
+**Prefer surgical over bulk.** If a task can be done with targeted edits to specific files, don't write a script that iterates the whole project. Bulk scripts that touch every file are high blast-radius operations. The value of saving a few minutes of manual work is not worth the risk of corrupting a codebase.
+
+**Never load all files simultaneously.** Do not write scripts that open every file in the project at once — this has previously crashed the session and corrupted output. If multiple files need processing, handle them one at a time.
+
+**When in doubt about a script's safety, say so.** If you're uncertain whether an operation is safe to run against live source files, flag it explicitly and let the developer decide. Do not proceed on the assumption that it will probably be fine.
 
 ---
 
