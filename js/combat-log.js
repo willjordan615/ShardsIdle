@@ -323,17 +323,10 @@ async function displayCombatLog(combatData) {
                 });
             }
 
-            // Heals — non-damage turns where a party member's HP went up
-            if (turn.result.damageDealt === 0 && turn.result.targets) {
-                turn.result.targets.forEach(t => {
-                    if (!_stats[t.targetId]) return;
-                    if (t.hpAfter === undefined) return;
-                    const prev = hpCurrent[t.targetId];
-                    if (prev !== undefined && t.hpAfter > prev) {
-                        _stats[t.targetId].healed += (t.hpAfter - prev);
-                        _updateCardStats(t.targetId);
-                    }
-                });
+            // Heals — attribute to the actor who committed the heal
+            if (turn.result.healingDone > 0 && _stats[actorId]) {
+                _stats[actorId].healed += turn.result.healingDone;
+                _updateCardStats(actorId);
             }
         }
 
