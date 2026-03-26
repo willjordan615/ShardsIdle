@@ -8776,11 +8776,11 @@
   {
     "id": "shockwave",
     "name": "Shockwave",
-    "description": "A shove amplified by electric shock.",
+    "description": "Channel thunderclap into an area shockwave",
     "category": "DAMAGE_AOE",
     "parentSkills": [
-      "shove",
-      "shock"
+      "channel",
+      "thunderclap"
     ],
     "basePower": 1.3,
     "baseHitChance": 0.85,
@@ -10794,5 +10794,1058 @@
       "endurance": 0.35,
       "ambition": 0.2
     }
+  },
+  {
+    "id": "song_of_vigor",
+    "name": "Song of Vigor",
+    "description": "A lilting melody that revitalizes the party, quickening their movements and sharpening their resolve.",
+    "category": "BUFF",
+    "isChildSkill": true,
+    "isStarterSkill": false,
+    "parentSkills": [
+      "proc_melody",
+      "shout"
+    ],
+    "basePower": 0.0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 1100,
+    "costType": "mana",
+    "costAmount": 14,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "targets": "all_allies",
+        "buff": "speed_boost",
+        "duration": 5,
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "targets": "all_allies",
+        "buff": "harmony",
+        "duration": 5,
+        "chance": 1.0
+      }
+    ],
+    "scalingFactors": {
+      "harmony": 0.7,
+      "conviction": 0.3
+    },
+    "masteryUnlockAt": 250,
+    "tags": [
+      "song",
+      "arcane"
+    ]
+  },
+  {
+    "id": "dissonance",
+    "name": "Dissonance",
+    "description": "Strikes a jarring, discordant note that rattles an enemy's concentration and disrupts their timing.",
+    "category": "CONTROL",
+    "isChildSkill": true,
+    "isStarterSkill": false,
+    "parentSkills": [
+      "proc_chime",
+      "shove"
+    ],
+    "basePower": 0.85,
+    "baseHitChance": 0.82,
+    "critChance": 0.06,
+    "critMultiplier": 1.4,
+    "delay": 950,
+    "costType": "mana",
+    "costAmount": 12,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "targets": "single_enemy",
+        "scalesBy": "basePower",
+        "damageType": "arcane",
+        "magnitude": 0.85
+      },
+      {
+        "type": "apply_debuff",
+        "targets": "single_enemy",
+        "debuff": "dazed",
+        "duration": 3,
+        "chance": 0.85
+      }
+    ],
+    "scalingFactors": {
+      "harmony": 0.6,
+      "ambition": 0.4
+    },
+    "masteryUnlockAt": 250,
+    "tags": [
+      "song",
+      "arcane"
+    ]
+  },
+  {
+    "id": "rhythmic_strike",
+    "name": "Rhythmic Strike",
+    "description": "An attack timed to an internal rhythm, flowing with unusual grace. Scales powerfully with harmony.",
+    "category": "DAMAGE_SINGLE",
+    "isChildSkill": true,
+    "isStarterSkill": false,
+    "parentSkills": [
+      "focus",
+      "attunement"
+    ],
+    "basePower": 1.1,
+    "baseHitChance": 0.9,
+    "critChance": 0.1,
+    "critMultiplier": 1.6,
+    "delay": 900,
+    "costType": "stamina",
+    "costAmount": 10,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "targets": "single_enemy",
+        "scalesBy": "basePower",
+        "damageType": "physical",
+        "magnitude": 1.1
+      }
+    ],
+    "scalingFactors": {
+      "harmony": 0.55,
+      "ambition": 0.3,
+      "conviction": 0.15
+    },
+    "masteryUnlockAt": 200,
+    "tags": [
+      "physical",
+      "song"
+    ]
+  },
+  {
+    "id": "lullaby",
+    "name": "Lullaby",
+    "description": "A soft, insidious melody that coaxes an enemy into a brief but vulnerable slumber.",
+    "category": "CONTROL",
+    "isChildSkill": true,
+    "isStarterSkill": false,
+    "parentSkills": [
+      "proc_lullaby",
+      "misdirect"
+    ],
+    "basePower": 0.0,
+    "baseHitChance": 0.78,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 1300,
+    "costType": "mana",
+    "costAmount": 18,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_debuff",
+        "targets": "single_enemy",
+        "debuff": "sleep",
+        "duration": 3,
+        "chance": 0.8
+      },
+      {
+        "type": "apply_debuff",
+        "targets": "single_enemy",
+        "debuff": "dazed",
+        "duration": 2,
+        "chance": 0.5
+      }
+    ],
+    "scalingFactors": {
+      "harmony": 0.8,
+      "conviction": 0.2
+    },
+    "masteryUnlockAt": 300,
+    "tags": [
+      "song",
+      "arcane"
+    ]
+  },
+  {
+    "id": "chorus",
+    "name": "Chorus",
+    "description": "Layers multiple melodies into a rising harmony that fills allies with power and purpose.",
+    "category": "BUFF",
+    "isChildSkill": true,
+    "isStarterSkill": false,
+    "parentSkills": [
+      "song_of_vigor",
+      "warcry"
+    ],
+    "basePower": 0.0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 1400,
+    "costType": "mana",
+    "costAmount": 22,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "targets": "all_allies",
+        "buff": "all_stats",
+        "duration": 6,
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "targets": "all_allies",
+        "buff": "attack_boost",
+        "duration": 6,
+        "chance": 1.0
+      }
+    ],
+    "scalingFactors": {
+      "harmony": 0.75,
+      "conviction": 0.25
+    },
+    "masteryUnlockAt": 400,
+    "tags": [
+      "song",
+      "arcane"
+    ]
+  },
+  {
+    "id": "haunting_refrain",
+    "name": "Haunting Refrain",
+    "description": "A looping, inescapable melody that saps the speed and will of all enemies on the field.",
+    "category": "CONTROL",
+    "isChildSkill": true,
+    "isStarterSkill": false,
+    "parentSkills": [
+      "dissonance",
+      "proc_echo"
+    ],
+    "basePower": 0.7,
+    "baseHitChance": 0.8,
+    "critChance": 0.04,
+    "critMultiplier": 1.3,
+    "delay": 1300,
+    "costType": "mana",
+    "costAmount": 20,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "targets": "all_enemies",
+        "scalesBy": "basePower",
+        "damageType": "arcane",
+        "magnitude": 0.7
+      },
+      {
+        "type": "apply_debuff",
+        "targets": "all_enemies",
+        "debuff": "slow",
+        "duration": 4,
+        "chance": 0.75
+      }
+    ],
+    "scalingFactors": {
+      "harmony": 0.65,
+      "ambition": 0.35
+    },
+    "masteryUnlockAt": 450,
+    "tags": [
+      "song",
+      "arcane"
+    ]
+  },
+  {
+    "id": "battle_hymn",
+    "name": "Battle Hymn",
+    "description": "A thunderous war-song that simultaneously emboldens allies and hammers enemies with sonic force.",
+    "category": "DAMAGE_AOE",
+    "isChildSkill": true,
+    "isStarterSkill": false,
+    "parentSkills": [
+      "rhythmic_strike",
+      "chorus"
+    ],
+    "basePower": 1.0,
+    "baseHitChance": 0.85,
+    "critChance": 0.08,
+    "critMultiplier": 1.5,
+    "delay": 1500,
+    "costType": "mana",
+    "costAmount": 24,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "targets": "all_enemies",
+        "scalesBy": "basePower",
+        "damageType": "arcane",
+        "magnitude": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "targets": "all_allies",
+        "buff": "attack_boost",
+        "duration": 4,
+        "chance": 1.0
+      }
+    ],
+    "scalingFactors": {
+      "harmony": 0.5,
+      "ambition": 0.3,
+      "conviction": 0.2
+    },
+    "masteryUnlockAt": 450,
+    "tags": [
+      "song",
+      "arcane",
+      "physical"
+    ]
+  },
+  {
+    "id": "soothing_verse",
+    "name": "Soothing Verse",
+    "description": "A gentle, wordless song that eases wounds and steadies the hearts of weary allies.",
+    "category": "HEALING_AOE",
+    "isChildSkill": true,
+    "isStarterSkill": false,
+    "parentSkills": [
+      "lullaby",
+      "first_aid"
+    ],
+    "basePower": 0.9,
+    "baseHitChance": 1.0,
+    "critChance": 0.04,
+    "critMultiplier": 1.4,
+    "delay": 1400,
+    "costType": "mana",
+    "costAmount": 20,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "heal",
+        "targets": "all_allies",
+        "scalesBy": "harmony",
+        "magnitude": 0.18,
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "targets": "all_allies",
+        "buff": "harmony",
+        "duration": 4,
+        "chance": 0.7
+      }
+    ],
+    "scalingFactors": {
+      "harmony": 0.8,
+      "conviction": 0.2
+    },
+    "masteryUnlockAt": 400,
+    "tags": [
+      "song",
+      "holy"
+    ]
+  },
+  {
+    "id": "grand_symphony",
+    "name": "Grand Symphony",
+    "description": "The bard's masterwork \u2014 a surging, all-encompassing composition that amplifies every ally to their peak.",
+    "category": "BUFF",
+    "isChildSkill": true,
+    "isStarterSkill": false,
+    "parentSkills": [
+      "chorus",
+      "proc_resonance"
+    ],
+    "basePower": 0.0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 1800,
+    "costType": "mana",
+    "costAmount": 35,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "targets": "all_allies",
+        "buff": "amplify",
+        "duration": 6,
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "targets": "all_allies",
+        "buff": "all_stats",
+        "duration": 8,
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "targets": "all_allies",
+        "buff": "speed_boost",
+        "duration": 6,
+        "chance": 1.0
+      }
+    ],
+    "scalingFactors": {
+      "harmony": 1.0
+    },
+    "masteryUnlockAt": 600,
+    "tags": [
+      "song",
+      "arcane"
+    ]
+  },
+  {
+    "id": "siren_call",
+    "name": "Siren Call",
+    "description": "An irresistible song that bewilders all enemies, silencing casters and leaving warriors stumbling.",
+    "category": "CONTROL",
+    "isChildSkill": true,
+    "isStarterSkill": false,
+    "parentSkills": [
+      "haunting_refrain",
+      "proc_harmony"
+    ],
+    "basePower": 0.0,
+    "baseHitChance": 0.78,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 1700,
+    "costType": "mana",
+    "costAmount": 32,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_debuff",
+        "targets": "all_enemies",
+        "debuff": "confused",
+        "duration": 4,
+        "chance": 0.75
+      },
+      {
+        "type": "apply_debuff",
+        "targets": "all_enemies",
+        "debuff": "silence",
+        "duration": 3,
+        "chance": 0.65
+      }
+    ],
+    "scalingFactors": {
+      "harmony": 0.85,
+      "conviction": 0.15
+    },
+    "masteryUnlockAt": 600,
+    "tags": [
+      "song",
+      "arcane"
+    ]
+  },
+  {
+    "id": "discordant_surge",
+    "name": "Discordant Surge",
+    "description": "The song tears apart at the seams, unleashing a violent burst of raw sonic energy across the battlefield.",
+    "category": "DAMAGE_AOE",
+    "isChildSkill": true,
+    "isStarterSkill": false,
+    "parentSkills": [
+      "battle_hymn",
+      "proc_chime"
+    ],
+    "basePower": 1.4,
+    "baseHitChance": 0.82,
+    "critChance": 0.1,
+    "critMultiplier": 1.8,
+    "delay": 1600,
+    "costType": "mana",
+    "costAmount": 38,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "targets": "all_enemies",
+        "scalesBy": "basePower",
+        "damageType": "arcane",
+        "magnitude": 1.4
+      },
+      {
+        "type": "apply_debuff",
+        "targets": "all_enemies",
+        "debuff": "dazed",
+        "duration": 2,
+        "chance": 0.7
+      }
+    ],
+    "scalingFactors": {
+      "harmony": 0.55,
+      "ambition": 0.3,
+      "conviction": 0.15
+    },
+    "masteryUnlockAt": 600,
+    "tags": [
+      "song",
+      "arcane"
+    ]
+  },
+  {
+    "id": "spirit_tap",
+    "name": "Spirit Tap",
+    "description": "Draws on ancestral energy to restore inner reserves. The body briefly weakens as the spirit surges.",
+    "category": "RESTORATION",
+    "isChildSkill": true,
+    "isStarterSkill": false,
+    "parentSkills": [
+      "rest",
+      "attunement"
+    ],
+    "basePower": 0.0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 1000,
+    "costType": "stamina",
+    "costAmount": 8,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "restore_resource",
+        "targets": "self",
+        "resource": "mana",
+        "magnitude": 0.25,
+        "chance": 1.0
+      },
+      {
+        "type": "apply_debuff",
+        "targets": "self",
+        "debuff": "weaken",
+        "duration": 2,
+        "chance": 1.0
+      }
+    ],
+    "scalingFactors": {
+      "harmony": 0.6,
+      "endurance": 0.4
+    },
+    "masteryUnlockAt": 200,
+    "tags": [
+      "spirit",
+      "nature"
+    ]
+  },
+  {
+    "id": "hex",
+    "name": "Hex",
+    "description": "Lays a curse on an enemy, making them vulnerable to harm and fraying their endurance.",
+    "category": "CONTROL",
+    "isChildSkill": true,
+    "isStarterSkill": false,
+    "parentSkills": [
+      "sense",
+      "shove"
+    ],
+    "basePower": 0.0,
+    "baseHitChance": 0.85,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 1000,
+    "costType": "mana",
+    "costAmount": 12,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_debuff",
+        "targets": "single_enemy",
+        "debuff": "cursed",
+        "duration": 5,
+        "chance": 0.9
+      },
+      {
+        "type": "apply_debuff",
+        "targets": "single_enemy",
+        "debuff": "weaken",
+        "duration": 3,
+        "chance": 0.7
+      }
+    ],
+    "scalingFactors": {
+      "harmony": 0.65,
+      "conviction": 0.35
+    },
+    "masteryUnlockAt": 250,
+    "tags": [
+      "spirit",
+      "nature"
+    ]
+  },
+  {
+    "id": "ward",
+    "name": "Ward",
+    "description": "Calls upon protective spirits to form a resilient shell around the shaman.",
+    "category": "DEFENSE",
+    "isChildSkill": true,
+    "isStarterSkill": false,
+    "parentSkills": [
+      "block",
+      "attunement"
+    ],
+    "basePower": 0.0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 900,
+    "costType": "mana",
+    "costAmount": 14,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "targets": "self",
+        "buff": "protection",
+        "duration": 6,
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "targets": "self",
+        "buff": "fortitude",
+        "duration": 4,
+        "chance": 1.0
+      }
+    ],
+    "scalingFactors": {
+      "endurance": 0.5,
+      "harmony": 0.5
+    },
+    "masteryUnlockAt": 200,
+    "tags": [
+      "spirit",
+      "nature"
+    ]
+  },
+  {
+    "id": "spirit_link",
+    "name": "Spirit Link",
+    "description": "Binds the shaman's spirit to an ally, drawing incoming harm away from them and onto the shaman.",
+    "category": "HEALING",
+    "isChildSkill": true,
+    "isStarterSkill": false,
+    "parentSkills": [
+      "first_aid",
+      "proc_harmony"
+    ],
+    "basePower": 0.0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 1100,
+    "costType": "mana",
+    "costAmount": 16,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "targets": "single_ally",
+        "buff": "protection",
+        "duration": 5,
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "targets": "self",
+        "buff": "regen",
+        "duration": 4,
+        "chance": 1.0
+      }
+    ],
+    "scalingFactors": {
+      "harmony": 0.7,
+      "endurance": 0.3
+    },
+    "masteryUnlockAt": 300,
+    "tags": [
+      "spirit",
+      "holy"
+    ]
+  },
+  {
+    "id": "corrupting_hex",
+    "name": "Corrupting Hex",
+    "description": "A deepened curse that eats at an enemy's conviction alongside their body, crumbling their fighting spirit.",
+    "category": "CONTROL",
+    "isChildSkill": true,
+    "isStarterSkill": false,
+    "parentSkills": [
+      "hex",
+      "proc_lullaby"
+    ],
+    "basePower": 0.0,
+    "baseHitChance": 0.82,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 1200,
+    "costType": "mana",
+    "costAmount": 20,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_debuff",
+        "targets": "single_enemy",
+        "debuff": "cursed",
+        "duration": 6,
+        "chance": 0.9
+      },
+      {
+        "type": "apply_debuff",
+        "targets": "single_enemy",
+        "debuff": "conviction_drain",
+        "duration": 5,
+        "chance": 0.8
+      }
+    ],
+    "scalingFactors": {
+      "harmony": 0.7,
+      "conviction": 0.3
+    },
+    "masteryUnlockAt": 400,
+    "tags": [
+      "spirit",
+      "nature"
+    ]
+  },
+  {
+    "id": "totemic_aura",
+    "name": "Totemic Aura",
+    "description": "Channels ancestral protection outward, wrapping the entire party in a spiritual ward.",
+    "category": "BUFF",
+    "isChildSkill": true,
+    "isStarterSkill": false,
+    "parentSkills": [
+      "ward",
+      "shout"
+    ],
+    "basePower": 0.0,
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 1300,
+    "costType": "mana",
+    "costAmount": 22,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "targets": "all_allies",
+        "buff": "protection",
+        "duration": 5,
+        "chance": 1.0
+      },
+      {
+        "type": "apply_buff",
+        "targets": "all_allies",
+        "buff": "harmony",
+        "duration": 5,
+        "chance": 1.0
+      }
+    ],
+    "scalingFactors": {
+      "harmony": 0.6,
+      "endurance": 0.4
+    },
+    "masteryUnlockAt": 400,
+    "tags": [
+      "spirit",
+      "nature"
+    ]
+  },
+  {
+    "id": "spirit_drain",
+    "name": "Spirit Drain",
+    "description": "Siphons the vital essence from an enemy, dealing damage and feeding the shaman's own reserves.",
+    "category": "DAMAGE_MAGIC",
+    "isChildSkill": true,
+    "isStarterSkill": false,
+    "parentSkills": [
+      "spirit_tap",
+      "hex"
+    ],
+    "basePower": 1.1,
+    "baseHitChance": 0.85,
+    "critChance": 0.06,
+    "critMultiplier": 1.5,
+    "delay": 1100,
+    "costType": "mana",
+    "costAmount": 18,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "targets": "single_enemy",
+        "scalesBy": "basePower",
+        "damageType": "arcane",
+        "magnitude": 1.1
+      },
+      {
+        "type": "restore_resource",
+        "targets": "self",
+        "resource": "mana",
+        "magnitude": 0.15,
+        "chance": 0.8
+      }
+    ],
+    "scalingFactors": {
+      "harmony": 0.6,
+      "ambition": 0.4
+    },
+    "masteryUnlockAt": 400,
+    "tags": [
+      "spirit",
+      "arcane"
+    ]
+  },
+  {
+    "id": "ancestral_shroud",
+    "name": "Ancestral Shroud",
+    "description": "Calls down the weight of generations upon all enemies, sapping their strength and clouding their purpose.",
+    "category": "CONTROL",
+    "isChildSkill": true,
+    "isStarterSkill": false,
+    "parentSkills": [
+      "corrupting_hex",
+      "sense"
+    ],
+    "basePower": 0.0,
+    "baseHitChance": 0.8,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 1500,
+    "costType": "mana",
+    "costAmount": 26,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_debuff",
+        "targets": "all_enemies",
+        "debuff": "weaken",
+        "duration": 5,
+        "chance": 0.8
+      },
+      {
+        "type": "apply_debuff",
+        "targets": "all_enemies",
+        "debuff": "dazed",
+        "duration": 3,
+        "chance": 0.7
+      }
+    ],
+    "scalingFactors": {
+      "harmony": 0.75,
+      "conviction": 0.25
+    },
+    "masteryUnlockAt": 500,
+    "tags": [
+      "spirit",
+      "nature"
+    ]
+  },
+  {
+    "id": "plague_wind",
+    "name": "Plague Wind",
+    "description": "A foul spirit-wind sweeps the field, delivering necrotic damage and leaving survivors sluggish and cursed.",
+    "category": "DAMAGE_AOE",
+    "isChildSkill": true,
+    "isStarterSkill": false,
+    "parentSkills": [
+      "ancestral_shroud",
+      "proc_melody"
+    ],
+    "basePower": 1.1,
+    "baseHitChance": 0.8,
+    "critChance": 0.07,
+    "critMultiplier": 1.5,
+    "delay": 1600,
+    "costType": "mana",
+    "costAmount": 32,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "targets": "all_enemies",
+        "scalesBy": "basePower",
+        "damageType": "nature",
+        "magnitude": 1.1
+      },
+      {
+        "type": "apply_debuff",
+        "targets": "all_enemies",
+        "debuff": "slow",
+        "duration": 4,
+        "chance": 0.75
+      },
+      {
+        "type": "apply_debuff",
+        "targets": "all_enemies",
+        "debuff": "cursed",
+        "duration": 3,
+        "chance": 0.6
+      }
+    ],
+    "scalingFactors": {
+      "harmony": 0.6,
+      "ambition": 0.4
+    },
+    "masteryUnlockAt": 550,
+    "tags": [
+      "spirit",
+      "nature"
+    ]
+  },
+  {
+    "id": "spirit_storm",
+    "name": "Spirit Storm",
+    "description": "Ancestral fury made manifest \u2014 a storm of spiritual energy that scours the battlefield.",
+    "category": "DAMAGE_AOE",
+    "isChildSkill": true,
+    "isStarterSkill": false,
+    "parentSkills": [
+      "spirit_drain",
+      "totemic_aura"
+    ],
+    "basePower": 1.5,
+    "baseHitChance": 0.82,
+    "critChance": 0.09,
+    "critMultiplier": 1.7,
+    "delay": 1700,
+    "costType": "mana",
+    "costAmount": 36,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "targets": "all_enemies",
+        "scalesBy": "basePower",
+        "damageType": "arcane",
+        "magnitude": 1.5
+      },
+      {
+        "type": "apply_debuff",
+        "targets": "all_enemies",
+        "debuff": "weaken",
+        "duration": 3,
+        "chance": 0.65
+      }
+    ],
+    "scalingFactors": {
+      "harmony": 0.55,
+      "ambition": 0.35,
+      "conviction": 0.1
+    },
+    "masteryUnlockAt": 600,
+    "tags": [
+      "spirit",
+      "arcane",
+      "nature"
+    ]
+  },
+  {
+    "id": "soul_shatter",
+    "name": "Soul Shatter",
+    "description": "The shaman's darkest invocation \u2014 shatters the spiritual coherence of all enemies, draining their ambition and harmony simultaneously.",
+    "category": "CONTROL",
+    "isChildSkill": true,
+    "isStarterSkill": false,
+    "parentSkills": [
+      "ancestral_shroud",
+      "corrupting_hex"
+    ],
+    "basePower": 0.0,
+    "baseHitChance": 0.75,
+    "critChance": 0.0,
+    "critMultiplier": 1.0,
+    "delay": 1900,
+    "costType": "mana",
+    "costAmount": 40,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_debuff",
+        "targets": "all_enemies",
+        "debuff": "harmony_discord",
+        "duration": 6,
+        "chance": 0.8
+      },
+      {
+        "type": "apply_debuff",
+        "targets": "all_enemies",
+        "debuff": "ambition_falter",
+        "duration": 6,
+        "chance": 0.8
+      },
+      {
+        "type": "apply_debuff",
+        "targets": "all_enemies",
+        "debuff": "cursed",
+        "duration": 4,
+        "chance": 0.7
+      }
+    ],
+    "scalingFactors": {
+      "harmony": 0.9,
+      "conviction": 0.1
+    },
+    "masteryUnlockAt": 700,
+    "tags": [
+      "spirit",
+      "arcane"
+    ]
   }
 ]
