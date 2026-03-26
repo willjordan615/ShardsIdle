@@ -1065,13 +1065,22 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
 }
 
 .stat-tooltip, .gear-tooltip, .skill-tooltip {
-    word-wrap:break-word !important;
-    white-space:normal !important;
-    overflow-wrap:break-word !important;
+    background: var(--window-base);
+    border: 1px solid var(--gold-border);
+    border-radius: var(--radius-md);
+    padding: 0.85rem 1rem;
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 0.82rem;
+    line-height: 1.55;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.75), 0 0 0 1px rgba(212,175,55,0.12);
+    word-wrap: break-word !important;
+    white-space: normal !important;
+    overflow-wrap: break-word !important;
 }
 .stat-tooltip div, .gear-tooltip div, .skill-tooltip div {
-    word-wrap:break-word; overflow-wrap:break-word;
-    display:block; width:100%;
+    word-wrap: break-word; overflow-wrap: break-word;
+    display: block; width: 100%;
 }
 
 /* ============================================================

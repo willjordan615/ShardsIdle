@@ -5,39 +5,31 @@ function createGearTooltip(item) {
     const tooltip = document.createElement('div');
     tooltip.className = 'gear-tooltip';
     tooltip.style.cssText = `
-        position: fixed; 
-        background: #16213e; 
-        border: 2px solid #d4af37; 
-        border-radius: 4px; 
-        padding: 0.75rem; 
-        max-width: 300px; 
-        z-index: 10000; 
-        color: #d4af37; 
-        font-family: 'Courier New', monospace; 
-        font-size: 0.85rem; 
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.8); 
-        pointer-events: none; 
-        word-wrap: break-word; 
-        white-space: normal; 
-        overflow-wrap: break-word;
+        position: fixed;
+        z-index: 10000;
+        max-width: 320px;
+        min-width: 200px;
+        width: max-content;
+        pointer-events: none;
+        box-sizing: border-box;
     `;
     
-    let content = `<div style="font-weight: bold; margin-bottom: 0.5rem; font-size: 0.95rem;">${item.name}</div>`;
+    let content = `<div style="font-weight: 700; margin-bottom: 0.4rem; font-size: 0.9rem; color: var(--gold); font-family: var(--font-display); letter-spacing: 0.04em;">${item.name}</div>`;
     
     // Item type and tier
-    content += `<div style="color: #aaa; font-size: 0.8rem; margin-bottom: 0.5rem;">`;
+    content += `<div style="color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 0.5rem;">`;
     content += `${item.type.toUpperCase()}`;
     if (item.tier !== undefined) content += ` • Tier ${item.tier}`;
     content += `</div>`;
     
     // Description
     if (item.description) {
-        content += `<div style="color: #aaa; margin-bottom: 0.5rem; font-size: 0.8rem;">${item.description}</div>`;
+        content += `<div style="color: var(--text-secondary); margin-bottom: 0.5rem; font-size: 0.8rem;">${item.description}</div>`;
     }
     
     // Damage
     if (item.dmg1) {
-        content += `<div style="color: #ff6b6b; margin-top: 0.5rem;">`;
+        content += `<div style="color: #ff7070; margin-top: 0.5rem;">`;
         content += `<strong>Damage:</strong> ${item.dmg1} ${item.dmg_type_1}`;
         if (item.dmg2) content += ` + ${item.dmg2} ${item.dmg_type_2}`;
         content += `</div>`;
@@ -45,20 +37,20 @@ function createGearTooltip(item) {
     
     // Delay
     if (item.delay !== undefined) {
-        content += `<div style="color: #4a9eff;"><strong>Delay:</strong> ${item.delay}ms</div>`;
+        content += `<div style="color: #5ab4ff;"><strong>Delay:</strong> ${item.delay}ms</div>`;
     }
     
     // Armor/Defense
     if (item.armor) {
-        content += `<div style="color: #4eff7f;"><strong>Armor:</strong> ${item.armor}</div>`;
+        content += `<div style="color: #4cd964;"><strong>Armor:</strong> ${item.armor}</div>`;
     }
     
     // Evasion
     if (item.phys_ev) {
-        content += `<div style="color: #4eff7f;"><strong>Phys EV:</strong> ${item.phys_ev}</div>`;
+        content += `<div style="color: #4cd964;"><strong>Phys EV:</strong> ${item.phys_ev}</div>`;
     }
     if (item.mag_ev) {
-        content += `<div style="color: #4eff7f;"><strong>Mag EV:</strong> ${item.mag_ev}</div>`;
+        content += `<div style="color: #4cd964;"><strong>Mag EV:</strong> ${item.mag_ev}</div>`;
     }
     
     // Stat bonuses
@@ -71,14 +63,14 @@ function createGearTooltip(item) {
     if (item.har) statBonuses.push(`+${item.har} HAR`);
     
     if (statBonuses.length > 0) {
-        content += `<div style="color: #d4af37; margin-top: 0.5rem;"><strong>Bonuses:</strong><br>${statBonuses.join(', ')}</div>`;
+        content += `<div style="color: var(--gold); margin-top: 0.5rem;"><strong>Bonuses:</strong><br>${statBonuses.join(', ')}</div>`;
     }
     
     // On-hit effects
     if (item.onhit_skillid) {
         const skill = gameData.skills.find(s => s.id === item.onhit_skillid);
         if (skill) {
-            content += `<div style="color: #ff9999; margin-top: 0.5rem;"><strong>On Hit:</strong> ${skill.name}`;
+            content += `<div style="color: #ffaaaa; margin-top: 0.5rem;"><strong>On Hit:</strong> ${skill.name}`;
             if (item.onhit_chance) content += ` (${(item.onhit_chance * 100).toFixed(0)}%)`;
             content += `</div>`;
         }
@@ -97,14 +89,14 @@ function createGearTooltip(item) {
     }
     
     if (procEffects.length > 0) {
-        content += `<div style="color: #ff9999; margin-top: 0.5rem;"><strong>Procs:</strong> ${procEffects.join(', ')}</div>`;
+        content += `<div style="color: #ffaaaa; margin-top: 0.5rem;"><strong>Procs:</strong> ${procEffects.join(', ')}</div>`;
     }
     
     // Effect skill (for consumables)
     if (item.effect_skillid) {
         const skill = gameData.skills.find(s => s.id === item.effect_skillid);
         if (skill) {
-            content += `<div style="color: #ff9999; margin-top: 0.5rem;"><strong>Effect:</strong> ${skill.name}`;
+            content += `<div style="color: #ffaaaa; margin-top: 0.5rem;"><strong>Effect:</strong> ${skill.name}`;
             if (item.effect_ct) content += ` (CT: ${item.effect_ct})`;
             content += `</div>`;
         }

@@ -61,28 +61,18 @@ function createStatTooltip(statKey) {
     tooltip.className = 'stat-tooltip';
     tooltip.style.cssText = `
         position: fixed;
-        background: #16213e;
-        border: 2px solid #d4af37;
-        border-radius: 4px;
-        padding: 1rem;
-        max-width: 400px;
-        width: auto;
         z-index: 10000;
-        color: #d4af37;
-        font-family: 'Courier New', monospace;
-        font-size: 0.85rem;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+        max-width: 460px;
+        min-width: 280px;
+        width: max-content;
         pointer-events: none;
-        word-wrap: break-word;
-        white-space: normal;
-        overflow-wrap: break-word;
         box-sizing: border-box;
     `;
     
-    let content = `<div style="font-weight: bold; margin-bottom: 0.75rem; font-size: 1rem; color: #d4af37;">${stat.name}</div>`;
-    content += `<div style="color: #aaa; margin-bottom: 0.75rem; font-size: 0.85rem;">${stat.description}</div>`;
-    content += `<div style="color: #4eff7f; font-weight: bold; margin-bottom: 0.5rem;">Effects:</div>`;
-    content += `<div style="color: #888; line-height: 1.5;">`;
+    let content = `<div style="font-weight: 700; margin-bottom: 0.6rem; font-size: 0.9rem; color: var(--gold); font-family: var(--font-display); letter-spacing: 0.05em;">${stat.name}</div>`;
+    content += `<div style="color: var(--text-secondary); margin-bottom: 0.6rem; font-size: 0.8rem; line-height: 1.5;">${stat.description}</div>`;
+    content += `<div style="color: var(--gold-dim); font-weight: 700; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.4rem;">Effects</div>`;
+    content += `<div style="color: var(--text-secondary); line-height: 1.6; font-size: 0.8rem;">`;
     stat.effects.forEach(effect => {
         content += `<div>${effect}</div>`;
     });
