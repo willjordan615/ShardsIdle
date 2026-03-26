@@ -1110,7 +1110,7 @@ async function renderCharacterSkills(character) {
                     : [];
                 const hintHTML = comboHints.length > 0
                     ? `<div style="margin-top:0.5rem; font-size:0.78em; color:#c8a84b; border-top:1px solid rgba(200,168,75,0.25); padding-top:0.4rem;">
-                           ⚗ May combine with a ${comboHints.join(' or ')} skill
+                           ⚗ May combine with: ${comboHints.join(', ')}
                        </div>`
                     : '';
 
