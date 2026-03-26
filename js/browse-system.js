@@ -624,6 +624,216 @@ async function loadPublicCompanions(page) {
 // ── Bot companion selection: rendering and pagination ────────────────────────
 // Party mutation (addBotToParty, removeBotFromParty) stays in combat-system.js.
 
+
+// ---------------------------------------------------------------------------
+// Procedural bot generator
+// Fills window.gameData.bots above the static cap (level 12) up to MAX_BOT_LEVEL.
+// Called lazily from renderBotsSelection — runs once per session, then no-ops.
+// ---------------------------------------------------------------------------
+
+const MAX_BOT_LEVEL = 100;
+const BOT_STATIC_CAP = 12; // highest level in bots.json
+let _botsGenerated = false;
+
+// Deterministic "random" from a seed so the same level always yields the same bot.
+function _botRng(seed) {
+    let s = seed;
+    return function() {
+        s = (s * 1664525 + 1013904223) & 0xffffffff;
+        return (s >>> 0) / 0xffffffff;
+    };
+}
+
+function _generateBots() {
+    if (_botsGenerated || !window.gameData || !window.gameData.bots) return;
+    _botsGenerated = true;
+
+    const skills  = window.gameData.skills  || [];
+    const gear    = window.gameData.gear    || [];
+    const races   = window.gameData.races   || [];
+
+    // Role definitions -------------------------------------------------------
+
+    const ROLES = [
+        {
+            role: 'Defender',
+            race: 'dwarf',
+            weaponTypes: ['hammer', 'mace'],
+            // [primary skill pool, secondary skill pool]
+            skillPools: [
+                ['block', 'stone_skin', 'arcane_barrier', 'mana_shield', 'footwork', 'spell_reflection'],
+                ['provoke', 'goad', 'jeer', 'intimidate', 'incite', 'infuriate', 'shove', 'misdirect'],
+            ],
+            // stat weights must sum to 1.0
+            statWeights: { conviction: 0.20, endurance: 0.40, ambition: 0.15, harmony: 0.25 },
+        },
+        {
+            role: 'Bruiser',
+            race: 'orc',
+            weaponTypes: ['axe', 'sword', 'hammer'],
+            skillPools: [
+                ['basic_attack', 'strong_attack', 'lunge', 'slash', 'cleave', 'wild_swing'],
+                ['shout', 'buff_strength', 'shove', 'focus', 'battle_cry', 'reckless_strike'],
+            ],
+            statWeights: { conviction: 0.38, endurance: 0.30, ambition: 0.22, harmony: 0.10 },
+        },
+        {
+            role: 'Assassin',
+            race: 'halfling',
+            weaponTypes: ['dagger', 'handaxe'],
+            skillPools: [
+                ['aim', 'weak_point', 'skirmish', 'lunge', 'singe', 'frostbite'],
+                ['footwork', 'misdirect', 'stalk', 'shadow_step', 'call_target', 'shove'],
+            ],
+            statWeights: { conviction: 0.25, endurance: 0.18, ambition: 0.45, harmony: 0.12 },
+        },
+        {
+            role: 'Mage',
+            race: 'human',
+            weaponTypes: ['wand', 'tome'],
+            skillPools: [
+                ['channel', 'shock', 'produce_flame', 'chill', 'skill_fireball', 'skill_lightning'],
+                ['focus', 'attunement', 'arcane_barrier', 'buff_all_stats', 'thunderclap', 'frost_slide'],
+            ],
+            statWeights: { conviction: 0.30, endurance: 0.12, ambition: 0.22, harmony: 0.36 },
+        },
+        {
+            role: 'Support',
+            race: 'human',
+            weaponTypes: ['scepter'],
+            skillPools: [
+                ['first_aid', 'mend', 'holy_light', 'nature_touch', 'heal_major', 'healing_light'],
+                ['shout', 'attunement', 'buff_all_stats', 'restore_mana_minor', 'regrowth', 'focused_rest'],
+            ],
+            statWeights: { conviction: 0.15, endurance: 0.22, ambition: 0.18, harmony: 0.45 },
+        },
+        {
+            role: 'Utility',
+            race: 'dwarf',
+            weaponTypes: ['totem', 'bell', 'flute'],
+            skillPools: [
+                ['rest', 'focused_rest', 'attunement', 'mana_cycle', 'iron_will', 'restore_stam_minor'],
+                ['buff_speed', 'buff_defense', 'buff_all_stats', 'shout', 'sense', 'focus'],
+            ],
+            statWeights: { conviction: 0.20, endurance: 0.28, ambition: 0.22, harmony: 0.30 },
+        },
+    ];
+
+    const NAMES = {
+        Defender: ['Aldric','Brynn','Oswin','Gareth','Mira','Holt','Edda','Vera','Torvin','Bran'],
+        Bruiser:  ['Fen','Grolt','Serak','Durn','Krag','Ulf','Barta','Norg','Threx','Vok'],
+        Assassin: ['Pip','Nyx','Varyn','Sable','Rhen','Cass','Dusk','Lira','Siv','Zynn'],
+        Mage:     ['Wren','Vesper','Calder','Lyss','Mael','Cinder','Tova','Oran','Brix','Fael'],
+        Support:  ['Edda','Thessa','Linna','Sera','Clem','Auri','Mira','Bel','Tahl','Wyn'],
+        Utility:  ['Cobb','Darro','Fynn','Seld','Mott','Bwick','Arlo','Nessa','Pip','Harn'],
+    };
+
+    const validSkillIds = new Set(skills.map(s => s.id));
+
+    function pickSkill(pool, rng) {
+        // Walk the pool in order, return first one that exists in game data
+        const valid = pool.filter(id => validSkillIds.has(id));
+        if (!valid.length) return null;
+        return valid[Math.floor(rng() * valid.length)];
+    }
+
+    function pickWeapon(weaponTypes, tier, rng) {
+        const candidates = gear.filter(i =>
+            i.slot_id1 === 'mainHand' &&
+            weaponTypes.includes(i.type) &&
+            (i.tier === tier || i.tier === tier - 1)
+        );
+        if (!candidates.length) {
+            // fallback: any tier for this weapon type
+            const fallback = gear.filter(i => i.slot_id1 === 'mainHand' && weaponTypes.includes(i.type) && (i.tier || 0) >= 0);
+            if (!fallback.length) return null;
+            return fallback[Math.floor(rng() * fallback.length)].id;
+        }
+        return candidates[Math.floor(rng() * candidates.length)].id;
+    }
+
+    function getIntrinsicSkill(raceName) {
+        const race = races.find(r => r.id === raceName);
+        if (!race) return null;
+        const intrinsics = race.intrinsicSkills || [];
+        return intrinsics[0] || null;
+    }
+
+    const generated = [];
+
+    for (let level = BOT_STATIC_CAP + 1; level <= MAX_BOT_LEVEL; level++) {
+        // 1-3 bots per level, role mix varies
+        const rng = _botRng(level * 7919);
+        const botsThisLevel = 1 + Math.floor(rng() * 3); // 1, 2, or 3
+        const usedRoles = new Set();
+
+        for (let i = 0; i < botsThisLevel; i++) {
+            const rng2 = _botRng(level * 7919 + i * 131);
+
+            // Pick a role not already used at this level
+            const available = ROLES.filter(r => !usedRoles.has(r.role));
+            if (!available.length) break;
+            const roleDef = available[Math.floor(rng2() * available.length)];
+            usedRoles.add(roleDef.role);
+
+            // Stats
+            const budget = 220 + 35 * (level - 1);
+            const rng3 = _botRng(level * 2053 + i * 97);
+            const jitter = () => Math.floor((rng3() - 0.5) * 20); // ±10
+            const raw = {
+                conviction: Math.round(budget * roleDef.statWeights.conviction) + jitter(),
+                endurance:  Math.round(budget * roleDef.statWeights.endurance)  + jitter(),
+                ambition:   Math.round(budget * roleDef.statWeights.ambition)   + jitter(),
+                harmony:    Math.round(budget * roleDef.statWeights.harmony)    + jitter(),
+            };
+            // Clamp negatives, re-normalise to exact budget
+            Object.keys(raw).forEach(k => { if (raw[k] < 10) raw[k] = 10; });
+            const actual = Object.values(raw).reduce((a, b) => a + b, 0);
+            const diff = budget - actual;
+            raw.endurance += diff; // absorb rounding error into endurance
+
+            // Skills
+            const rng4 = _botRng(level * 1301 + i * 61);
+            const skillLevel = Math.min(10, Math.floor(level / 5) + 1);
+            const s1id = pickSkill(roleDef.skillPools[0], rng4);
+            const rng5 = _botRng(level * 1301 + i * 61 + 1);
+            const s2id = pickSkill(roleDef.skillPools[1].filter(id => id !== s1id), rng5);
+
+            const intrinsicId = getIntrinsicSkill(roleDef.race);
+            const botSkills = [];
+            if (intrinsicId) {
+                botSkills.push({ skillID: intrinsicId, learned: true, intrinsic: true, skillXP: 0, skillLevel: 1, usageCount: 0 });
+            }
+            if (s1id) botSkills.push({ skillID: s1id, learned: true, skillXP: skillLevel * 80, skillLevel, usageCount: skillLevel * 5 });
+            if (s2id) botSkills.push({ skillID: s2id, learned: true, skillXP: skillLevel * 60, skillLevel, usageCount: skillLevel * 4 });
+
+            // Equipment — tier 0–8 over levels 1–100, each tier spans ~12 levels
+            const tier = Math.min(8, Math.floor((level - 1) / 12));
+            const rng6 = _botRng(level * 541 + i * 43);
+            const weaponId = pickWeapon(roleDef.weaponTypes, tier, rng6);
+
+            // Name — deterministic per role+level
+            const namePool = NAMES[roleDef.role];
+            const name = namePool[(level + i) % namePool.length];
+
+            generated.push({
+                characterID: `bot_gen_${roleDef.role.toLowerCase()}_${level}_${i}`,
+                characterName: name,
+                role: roleDef.role,
+                level,
+                race: roleDef.race,
+                stats: raw,
+                skills: botSkills,
+                equipment: weaponId ? { mainHand: weaponId } : {},
+                consumables: {},
+            });
+        }
+    }
+
+    window.gameData.bots = window.gameData.bots.concat(generated);
+    console.log(`[bots] Generated ${generated.length} procedural bots (levels ${BOT_STATIC_CAP + 1}–${MAX_BOT_LEVEL})`);
+}
+
 // Bot selection pagination state
 const _botsPaging = { page: 1, totalPages: 1 };
 
@@ -651,6 +861,9 @@ function renderBotsSelection(page) {
         !m.characterID?.startsWith('bot_') && !m.characterID?.startsWith('import_')
     );
     const playerLevel = playerChar?.level || 1;
+
+    // Generate procedural bots above the static cap if not yet done
+    _generateBots();
 
     // Show bots at or below player level, sorted strongest-first
     const eligibleBots = window.gameData.bots
