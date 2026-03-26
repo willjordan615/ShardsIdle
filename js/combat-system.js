@@ -11,7 +11,7 @@ if (typeof window.currentState === 'undefined') {
         detailCharacterId: null,
         // Idle loop state
         idleActive: false,       // true while the auto-restart loop is running
-        pendingLoopExit: false,  // set by "Return from Challenge" ΓÇö exits after current combat
+        pendingLoopExit: false,  // set by "Return from Challenge" — exits after current combat
         // Character creation state (used by character-management.js)
         selectedRace: null,
         selectedSkills: [],
@@ -179,7 +179,7 @@ async function renderPartyFormation() {
     
     if (nameEl) nameEl.textContent = challenge.name;
     if (metaEl) metaEl.textContent = 
-        `Difficulty ${challenge.difficulty} ΓÇó Recommended Level ${challenge.recommendedLevel}`;
+        `Difficulty ${challenge.difficulty} · Recommended Level ${challenge.recommendedLevel}`;
     
     renderCurrentParty();
     renderBotsSelection();
@@ -202,7 +202,7 @@ function renderCurrentParty() {
         memberEl.innerHTML = `
             <div class="party-member-info">
                 <div class="party-member-name">${memberName}</div>
-                <div class="party-member-stats">Level ${member.level} ΓÇó HP: ${formatNumber(derivedStats.hp)}</div>
+                <div class="party-member-stats">Level ${member.level} &middot; HP: ${formatNumber(derivedStats.hp)}</div>
             </div>
             ${idx > 0 ? `<button onclick="removeFromParty(${idx})" class="danger" style="padding: 0.5rem 1rem;">Remove</button>` : ''}
         `;
@@ -386,7 +386,7 @@ async function addPublicCompanion(shareCode, characterName, level, race) {
  */
 async function startCombat(forcedChallengeId) {
     if (window._combatStartInFlight) {
-        console.warn('[COMBAT] startCombat called while request already in flight ΓÇö ignored.');
+        console.warn('[COMBAT] startCombat called while request already in flight — ignored.');
         return;
     }
     window._combatStartInFlight = true;
@@ -451,7 +451,7 @@ async function startCombat(forcedChallengeId) {
         console.log('[COMBAT] Server response received. Result:', combatResult.result);
 
         // If the player navigated away during the idle loop, don't drag them back to
-        // the combat screen ΓÇö just run the log silently and let the toast notify them.
+        // the combat screen — just run the log silently and let the toast notify them.
         const silent = window._silentCombatRestart;
         window._silentCombatRestart = false;
 
@@ -536,11 +536,11 @@ function requestLoopExit() {
     currentState.pendingLoopExit = true;
     updateChallengeStatusBanner();
     if (typeof _updateMediaControls === 'function') _updateMediaControls();
-    console.log('[IDLE] Loop exit requested ΓÇö will stop after current combat.');
+    console.log('[IDLE] Loop exit requested — will stop after current combat.');
 }
 
 /**
- * Cancel a pending loop exit ΓÇö restores the active idle state.
+ * Cancel a pending loop exit — restores the active idle state.
  * Called from the "Γ£ò Cancel Stop" button in the banner.
  */
 function cancelLoopExit() {
@@ -548,5 +548,5 @@ function cancelLoopExit() {
     currentState.pendingLoopExit = false;
     updateChallengeStatusBanner();
     if (typeof _updateMediaControls === 'function') _updateMediaControls();
-    console.log('[IDLE] Loop exit cancelled ΓÇö continuing idle loop.');
+    console.log('[IDLE] Loop exit cancelled — continuing idle loop.');
 }

@@ -7,81 +7,86 @@ Two-part fix for a player whose character had `hunters_mark` saved in their skil
 
 **Backend** (`database.js`): Already correct from a previous session — `SKILL_ID_MIGRATIONS`, `migrateSkillIds()`, and `patchCharacterSkills()` were all present and wired into both `getCharacter` and `getAllCharacters`. The migration fires on character load, remaps the stale ID, and writes back to the DB. Server needed a restart to take effect.
 
-**Frontend** (`character-management.js`): The "graceful fallback" from the previous session handoff had not actually landed in the code. The corrupt-data `else` branch still showed a red "Unknown Skill" dead end with no action available. Fixed to show "Skill Unavailable" in grey with a working Equip Skill button. Bad ID logged to console only.
+**Frontend** (`character-management.js`): The "graceful fallback" from the previous session handoff had not actually landed in the code. Fixed to show "Skill Unavailable" in grey with a working Equip Skill button instead of a red dead-end. Bad ID logged to console only.
 
 If this pattern recurs in future: check `SKILL_ID_MIGRATIONS` in `database.js` first, then verify the frontend fallback branch (~line 1151 in `character-management.js`).
 
 ### Minor Fix — Combo Hint Wording
-Combo hints were rendering as "May combine with a utility or defensive or fire or cold..." — joining with ` or ` and wrapping in an awkward sentence. Changed to "May combine with: utility, defensive, fire, cold" — comma-separated, no filler grammar. File: `browse-system.js`.
+Combo hints were rendering as "May combine with a utility or defensive or fire or cold..." Changed to "May combine with: utility, defensive, fire, cold" — comma-separated. File: `browse-system.js`.
 
 ### Feature — Procedural Bot Generation
-Bots above the static cap (level 12, defined in `bots.json`) are now generated procedurally at runtime. Lives entirely in `browse-system.js`.
+Bots above the static cap (level 12) are now generated procedurally at runtime in `browse-system.js`. Generated once per session on first `renderBotsSelection` call, then cached.
 
 **Key constants:**
 - `MAX_BOT_LEVEL = 100`
 - `BOT_STATIC_CAP = 12`
-- `_botsGenerated` flag — runs once per session on first `renderBotsSelection` call, then no-ops
+- `_botsGenerated` — session flag, prevents re-running
 - `_botSessionSeed = Date.now() & 0xffffffff` — XORed into all RNG seeds so bots vary per session
 
 **Generation logic:**
 - 1–3 bots per level, non-repeating roles at each level
-- Stat budget: `220 + 35 * (level - 1)` distributed by role profile with ±10 jitter, absorbed into endurance
-- Equipment: role→weapon type map, tier = `Math.min(8, Math.floor((level - 1) / 12))` — tier 8 not until ~level 97
+- Stat budget: `220 + 35 * (level - 1)` by role profile with ±10 jitter, absorbed into endurance
+- Equipment tier: `Math.min(8, Math.floor((level - 1) / 12))` — tier 8 not until ~level 97
 - Skill level: `Math.min(10, Math.floor(level / 10) + 1)` — hits cap at level 90
-- Names: fixed pool per role, rotated by `(level + slotIndex) % poolSize` — vary per session due to seed
-- `_botRng(seed)` — LCG seeded deterministically per level+slot, then XORed with session seed
 
-**Design intent:** High-level bots are distinctly weaker than players. Naturalistic builds, not optimised. A level 90 bot has decent gear and appropriate skills but will not keep up with a well-built player character.
+**Design intent:** High-level bots are naturalistic and noticeably weaker than well-built players. Not optimised.
 
 ### Feature — Bot Skill Depth Thresholds
-Bot skill pools restructured from flat arrays to tiered `{ minLevel, skills[] }` objects. `pickSkill()` collects all skills from every qualifying tier and picks randomly across them — so a high-level bot can still roll a shallow skill, but the pool expands as they level.
+Bot skill pools restructured from flat arrays to tiered `{ minLevel, skills[] }` objects. `pickSkill()` collects all qualifying tiers and picks randomly — pool expands as bots level.
 
 Depth thresholds:
 - Level 1–12: static `bots.json` (d1–2 only)
 - Level 13–19: d1–2
 - Level 20–39: d1–3
 - Level 40–100: d1–4
-- Never: d5+ (bots never reach depth 5 or above)
+- Never: d5+
 
-Each role has `primary` and `secondary` pool objects. Secondary slot explicitly excludes whatever was picked for the primary slot.
+Each role has `primary` and `secondary` pool objects. Secondary explicitly excludes the primary pick.
 
 ### Documentation — Skill Depth Reference
-Two new files added to `Documentation/`:
+Two new files in `Documentation/`:
 
-**`skill_depth_reference.md`** — Full reference for AI-assisted content generation. Contains:
-- Explanation of what combo-tree depth means
-- Enemy skill pool guidelines by challenge level range
-- Bot generation thresholds
-- Archetype-to-category mappings (Defender→DEFENSE/CONTROL, Mage→DAMAGE_MAGIC/AOE, etc.)
-- Complete skill table: all 233 non-intrinsic, non-proc skills with depth, category, group, and parents
+**`skill_depth_reference.md`** — Reference for AI content generation: depth explanation, enemy skill pool guidelines by challenge level, bot thresholds, archetype-to-category mappings, full table of 233 skills with depth/category/parents.
 
-**`generate_skill_depth_reference.py`** — Script that regenerates the above from `skills.json`. Run from project root:
+**`generate_skill_depth_reference.py`** — Regenerates the above from `skills.json`. Run from project root:
 ```
 python3 Documentation/generate_skill_depth_reference.py
 ```
-Re-run whenever new skills are added. The reference file is static — it does not update automatically.
+Re-run whenever new skills are added. Static file, does not auto-update.
 
 ### Feature — Server Status Indicator
-Persistent green/yellow/red dot in the header top bar, left of the Settings button. Polls `/api/health` every 30 seconds. Green = online (<500ms), Yellow = slow (≥500ms), Red = offline/timeout (5s).
+Persistent green/yellow/red dot in the header top bar, left of Settings. Polls `/api/health` every 30s. Green = online (<500ms), Yellow = slow (≥500ms), Red = offline/timeout (5s).
 
-**Files changed:**
-- `index.html` — added `#serverStatusIndicator` with dot and label to `#headerTopBar`
+- `index.html` — `#serverStatusIndicator` added to `#headerTopBar`
 - `styles.css` — `.server-dot`, `.server-label` with three state classes
-- `game-data.js` — self-contained polling IIFE appended at end of file; uses `BACKEND_URL` already defined there
-
-**Backend** (`server.js`): Health endpoint updated to ping the DB before responding, so latency reflects the full stack (Node + SQLite), not just the Node process. Railway infrastructure latency (slow volumes, DB issues) will now show as yellow rather than a false green.
+- `game-data.js` — polling IIFE at end of file
+- `server.js` — health endpoint now does `SELECT 1` against the DB before responding, so latency reflects the full stack. Railway volume/DB slowness will show yellow instead of false green.
 
 ### Bug Fix — gear-tooltip.js Syntax Error
-Stray `});` on line 195 of `gear-tooltip.js` — an extra closing bracket after the `touchmove` event listener in `addGearCardTooltip()`. Pre-existing bug, not introduced this session. Removed. Version bumped to v=5 in `index.html`.
+Stray `});` after the `touchmove` listener in `addGearCardTooltip()`. Pre-existing, removed. Version bumped to v=5.
 
-### Critical Bug Fix — combat-system.js Duplicate Declarations
-`combat-system.js` was a stale full copy of `browse-system.js` — it contained every declaration (`_browsePagination`, `_botsPaging`, `BOT_PAGE_SIZE`, all browse/bot functions) that also exists in `browse-system.js`. Both files were being loaded by `index.html`, causing duplicate `const`/`let` declarations in the same scope and breaking the entire frontend.
+### Critical Bug Fix — combat-system.js Restored
+**What happened:** At some prior session, `browse-system.js` was created as a split-out of `combat-system.js`, but `combat-system.js` was never cleaned up — it became a stale duplicate of browse-system.js. Later it was overwritten entirely with browse-system.js content and committed. This sat dormant until this session's bot generator added new `const` declarations to browse-system.js, which caused a hard duplicate declaration error in the browser that prevented all JS from running — characters wouldn't load.
 
-**Root cause:** `browse-system.js` was created as a split-out of `combat-system.js` at some prior session, but `combat-system.js` was never cleaned up. The duplicate sat dormant until bot generation added more `const` declarations this session, which surfaced the conflict as a hard syntax error preventing any JS from running.
+**Fix:** Recovered the real `combat-system.js` from git history (`796906e`), decoded it from UTF-16 (PowerShell redirect encoding), stripped the functions that had since moved to browse-system.js (`renderBotsSelection`, `loadPublicCompanions`, `loadPublicCompanionsDebounced`, `_publicCompanionsSearchTimeout`), verified zero conflicts with browse-system.js, and committed.
 
-**Fix:** Removed the `combat-system.js` script tag from `index.html`. The file itself can be deleted — it contains no combat-specific logic. Everything it had is in `browse-system.js`.
+**What combat-system.js owns:**
+- `window.currentState` initialisation (combat, party, idle loop, character creation state)
+- `renderChallenges`, `selectChallenge`, `selectCharacterForChallenge`
+- `renderPartyFormation`, `renderCurrentParty`
+- `addBotToParty`, `removeBotFromParty`, `removeFromParty`
+- `confirmPartyAndStart`, `startCombat`
+- `showCompanionTab`, `addPublicCompanion`
+- `viewCharacterDuringCombat`
+- `updateChallengeStatusBanner`, `requestLoopExit`, `cancelLoopExit`
 
-**If a future session adds a `combat-system.js` back:** make sure it contains only combat UI logic (party display, challenge selection, combat start) and does not redeclare anything from `browse-system.js`.
+**What browse-system.js owns:**
+- `_browsePagination`, `loadBrowseCharacters`, `createBrowseCard`, browse/import/share UI
+- `_botsPaging`, `BOT_PAGE_SIZE`, `renderBotsSelection`, `_renderBotsPagination`
+- `_generateBots`, `_botRng`, bot generation
+- `loadPublicCompanions`, `loadPublicCompanionsDebounced`
+
+**Do not let these overlap again.** If a future session moves functions between these files, remove them from the source file — don't just copy.
 
 ---
 
@@ -117,10 +122,10 @@ No outstanding bugs. Backlog:
 - Stealth targeting weight: 0.15
 - Taunt targeting weight: 4.0
 - Browse page size: 8 (party formation companions: 6)
-- Bot page size: 6 (BOT_PAGE_SIZE in browse-system.js)
+- Bot page size: 6 (`BOT_PAGE_SIZE` in `browse-system.js`)
 - Roster page size: 6
 - Player max level: 100
-- Bot static cap: 12 (bots.json)
-- Bot procedural ceiling: 100 (MAX_BOT_LEVEL in browse-system.js)
+- Bot static cap: 12 (`bots.json`)
+- Bot procedural ceiling: 100 (`MAX_BOT_LEVEL` in `browse-system.js`)
 - Bot stat budget: `220 + 35 * (level - 1)`
 - Bot equipment tier: `Math.min(8, Math.floor((level - 1) / 12))`
