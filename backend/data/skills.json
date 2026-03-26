@@ -9215,13 +9215,13 @@
     "isChildSkill": true
   },
   {
-    "id": "hunter_mark",
-    "name": "Hunter Mark",
-    "description": "Aiming while stalking reveals the target's weaknesses.",
+    "id": "call_target",
+    "name": "Call Target",
+    "description": "Call out a target for your team to focus down.",
     "category": "UTILITY",
     "parentSkills": [
       "aim",
-      "stalk"
+      "shout"
     ],
     "basePower": 0,
     "baseHitChance": 1.0,
