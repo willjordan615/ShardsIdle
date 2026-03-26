@@ -27,9 +27,17 @@ app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 // while server.js is in /backend.
 app.use(express.static(path.join(__dirname, '..')));
 
-// Health check endpoint
+// Health check endpoint — includes a DB ping so latency reflects full stack
 app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok', message: 'Combat engine is running' });
+    const t0 = Date.now();
+    const database = db.getDatabase();
+    database.get('SELECT 1', [], (err) => {
+        const dbMs = Date.now() - t0;
+        if (err) {
+            return res.status(503).json({ status: 'error', dbMs, message: 'DB unavailable' });
+        }
+        res.json({ status: 'ok', dbMs, message: 'Combat engine is running' });
+    });
 });
 
 // ==========================================
