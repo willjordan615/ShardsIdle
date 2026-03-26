@@ -134,17 +134,13 @@ function renderMerchant(character) {
 
   slot.style.display = 'block';
   slot.innerHTML = `
-    <div style="border:1px solid rgba(212,175,55,0.35); border-radius:6px; padding:1rem; background:rgba(212,175,55,0.04); margin-bottom:1rem;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-        <span style="color:#d4af37; font-size:0.85rem; font-weight:600; letter-spacing:0.05em; text-transform:uppercase;">
-          ${m.icon} ${m.name}
-        </span>
-        <button onclick="dismissMerchant()" style="background:none; border:none; color:#666; cursor:pointer; font-size:0.8rem; padding:0;">✕ Send away</button>
+    <div>
+      <div class="merchant-header">
+        <span class="merchant-name">${m.icon} ${m.name}</span>
+        <button onclick="dismissMerchant()" class="btn-dismiss-hint">✕ Send away</button>
       </div>
-      <div style="color:#8b7355; font-size:0.78rem; font-style:italic; margin-bottom:0.75rem; line-height:1.5;">
-        "${m.greeting}"
-      </div>
-      <div id="merchantStock" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(180px,1fr)); gap:0.5rem;">
+      <div class="merchant-greeting">"${m.greeting}"</div>
+      <div id="merchantStock">
         ${currentMerchantStock.map((entry, idx) => renderStockEntry(entry, idx, gold)).join('')}
       </div>
     </div>
@@ -155,16 +151,21 @@ function renderStockEntry(entry, idx, gold) {
   const { item, quantity, price } = entry;
   const canAfford = gold >= price;
   const soldOut = quantity <= 0;
+  const btnBg     = soldOut ? '#333'    : canAfford ? '#2a4a2a'  : '#3a2a1a';
+  const btnColor  = soldOut ? '#555'    : canAfford ? '#4cd964'  : '#888';
+  const btnBorder = soldOut ? '#444'    : canAfford ? '#3a6a3a'  : '#5a4a2a';
+  const btnLabel  = soldOut ? 'Sold out': canAfford ? 'Buy'      : 'No gold';
   return `
-    <div style="background:rgba(0,0,0,0.2); border:1px solid rgba(139,115,85,0.2); border-radius:4px; padding:0.5rem; display:flex; flex-direction:column; gap:0.25rem;">
-      <div style="color:#e8d5b0; font-size:0.8rem; font-weight:600;">${item.name}</div>
-      <div style="color:#666; font-size:0.72rem;">Qty: ${quantity}</div>
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.25rem;">
-        <span style="color:#d4af37; font-size:0.78rem;">${price}g each</span>
+    <div class="merchant-stock-entry">
+      <div class="merchant-item-name">${item.name}</div>
+      <div class="merchant-item-qty">Qty: ${quantity}</div>
+      <div class="merchant-item-footer">
+        <span class="merchant-item-price">${price}g each</span>
         <button onclick="buyFromMerchant(${idx})"
           ${soldOut || !canAfford ? 'disabled' : ''}
-          style="padding:2px 8px; font-size:0.72rem; background:${soldOut ? '#333' : canAfford ? '#2a4a2a' : '#3a2a1a'}; color:${soldOut ? '#555' : canAfford ? '#4cd964' : '#888'}; border:1px solid ${soldOut ? '#444' : canAfford ? '#3a6a3a' : '#5a4a2a'}; border-radius:3px; cursor:${soldOut || !canAfford ? 'not-allowed' : 'pointer'};">
-          ${soldOut ? 'Sold out' : !canAfford ? 'No gold' : 'Buy'}
+          class="btn-merchant-buy"
+          style="background:${btnBg}; color:${btnColor}; border:1px solid ${btnBorder}; cursor:${soldOut || !canAfford ? 'not-allowed' : 'pointer'};">
+          ${btnLabel}
         </button>
       </div>
     </div>

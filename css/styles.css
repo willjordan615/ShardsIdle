@@ -3157,3 +3157,84 @@ body:has(#combatlog.active) #headerTopBar {
 .color-red       { color: #ff6b6b; }
 .color-red-soft  { color: #ff8c8c; }
 .color-blue      { color: #4a9eff; }
+
+/* ============================================================
+   MERCHANT PANEL
+   ============================================================ */
+
+#merchantSlot > div {
+    border: 1px solid rgba(212, 175, 55, 0.35);
+    border-radius: 6px;
+    padding: 1rem;
+    background: rgba(212, 175, 55, 0.04);
+    margin-bottom: 1rem;
+}
+
+.merchant-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.merchant-name {
+    color: var(--gold);
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.merchant-greeting {
+    color: #8b7355;
+    font-size: 0.78rem;
+    font-style: italic;
+    margin-bottom: 0.75rem;
+    line-height: 1.5;
+}
+
+#merchantStock {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 0.5rem;
+}
+
+.merchant-stock-entry {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(139, 115, 85, 0.2);
+    border-radius: 4px;
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.merchant-item-name {
+    color: #e8d5b0;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.merchant-item-qty {
+    color: #666;
+    font-size: 0.72rem;
+}
+
+.merchant-item-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.25rem;
+}
+
+.merchant-item-price {
+    color: var(--gold);
+    font-size: 0.78rem;
+}
+
+/* Buy button — bg/color/border set inline (state-driven) */
+.btn-merchant-buy {
+    padding: 2px 8px;
+    font-size: 0.72rem;
+    border-radius: 3px;
+}

@@ -1147,8 +1147,15 @@ async function renderCharacterSkills(character) {
                 btn.onclick = () => openSkillSwapModal(character, slotIndex);
                 card.appendChild(btn);
             } else {
-                // Corrupt data
-                card.innerHTML = `<div class="card-title" style="color:red;">Unknown Skill</div><div class="card-description">ID: ${skillRecord.skillID}</div>`;
+                // Skill ID not found in game data (renamed or removed) — treat as empty slot
+                console.warn(`[SKILLS] Slot ${slotIndex}: skill ID "${skillRecord.skillID}" not found in game data. Rendering as empty.`);
+                card.innerHTML = `
+                    <div class="card-title" style="color:#666;">Slot ${slotIndex + 1}</div>
+                    <div class="card-description" style="color:#555; font-size:0.8em;">Skill unavailable — please select a replacement.</div>
+                    <button id="swap-btn-${slotIndex}" class="btn-swap secondary">⚡ Equip Skill</button>
+                `;
+                const btn = card.querySelector(`#swap-btn-${slotIndex}`);
+                if (btn) btn.onclick = () => openSkillSwapModal(character, slotIndex);
             }
         } else {
             // Empty Slot
