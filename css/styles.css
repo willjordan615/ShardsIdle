@@ -24,6 +24,19 @@
     --ink-surface:    #1a2240;
     --ink-raised:     #202848;
 
+    /* Window surfaces — cards, panels, modals */
+    --window-base:    #1a2240;
+    --window-deep:    #10162d;
+    --window-raised:  #202848;
+    --window-input:   rgba(18,24,48,0.7);
+    --window-subtle:  rgba(7,10,24,0.55);
+    --window-muted:   rgba(7,10,24,0.7);
+
+    /* Background overlay gradient tint (RGB components) */
+    --overlay-r: 30;
+    --overlay-g: 50;
+    --overlay-b: 120;
+
     --text-primary:   #e8e0d0;
     --text-secondary: #b8a888;
     --text-muted:     #5a5060;
@@ -101,9 +114,9 @@ body::before {
     position:fixed;
     inset:0;
     background:
-        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(30,50,120,0.35) 0%, transparent 70%),
-        radial-gradient(ellipse 50% 40% at 100% 100%, rgba(100,50,20,0.15) 0%, transparent 60%),
-        linear-gradient(180deg, var(--ink-deep) 0%, #0e1530 50%, #0a1020 100%);
+        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(var(--overlay-r),var(--overlay-g),var(--overlay-b),0.35) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 40% at 100% 100%, rgba(var(--overlay-r),var(--overlay-g),var(--overlay-b),0.12) 0%, transparent 60%),
+        linear-gradient(180deg, var(--ink-deep) 0%, var(--ink-dark) 50%, var(--ink-deep) 100%);
     pointer-events:none;
     z-index:-1;
 }
@@ -371,7 +384,7 @@ button.danger:hover:not(:disabled) {
    SECTIONS & SURFACES
    ============================================================ */
 .section {
-    background: linear-gradient(135deg, #1a2240 0%, #10162d 100%);
+    background: linear-gradient(135deg, var(--window-base) 0%, var(--window-deep) 100%);
     border: 1px solid var(--gold-border);
     border-radius: var(--radius-md);
     padding: var(--space-xl);
@@ -390,7 +403,7 @@ button.danger:hover:not(:disabled) {
    CARDS
    ============================================================ */
 .card {
-    background: linear-gradient(135deg, #1a2240 0%, #10162d 100%);
+    background: linear-gradient(135deg, var(--window-base) 0%, var(--window-deep) 100%);
     border: 1px solid var(--gold-border);
     border-radius: var(--radius-md);
     padding: var(--space-lg);
@@ -449,7 +462,7 @@ select,
 textarea {
     width: 100%;
     padding: 0.7rem 0.9rem;
-    background: rgba(7,10,24,0.7);
+    background: var(--window-muted);
     border: 1px solid rgba(139,115,85,0.4);
     border-radius: var(--radius-sm);
     color: var(--text-primary);
@@ -496,7 +509,7 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
 .stat-block { display:grid; grid-template-columns:1fr 1fr; gap:var(--space-sm); margin-bottom:var(--space-md); }
 
 .stat-item {
-    background: rgba(7,10,24,0.55);
+    background: var(--window-subtle);
     border: 1px solid rgba(139,115,85,0.28);
     border-radius: var(--radius-sm);
     padding: 0.75rem var(--space-md);
@@ -524,7 +537,7 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
 
 .stat-allocation-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:var(--space-md); }
 .stat-allocation-item {
-    background: rgba(7,10,24,0.55);
+    background: var(--window-subtle);
     border: 1px solid rgba(139,115,85,0.28);
     border-radius: var(--radius-sm);
     padding: 0.75rem var(--space-md);
@@ -534,7 +547,7 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
 .derived-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:var(--space-md); }
 .derived-item {
     display:flex; flex-direction:column; align-items:center;
-    background: rgba(7,10,24,0.55);
+    background: var(--window-subtle);
     border: 1px solid rgba(139,115,85,0.22);
     border-radius: var(--radius-md);
     padding: var(--space-md);
@@ -561,7 +574,7 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
    ============================================================ */
 .health-bar {
     width:100%; height:14px;
-    background: rgba(7,10,24,0.7);
+    background: var(--window-muted);
     border: 1px solid rgba(139,115,85,0.28);
     border-radius: 2px;
     margin: 0.35rem 0;
@@ -595,7 +608,7 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
    PARTY MEMBERS
    ============================================================ */
 .party-member {
-    background: rgba(18,24,48,0.7);
+    background: var(--window-input);
     border: 1px solid var(--gold-border);
     border-radius: var(--radius-sm);
     padding: 0.85rem var(--space-md);
@@ -616,7 +629,7 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
    EQUIPMENT SLOTS
    ============================================================ */
 .equipment-slot {
-    background: rgba(7,10,24,0.55);
+    background: var(--window-subtle);
     border: 1px solid rgba(139,115,85,0.28);
     border-radius: var(--radius-sm);
     padding: 0.75rem var(--space-md);
@@ -632,7 +645,7 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
 .slot-item { font-family:var(--font-display); color:var(--gold); font-weight:600; font-size:0.83rem; letter-spacing:0.04em; }
 
 .consumable-slot {
-    background: rgba(7,10,24,0.55);
+    background: var(--window-subtle);
     border: 1px solid rgba(139,115,85,0.28);
     border-radius: var(--radius-sm);
     padding: 0.75rem var(--space-md);
@@ -1012,7 +1025,7 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
 
 [id$="Modal"] > div {
     max-width:1200px; margin:2rem auto;
-    background: linear-gradient(135deg, rgba(20,28,60,0.98) 0%, rgba(12,18,40,0.99) 100%);
+    background: linear-gradient(135deg, var(--window-base) 0%, var(--window-deep) 100%);
     border: 1px solid var(--gold-border);
     border-radius: var(--radius-lg);
     padding: var(--space-xl);
@@ -1096,7 +1109,7 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
     left: 0;
     right: 0;
     max-height: 60vh;
-    background: linear-gradient(135deg, #1a2240 0%, #10162d 100%);
+    background: linear-gradient(135deg, var(--window-base) 0%, var(--window-deep) 100%);
     border-top: 1px solid var(--gold-border);
     border-radius: 12px 12px 0 0;
     display: flex;
@@ -1740,7 +1753,7 @@ body:has(#combatlog.active) #headerTopBar {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.4rem;
-    background: rgba(7,10,24,0.45);
+    background: var(--window-subtle);
     border: 1px solid rgba(139,115,85,0.22);
     border-radius: var(--radius-md);
     padding: 0.6rem var(--space-md);
@@ -1777,7 +1790,7 @@ body:has(#combatlog.active) #headerTopBar {
     letter-spacing: 0.02em;
     text-transform: none;
     padding: 0.3rem 0.65rem;
-    background: rgba(18,24,48,0.7);
+    background: var(--window-input);
     border: 1px solid rgba(139,115,85,0.25);
     color: var(--text-secondary);
     border-radius: var(--radius-sm);

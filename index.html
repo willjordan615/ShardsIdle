@@ -673,7 +673,7 @@
                 <div class="settings-grid">
 
                     <div class="settings-group">
-                        <h3>Colour Theme</h3>
+                        <h3>Accent Color</h3>
                         <p class="settings-desc">The primary accent colour used throughout the interface.</p>
                         <div class="settings-options">
                             <button class="settings-opt" data-setting="theme" data-value="gold">
@@ -698,7 +698,7 @@
                     </div>
 
                     <div class="settings-group">
-                        <h3>Background</h3>
+                        <h3>Background Darkness</h3>
                         <p class="settings-desc">The base darkness and atmosphere of the UI.</p>
                         <div class="settings-options">
                             <button class="settings-opt" data-setting="background" data-value="dark">Dark</button>
@@ -771,6 +771,56 @@
                             </button>
                             <button class="settings-opt" data-setting="bgHue" data-value="verdant">
                                 <span class="theme-swatch" style="background:#0a1a0c;"></span>Verdant
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>Window Color</h3>
+                        <p class="settings-desc">The colour tint of cards, panels, and modals.</p>
+                        <div class="settings-options">
+                            <button class="settings-opt" data-setting="windowColor" data-value="navy">
+                                <span class="theme-swatch" style="background:#182038;"></span>Navy
+                            </button>
+                            <button class="settings-opt" data-setting="windowColor" data-value="dungeon">
+                                <span class="theme-swatch" style="background:#141a14;"></span>Dungeon
+                            </button>
+                            <button class="settings-opt" data-setting="windowColor" data-value="crimson">
+                                <span class="theme-swatch" style="background:#2a1016;"></span>Crimson
+                            </button>
+                            <button class="settings-opt" data-setting="windowColor" data-value="arcane">
+                                <span class="theme-swatch" style="background:#1c1030;"></span>Arcane
+                            </button>
+                            <button class="settings-opt" data-setting="windowColor" data-value="verdant">
+                                <span class="theme-swatch" style="background:#101e12;"></span>Verdant
+                            </button>
+                            <button class="settings-opt" data-setting="windowColor" data-value="slate">
+                                <span class="theme-swatch" style="background:#181820;"></span>Slate
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>Background Overlay</h3>
+                        <p class="settings-desc">The colour tint of the full-screen background gradient.</p>
+                        <div class="settings-options">
+                            <button class="settings-opt" data-setting="overlayColor" data-value="navy">
+                                <span class="theme-swatch" style="background:#1e3278;"></span>Navy
+                            </button>
+                            <button class="settings-opt" data-setting="overlayColor" data-value="dungeon">
+                                <span class="theme-swatch" style="background:#142814;"></span>Dungeon
+                            </button>
+                            <button class="settings-opt" data-setting="overlayColor" data-value="crimson">
+                                <span class="theme-swatch" style="background:#640f14;"></span>Crimson
+                            </button>
+                            <button class="settings-opt" data-setting="overlayColor" data-value="arcane">
+                                <span class="theme-swatch" style="background:#3c0f78;"></span>Arcane
+                            </button>
+                            <button class="settings-opt" data-setting="overlayColor" data-value="verdant">
+                                <span class="theme-swatch" style="background:#0f4619;"></span>Verdant
+                            </button>
+                            <button class="settings-opt" data-setting="overlayColor" data-value="slate">
+                                <span class="theme-swatch" style="background:#191923;"></span>Slate
                             </button>
                         </div>
                     </div>
@@ -912,6 +962,8 @@
         theme:             'gold',
         background:        'dark',
         bgHue:             'navy',
+        windowColor:       'navy',
+        overlayColor:      'navy',
         combatSpeed:       '1.0',
         victoryDuration:   '7',
         displayFont:       'cinzel',
@@ -979,17 +1031,37 @@
         dark:     { '--ink-deep': '#070a18', '--ink-dark': '#0d1128', '--ink-mid': '#121830' },
         darker:   { '--ink-deep': '#040610', '--ink-dark': '#0a0d1e', '--ink-mid': '#0e1226' },
         darkest:  { '--ink-deep': '#020308', '--ink-dark': '#060810', '--ink-mid': '#090c18' },
-        midnight: { '--ink-deep': '#050010', '--ink-dark': '#0a0020', '--ink-mid': '#100030' },
+        midnight: { '--ink-deep': '#040508', '--ink-dark': '#08090e', '--ink-mid': '#0c0e16' },
     };
 
     // Hue offsets applied on top of background darkness tokens.
     // Values are HSL-based replacements for the ink CSS variables.
     const BG_HUE_TOKENS = {
-        navy:    { '--ink-deep': '#07091a', '--ink-dark': '#0c1028', '--ink-mid': '#111730' },
-        dungeon: { '--ink-deep': '#070a08', '--ink-dark': '#0c1210', '--ink-mid': '#101814' },
-        crimson: { '--ink-deep': '#120508', '--ink-dark': '#1e0a0e', '--ink-mid': '#260e12' },
-        arcane:  { '--ink-deep': '#0a0612', '--ink-dark': '#110a1e', '--ink-mid': '#160e28' },
-        verdant: { '--ink-deep': '#060e08', '--ink-dark': '#0a1a0c', '--ink-mid': '#0e2210' },
+        navy:    { '--ink-deep': '#07091e', '--ink-dark': '#0d1230', '--ink-mid': '#131a3e' },
+        dungeon: { '--ink-deep': '#07100a', '--ink-dark': '#0e1c10', '--ink-mid': '#142416' },
+        crimson: { '--ink-deep': '#200608', '--ink-dark': '#320a0e', '--ink-mid': '#400e12' },
+        arcane:  { '--ink-deep': '#100618', '--ink-dark': '#1a0a28', '--ink-mid': '#220e34' },
+        verdant: { '--ink-deep': '#06120a', '--ink-dark': '#0c2010', '--ink-mid': '#102a14' },
+    };
+
+    // Window surface colours — cards, panels, modals
+    const WINDOW_COLOR_TOKENS = {
+        navy:    { '--window-base': '#182038', '--window-deep': '#0e1528', '--window-raised': '#1e2a48', '--window-input': 'rgba(18,24,48,0.7)', '--window-subtle': 'rgba(10,14,32,0.55)', '--window-muted': 'rgba(10,14,32,0.7)' },
+        dungeon: { '--window-base': '#141a14', '--window-deep': '#0c120c', '--window-raised': '#1a221a', '--window-input': 'rgba(18,26,18,0.7)', '--window-subtle': 'rgba(10,16,10,0.55)', '--window-muted': 'rgba(10,16,10,0.7)' },
+        crimson: { '--window-base': '#2a1016', '--window-deep': '#1c0a0e', '--window-raised': '#340e14', '--window-input': 'rgba(36,14,18,0.7)', '--window-subtle': 'rgba(22,8,10,0.55)', '--window-muted': 'rgba(22,8,10,0.7)' },
+        arcane:  { '--window-base': '#1c1030', '--window-deep': '#120a20', '--window-raised': '#22143c', '--window-input': 'rgba(24,14,40,0.7)', '--window-subtle': 'rgba(14,8,24,0.55)', '--window-muted': 'rgba(14,8,24,0.7)' },
+        verdant: { '--window-base': '#101e12', '--window-deep': '#0a140c', '--window-raised': '#142416', '--window-input': 'rgba(14,24,16,0.7)', '--window-subtle': 'rgba(8,14,10,0.55)', '--window-muted': 'rgba(8,14,10,0.7)' },
+        slate:   { '--window-base': '#181820', '--window-deep': '#101016', '--window-raised': '#1e1e28', '--window-input': 'rgba(20,20,28,0.7)', '--window-subtle': 'rgba(12,12,18,0.55)', '--window-muted': 'rgba(12,12,18,0.7)' },
+    };
+
+    // Background overlay gradient tint (RGB components for body::before)
+    const OVERLAY_COLOR_TOKENS = {
+        navy:    { '--overlay-r': '30',  '--overlay-g': '50',  '--overlay-b': '120' },
+        dungeon: { '--overlay-r': '20',  '--overlay-g': '40',  '--overlay-b': '20'  },
+        crimson: { '--overlay-r': '100', '--overlay-g': '15',  '--overlay-b': '20'  },
+        arcane:  { '--overlay-r': '60',  '--overlay-g': '15',  '--overlay-b': '120' },
+        verdant: { '--overlay-r': '15',  '--overlay-g': '70',  '--overlay-b': '25'  },
+        slate:   { '--overlay-r': '25',  '--overlay-g': '25',  '--overlay-b': '35'  },
     };
 
     const FONT_SIZE_SCALE = {
@@ -1066,6 +1138,14 @@
             const rs = Math.round(r * darknessScale), gs = Math.round(g * darknessScale), bs = Math.round(b * darknessScale);
             root.style.setProperty(k, `rgb(${rs},${gs},${bs})`);
         });
+
+        // Window color — card, panel, modal surfaces
+        const wc = WINDOW_COLOR_TOKENS[settings.windowColor] || WINDOW_COLOR_TOKENS.navy;
+        Object.entries(wc).forEach(([k, v]) => root.style.setProperty(k, v));
+
+        // Background overlay tint
+        const ov = OVERLAY_COLOR_TOKENS[settings.overlayColor] || OVERLAY_COLOR_TOKENS.navy;
+        Object.entries(ov).forEach(([k, v]) => root.style.setProperty(k, v));
 
         // Display font
         root.style.setProperty('--font-display', FONT_STACKS.displayFont[settings.displayFont] || FONT_STACKS.displayFont.cinzel);
