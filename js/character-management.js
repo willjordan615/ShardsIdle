@@ -543,7 +543,7 @@ window.stopStatHold = function() {
  */
 const COMBAT_STYLE_DESCS = {
     balanced:    'Adapts fluidly to the situation — finishes wounded enemies, conserves resources across stages, and buffs early in a fight. A solid choice for any build.',
-    aggressive:  'Maximises damage at all times. Almost never buffs or heals, spends resources freely, and targets the weakest enemy to secure kills fast. High risk, high output.',
+    aggressive:  'Plays opportunistically until an enemy is wounded, then shifts single-mindedly to securing the kill. Sets up debuffs and damage buffs early, then ignores everything else once blood is drawn. High risk, high output.',
     cautious:    'Prioritises survival and utility. Casts defensive skills early, heals proactively, targets the most dangerous enemy first, and conserves resources carefully across long challenges.',
     support:     'Focuses on healing and buffing allies first. Rarely deals damage. Rescues low-HP party members before acting offensively. Best paired with a damage dealer.',
     disruptor:   'Heavily favours control and debuff skills. Targets the most dangerous enemy and locks them down. Deals moderate damage but significantly reduces enemy effectiveness.',
@@ -1147,15 +1147,8 @@ async function renderCharacterSkills(character) {
                 btn.onclick = () => openSkillSwapModal(character, slotIndex);
                 card.appendChild(btn);
             } else {
-                // Skill ID not found in game data (renamed or removed) — treat as empty slot
-                console.warn(`[SKILLS] Slot ${slotIndex}: skill ID "${skillRecord.skillID}" not found in game data. Rendering as empty.`);
-                card.innerHTML = `
-                    <div class="card-title" style="color:#666;">Slot ${slotIndex + 1}</div>
-                    <div class="card-description" style="color:#555; font-size:0.8em;">Skill unavailable — please select a replacement.</div>
-                    <button id="swap-btn-${slotIndex}" class="btn-swap secondary">⚡ Equip Skill</button>
-                `;
-                const btn = card.querySelector(`#swap-btn-${slotIndex}`);
-                if (btn) btn.onclick = () => openSkillSwapModal(character, slotIndex);
+                // Corrupt data
+                card.innerHTML = `<div class="card-title" style="color:red;">Unknown Skill</div><div class="card-description">ID: ${skillRecord.skillID}</div>`;
             }
         } else {
             // Empty Slot

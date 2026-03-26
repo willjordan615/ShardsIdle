@@ -10532,7 +10532,7 @@
     "id": "provoke",
     "name": "Provoke",
     "description": "A baiting strike that draws the target's full attention.",
-    "category": "DEFENSE",
+    "category": "CONTROL",
     "parentSkills": [
       "misdirect",
       "block"
@@ -10575,7 +10575,7 @@
     "id": "goad",
     "name": "Goad",
     "description": "A punishing blow that demands retaliation.",
-    "category": "DAMAGE_SINGLE",
+    "category": "CONTROL",
     "parentSkills": [
       "provoke",
       "strong_attack"
@@ -10618,7 +10618,7 @@
     "id": "incite",
     "name": "Incite",
     "description": "A vicious strike that makes ignoring you impossible.",
-    "category": "DAMAGE_SINGLE",
+    "category": "CONTROL",
     "parentSkills": [
       "goad",
       "lunge"
@@ -10661,7 +10661,7 @@
     "id": "infuriate",
     "name": "Infuriate",
     "description": "A devastating attack that breaks the target's composure entirely.",
-    "category": "DAMAGE_SINGLE",
+    "category": "CONTROL",
     "parentSkills": [
       "incite",
       "berserker_rage"
@@ -10704,7 +10704,7 @@
     "id": "jeer",
     "name": "Jeer",
     "description": "A taunting display that draws the attention of all nearby enemies.",
-    "category": "DEFENSE",
+    "category": "CONTROL",
     "parentSkills": [
       "provoke",
       "shout"
@@ -10748,7 +10748,7 @@
     "id": "intimidate",
     "name": "Intimidate",
     "description": "An overwhelming show of force that roots all enemies in fearful focus.",
-    "category": "DEFENSE",
+    "category": "CONTROL",
     "parentSkills": [
       "jeer",
       "shockwave"

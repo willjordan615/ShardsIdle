@@ -1333,10 +1333,32 @@ calculateRewards(players, challenge, segments = []) {
           score *= 4.0;  // override all other scoring — if it's in the pool, use it
         }
         if (profile === 'aggressive') {
-          if (cat && cat.includes('DAMAGE')) score *= 1.5;
-          if (cat === 'BUFF' || cat === 'DEFENSE') score *= 0.25;
-          if (cat === 'UTILITY') score *= 0.35;
-          if (cat === 'HEALING' || cat === 'HEALING_AOE') score *= 0.5;
+          const targetHPPct = targetCombatant
+            ? targetCombatant.currentHP / targetCombatant.maxHP
+            : 1.0;
+          const bloodDrawn = targetHPPct <= 0.75;
+
+          if (!bloodDrawn) {
+            // Target is healthy — set up the kill like opportunist would
+            if (cat && cat.includes('DAMAGE')) score *= 1.2;
+            if (cat === 'CONTROL' || cat === 'UTILITY') score *= 1.3;
+            if (cat === 'BUFF' || cat === 'DEFENSE') score *= 0.65;
+            if (targetCombatant && (targetCombatant.statusEffects || []).some(e => e.duration > 0)) {
+              if (cat && cat.includes('DAMAGE')) score *= 1.8;
+            }
+          } else {
+            // Blood drawn — focus in for the kill
+            if (cat && cat.includes('DAMAGE')) score *= 2.2;
+            if (cat === 'CONTROL') score *= 0.4;
+            if (cat === 'BUFF' || cat === 'DEFENSE') score *= 0.25;
+            if (cat === 'UTILITY') score *= 0.35;
+            // Deeper into kill range, even more single-minded
+            if (targetHPPct <= 0.40) {
+              if (cat && cat.includes('DAMAGE')) score *= 1.4;
+              if (cat !== 'HEALING' && cat !== 'HEALING_AOE' && !(cat && cat.includes('DAMAGE'))) score *= 0.5;
+            }
+          }
+          // Healing is gated by the 15% emergency threshold above — no additional suppression needed
         }
         if (profile === 'cautious') {
           if (cat === 'UTILITY' || cat === 'DEFENSE') score *= 1.6;
