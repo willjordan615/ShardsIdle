@@ -792,7 +792,9 @@ function _generateBots() {
         Utility:  ['Cobb','Darro','Fynn','Seld','Mott','Bwick','Arlo','Nessa','Pip','Harn'],
     };
 
-    const validSkillIds = new Set(skills.map(s => s.id));
+    const validSkillIds = new Set(
+        skills.filter(s => s.isStarterSkill || s.isChildSkill).map(s => s.id)
+    );
 
     // pool is a tiered array: [{minLevel, skills[]}, ...]
     // Returns a skill from the deepest tier the bot qualifies for, excluding .
