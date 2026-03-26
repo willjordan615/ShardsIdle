@@ -118,6 +118,7 @@ function selectRace(race, element) {
     
     updateStatDisplay();
     renderStatAllocation();
+    renderSkillSelection();
 }
 
 /**
