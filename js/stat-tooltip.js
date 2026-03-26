@@ -58,7 +58,7 @@ function createStatTooltip(statKey) {
     if (!stat) return null;
     
     const tooltip = document.createElement('div');
-    tooltip.className = 'stat-tooltip';
+    tooltip.className = 'stat-tooltip-panel gear-tooltip';
     tooltip.style.cssText = `
         position: fixed;
         z-index: 10000;
