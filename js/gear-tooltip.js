@@ -192,8 +192,7 @@ function addGearCardTooltip(cardElement, item) {
     cardElement.addEventListener('touchmove', () => {
         clearTimeout(tooltipTimeout);
     }, { passive: true });
-    });
-    
+
     // Note: We do NOT define destroyGearTooltip here anymore. 
     // It is now global above.
 }
