@@ -1147,8 +1147,17 @@ async function renderCharacterSkills(character) {
                 btn.onclick = () => openSkillSwapModal(character, slotIndex);
                 card.appendChild(btn);
             } else {
-                // Corrupt data
-                card.innerHTML = `<div class="card-title" style="color:red;">Unknown Skill</div><div class="card-description">ID: ${skillRecord.skillID}</div>`;
+                // Stale skill ID — no matching definition in current game data
+                console.warn(`[skills] Unknown skill ID in slot ${slotIndex}: ${skillRecord.skillID}`);
+                card.innerHTML = `
+                    <div class="card-title" style="color:#888;">Skill Unavailable</div>
+                    <div class="card-description">This skill no longer exists. Please select a replacement.</div>
+                `;
+                const btn = document.createElement('button');
+                btn.textContent = '⚡ Equip Skill';
+                btn.className = 'btn-swap secondary';
+                btn.onclick = () => openSkillSwapModal(character, slotIndex);
+                card.appendChild(btn);
             }
         } else {
             // Empty Slot
