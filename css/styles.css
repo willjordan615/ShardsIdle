@@ -32,10 +32,11 @@
     --window-subtle:  rgba(7,10,24,0.55);
     --window-muted:   rgba(7,10,24,0.7);
 
-    /* Background overlay gradient tint (RGB components) */
+    /* Background overlay gradient tint (RGB components) and opacity */
     --overlay-r: 30;
     --overlay-g: 50;
     --overlay-b: 120;
+    --overlay-opacity: 0.92;
 
     --text-primary:   #e8e0d0;
     --text-secondary: #b8a888;
@@ -109,7 +110,7 @@ body {
 }
 
 body::before {
-    opacity: 0.92;
+    opacity: var(--overlay-opacity);
     content:'';
     position:fixed;
     inset:0;
@@ -1032,6 +1033,17 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
     box-shadow: 0 0 60px rgba(0,0,0,0.8), 0 0 30px rgba(212,175,55,0.07);
     animation: modalContentIn 0.25s cubic-bezier(0.16,1,0.3,1);
 }
+
+#settingsModal > div {
+    max-width: 680px;
+    max-height: 88vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--gold-dim) transparent;
+}
+#settingsModal > div::-webkit-scrollbar { width: 6px; }
+#settingsModal > div::-webkit-scrollbar-track { background: transparent; }
+#settingsModal > div::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
 @keyframes modalContentIn {
     from { opacity:0; transform:scale(0.97) translateY(10px); }
     to   { opacity:1; transform:scale(1) translateY(0); }
@@ -1819,6 +1831,51 @@ body:has(#combatlog.active) #headerTopBar {
     border-color: var(--gold) !important;
     color: var(--gold) !important;
     font-weight: 700 !important;
+}
+
+/* Settings sliders */
+.settings-slider-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+}
+
+.settings-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    flex: 1;
+    height: 4px;
+    background: rgba(139,115,85,0.3);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+}
+.settings-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--gold);
+    cursor: pointer;
+    border: 2px solid var(--window-base);
+    box-shadow: 0 0 4px rgba(0,0,0,0.4);
+}
+.settings-slider::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--gold);
+    cursor: pointer;
+    border: 2px solid var(--window-base);
+    box-shadow: 0 0 4px rgba(0,0,0,0.4);
+}
+.settings-slider-val {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    color: var(--gold);
+    min-width: 2.5rem;
+    text-align: right;
 }
 
 /* Colour swatch dot in theme buttons */
