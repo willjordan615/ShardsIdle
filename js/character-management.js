@@ -283,6 +283,24 @@ function renderSkillSelection() {
         statusMsg.textContent = `${selected.length} / 2 skills selected`;
     }
     container.appendChild(statusMsg);
+
+    // Racial skill notice
+    const race = currentState.selectedRace;
+    if (race?.intrinsicSkills?.length) {
+        const intrinsicId = race.intrinsicSkills[0];
+        const intrinsicSkill = gameData.skills.find(s => s.id === intrinsicId);
+        if (intrinsicSkill) {
+            const racialNotice = document.createElement('div');
+            racialNotice.style.cssText = 'margin-top: 1rem; padding: 0.75rem 1rem; background: rgba(180, 120, 255, 0.08); border: 1px solid rgba(180, 120, 255, 0.35); border-radius: 4px;';
+            racialNotice.innerHTML = `
+                <div style="color: #888; font-size: 0.72rem; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px;">Racial Ability · ${race.name}</div>
+                <div style="color: #c9a0ff; font-weight: bold; margin-bottom: 4px;">${intrinsicSkill.name}</div>
+                <div style="color: #aaa; font-size: 0.88rem;">${intrinsicSkill.description}</div>
+                <div style="margin-top: 6px; color: #777; font-size: 0.8rem;"><strong>Cost:</strong> ${intrinsicSkill.costAmount} ${intrinsicSkill.costType} &nbsp;·&nbsp; <strong>Category:</strong> ${intrinsicSkill.category}</div>
+            `;
+            container.appendChild(racialNotice);
+        }
+    }
 }
 
 /**
