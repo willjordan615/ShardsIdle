@@ -61,11 +61,11 @@ async function loadBrowseCharacters(page) {
         const { totalPages, total } = _browsePagination;
         if (totalPages > 1) {
             const nav = document.createElement('div');
-            nav.style.cssText = 'grid-column:1/-1;display:flex;justify-content:center;align-items:center;gap:12px;margin-top:1rem;';
+            nav.className = 'browse-pagination';
             nav.innerHTML = `
-                <button onclick="loadBrowseCharacters(${page - 1})" ${page <= 1 ? 'disabled' : ''} class="secondary" style="padding:4px 14px;">← Prev</button>
-                <span style="color:#8b7355;font-size:0.85rem;">Page ${page} of ${totalPages} <span style="color:#555;">(${total} total)</span></span>
-                <button onclick="loadBrowseCharacters(${page + 1})" ${page >= totalPages ? 'disabled' : ''} class="secondary" style="padding:4px 14px;">Next →</button>
+                <button onclick="loadBrowseCharacters(${page - 1})" ${page <= 1 ? 'disabled' : ''} class="secondary btn-compact">← Prev</button>
+                <span class="browse-pagination__info">Page ${page} of ${totalPages} <span class="browse-pagination__total">(${total} total)</span></span>
+                <button onclick="loadBrowseCharacters(${page + 1})" ${page >= totalPages ? 'disabled' : ''} class="secondary btn-compact">Next →</button>
             `;
             container.appendChild(nav);
         }
@@ -78,7 +78,7 @@ async function loadBrowseCharacters(page) {
                 <div style="grid-column:1/-1;text-align:center;padding:3rem;color:#ff6b6b;">
                     <h3>Error Loading Characters</h3>
                     <p>${error.message}</p>
-                    <button onclick="loadBrowseCharacters()" class="btn-secondary" style="margin-top:1rem;">Retry</button>
+                    <button onclick="loadBrowseCharacters()" class="secondary" style="margin-top:1rem;">Retry</button>
                 </div>`;
         }
     }
@@ -98,8 +98,7 @@ function loadBrowseCharactersDebounced() {
  */
 function createBrowseCard(char) {
     const card = document.createElement('div');
-    card.className = 'card';
-    card.style.cssText = 'padding: 1.25rem; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 1px solid #333; border-radius: 12px;';
+    card.className = 'card browse-card';
 
     const stats = char.combatStats || {};
     const milestones = stats.milestones || {};
@@ -127,7 +126,6 @@ function createBrowseCard(char) {
     const characterClass = (typeof getCharacterClass === 'function' && char.skills)
         ? getCharacterClass(char, window.gameData?.skills || [])
         : null;
-    // Top 2 active (non-intrinsic) skills by level
     const activeSkillNames = (char.skills || [])
         .filter(s => !s.intrinsic)
         .sort((a, b) => (b.skillLevel || 0) - (a.skillLevel || 0))
@@ -143,10 +141,10 @@ function createBrowseCard(char) {
     if (milestones.undefeated)        badges.push({ icon: '🏆', label: 'Undefeated — 10+ wins, no losses' });
     if (milestones.centuryOfCombats)  badges.push({ icon: '⚔️', label: 'Century — 100 combats fought' });
 
-    const statCell = (label, value, color = '#fff') =>
-        `<div style="padding:0.35rem 0.5rem;background:rgba(255,255,255,0.04);border-radius:5px;">
-            <div style="color:#666;font-size:0.7rem;">${label}</div>
-            <div style="color:${color};font-weight:bold;font-size:0.9rem;">${value}</div>
+    const statCell = (label, value, colorClass = '') =>
+        `<div class="browse-stat-cell">
+            <div class="browse-stat-cell__label">${label}</div>
+            <div class="browse-stat-cell__value${colorClass ? ' ' + colorClass : ''}">${value}</div>
         </div>`;
 
     card.innerHTML = `
@@ -154,10 +152,10 @@ function createBrowseCard(char) {
             <div>
                 <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
                     <h3 style="margin:0;color:#4eff7f;font-size:1rem;">${char.characterName}</h3>
-                    ${roleLabel ? `<span style="font-size:0.72rem;color:#d4af37;background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.3);border-radius:10px;padding:1px 7px;">${roleLabel}</span>` : ''}
+                    ${roleLabel ? `<span class="role-badge">${roleLabel}</span>` : ''}
                 </div>
                 <div style="color:#888;font-size:0.8rem;margin-top:2px;">Lv.${char.level} ${char.race}${characterClass ? ' · ' + characterClass : ''} ${profileEmoji}</div>
-                ${activeSkillNames.length ? `<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;">${activeSkillNames.map(n => `<span style="font-size:0.7rem;color:#d4af37;background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.2);border-radius:3px;padding:1px 6px;">${n}</span>`).join('')}</div>` : ''}
+                ${activeSkillNames.length ? `<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;">${activeSkillNames.map(n => `<span class="skill-tag">${n}</span>`).join('')}</div>` : ''}
             </div>
             <div style="text-align:right;flex-shrink:0;">
                 <code style="color:#4eff7f;font-size:0.85rem;letter-spacing:1px;">${char.shareCode}</code>
@@ -167,11 +165,11 @@ function createBrowseCard(char) {
 
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:0.6rem;">
             ${statCell('Combats', stats.totalCombats || 0)}
-            ${statCell('Wins', stats.wins || 0, '#4eff7f')}
-            ${statCell('Win Rate', stats.winRate ? (parseFloat(stats.winRate)*100).toFixed(0)+'%' : '—', '#ffd700')}
-            ${statCell('Kills', totalKills || 0, '#ff8c8c')}
-            ${statCell('Crits', stats.totalCriticalHits || 0, '#ff6b6b')}
-            ${statCell('Challenges', totalChallenges || 0, '#4a9eff')}
+            ${statCell('Wins', stats.wins || 0, 'color-green')}
+            ${statCell('Win Rate', stats.winRate ? (parseFloat(stats.winRate)*100).toFixed(0)+'%' : '—', 'color-gold')}
+            ${statCell('Kills', totalKills || 0, 'color-red-soft')}
+            ${statCell('Crits', stats.totalCriticalHits || 0, 'color-red')}
+            ${statCell('Challenges', totalChallenges || 0, 'color-blue')}
         </div>
 
         ${topSkillName ? `
@@ -186,8 +184,8 @@ function createBrowseCard(char) {
         </div>` : ''}
 
         ${char.isOwn
-            ? `<div style="width:100%;text-align:center;padding:0.4rem;color:#555;font-size:0.82rem;border:1px solid #2a2a3a;border-radius:6px;">Your Character</div>`
-            : `<button onclick="importCharacter('${char.shareCode}')" class="btn-primary" style="width:100%;padding:0.4rem;">Import to Party</button>`
+            ? `<div class="browse-card__own-label">Your Character</div>`
+            : `<button onclick="importCharacter('${char.shareCode}')" class="btn-full">Import to Party</button>`
         }
     `;
 
@@ -552,48 +550,48 @@ async function loadPublicCompanions(page) {
             card.innerHTML = `
                 <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:2px;">
                     <span class="card-title" style="margin:0;">${escapeHtml(char.characterName)}</span>
-                    ${roleLabel ? `<span style="font-size:0.68rem;color:#d4af37;background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.25);border-radius:8px;padding:1px 6px;">${roleLabel}</span>` : ''}
+                    ${roleLabel ? `<span class="role-badge role-badge--sm">${roleLabel}</span>` : ''}
                 </div>
                 <div class="card-subtitle" style="margin-bottom:0.3rem;">Lv.${char.level} ${escapeHtml(char.race)}${charClass ? ' · ' + charClass : ''}</div>
-                ${activeSkillNames.length ? `<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:0.35rem;">${activeSkillNames.map(n => `<span style="font-size:0.7rem;color:#d4af37;background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.2);border-radius:3px;padding:1px 6px;">${n}</span>`).join('')}</div>` : ''}
+                ${activeSkillNames.length ? `<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:0.35rem;">${activeSkillNames.map(n => `<span class="skill-tag">${n}</span>`).join('')}</div>` : ''}
 
                 <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:0.35rem;">
-                    <div style="background:rgba(10,14,39,0.6);padding:0.2rem;border-radius:4px;text-align:center;">
-                        <div style="color:#8b7355;font-size:0.65rem;">Combats</div>
-                        <div style="color:#ccc;font-weight:bold;font-size:0.82rem;">${stats.totalCombats || 0}</div>
+                    <div class="companion-stat-cell">
+                        <div class="companion-stat-cell__label">Combats</div>
+                        <div class="companion-stat-cell__value">${stats.totalCombats || 0}</div>
                     </div>
-                    <div style="background:rgba(10,14,39,0.6);padding:0.2rem;border-radius:4px;text-align:center;">
-                        <div style="color:#8b7355;font-size:0.65rem;">Wins</div>
-                        <div style="color:#4cd964;font-weight:bold;font-size:0.82rem;">${stats.wins || 0}</div>
+                    <div class="companion-stat-cell">
+                        <div class="companion-stat-cell__label">Wins</div>
+                        <div class="companion-stat-cell__value color-green">${stats.wins || 0}</div>
                     </div>
-                    <div style="background:rgba(10,14,39,0.6);padding:0.2rem;border-radius:4px;text-align:center;">
-                        <div style="color:#8b7355;font-size:0.65rem;">Win Rate</div>
-                        <div style="color:#d4af37;font-weight:bold;font-size:0.82rem;">${stats.winRate ? (parseFloat(stats.winRate)*100).toFixed(0)+'%' : '—'}</div>
+                    <div class="companion-stat-cell">
+                        <div class="companion-stat-cell__label">Win Rate</div>
+                        <div class="companion-stat-cell__value color-gold">${stats.winRate ? (parseFloat(stats.winRate)*100).toFixed(0)+'%' : '—'}</div>
                     </div>
-                    <div style="background:rgba(10,14,39,0.6);padding:0.2rem;border-radius:4px;text-align:center;">
-                        <div style="color:#8b7355;font-size:0.65rem;">Kills</div>
-                        <div style="color:#ff8c8c;font-weight:bold;font-size:0.82rem;">${totalKills}</div>
+                    <div class="companion-stat-cell">
+                        <div class="companion-stat-cell__label">Kills</div>
+                        <div class="companion-stat-cell__value color-red-soft">${totalKills}</div>
                     </div>
-                    <div style="background:rgba(10,14,39,0.6);padding:0.2rem;border-radius:4px;text-align:center;">
-                        <div style="color:#8b7355;font-size:0.65rem;">Crits</div>
-                        <div style="color:#ff6b6b;font-weight:bold;font-size:0.82rem;">${stats.totalCriticalHits || 0}</div>
+                    <div class="companion-stat-cell">
+                        <div class="companion-stat-cell__label">Crits</div>
+                        <div class="companion-stat-cell__value color-red">${stats.totalCriticalHits || 0}</div>
                     </div>
-                    <div style="background:rgba(10,14,39,0.6);padding:0.2rem;border-radius:4px;text-align:center;">
-                        <div style="color:#8b7355;font-size:0.65rem;">Challenges</div>
-                        <div style="color:#4a9eff;font-weight:bold;font-size:0.82rem;">${totalChallenges}</div>
+                    <div class="companion-stat-cell">
+                        <div class="companion-stat-cell__label">Challenges</div>
+                        <div class="companion-stat-cell__value color-blue">${totalChallenges}</div>
                     </div>
                 </div>
 
                 ${topSkillName || topKillEntry ? `
                 <div style="font-size:0.7rem;color:#666;margin-bottom:0.3rem;">
                     ${topSkillName ? `Sig: <span style="color:#d4af37;">${topSkillName}</span>` : ''}
-                    ${topKillEntry ? ` · <span style="color:#ff8c8c;">${topKillEntry[0].replace(/_/g,' ')} ×${topKillEntry[1]}</span>` : ''}
+                    ${topKillEntry ? ` · <span class="color-red-soft">${topKillEntry[0].replace(/_/g,' ')} ×${topKillEntry[1]}</span>` : ''}
                 </div>` : ''}
 
                 ${badges.length ? `<div style="margin-bottom:0.3rem;font-size:0.95rem;letter-spacing:2px;">${badges.map(b => `<span title="${b.title}" style="cursor:default;">${b.icon}</span>`).join('')}</div>` : ''}
 
                 <div style="color:#8b7355;font-size:0.68rem;margin-bottom:0.4rem;">${char.importCount || 0} imports</div>
-                <button class="secondary" style="width:100%;font-size:0.82rem;" ${disabled ? 'disabled' : ''}>${disabledLabel || 'Add to Party'}</button>
+                <button class="secondary btn-full" ${disabled ? 'disabled' : ''}>${disabledLabel || 'Add to Party'}</button>
             `;
 
             container.appendChild(card);
@@ -603,11 +601,11 @@ async function loadPublicCompanions(page) {
         const { totalPages, total } = pagination;
         if (totalPages > 1) {
             const nav = document.createElement('div');
-            nav.style.cssText = 'grid-column:1/-1;display:flex;justify-content:center;align-items:center;gap:12px;margin-top:1rem;';
+            nav.className = 'browse-pagination';
             nav.innerHTML = `
-                <button onclick="loadPublicCompanions(${page - 1})" ${page <= 1 ? 'disabled' : ''} class="secondary" style="padding:4px 14px;">← Prev</button>
-                <span style="color:#8b7355;font-size:0.85rem;">Page ${page} of ${totalPages} <span style="color:#555;">(${total} total)</span></span>
-                <button onclick="loadPublicCompanions(${page + 1})" ${page >= totalPages ? 'disabled' : ''} class="secondary" style="padding:4px 14px;">Next →</button>
+                <button onclick="loadPublicCompanions(${page - 1})" ${page <= 1 ? 'disabled' : ''} class="secondary btn-compact">← Prev</button>
+                <span class="browse-pagination__info">Page ${page} of ${totalPages} <span class="browse-pagination__total">(${total} total)</span></span>
+                <button onclick="loadPublicCompanions(${page + 1})" ${page >= totalPages ? 'disabled' : ''} class="secondary btn-compact">Next →</button>
             `;
             container.appendChild(nav);
         }
@@ -706,9 +704,9 @@ function renderBotsSelection(page) {
             <div class="card-title">${bot.characterName}</div>
             <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px; flex-wrap:wrap;">
                 <span class="card-subtitle" style="margin:0;">Lv.${bot.level}${botClass ? ' · ' + botClass : ''}</span>
-                ${bot.role ? `<span style="font-size:0.7rem; color:${roleColor}; background:rgba(255,255,255,0.06); border:1px solid ${roleColor}44; border-radius:4px; padding:1px 6px;">${bot.role}</span>` : ''}
+                ${bot.role ? `<span class="bot-role-badge" style="color:${roleColor}; border:1px solid ${roleColor}44;">${bot.role}</span>` : ''}
             </div>
-            ${botActiveSkills.length ? `<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;">${botActiveSkills.map(n => `<span style="font-size:0.7rem;color:#d4af37;background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.2);border-radius:3px;padding:1px 6px;">${n}</span>`).join('')}</div>` : ''}
+            ${botActiveSkills.length ? `<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;">${botActiveSkills.map(n => `<span class="skill-tag">${n}</span>`).join('')}</div>` : ''}
             <div class="card-description" style="margin-bottom: 0.75rem;">
                 HP: ${formatNumber(derivedStats.hp)}
             </div>

@@ -70,6 +70,7 @@
 
     --font-display: 'Cinzel', 'Palatino Linotype', serif;
     --font-body:    'Lato', 'Segoe UI', sans-serif;
+    --font-mono:    'Courier New', monospace;
 
     --radius-sm: 3px;
     --radius-md: 6px;
@@ -2569,3 +2570,590 @@ body:has(#combatlog.active) #headerTopBar {
     padding-top: 0.6rem;
     border-top: 1px solid #1a2a3a;
 }
+
+/* Stat name expand/collapse toggle — resets button chrome, styled via span children */
+.stat-name-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    padding: 0 0 0 0.75rem;
+    flex: 1;
+}
+.stat-name-btn::before { display: none; } /* suppress global button shimmer */
+.stat-name-btn:hover:not(:disabled) {
+    box-shadow: none;
+    border-color: transparent;
+    transform: none;
+    color: inherit;
+}
+
+/* Skill slot card — two-column flex in #skillDisplay */
+.skill-card {
+    flex: 1;
+    margin: 5px;
+    min-width: 140px;
+    border: 1px solid var(--gold-dim);
+    background: var(--window-deep);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Change Skill / Equip Skill button inside skill cards */
+.btn-swap {
+    margin-top: 10px;
+    width: 100%;
+    background: rgba(42, 74, 106, 0.8);
+    color: var(--text-secondary);
+    border-color: #4a6a8a;
+}
+.btn-swap:hover:not(:disabled) {
+    background: rgba(60, 100, 140, 0.9);
+    border-color: #6a8aaa;
+    color: #fff;
+    box-shadow: 0 0 10px rgba(74, 106, 138, 0.3);
+}
+
+/* Skill swap modal */
+#skillSwapModal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+}
+#skillSwapModal > div {
+    background: var(--window-deep);
+    border: 2px solid var(--gold-dim);
+    padding: 20px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+    border-radius: var(--radius);
+    position: relative;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+#skillSwapTitle {
+    color: var(--gold-bright);
+    margin-top: 0;
+    border-bottom: 1px solid #333;
+    padding-bottom: 10px;
+}
+#skillSwapList {
+    margin-bottom: 20px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+/* Combat history log entries */
+.history-entry {
+    margin-bottom: 10px;
+    padding: 10px 12px;
+    background: rgba(20, 30, 50, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: var(--radius-sm);
+    /* border-left color is result-dependent — set inline */
+}
+.history-entry__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 3px;
+}
+.history-entry__challenge {
+    color: var(--gold);
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+.history-entry__meta {
+    color: #555;
+    font-size: 0.75rem;
+    margin-bottom: 6px;
+}
+.history-entry__actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+}
+.history-entry__stage {
+    font-size: 0.78rem;
+    margin-top: 3px;
+    padding: 3px 8px;
+    color: #888;
+    /* border-left color is result-dependent — set inline */
+}
+.history-entry__textlog {
+    display: none;
+    margin-top: 8px;
+    max-height: 260px;
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: var(--radius-sm);
+    padding: 8px;
+    font-size: 0.75rem;
+    color: #aaa;
+    font-family: var(--font-mono);
+}
+
+/* Small secondary action buttons in history entries */
+.btn-history-log {
+    font-size: 0.75rem;
+    padding: 3px 10px;
+    background: var(--window-deep);
+    color: var(--text-muted);
+    border-color: #334;
+}
+.btn-history-log:hover:not(:disabled) {
+    color: var(--text-secondary);
+    border-color: #556;
+    box-shadow: none;
+}
+.btn-history-replay {
+    font-size: 0.75rem;
+    padding: 3px 10px;
+    background: var(--window-deep);
+    color: var(--gold-dim);
+    border-color: #554;
+}
+.btn-history-replay:hover:not(:disabled) {
+    color: var(--gold);
+    border-color: var(--gold-dim);
+    box-shadow: 0 0 8px rgba(212, 175, 55, 0.2);
+}
+
+/* Mobile tooltip hint banner */
+#tooltipHint {
+    display: none; /* shown via JS when needed */
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.6rem 0.9rem;
+    margin-top: 1rem;
+    background: rgba(212, 175, 55, 0.07);
+    border: 1px solid rgba(212, 175, 55, 0.25);
+    border-radius: var(--radius-sm);
+    font-size: 0.72rem;
+    color: #8b7355;
+}
+.btn-dismiss-hint {
+    background: none;
+    border: none;
+    color: #8b7355;
+    cursor: pointer;
+    font-size: 0.72rem;
+    white-space: nowrap;
+    padding: 0;
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: normal;
+}
+.btn-dismiss-hint::before { display: none; }
+.btn-dismiss-hint:hover:not(:disabled) {
+    box-shadow: none;
+    transform: none;
+    color: var(--gold-dim);
+    border-color: transparent;
+}
+
+/* ============================================================
+   COMBAT LOG — TURN VARIANTS
+   ============================================================ */
+
+/* Sudden death turn — always crimson */
+.combat-turn.sudden-death-turn {
+    border: 1px solid #c0392b;
+    background: rgba(192, 57, 43, 0.08);
+}
+
+/* Child skill discovery proc — always gold */
+.combat-turn.child-skill-turn {
+    border: 1px solid var(--gold-dim);
+    background: rgba(212, 175, 55, 0.08);
+}
+
+/* Status tick — de-emphasised */
+.combat-turn.status-turn {
+    font-style: italic;
+    opacity: 0.8;
+}
+
+/* Stage summary outcome label — outcome color stays inline */
+.stage-outcome-label {
+    margin-top: 6px;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 0.85rem;
+}
+
+/* Summary log border — outcome color stays inline */
+.summary-turn .turn-message {
+    padding-left: 10px;
+    font-style: italic;
+    color: #aaa;
+}
+
+/* ============================================================
+   COMBAT TOAST
+   ============================================================ */
+
+#combatToast {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 9998;
+    background: var(--window-deep);
+    border: 1px solid var(--gold-dim);
+    border-radius: var(--radius);
+    padding: 0.85rem 1rem;
+    min-width: 220px;
+    max-width: 300px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
+    font-size: 0.85rem;
+    font-family: var(--font-mono, 'Courier New', monospace);
+    animation: fadeInUp 0.3s ease;
+}
+
+.toast-header {
+    color: var(--gold);
+    font-weight: bold;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+}
+
+.toast-timer {
+    color: var(--gold-bright);
+}
+
+.toast-actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+}
+
+.btn-toast-watch {
+    flex: 1;
+    padding: 4px 8px;
+    background: var(--window-base);
+    color: var(--gold);
+    border-color: var(--gold-dim);
+    font-size: 0.75rem;
+}
+.btn-toast-watch:hover:not(:disabled) {
+    color: var(--gold-bright);
+    border-color: var(--gold);
+    box-shadow: 0 0 8px rgba(212, 175, 55, 0.2);
+}
+
+.btn-toast-stop {
+    flex: 1;
+    padding: 4px 8px;
+    background: var(--window-base);
+    color: #f88;
+    border-color: #533;
+    font-size: 0.75rem;
+}
+.btn-toast-stop:hover:not(:disabled) {
+    color: #ffaaaa;
+    border-color: #755;
+    box-shadow: none;
+}
+
+/* ============================================================
+   RESULT MODAL — SKILL XP ROWS & DISCOVERY FANFARE
+   ============================================================ */
+
+.skill-xp-row {
+    margin-bottom: 0.6rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid rgba(139, 115, 85, 0.2);
+}
+
+.skill-xp-row__name {
+    color: #ccc;
+    font-size: 0.85em;
+}
+
+.skill-xp-row__level {
+    color: #8b7355;
+    font-size: 0.75em;
+}
+
+.skill-xp-row__gain {
+    color: #4cd964;
+    font-size: 0.75em;
+}
+
+.skill-xp-row__discovery-name {
+    color: var(--gold);
+    font-size: 0.85em;
+}
+
+.skill-xp-row__discovery-label {
+    color: #666;
+    font-size: 0.75em;
+}
+
+.skill-xp-row__discovery-count {
+    color: #aaa;
+    font-size: 0.75em;
+}
+
+/* Discovery unlock fanfare block in result modal */
+.discovery-fanfare {
+    margin-bottom: 1.2rem;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(76, 217, 100, 0.08));
+    border: 2px solid var(--gold-dim);
+    border-radius: var(--radius);
+    padding: 1rem 1.2rem;
+    animation: bannerFadeIn 0.5s ease forwards;
+}
+
+.discovery-fanfare__title {
+    color: var(--gold);
+    font-weight: bold;
+    font-size: 1.05rem;
+    margin-bottom: 0.6rem;
+    letter-spacing: 1px;
+}
+
+.discovery-fanfare__skill-name {
+    color: #4cd964;
+    font-weight: bold;
+    font-size: 0.95rem;
+}
+
+.discovery-fanfare__skill-desc {
+    color: #ccc;
+    font-size: 0.82rem;
+    font-style: italic;
+    margin-top: 2px;
+}
+
+.discovery-fanfare__skill-cat {
+    color: #8b7355;
+    font-size: 0.75rem;
+    margin-top: 2px;
+}
+
+/* ============================================================
+   UTILITY BUTTON CLASSES (index.html audit)
+   ============================================================ */
+
+/* Bare-chrome × close button — used in modals */
+.btn-close {
+    position: absolute;
+    background: none;
+    border: none;
+    color: #555;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: normal;
+}
+.btn-close::before { display: none; }
+.btn-close:hover:not(:disabled) {
+    color: var(--text-secondary);
+    box-shadow: none;
+    transform: none;
+    border-color: transparent;
+}
+
+/* Scroll-to-bottom pill inside the battle log header */
+.btn-scroll-resume {
+    margin-left: 8px;
+    padding: 2px 8px;
+    font-size: 0.75rem;
+    background: rgba(42, 74, 106, 0.8);
+    color: var(--text-secondary);
+    border-color: #4a6a8a;
+}
+.btn-scroll-resume:hover:not(:disabled) {
+    background: rgba(60, 100, 140, 0.9);
+    border-color: #6a8aaa;
+    color: #fff;
+    box-shadow: none;
+}
+
+/* Muted micro-action buttons (session loot Clear / ✕) */
+.btn-loot-action {
+    padding: 2px 8px;
+    font-size: 0.65rem;
+    background: rgba(139, 115, 85, 0.15);
+    color: var(--text-muted);
+    border-color: rgba(139, 115, 85, 0.3);
+}
+.btn-loot-action:hover:not(:disabled) {
+    background: rgba(139, 115, 85, 0.25);
+    color: var(--text-secondary);
+    border-color: rgba(139, 115, 85, 0.5);
+    box-shadow: none;
+}
+
+/* Full-width button — auth submit, Begin Challenge */
+.btn-full {
+    width: 100%;
+    margin-bottom: 0.75rem;
+}
+
+/* Full-width with top spacing — Begin Challenge */
+.btn-full--spaced {
+    width: 100%;
+    margin-top: 1.5rem;
+}
+
+/* Ghost/muted variant for secondary full-width (Continue as Guest) */
+.btn-full.secondary {
+    opacity: 0.6;
+    font-size: 0.85rem;
+}
+
+/* Compact secondary — Combat History, Settings close */
+.btn-compact {
+    font-size: 0.8rem;
+    padding: 4px 12px;
+}
+
+/* Minor inline button — Inventory gear section */
+.btn-minor {
+    font-size: 0.75rem;
+    padding: 3px 10px;
+    opacity: 0.7;
+}
+.btn-minor:hover:not(:disabled) {
+    opacity: 1;
+}
+
+/* ============================================================
+   AUTH MODAL TAB BUTTONS
+   ============================================================ */
+
+.auth-tab-btn {
+    flex: 1;
+    opacity: 0.5;
+}
+.auth-tab-btn.active {
+    opacity: 1;
+}
+
+/* ============================================================
+   BROWSE SYSTEM
+   ============================================================ */
+
+/* Browse card — overrides base .card gradient/border */
+.browse-card {
+    padding: 1.25rem;
+    background: linear-gradient(135deg, var(--window-base) 0%, var(--window-deep) 100%);
+    border-color: #333;
+    border-radius: 12px;
+}
+
+/* "Your Character" placeholder in browse card */
+.browse-card__own-label {
+    width: 100%;
+    text-align: center;
+    padding: 0.4rem;
+    color: #555;
+    font-size: 0.82rem;
+    border: 1px solid #2a2a3a;
+    border-radius: 6px;
+}
+
+/* Stat cell in browse card (3-column grid) */
+.browse-stat-cell {
+    padding: 0.35rem 0.5rem;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 5px;
+}
+.browse-stat-cell__label {
+    color: #666;
+    font-size: 0.7rem;
+}
+.browse-stat-cell__value {
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+/* Compact stat cell in companion card (denser) */
+.companion-stat-cell {
+    background: rgba(10, 14, 39, 0.6);
+    padding: 0.2rem;
+    border-radius: 4px;
+    text-align: center;
+}
+.companion-stat-cell__label {
+    color: #8b7355;
+    font-size: 0.65rem;
+}
+.companion-stat-cell__value {
+    font-weight: bold;
+    font-size: 0.82rem;
+}
+
+/* Skill tags — used in browse, companion, and bot cards */
+.skill-tag {
+    font-size: 0.7rem;
+    color: var(--gold);
+    background: rgba(212, 175, 55, 0.08);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-radius: 3px;
+    padding: 1px 6px;
+}
+
+/* Role badge — pill label on character cards */
+.role-badge {
+    font-size: 0.72rem;
+    color: var(--gold);
+    background: rgba(212, 175, 55, 0.12);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 10px;
+    padding: 1px 7px;
+}
+
+/* Smaller role badge variant used in companion cards */
+.role-badge--sm {
+    font-size: 0.68rem;
+    border-color: rgba(212, 175, 55, 0.25);
+    border-radius: 8px;
+    padding: 1px 6px;
+}
+
+/* Bot role badge — color is data-driven, set inline */
+.bot-role-badge {
+    font-size: 0.7rem;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 4px;
+    padding: 1px 6px;
+    /* border-color set inline per role */
+}
+
+/* Browse/companion pagination nav row */
+.browse-pagination {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-top: 1rem;
+}
+.browse-pagination__info {
+    color: #8b7355;
+    font-size: 0.85rem;
+}
+.browse-pagination__total {
+    color: #555;
+}
+
+/* Semantic color utilities — used in stat cells */
+.color-green     { color: #4eff7f; }
+.color-gold      { color: #ffd700; }
+.color-red       { color: #ff6b6b; }
+.color-red-soft  { color: #ff8c8c; }
+.color-blue      { color: #4a9eff; }

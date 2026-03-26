@@ -480,8 +480,7 @@ function renderStatAllocation() {
                     onclick="modifyStat('${stat}',1)"
                     ${canAdd ? '' : 'disabled'}>+</button>
 
-                <button class="stat-name-btn" onclick="toggleStatDesc('${stat}')"
-                    style="background:none;border:none;cursor:pointer;text-align:left;padding:0 0 0 0.75rem;flex:1;">
+                <button class="stat-name-btn" onclick="toggleStatDesc('${stat}')">
                     <span style="color:#d4af37;font-weight:bold;font-size:0.95rem;text-decoration:underline dotted;text-underline-offset:3px;">
                         ${def ? def.name : stat}
                     </span>
@@ -1097,8 +1096,7 @@ async function renderCharacterSkills(character) {
         const skillRecord = nonIntrinsicSkills[slotIndex] || null;
         
         const card = document.createElement('div');
-        card.className = 'card';
-        card.style.cssText = 'flex:1; margin:5px; min-width:140px; border: 1px solid #d4af37; background: rgba(20,30,50,0.8); position:relative; display:flex; flex-direction:column; justify-content:space-between;';
+        card.className = 'card skill-card';
         
         if (skillRecord) {
             const skillDef = window.gameData.skills.find(s => s.id === skillRecord.skillID);
@@ -1145,7 +1143,7 @@ async function renderCharacterSkills(character) {
                 // Swap Button
                 const btn = document.createElement('button');
                 btn.textContent = '🔄 Change Skill';
-                btn.style.cssText = 'margin-top:10px; width:100%; padding:5px; background:#2a4a6a; color:#fff; border:1px solid #4a6a8a; cursor:pointer;';
+                btn.className = 'btn-swap secondary';
                 btn.onclick = () => openSkillSwapModal(character, slotIndex);
                 card.appendChild(btn);
             } else {
@@ -1157,7 +1155,7 @@ async function renderCharacterSkills(character) {
             card.innerHTML = `
                 <div class="card-title" style="color:#666;">Empty Slot ${slotIndex + 1}</div>
                 <div class="card-description">No skill equipped</div>
-                <button id="swap-btn-${slotIndex}" style="margin-top:10px; width:100%; padding:5px; background:#2a4a6a; color:#fff; border:1px solid #4a6a8a; cursor:pointer;">
+                <button id="swap-btn-${slotIndex}" class="btn-swap secondary">
                     ⚡ Equip Skill
                 </button>
             `;
@@ -1418,12 +1416,11 @@ async function confirmSkillSwap(character, slotIndex, newSkillID) {
 function createSkillSwapModalHTML() {
     const modal = document.createElement('div');
     modal.id = 'skillSwapModal';
-    modal.style.cssText = 'display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:2000; justify-content:center; align-items:center;';
     modal.innerHTML = `
-        <div style="background:#1a1a2e; border:2px solid #d4af37; padding:20px; width:90%; max-width:500px; max-height:80vh; overflow-y:auto; border-radius:8px; position:relative; box-shadow:0 0 20px rgba(0,0,0,0.5);">
-            <h3 id="skillSwapTitle" style="color:#ffd700; margin-top:0; border-bottom:1px solid #333; padding-bottom:10px;">Select Skill</h3>
-            <div id="skillSwapList" style="margin-bottom:20px; max-height:60vh; overflow-y:auto;"></div>
-            <button onclick="document.getElementById('skillSwapModal').style.display='none'" style="width:100%; padding:12px; background:#4a2a2a; color:#fff; border:none; border-radius:4px; cursor:pointer; font-weight:bold;">Cancel</button>
+        <div>
+            <h3 id="skillSwapTitle">Select Skill</h3>
+            <div id="skillSwapList"></div>
+            <button class="danger" onclick="document.getElementById('skillSwapModal').style.display='none'">Cancel</button>
         </div>
     `;
     document.body.appendChild(modal);
@@ -1902,24 +1899,24 @@ function openCombatHistoryModal() {
 
         const stageRows = (log.stages || []).map(s => {
             const sc = s.status === 'victory' ? '#4cd964' : '#d4484a';
-            return `<div style="font-size:0.78rem; margin-top:3px; padding:3px 8px; border-left:2px solid ${sc}; color:#888;">
+            return `<div class="history-entry__stage" style="border-left:2px solid ${sc};">
                 <span style="color:${sc}; font-weight:500;">${s.title}: ${s.status?.toUpperCase()}</span>
                 ${s.summaryText ? `<span style="color:#666;"> — ${s.summaryText}</span>` : ''}
             </div>`;
         }).join('');
 
-        return `<div style="margin-bottom:10px; padding:10px 12px; background:rgba(20,30,50,0.7); border:1px solid rgba(255,255,255,0.06); border-left:3px solid ${color}; border-radius:4px;">
-            <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:3px;">
-                <span style="color:#d4af37; font-weight:500; font-size:0.9rem;">${challenge}</span>
+        return `<div class="history-entry" style="border-left:3px solid ${color};">
+            <div class="history-entry__header">
+                <span class="history-entry__challenge">${challenge}</span>
                 <span style="color:${color}; font-size:0.8rem; font-weight:600;">${label}</span>
             </div>
-            <div style="color:#555; font-size:0.75rem; margin-bottom:6px;">${date} &middot; ${log.totalTurns} turns</div>
+            <div class="history-entry__meta">${date} &middot; ${log.totalTurns} turns</div>
             ${stageRows}
-            <div style="display:flex; gap:6px; margin-top:8px;">
-                <button onclick="viewCombatTextLog('${log.id}')" style="font-size:0.75rem; padding:3px 10px; background:#1a2a3a; color:#aaa; border:1px solid #334; border-radius:3px; cursor:pointer;">📄 View Log</button>
-                <button onclick="replayCombatLog('${log.id}')" style="font-size:0.75rem; padding:3px 10px; background:#1a2a3a; color:#d4af37; border:1px solid #554; border-radius:3px; cursor:pointer;">▶ Replay</button>
+            <div class="history-entry__actions">
+                <button class="btn-history-log secondary" onclick="viewCombatTextLog('${log.id}')">📄 View Log</button>
+                <button class="btn-history-replay secondary" onclick="replayCombatLog('${log.id}')">▶ Replay</button>
             </div>
-            <div id="textlog-${log.id}" style="display:none; margin-top:8px; max-height:260px; overflow-y:auto; background:rgba(0,0,0,0.3); border-radius:4px; padding:8px; font-size:0.75rem; color:#aaa; font-family:monospace;"></div>
+            <div id="textlog-${log.id}" class="history-entry__textlog"></div>
         </div>`;
     }).join('') || '<p style="color:#666; font-style:italic;">No combat history yet.</p>';
 }
@@ -2035,12 +2032,12 @@ function _renderTooltipHint() {
     const el = document.getElementById('tooltipHint');
     if (!el) return;
 
-    el.style.cssText = 'display:flex; align-items:center; justify-content:space-between; gap:0.5rem; padding:0.6rem 0.9rem; margin-top:1rem; background:rgba(212,175,55,0.07); border:1px solid rgba(212,175,55,0.25); border-radius:6px; font-size:0.72rem; color:#8b7355;';
+    el.style.display = 'flex';
     el.innerHTML = `
         <span>💡 Long press skills or gear for details</span>
-        <button onclick="
+        <button class="btn-dismiss-hint" onclick="
             localStorage.setItem('tooltipHintDismissed','true');
             document.getElementById('tooltipHint').style.display='none';
-        " style="background:none; border:none; color:#8b7355; cursor:pointer; font-size:0.72rem; white-space:nowrap; padding:0;">Dismiss forever</button>
+        ">Dismiss forever</button>
     `;
 }
