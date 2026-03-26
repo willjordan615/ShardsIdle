@@ -634,6 +634,7 @@ async function loadPublicCompanions(page) {
 const MAX_BOT_LEVEL = 100;
 const BOT_STATIC_CAP = 12; // highest level in bots.json
 let _botsGenerated = false;
+const _botSessionSeed = Date.now() & 0xffffffff;
 
 // Deterministic "random" from a seed so the same level always yields the same bot.
 function _botRng(seed) {
@@ -654,68 +655,131 @@ function _generateBots() {
 
     // Role definitions -------------------------------------------------------
 
+    // Skill pools are tiered by combo-tree depth.
+    // Depth thresholds: d1-2 from level 1, d3 from level 20, d4 from level 40, d5+ never for bots.
+    // Each role has { primary: [...tiers], secondary: [...tiers] }
+    // where tiers = [ {minLevel, skills[]}, ... ] sorted ascending.
+    // pickSkill() walks tiers in reverse to use the deepest available pool.
     const ROLES = [
         {
             role: 'Defender',
             race: 'dwarf',
             weaponTypes: ['hammer', 'mace'],
-            // [primary skill pool, secondary skill pool]
-            skillPools: [
-                ['block', 'stone_skin', 'arcane_barrier', 'mana_shield', 'footwork', 'spell_reflection'],
-                ['provoke', 'goad', 'jeer', 'intimidate', 'incite', 'infuriate', 'shove', 'misdirect'],
-            ],
-            // stat weights must sum to 1.0
             statWeights: { conviction: 0.20, endurance: 0.40, ambition: 0.15, harmony: 0.25 },
+            skillPools: {
+                primary: [
+                    { minLevel:  1, skills: ['block', 'footwork', 'misdirect', 'shove'] },
+                    { minLevel: 13, skills: ['stone_skin', 'fortify', 'provoke'] },
+                    { minLevel: 20, skills: ['arcane_barrier', 'faith_armor', 'crystal_skin', 'ice_block', 'fire_wall', 'goad', 'jeer', 'dispel', 'stone_ward'] },
+                    { minLevel: 40, skills: ['shadow_tendril', 'primal_crush', 'spell_reflection', 'sacred_roots', 'divine_barrier', 'bark_carapace', 'sanctuary', 'frozen_cry', 'holy_roots', 'incite', 'intimidate'] },
+                ],
+                secondary: [
+                    { minLevel:  1, skills: ['shove', 'misdirect', 'block', 'footwork'] },
+                    { minLevel: 13, skills: ['stone_skin', 'fortify', 'provoke'] },
+                    { minLevel: 20, skills: ['goad', 'jeer', 'dispel', 'nature_wrap', 'entangle', 'mana_shield'] },
+                    { minLevel: 40, skills: ['incite', 'intimidate', 'shadow_tendril', 'judgment_field', 'ward_break'] },
+                ],
+            },
         },
         {
             role: 'Bruiser',
             race: 'orc',
             weaponTypes: ['axe', 'sword', 'hammer'],
-            skillPools: [
-                ['basic_attack', 'strong_attack', 'lunge', 'slash', 'cleave', 'wild_swing'],
-                ['shout', 'buff_strength', 'shove', 'focus', 'battle_cry', 'reckless_strike'],
-            ],
             statWeights: { conviction: 0.38, endurance: 0.30, ambition: 0.22, harmony: 0.10 },
+            skillPools: {
+                primary: [
+                    { minLevel:  1, skills: ['basic_attack', 'aim', 'shout', 'buff_strength'] },
+                    { minLevel: 13, skills: ['strong_attack', 'lunge', 'slash', 'pummel', 'pierce', 'frenzy', 'warcry'] },
+                    { minLevel: 20, skills: ['singe', 'frostbite', 'blood_letting', 'flaming_edge', 'shocking_blow', 'counter_strike', 'riposte', 'stone_fist', 'runic_smash'] },
+                    { minLevel: 40, skills: ['shadow_strike', 'inferno_slice', 'glacial_javelin', 'divine_judgment', 'shield_bash', 'silent_death', 'shadow_wound', 'corrosive_wound'] },
+                ],
+                secondary: [
+                    { minLevel:  1, skills: ['shout', 'focus', 'buff_strength', 'buff_all_stats'] },
+                    { minLevel: 13, skills: ['warcry', 'vitality_boost', 'berserker_stance', 'blood_rage'] },
+                    { minLevel: 20, skills: ['vitality_surge', 'assassinate', 'echoing_prayer'] },
+                    { minLevel: 40, skills: ['blood_fury', 'mental_fortitude', 'terror_cry'] },
+                ],
+            },
         },
         {
             role: 'Assassin',
             race: 'halfling',
             weaponTypes: ['dagger', 'handaxe'],
-            skillPools: [
-                ['aim', 'weak_point', 'skirmish', 'lunge', 'singe', 'frostbite'],
-                ['footwork', 'misdirect', 'stalk', 'shadow_step', 'call_target', 'shove'],
-            ],
             statWeights: { conviction: 0.25, endurance: 0.18, ambition: 0.45, harmony: 0.12 },
+            skillPools: {
+                primary: [
+                    { minLevel:  1, skills: ['aim', 'basic_attack', 'footwork', 'misdirect'] },
+                    { minLevel: 13, skills: ['weak_point', 'skirmish', 'lunge', 'slash', 'stalk', 'shadow_step', 'call_target'] },
+                    { minLevel: 20, skills: ['singe', 'frostbite', 'blood_letting', 'venomous_slash', 'counter_strike', 'riposte', 'assassinate', 'phantom_lunge', 'wind_cut'] },
+                    { minLevel: 40, skills: ['shadow_strike', 'silent_death', 'shadow_wound', 'shadow_riposte', 'arcane_dash'] },
+                ],
+                secondary: [
+                    { minLevel:  1, skills: ['footwork', 'misdirect', 'aim'] },
+                    { minLevel: 13, skills: ['stalk', 'shadow_step', 'call_target', 'weak_point'] },
+                    { minLevel: 20, skills: ['assassinate', 'counter_strike', 'poison_lunge', 'nature_pierce'] },
+                    { minLevel: 40, skills: ['shadow_riposte', 'silent_death', 'arcane_dash', 'penitent_strike'] },
+                ],
+            },
         },
         {
             role: 'Mage',
             race: 'human',
             weaponTypes: ['wand', 'tome'],
-            skillPools: [
-                ['channel', 'shock', 'produce_flame', 'chill', 'skill_fireball', 'skill_lightning'],
-                ['focus', 'attunement', 'arcane_barrier', 'buff_all_stats', 'thunderclap', 'frost_slide'],
-            ],
             statWeights: { conviction: 0.30, endurance: 0.12, ambition: 0.22, harmony: 0.36 },
+            skillPools: {
+                primary: [
+                    { minLevel:  1, skills: ['channel', 'skill_fireball', 'skill_lightning'] },
+                    { minLevel: 13, skills: ['shock', 'produce_flame', 'chill', 'arcane_bolt'] },
+                    { minLevel: 20, skills: ['thunderclap', 'frost_slide', 'scorched_shot', 'sleet', 'shadow_bolt', 'mind_spike', 'burning_aura', 'frost_nova', 'lightning_chain', 'fireball'] },
+                    { minLevel: 40, skills: ['storm_hammer', 'plague_carrier', 'ring_of_fire', 'blizzard', 'earthquake', 'chain_lightning', 'meteor', 'entropic_decay'] },
+                ],
+                secondary: [
+                    { minLevel:  1, skills: ['focus', 'attunement', 'buff_all_stats'] },
+                    { minLevel: 13, skills: ['shock', 'chill', 'arcane_bolt', 'vitality_boost'] },
+                    { minLevel: 20, skills: ['thunderclap', 'frost_slide', 'vitality_surge', 'echoing_prayer'] },
+                    { minLevel: 40, skills: ['blood_fury', 'mental_fortitude', 'entropic_decay', 'water_bolt'] },
+                ],
+            },
         },
         {
             role: 'Support',
             race: 'human',
             weaponTypes: ['scepter'],
-            skillPools: [
-                ['first_aid', 'mend', 'holy_light', 'nature_touch', 'heal_major', 'healing_light'],
-                ['shout', 'attunement', 'buff_all_stats', 'restore_mana_minor', 'regrowth', 'focused_rest'],
-            ],
             statWeights: { conviction: 0.15, endurance: 0.22, ambition: 0.18, harmony: 0.45 },
+            skillPools: {
+                primary: [
+                    { minLevel:  1, skills: ['first_aid', 'heal_major', 'restore_mana_minor', 'restore_stam_minor'] },
+                    { minLevel: 13, skills: ['mend', 'holy_light', 'nature_touch', 'focused_rest', 'iron_will', 'second_wind'] },
+                    { minLevel: 20, skills: ['healing_light', 'regrowth', 'holy_word', 'sacred_grove', 'life_link', 'atonement'] },
+                    { minLevel: 40, skills: ['mass_heal', 'forest_embrace', 'rooted_healing', 'martyrdom', 'thorned_regeneration', 'retaliatory_heal', 'persistent_life', 'caustic_mend'] },
+                ],
+                secondary: [
+                    { minLevel:  1, skills: ['shout', 'buff_all_stats', 'focus', 'restore_mana_minor'] },
+                    { minLevel: 13, skills: ['focused_rest', 'iron_will', 'warcry', 'vitality_boost'] },
+                    { minLevel: 20, skills: ['vitality_surge', 'echoing_prayer', 'mana_cycle'] },
+                    { minLevel: 40, skills: ['blood_fury', 'mental_fortitude', 'resurrection_rite'] },
+                ],
+            },
         },
         {
             role: 'Utility',
             race: 'dwarf',
             weaponTypes: ['totem', 'bell', 'flute'],
-            skillPools: [
-                ['rest', 'focused_rest', 'attunement', 'mana_cycle', 'iron_will', 'restore_stam_minor'],
-                ['buff_speed', 'buff_defense', 'buff_all_stats', 'shout', 'sense', 'focus'],
-            ],
             statWeights: { conviction: 0.20, endurance: 0.28, ambition: 0.22, harmony: 0.30 },
+            skillPools: {
+                primary: [
+                    { minLevel:  1, skills: ['rest', 'attunement', 'sense', 'restore_stam_minor', 'restore_mana_minor'] },
+                    { minLevel: 13, skills: ['focused_rest', 'iron_will', 'stalk', 'call_target', 'shadow_step', 'silent_prayer'] },
+                    { minLevel: 20, skills: ['shadow_misdirection', 'stalking_shadow', 'vitality_surge', 'echoing_prayer'] },
+                    { minLevel: 40, skills: ['shadow_veil', 'blood_fury', 'mental_fortitude'] },
+                ],
+                secondary: [
+                    { minLevel:  1, skills: ['buff_speed', 'buff_defense', 'buff_all_stats', 'shout', 'focus'] },
+                    { minLevel: 13, skills: ['warcry', 'vitality_boost', 'call_target', 'iron_will'] },
+                    { minLevel: 20, skills: ['vitality_surge', 'shadow_misdirection', 'mana_cycle'] },
+                    { minLevel: 40, skills: ['mental_fortitude', 'shadow_veil', 'terror_cry'] },
+                ],
+            },
         },
     ];
 
@@ -730,11 +794,15 @@ function _generateBots() {
 
     const validSkillIds = new Set(skills.map(s => s.id));
 
-    function pickSkill(pool, rng) {
-        // Walk the pool in order, return first one that exists in game data
-        const valid = pool.filter(id => validSkillIds.has(id));
-        if (!valid.length) return null;
-        return valid[Math.floor(rng() * valid.length)];
+    // pool is a tiered array: [{minLevel, skills[]}, ...]
+    // Returns a skill from the deepest tier the bot qualifies for, excluding .
+    function pickSkill(tieredPool, botLevel, rng, exclude) {
+        const eligible = tieredPool
+            .filter(tier => botLevel >= tier.minLevel)
+            .flatMap(tier => tier.skills)
+            .filter(id => validSkillIds.has(id) && id !== exclude);
+        if (!eligible.length) return null;
+        return eligible[Math.floor(rng() * eligible.length)];
     }
 
     function pickWeapon(weaponTypes, tier, rng) {
@@ -763,12 +831,12 @@ function _generateBots() {
 
     for (let level = BOT_STATIC_CAP + 1; level <= MAX_BOT_LEVEL; level++) {
         // 1-3 bots per level, role mix varies
-        const rng = _botRng(level * 7919);
+        const rng = _botRng(level * 7919 ^ _botSessionSeed);
         const botsThisLevel = 1 + Math.floor(rng() * 3); // 1, 2, or 3
         const usedRoles = new Set();
 
         for (let i = 0; i < botsThisLevel; i++) {
-            const rng2 = _botRng(level * 7919 + i * 131);
+            const rng2 = _botRng(level * 7919 + i * 131 ^ _botSessionSeed);
 
             // Pick a role not already used at this level
             const available = ROLES.filter(r => !usedRoles.has(r.role));
@@ -778,7 +846,7 @@ function _generateBots() {
 
             // Stats
             const budget = 220 + 35 * (level - 1);
-            const rng3 = _botRng(level * 2053 + i * 97);
+            const rng3 = _botRng(level * 2053 + i * 97 ^ _botSessionSeed);
             const jitter = () => Math.floor((rng3() - 0.5) * 20); // ±10
             const raw = {
                 conviction: Math.round(budget * roleDef.statWeights.conviction) + jitter(),
@@ -793,11 +861,11 @@ function _generateBots() {
             raw.endurance += diff; // absorb rounding error into endurance
 
             // Skills
-            const rng4 = _botRng(level * 1301 + i * 61);
-            const skillLevel = Math.min(10, Math.floor(level / 5) + 1);
-            const s1id = pickSkill(roleDef.skillPools[0], rng4);
-            const rng5 = _botRng(level * 1301 + i * 61 + 1);
-            const s2id = pickSkill(roleDef.skillPools[1].filter(id => id !== s1id), rng5);
+            const rng4 = _botRng(level * 1301 + i * 61 ^ _botSessionSeed);
+            const skillLevel = Math.min(10, Math.floor(level / 10) + 1);
+            const s1id = pickSkill(roleDef.skillPools.primary, level, rng4, null);
+            const rng5 = _botRng(level * 1301 + i * 61 + 1 ^ _botSessionSeed);
+            const s2id = pickSkill(roleDef.skillPools.secondary, level, rng5, s1id);
 
             const intrinsicId = getIntrinsicSkill(roleDef.race);
             const botSkills = [];
@@ -809,7 +877,7 @@ function _generateBots() {
 
             // Equipment — tier 0–8 over levels 1–100, each tier spans ~12 levels
             const tier = Math.min(8, Math.floor((level - 1) / 12));
-            const rng6 = _botRng(level * 541 + i * 43);
+            const rng6 = _botRng(level * 541 + i * 43 ^ _botSessionSeed);
             const weaponId = pickWeapon(roleDef.weaponTypes, tier, rng6);
 
             // Name — deterministic per role+level
