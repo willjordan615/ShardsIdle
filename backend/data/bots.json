@@ -9,7 +9,7 @@
     "skills": [
       { "skillID": "prayer",       "learned": true, "intrinsic": true, "skillXP": 0,  "skillLevel": 1, "usageCount": 0 },
       { "skillID": "block",        "learned": true, "skillXP": 80,  "skillLevel": 1, "usageCount": 8 },
-      { "skillID": "shout",        "learned": true, "skillXP": 60,  "skillLevel": 1, "usageCount": 6 }
+      { "skillID": "misdirect",        "learned": true, "skillXP": 60,  "skillLevel": 1, "usageCount": 6 }
     ],
     "equipment": { "mainHand": "mace_wood_tier0" },
     "consumables": { "health_potion_minor": 1 }
@@ -129,7 +129,7 @@
     "skills": [
       { "skillID": "restore_stam_minor", "learned": true, "intrinsic": true, "skillXP": 0, "skillLevel": 1, "usageCount": 0 },
       { "skillID": "block",        "learned": true, "skillXP": 150,  "skillLevel": 2, "usageCount": 16 },
-      { "skillID": "shout",        "learned": true, "skillXP": 110,  "skillLevel": 1, "usageCount": 11 }
+      { "skillID": "provoke",        "learned": true, "skillXP": 110,  "skillLevel": 1, "usageCount": 11 }
     ],
     "equipment": { "mainHand": "hammer_iron_tier0" },
     "consumables": { "health_potion_minor": 2 }
@@ -219,7 +219,7 @@
     "skills": [
       { "skillID": "bloodlust",    "learned": true, "intrinsic": true, "skillXP": 0,   "skillLevel": 1, "usageCount": 0 },
       { "skillID": "block",        "learned": true, "skillXP": 520,  "skillLevel": 4, "usageCount": 52 },
-      { "skillID": "shout",        "learned": true, "skillXP": 400,  "skillLevel": 3, "usageCount": 40 }
+      { "skillID": "goad",        "learned": true, "skillXP": 400,  "skillLevel": 3, "usageCount": 40 }
     ],
     "equipment": { "mainHand": "mace_iron_tier0" },
     "consumables": { "health_potion_minor": 3 }
@@ -294,7 +294,7 @@
     "skills": [
       { "skillID": "restore_stam_minor", "learned": true, "intrinsic": true, "skillXP": 0, "skillLevel": 1, "usageCount": 0 },
       { "skillID": "block",        "learned": true, "skillXP": 900,  "skillLevel": 7, "usageCount": 90 },
-      { "skillID": "shout",        "learned": true, "skillXP": 720,  "skillLevel": 6, "usageCount": 72 }
+      { "skillID": "jeer",        "learned": true, "skillXP": 720,  "skillLevel": 6, "usageCount": 72 }
     ],
     "equipment": { "mainHand": "hammer_steel_tier1" },
     "consumables": { "health_potion_minor": 3, "mana_potion_minor": 1 }
