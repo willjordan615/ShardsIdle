@@ -900,7 +900,7 @@
     "type": "debuff",
     "description": "Exposed and targeted. Enemies are drawn to attack this combatant.",
     "emoji": "\ud83c\udfaf",
-    "tooltip": "Marked \u2014 enemies are more likely to target you",
+    "tooltip": "Marked \u2014 characters are more likely to be targeted",
     "defaultDuration": 3,
     "defaultMagnitude": 1,
     "targetingWeight": 3.0,

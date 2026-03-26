@@ -4148,7 +4148,7 @@
     "aiProfile": "support",
     "equipment": {},
     "availableSkills": [
-      "hunter_mark",
+      "call_target",
       "weak_point",
       "terror_cry",
       "shout",
