@@ -166,161 +166,117 @@ window.closeConsumableManagement = window.closeInventory;
 function _renderGearModal(character, activeSlot) {
     const inner = document.getElementById('inventoryModalInner');
     if (!inner) return;
+    window._currentModalChar = character;
+
     const inventory = _safeInventory(character);
+    const eq        = character.equipment || {};
 
-// Build inventory gear grouped by slot
-const bySlot = {};
-GEAR_SLOTS.forEach(s => bySlot[s] = []);
-const addedToSecondary = new Set(); // Track items added to secondary slot
-
-inventory.forEach((inv, idx) => {
-    if (!inv) return;
-    const def = _itemDef(inv.itemID);
-    if (!_isGear(def)) return;
-    
-    const slot1 = _itemSlot(def);
-    const slot2 = def?.slot_id2;
-    
-    // Always add to primary slot
-    if (slot1 && GEAR_SLOTS.includes(slot1)) {
-        bySlot[slot1].push({ inv, idx, def });
-    }
-    
-    // Add to secondary slot ONLY if it exists and differs from primary
-    if (slot2 && GEAR_SLOTS.includes(slot2) && slot2 !== slot1) {
-        // Use inventory index as unique key (same item in inventory = same index)
-        addedToSecondary.add(idx);
-        bySlot[slot2].push({ inv, idx, def });
-    }
-});
-
-    const miscItems = inventory.filter(inv => {
-        if (!inv) return false;
+    // Build inventory gear grouped by slot
+    const bySlot = {};
+    GEAR_SLOTS.forEach(s => bySlot[s] = []);
+    inventory.forEach((inv, idx) => {
+        if (!inv) return;
         const def = _itemDef(inv.itemID);
-        return !_isGear(def) && !_isConsumable(def);
+        if (!_isGear(def)) return;
+        const slot1 = _itemSlot(def);
+        const slot2 = def?.slot_id2;
+        if (slot1 && GEAR_SLOTS.includes(slot1)) bySlot[slot1].push({ inv, idx, def });
+        if (slot2 && GEAR_SLOTS.includes(slot2) && slot2 !== slot1) bySlot[slot2].push({ inv, idx, def });
     });
 
-    // Which slots to show in inventory column — filtered if slot active
     const visibleSlots = activeSlot ? [activeSlot] : GEAR_SLOTS;
-    const hasInventoryItems = visibleSlots.some(s => bySlot[s]?.length) || (!activeSlot && miscItems.length);
 
-    // Slot filter tabs
-    const filterTabs = `
-        <div style="display:flex; gap:4px; flex-wrap:wrap; margin-bottom:10px; flex-shrink:0;">
-            <button onclick="_renderGearModal(window._currentModalChar, null)"
-                style="font-size:0.72rem; padding:2px 8px; border-radius:3px; cursor:pointer;
-                       background:${!activeSlot?'#2a4a6a':'#111'}; color:${!activeSlot?'#d4af37':'#666'};
-                       border:1px solid ${!activeSlot?'#d4af37':'#333'};">All</button>
+    // ── Header ────────────────────────────────────────────────────────────────
+    const header = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--space-sm); flex-shrink:0;">
+            <div style="display:flex; align-items:center; gap:var(--space-md);">
+                <h3 style="margin:0; font-size:0.88rem; letter-spacing:0.08em;">GEAR MANAGEMENT</h3>
+                <span style="color:var(--gold); font-size:0.78rem;">&#128176; ${character.gold.toFixed(0)}g</span>
+                <span style="color:#8888ff; font-size:0.78rem;">&#10022; ${character.arcaneDust.toFixed(2)} dust</span>
+            </div>
+            <button class="secondary" onclick="closeInventory()" style="padding:3px 10px; font-size:0.72rem;">&#10005; Close</button>
+        </div>`;
+
+    // ── Filter tabs ───────────────────────────────────────────────────────────
+    const tabs = `
+        <div class="inv-tabs">
+            <button class="inv-tab ${!activeSlot ? 'inv-tab--active' : ''}"
+                    onclick="_renderGearModal(window._currentModalChar, null)">All</button>
             ${GEAR_SLOTS.map(s => `
-                <button onclick="_renderGearModal(window._currentModalChar, '${s}')"
-                    style="font-size:0.72rem; padding:2px 8px; border-radius:3px; cursor:pointer;
-                           background:${activeSlot===s?'#2a4a6a':'#111'}; color:${activeSlot===s?'#d4af37':'#666'};
-                           border:1px solid ${activeSlot===s?'#d4af37':'#333'};">${SLOT_LABELS[s]}</button>
+                <button class="inv-tab ${activeSlot === s ? 'inv-tab--active' : ''}"
+                        onclick="_renderGearModal(window._currentModalChar, '${s}')">${SLOT_LABELS[s]}</button>
             `).join('')}
         </div>`;
 
-    // Store ref for tab clicks
-    window._currentModalChar = character;
+    // ── Item list ─────────────────────────────────────────────────────────────
+    let rows = '';
+    let anyItem = false;
 
-    inner.innerHTML = `
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-shrink:0;">
-        <div style="display:flex; align-items:center; gap:12px;">
-            <h3 style="margin:0; color:#ffd700;">⚔ Gear Management</h3>
-            <span style="color:#d4af37; font-size:0.82rem;">💰 ${character.gold.toFixed(0)}g</span>
-            <span style="color:#8888ff; font-size:0.82rem;">✨ ${character.arcaneDust.toFixed(2)} dust</span>
-        </div>
-        <button onclick="closeInventory()" style="padding:4px 12px; background:#4a2a2a; color:#fff; border:none; border-radius:4px; cursor:pointer;">✕ Close</button>
-    </div>
+    visibleSlots.forEach(slot => {
+        const equippedId  = eq[slot];
+        const equippedDef = equippedId ? _itemDef(equippedId) : null;
+        const invItems    = bySlot[slot] || [];
+        const hasContent  = equippedDef || invItems.length > 0;
 
-    ${filterTabs}
+        if (visibleSlots.length > 1 && !hasContent) return;
 
-    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; overflow:hidden; flex:1; min-height:0;">
+        rows += `<div class="inv-slot-header">${SLOT_LABELS[slot]}</div>`;
 
-        <!-- Equipped -->
-        <div style="display:flex; flex-direction:column; overflow:hidden;">
-            <div style="color:#888; font-size:0.72rem; letter-spacing:1px; text-transform:uppercase; margin-bottom:6px; flex-shrink:0;">Equipped</div>
-            <div style="overflow-y:auto; flex:1;">
-                ${visibleSlots.map(slot => {
-                    const itemId = character.equipment?.[slot];
-                    const def = itemId ? _itemDef(itemId) : null;
-                    if (def) {
-                        return `<div class="inv-card inv-equipped" onclick="unequipItemNew('${character.id}','${slot}')" title="Click to unequip">
-                            <div style="color:#555; font-size:0.68rem;">${SLOT_LABELS[slot]}</div>
-                            <div style="color:#d4af37; font-size:0.82rem; font-weight:500;">${def.name}</div>
-                            ${def.dmg1 ? `<div style="color:#ff6b6b; font-size:0.72rem;">${def.dmg1} ${def.dmg_type_1||''}</div>` : ''}
-                            ${def.armor ? `<div style="color:#4eff7f; font-size:0.72rem;">Armor: ${def.armor}</div>` : ''}
-                            ${_statBonuses(def) ? `<div style="color:#aaa; font-size:0.7rem;">${_statBonuses(def)}</div>` : ''}
-                            <div style="color:#d44; font-size:0.68rem; margin-top:2px;">↩ Unequip</div>
-                        </div>`;
-                    } else {
-                        return `<div class="inv-card inv-empty-slot">
-                            <div style="color:#555; font-size:0.68rem;">${SLOT_LABELS[slot]}</div>
-                            <div style="color:#333; font-size:0.78rem; font-style:italic;">Empty</div>
-                        </div>`;
-                    }
-                }).join('')}
-            </div>
-        </div>
+        // Equipped row
+        if (equippedDef) {
+            anyItem = true;
+            const stats = [
+                equippedDef.dmg1 ? `${equippedDef.dmg1} ${equippedDef.dmg_type_1 || ''}`.trim() : null,
+                equippedDef.armor ? `${equippedDef.armor} armor` : null,
+                _statBonuses(equippedDef) || null,
+            ].filter(Boolean).join(' · ');
+            rows += `
+                <div class="inv-item inv-item--equipped">
+                    <div class="inv-item__info">
+                        <div class="inv-item__name">${equippedDef.name}</div>
+                        ${stats ? `<div class="inv-item__stats">${stats}</div>` : ''}
+                    </div>
+                    <div class="inv-item__actions">
+                        <button class="inv-btn inv-btn--unequip"
+                                onclick="unequipItemNew('${character.id}','${slot}')">Unequip</button>
+                    </div>
+                </div>`;
+        } else {
+            rows += `<div class="inv-item inv-item--empty"><div class="inv-item__info"><div class="inv-item__name">Empty</div></div></div>`;
+        }
 
-        <!-- Inventory -->
-        <div style="display:flex; flex-direction:column; overflow:hidden;">
-            <div style="color:#888; font-size:0.72rem; letter-spacing:1px; text-transform:uppercase; margin-bottom:6px; flex-shrink:0;">Inventory</div>
-            <div style="overflow-y:auto; flex:1;">
-                ${visibleSlots.map(slot => {
-                    const items = bySlot[slot] || [];
-                    if (!items.length) return '';
-                    const header = visibleSlots.length > 1
-                        ? `<div style="color:#4a9eff; font-size:0.68rem; letter-spacing:1px; margin:5px 0 2px; text-transform:uppercase;">${SLOT_LABELS[slot]}</div>`
-                        : '';
-                    return header + items.map(({inv, idx, def}) =>
-                        `<div class="inv-card inv-gear" onclick="equipItemNew('${character.id}','${inv.itemID}',${idx})" title="Click to equip">
-                            <div style="color:${_rarityColor(inv.rarity)}; font-size:0.82rem; font-weight:500;">${def?.name || inv.itemID}</div>
-                            ${def?.dmg1 ? `<div style="color:#ff6b6b; font-size:0.72rem;">${def.dmg1} ${def.dmg_type_1||''}</div>` : ''}
-                            ${def?.armor ? `<div style="color:#4eff7f; font-size:0.72rem;">Armor: ${def.armor}</div>` : ''}
-                            ${_statBonuses(def) ? `<div style="color:#aaa; font-size:0.7rem;">${_statBonuses(def)}</div>` : ''}
-                            <div style="color:#4a9eff; font-size:0.68rem; margin-top:2px;">↑ Equip</div>
-                        </div>`
-                    ).join('');
-                }).join('')}
-                ${!activeSlot && miscItems.map(inv => {
-                    const def = _itemDef(inv.itemID);
-                    const ri = inventory.indexOf(inv);
-                    return `<div class="inv-card" style="border-color:#333;">
-                        <div style="color:#aaa; font-size:0.82rem;">${def?.name || inv.itemID}</div>
-                        <div style="color:#555; font-size:0.7rem; font-style:italic;">Quest item</div>
-                        <button onclick="deleteInventoryItem('${character.id}',${ri})" style="margin-top:3px; font-size:0.68rem; padding:2px 6px; background:#4a1a1a; color:#ff6b6b; border:none; border-radius:3px; cursor:pointer;">🗑 Delete</button>
-                    </div>`;
-                }).join('')}
-                ${!hasInventoryItems ? '<p style="color:#444; font-style:italic; font-size:0.8rem; text-align:center; padding:1rem 0;">No items for this slot</p>' : ''}
-            </div>
-        </div>
+        // Inventory rows for this slot
+        invItems.forEach(({ inv, idx, def }) => {
+            anyItem = true;
+            const g = _goldValue(def);
+            const stats = [
+                def?.dmg1 ? `${def.dmg1} ${def.dmg_type_1 || ''}`.trim() : null,
+                def?.armor ? `${def.armor} armor` : null,
+                _statBonuses(def) || null,
+            ].filter(Boolean).join(' · ');
+            rows += `
+                <div class="inv-item">
+                    <div class="inv-item__info">
+                        <div class="inv-item__name" style="color:${_rarityColor(inv.rarity)};">${def?.name || inv.itemID}</div>
+                        ${stats ? `<div class="inv-item__stats">${stats}</div>` : ''}
+                    </div>
+                    <div class="inv-item__actions">
+                        <button class="inv-btn inv-btn--equip"
+                                onclick="equipItemNew('${character.id}','${inv.itemID}',${idx})">Equip</button>
+                        <button class="inv-btn inv-btn--sell"
+                                onclick="sellInventoryItem('${character.id}',${idx})">${g}g</button>
+                    </div>
+                </div>`;
+        });
+    });
 
-        <!-- Sell -->
-        <div style="display:flex; flex-direction:column; overflow:hidden;">
-            <div style="color:#888; font-size:0.72rem; letter-spacing:1px; text-transform:uppercase; margin-bottom:6px; flex-shrink:0;">Sell</div>
-            <div style="overflow-y:auto; flex:1;">
-                ${inventory.filter(inv => {
-                    if (!inv) return false;
-                    const def = _itemDef(inv.itemID);
-                    if (!_isGear(def)) return false;
-                    return !activeSlot || _itemSlot(def) === activeSlot;
-                }).map(inv => {
-                    const def = _itemDef(inv.itemID);
-                    const ri = inventory.indexOf(inv);
-                    const g = _goldValue(def);
-                    const d = _dustYield(g);
-                    return `<div class="inv-card" style="border-color:#2a3a2a;">
-                        <div style="color:${_rarityColor(inv.rarity)}; font-size:0.8rem; font-weight:500;">${def?.name || inv.itemID}</div>
-                        <div style="color:#666; font-size:0.7rem;">${g}g · ${d.toFixed(2)} dust</div>
-                        <button onclick="sellInventoryItem('${character.id}',${ri})" style="margin-top:3px; font-size:0.68rem; padding:2px 8px; background:#2a3a1a; color:#4eff7f; border:1px solid #3a5a2a; border-radius:3px; cursor:pointer;">💰 Sell</button>
-                    </div>`;
-                }).join('')}
-                ${!inventory.some(inv => inv && _isGear(_itemDef(inv.itemID)) && (!activeSlot || _itemSlot(_itemDef(inv.itemID)) === activeSlot))
-                    ? '<p style="color:#444; font-style:italic; font-size:0.8rem; text-align:center; padding:0.5rem 0;">Nothing to sell</p>' : ''}
-            </div>
-        </div>
-    </div>`;
+    if (!anyItem) {
+        rows = '<div class="inv-empty-msg">Nothing here.</div>';
+    }
+
+    inner.innerHTML = header + tabs + `<div class="inv-list">${rows}</div>`;
 }
+
 
 // ── Belt slot actions ─────────────────────────────────────────────────────────
 
