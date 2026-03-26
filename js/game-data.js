@@ -1197,3 +1197,51 @@ function getComboHints(character, skillID) {
 
     return [...hints];
 }
+
+// ---------------------------------------------------------------------------
+// Server status indicator
+// Polls /api/health every 30s. Updates the dot and label in the header.
+// Green = online (<500ms), Yellow = slow (500ms–2s), Red = offline/timeout.
+// ---------------------------------------------------------------------------
+
+(function initServerStatus() {
+    const POLL_INTERVAL = 30000; // 30s
+    const SLOW_THRESHOLD = 500;  // ms
+    const TIMEOUT_MS = 5000;     // treat as offline after 5s
+
+    function setStatus(state, label) {
+        const dot = document.getElementById('serverStatusDot');
+        const lbl = document.getElementById('serverStatusLabel');
+        if (!dot || !lbl) return;
+        dot.className = 'server-dot ' + state;
+        lbl.className = 'server-label ' + state;
+        lbl.textContent = label;
+    }
+
+    async function poll() {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
+        const t0 = Date.now();
+        try {
+            const res = await fetch(`${BACKEND_URL}/api/health`, {
+                signal: controller.signal,
+                cache: 'no-store',
+            });
+            clearTimeout(timeout);
+            if (!res.ok) throw new Error('non-ok');
+            const ms = Date.now() - t0;
+            if (ms >= SLOW_THRESHOLD) {
+                setStatus('slow', `Slow (${ms}ms)`);
+            } else {
+                setStatus('online', 'Online');
+            }
+        } catch {
+            clearTimeout(timeout);
+            setStatus('offline', 'Offline');
+        }
+    }
+
+    // First poll after a short delay so DOM is ready
+    setTimeout(poll, 1500);
+    setInterval(poll, POLL_INTERVAL);
+})();

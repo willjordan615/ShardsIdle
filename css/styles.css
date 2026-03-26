@@ -3238,3 +3238,30 @@ body:has(#combatlog.active) #headerTopBar {
     font-size: 0.72rem;
     border-radius: 3px;
 }
+
+/* Server status indicator */
+#serverStatusIndicator {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    opacity: 0.8;
+}
+.server-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #555;
+    flex-shrink: 0;
+    transition: background 0.4s;
+}
+.server-dot.online  { background: #4cd964; box-shadow: 0 0 5px #4cd96488; }
+.server-dot.offline { background: #ff4444; box-shadow: 0 0 5px #ff444488; }
+.server-dot.slow    { background: #ffd700; box-shadow: 0 0 5px #ffd70088; }
+.server-label {
+    color: #888;
+}
+.server-label.online  { color: #4cd964; }
+.server-label.offline { color: #ff4444; }
+.server-label.slow    { color: #ffd700; }
