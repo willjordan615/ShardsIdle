@@ -1,7 +1,7 @@
 // combat-system.js
 // Handles challenge selection, party formation, and combat execution
 
-// Γ£à 1. DECLARE GLOBAL STATE ONCE (guarded against double-load)
+// ✅ 1. DECLARE GLOBAL STATE ONCE (guarded against double-load)
 if (typeof window.currentState === 'undefined') {
     window.currentState = {
         // Combat state
@@ -109,7 +109,7 @@ async function renderChallenges() {
             <div style="margin-top:0.75rem; border-top:1px solid rgba(139,115,85,0.2); padding-top:0.5rem;">
                 <button onclick="event.stopPropagation(); toggleLore('${loreId}')"
                     style="background:none; border:none; color:#8b7355; font-size:0.72rem; letter-spacing:0.06em; text-transform:uppercase; cursor:pointer; padding:0;">
-                    ≡ƒôû Lore ${unlockedLore.length > 0 ? `(${unlockedLore.length}/${loreEntries.length})` : ''}
+                    📖 Lore ${unlockedLore.length > 0 ? `(${unlockedLore.length}/${loreEntries.length})` : ''}
                 </button>
                 <div id="${loreId}" style="display:none; margin-top:0.5rem;">
                     ${unlockedLore.map(e => `
@@ -118,7 +118,7 @@ async function renderChallenges() {
                         </div>`).join('')}
                     ${lockedCount > 0 ? `
                         <div style="color:#444; font-size:0.72rem; margin-top:0.25rem;">
-                            ${Array(lockedCount).fill('≡ƒöÆ').join(' ')} ${lockedCount} entr${lockedCount === 1 ? 'y' : 'ies'} undiscovered
+                            ${Array(lockedCount).fill('🔒').join(' ')} ${lockedCount} entr${lockedCount === 1 ? 'y' : 'ies'} undiscovered
                         </div>` : ''}
                 </div>
             </div>` : ''}
@@ -391,7 +391,7 @@ async function startCombat(forcedChallengeId) {
     }
     window._combatStartInFlight = true;
     try {
-        // Γ£à FIX: Handle Forced Challenge ID (for Auto-Retry Loop)
+        // ✅ FIX: Handle Forced Challenge ID (for Auto-Retry Loop)
         if (forcedChallengeId) {
             if (!window.gameData || !window.gameData.challenges) {
                 throw new Error('Game data not loaded yet.');
@@ -470,7 +470,7 @@ async function startCombat(forcedChallengeId) {
 
 /**
  * Navigate to character detail screen without stopping the idle loop.
- * Called from the "≡ƒæñ View Character" button on the combat log screen.
+ * Called from the "👤 View Character" button on the combat log screen.
  */
 function viewCharacterDuringCombat() {
     const charId = currentState.detailCharacterId;
@@ -499,22 +499,22 @@ function updateChallengeStatusBanner() {
             banner.style.display = 'flex';
             banner.innerHTML = `
                 <div style="display:flex; align-items:center; gap:8px; flex:1; flex-wrap:wrap;">
-                    <span style="color:#ffd700;">ΓÅ│ Finishing current challenge...</span>
+                    <span style="color:#ffd700;">⏳ Finishing current challenge...</span>
                     <span style="color:#aaa; font-size:0.82em;">Will stop after this run.</span>
                 </div>
                 <div style="display:flex; gap:8px; margin-left:auto;">
-                    <button onclick="showScreen('combatlog')" class="secondary" style="font-size:0.85rem; padding:6px 14px;">Γû╢ Watch</button>
-                    <button onclick="cancelLoopExit()" class="secondary" style="font-size:0.85rem; padding:6px 14px;">Γ£ò Cancel Stop</button>
+                    <button onclick="showScreen('combatlog')" class="secondary" style="font-size:0.85rem; padding:6px 14px;">▶ Watch</button>
+                    <button onclick="cancelLoopExit()" class="secondary" style="font-size:0.85rem; padding:6px 14px;">✕ Cancel Stop</button>
                 </div>
             `;
         } else {
             banner.style.display = 'flex';
             banner.innerHTML = `
-                <span style="color:#4cd964;">ΓÜö∩╕Å Active:</span>
+                <span style="color:#4cd964;">⚔️ Active:</span>
                 <span style="color:#ffd700; margin-left:6px;">${challengeName}</span>
                 <div style="margin-left:auto; display:flex; gap:8px;">
-                    <button onclick="showScreen('combatlog')" class="secondary" style="font-size:0.85rem; padding:6px 14px;">Γû╢ Watch</button>
-                    <button id="returnFromChallengeBtn" onclick="requestLoopExit()" class="secondary" style="font-size:0.85rem; padding:6px 14px;">ΓÅ╣ Return from Challenge</button>
+                    <button onclick="showScreen('combatlog')" class="secondary" style="font-size:0.85rem; padding:6px 14px;">▶ Watch</button>
+                    <button id="returnFromChallengeBtn" onclick="requestLoopExit()" class="secondary" style="font-size:0.85rem; padding:6px 14px;">⏹ Return from Challenge</button>
                 </div>
             `;
         }
@@ -541,7 +541,7 @@ function requestLoopExit() {
 
 /**
  * Cancel a pending loop exit — restores the active idle state.
- * Called from the "Γ£ò Cancel Stop" button in the banner.
+ * Called from the "✕ Cancel Stop" button in the banner.
  */
 function cancelLoopExit() {
     if (!currentState.idleActive) return;
