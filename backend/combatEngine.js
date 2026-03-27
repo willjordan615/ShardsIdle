@@ -2,7 +2,7 @@ const crypto = require('crypto');
 
 // Game balance constants
 const CONSTANTS = {
-    STAT_SCALE: 300,
+    STAT_SCALE: 200,
     STAT_CAP_MAX: 0.99,
     STAT_CAP_MIN: 0.1,
     BASE_HIT_CHANCE: 0.85,
@@ -3127,9 +3127,20 @@ _applyLootTagFlavour(item, tagDef) {
                 }
             }
 
-            const maxHP = this.calculateMaxHP(enemyType.stats, enemyLevel, false);
-            const maxMana = this.calculateMaxMana(enemyType.stats, enemyLevel, false);
-            const maxStamina = this.calculateMaxStamina(enemyType.stats, enemyLevel, false);
+            // Scale enemy stats to level. Data stats define the distribution
+            // (relative weights per stat); level determines the total budget.
+            // Budget: 240 + 6*(level-1) — puts enemies just below bot parity at all levels.
+            const rawStatTotal = Object.values(enemyType.stats || {}).reduce((a, b) => a + b, 0);
+            const targetBudget = 240 + 6 * (enemyLevel - 1);
+            const statScale = rawStatTotal > 0 ? targetBudget / rawStatTotal : 1;
+            const scaledStats = {};
+            for (const [k, v] of Object.entries(enemyType.stats || {})) {
+                scaledStats[k] = Math.floor(v * statScale);
+            }
+
+            const maxHP = this.calculateMaxHP(scaledStats, enemyLevel, false);
+            const maxMana = this.calculateMaxMana(scaledStats, enemyLevel, false);
+            const maxStamina = this.calculateMaxStamina(scaledStats, enemyLevel, false);
 
             // Also sum armor from equipped chest piece if any
             let enemyArmor = enemyType.armorValue || 0;
@@ -3143,7 +3154,7 @@ _applyLootTagFlavour(item, tagDef) {
                 name: enemyType.name.trim(),
                 type: 'enemy',
                 level: enemyLevel,
-                stats: { ...enemyType.stats },
+                stats: { ...scaledStats },
                 maxHP: maxHP, currentHP: maxHP,
                 maxMana: maxMana, currentMana: maxMana,
                 maxStamina: maxStamina, currentStamina: maxStamina,

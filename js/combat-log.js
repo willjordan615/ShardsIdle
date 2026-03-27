@@ -1335,6 +1335,28 @@ try {
         });
         // ------------------------------------------------------
 
+        // --- PRE-PASS: count skill uses for xpGained bonus distribution ---
+        const skillUseCounts = {};
+        let totalSkillUses = 0;
+        allTurns.forEach(turn => {
+            const isMyTurn = (turn.actor === charId) || (turn.actorName === character.name);
+            if (!isMyTurn) return;
+            const isRegularSkill   = turn.action?.type === 'skill';
+            const isPreCombatSkill = turn.action?.type === 'pre_combat_skill' || turn.action?.type === 'pre_combat_fallback';
+            if (!isRegularSkill && !isPreCombatSkill) return;
+            if (turn.isDesperation) return;
+            const sid = (isPreCombatSkill && turn.action?.resolvedSkillID)
+                ? turn.action.resolvedSkillID
+                : turn.action?.skillID;
+            if (!sid) return;
+            skillUseCounts[sid] = (skillUseCounts[sid] || 0) + 1;
+            totalSkillUses++;
+        });
+        // 5% of character XP gained this combat feeds into the skill bonus pool,
+        // distributed proportionally by usage — rewards active skills naturally.
+        const skillBonusPool = xpGained * 0.05;
+        const bonusXPPerUse  = totalSkillUses > 0 ? skillBonusPool / totalSkillUses : 0;
+
         // Apply skill XP
         allTurns.forEach(turn => {
             // Match by ID first, then Name
@@ -1388,7 +1410,7 @@ try {
                 
                 let baseSkillXP = 50.0;
                 if (skillDef?.category?.includes('DAMAGE_SINGLE')) { 
-                    baseSkillXP = 2.0; 
+                    baseSkillXP = 20.0; 
                 }
 
                 xpToAward = (baseSkillXP * multiplier) / Math.log(skillRef.skillLevel + 2);
@@ -1396,6 +1418,11 @@ try {
                 if (turn.isDesperation) {
                     xpToAward = 0; 
                 }
+            }
+
+            // Add enemy-level bonus XP proportional to this skill's share of combat usage
+            if (!turn.isDesperation && skillRef.skillLevel >= 1) {
+                xpToAward += bonusXPPerUse;
             }
 
             if (xpToAward > 0) {
@@ -1425,7 +1452,7 @@ try {
 
                 if (skillRef.skillXP >= threshold) {
                     skillRef.skillXP -= threshold;
-                    skillRef.skillLevel++;
+                    skillRef.skillLevel = Math.min(skillRef.skillLevel + 1, 20);
                     // Track discovery unlocks (level 0 → 1) separately for the fanfare modal
                     if (skillRef.skillLevel === 1 && skillRef.discovered) {
                         newUnlocks.push({ skillID, skillDef });
