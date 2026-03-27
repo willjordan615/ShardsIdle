@@ -1414,6 +1414,7 @@ try {
                 }
 
                 xpToAward = (baseSkillXP * multiplier) / Math.log(skillRef.skillLevel + 2);
+                if (skillRef.skillLevel > 20) xpToAward *= 0.1;
                 
                 if (turn.isDesperation) {
                     xpToAward = 0; 
@@ -1452,7 +1453,7 @@ try {
 
                 if (skillRef.skillXP >= threshold) {
                     skillRef.skillXP -= threshold;
-                    skillRef.skillLevel = Math.min(skillRef.skillLevel + 1, 20);
+                    skillRef.skillLevel++;
                     // Track discovery unlocks (level 0 → 1) separately for the fanfare modal
                     if (skillRef.skillLevel === 1 && skillRef.discovered) {
                         newUnlocks.push({ skillID, skillDef });
