@@ -1,0 +1,76 @@
+Session 18 Handoff
+Work Completed This Session
+Fix — combat-system.js Mojibake
+12 garbled emoji sequences fixed (CP437 misread of UTF-8). All other files were clean.
+Feature — Belt Modal + Stack-Aware Consumables (inventory-system.js)
+Belt slots now hold full stash stacks rather than single items. Clicking a slot opens a proper modal (reusing #inventoryModal) with slot tabs, equipped row, and stash list. Each row shows flavour description and a mechanic effect line (_consumableEffectLine) sourced from the item's skillID — e.g. "Restores 25% HP (self)". _migrateBelt no longer clobbers existing stack counts on load. setBeltSlot moves the full stack; clearBeltSlot returns it.
+Fix — Inventory Item Name Truncation (styles.css, inventory-system.js)
+inv-item__stats changed from white-space: nowrap + ellipsis to white-space: normal. Inline gear slots no longer show stat sub-lines at all — name only, stats in the modal.
+Feature — Loop Toggle Button (combat-log.js, index.html, styles.css)
+Stop button hidden (not removed). Loop toggle replaces it — green, always visible. Active (lit) when looping, dimmed (opacity 0.4) while pending exit, off when stopped. Toggling off calls requestLoopExit for graceful stop. Toggling on calls startCombat directly. startCombat no longer clears pendingLoopExit — _fireNextCombat owns that transition.
+Fix — Secret Path Threshold Guarantee (combatEngine.js)
+All four check types (skill, stat, combo, item_and_stat): meeting or exceeding difficultyThreshold now guarantees success (1.0). Under-threshold attempts retain the probabilistic roll, floored at 5%, ceiling removed.
+Fix — Combo Hint Party Check (game-data.js)
+getComboHints now includes skills from all currentState.currentParty members in knownIDs, not just the viewed character.
+Feature — Discovery Origin Line (character-management.js)
+Discovery progress bar cards now show ⚗ Discovered via: Parent One + Parent Two below the description. Sourced from skillDef.parentSkills. Skills without two parents show nothing.
+Fix — AI Damage Skill Jitter (combatEngine.js)
+Damage skills now get a 50%–150% random multiplier on base score. Prevents lock-in when two damage skills are equipped — neither can ever be crowded to 0% chance.
+Admin Panel — Character View (admin-panel.js)
+adminViewCharacter now shows full skill list in DB order with level and equipped position, plus equipment. Used to diagnose Marcel's secret path issue.
+
+Next Session — Top Priority
+Backlog (Discord)
+
+REQ: Explicit skill req display on secret paths after N attempts
+
+Feature Backlog
+
+Polish Discovery Systems — confirm hint fires correctly with level 3 skill and valid partner
+Summoning
+Charming
+Async Multiplayer Progression
+Assignable Character Progression
+Unique/Rare Items
+Mobile layout polish (ongoing)
+New challenges (script reviewed, ready to begin implementation)
+
+
+Carry Forward
+Bugs / Pending Review
+
+Profile and role labels — verify emoji prefixes correct after Session 14 git revert
+Emojis in data files — present, acknowledged, manual removal deferred indefinitely. Do not script-remove.
+stat-tooltip.js — delete from repo (script tag already removed from index.html)
+Mojibake sweep incomplete — only combat-system.js confirmed fixed. Other files may have similar issues introduced via PowerShell; check on sight.
+
+Architecture Notes
+
+combat-system.js owns challenge/party/combat state and flow
+browse-system.js owns browse UI, bot generation, public companions
+gear-tooltip.js owns all tooltip logic (gear, skill, stat)
+inventory-system.js owns gear slots, belt slots, both modals
+Loop toggle: idleActive + pendingLoopExit flags own all loop state. startCombat no longer clears pendingLoopExit. _fireNextCombat is the only place that transitions pending → stopped.
+
+Key Constants (unchanged)
+
+STAT_SCALE = 300
+SUDDEN_DEATH_START = 100
+Harmony XP: 1 + harmony/750
+Ambition loot: baseDropChance × (1 + ambition/500)
+Global bonus loot: 0.5% base, D1–D8 window, one per combat
+untrained_strike injected at mana < 15%, costPercent: 0.35
+Enemy stat scale: 1 + (level - 1) * 0.04
+Skill combo hint threshold: level >= 3
+Stealth targeting weight: 0.15
+Taunt targeting weight: 4.0
+Browse page size: 8 (party formation companions: 6)
+Bot page size: 6 (BOT_PAGE_SIZE in browse-system.js)
+Roster page size: 6
+Player max level: 100
+Bot static cap: 12 (bots.json)
+Bot procedural ceiling: 100 (MAX_BOT_LEVEL in browse-system.js)
+Bot stat budget: 220 + 35 * (level - 1)
+Bot equipment tier: Math.min(8, Math.floor((level - 1) / 12))
+Bot skill depth: d1–2 (lvl 13–19), d1–3 (lvl 20–39), d1–4 (lvl 40–100), never d5+
+Secret path checks: threshold met = guaranteed pass; under threshold = probabilistic, floor 5%

@@ -818,7 +818,13 @@ function pruneCombatLogs() {
                     if (stripped > 0) {
                         console.log(`[PRUNE] Stripped full log data from ${stripped} combat logs (>24h old)`);
                     }
-                    resolve();
+
+                    // Reclaim freed pages — SQLite does not shrink the file without this
+                    db.run('VACUUM', (err) => {
+                        if (err) console.error('[PRUNE] VACUUM error:', err);
+                        else console.log('[PRUNE] VACUUM complete');
+                        resolve();
+                    });
                 }
             );
         });
