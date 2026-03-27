@@ -8,6 +8,27 @@ const CONSTANTS = {
     BASE_HIT_CHANCE: 0.85,
     MAX_CRIT_CHANCE: 0.4,
     BASE_CRIT_CHANCE: 0.05,
+
+    // ── Resource scaling ────────────────────────────────────────────────────
+    // BASE_*: starting value at level 1
+    // GROWTH_*: exponential growth factor per level
+    // STAT_DIVISOR_*: lower = stats matter more (halves pool at this stat value)
+    PLAYER_BASE_HP:         60,
+    PLAYER_BASE_MANA:       80,
+    PLAYER_BASE_STAMINA:    80,
+    ENEMY_BASE_HP:          22,
+    ENEMY_BASE_MANA:        45,
+    ENEMY_BASE_STAMINA:     45,
+    HP_GROWTH:              1.05,
+    MANA_GROWTH:            1.02,
+    STAMINA_GROWTH:         1.02,
+    HP_STAT_DIVISOR:        150,
+    MANA_STAT_DIVISOR:      150,
+    STAMINA_STAT_DIVISOR:   150,
+
+    // ── Enemy skill level ───────────────────────────────────────────────────
+    // Effective skill level = floor(spawnLevel / ENEMY_SKILL_LEVEL_DIVISOR), min 1
+    ENEMY_SKILL_LEVEL_DIVISOR: 4,
 };
 
 /**
@@ -2361,6 +2382,10 @@ _applyLootTagFlavour(item, tagDef) {
     if (actor.type === 'player' && actor.skills) {
         const skillData = actor.skills.find(s => s.skillID === action.skillID);
         if (skillData) skillLevel = skillData.skillLevel || 1;
+    } else if (actor.type === 'enemy') {
+        // Enemies have no skill progression — derive effective skill level from spawn level.
+        // Mirrors roughly the pace a player develops skills: ~level/4, minimum 1.
+        skillLevel = Math.max(1, Math.floor((actor.level || 1) / CONSTANTS.ENEMY_SKILL_LEVEL_DIVISOR));
     }
 
     // Multi-Hit Support
@@ -3151,29 +3176,23 @@ _applyLootTagFlavour(item, tagDef) {
   }
 
   calculateMaxHP(stats, level, isPlayer = false) {
-    const BASE_HP = isPlayer ? 50 : 18;
-    const GROWTH_FACTOR = 1.12;
-    const scaledBase = BASE_HP * Math.pow(GROWTH_FACTOR, level - 1);
-    const statMultiplier = 1 + (stats?.endurance || 0) / 300;
-    return Math.floor(scaledBase * statMultiplier);
+    const base   = isPlayer ? CONSTANTS.PLAYER_BASE_HP : CONSTANTS.ENEMY_BASE_HP;
+    const scaled = base * Math.pow(CONSTANTS.HP_GROWTH, level - 1);
+    return Math.floor(scaled * (1 + (stats?.endurance || 0) / CONSTANTS.HP_STAT_DIVISOR));
   }
 
   calculateMaxMana(stats, level, isPlayer = false) {
-    const BASE_MANA = isPlayer ? 80 : 40; 
-    const GROWTH_FACTOR = 1.10; 
-    const scaledBase = BASE_MANA * Math.pow(GROWTH_FACTOR, level - 1);
+    const base      = isPlayer ? CONSTANTS.PLAYER_BASE_MANA : CONSTANTS.ENEMY_BASE_MANA;
+    const scaled    = base * Math.pow(CONSTANTS.MANA_GROWTH, level - 1);
     const statBlend = ((stats?.harmony || 0) * 0.7 + (stats?.endurance || 0) * 0.3);
-    const statMultiplier = 1 + statBlend / 300;
-    return Math.floor(scaledBase * statMultiplier);
+    return Math.floor(scaled * (1 + statBlend / CONSTANTS.MANA_STAT_DIVISOR));
   }
 
   calculateMaxStamina(stats, level, isPlayer = false) {
-    const BASE_STAMINA = isPlayer ? 80 : 40; 
-    const GROWTH_FACTOR = 1.10; 
-    const scaledBase = BASE_STAMINA * Math.pow(GROWTH_FACTOR, level - 1);
+    const base      = isPlayer ? CONSTANTS.PLAYER_BASE_STAMINA : CONSTANTS.ENEMY_BASE_STAMINA;
+    const scaled    = base * Math.pow(CONSTANTS.STAMINA_GROWTH, level - 1);
     const statBlend = ((stats?.endurance || 0) * 0.7 + (stats?.conviction || 0) * 0.3);
-    const statMultiplier = 1 + statBlend / 300;
-    return Math.floor(scaledBase * statMultiplier);
+    return Math.floor(scaled * (1 + statBlend / CONSTANTS.STAMINA_STAT_DIVISOR));
   }
 
   updateCombatStats(character, combatResult, challenge) {
