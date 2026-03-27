@@ -1157,6 +1157,14 @@ function getComboHints(character, skillID) {
         .filter(s => s.isStarterSkill)
         .forEach(s => knownIDs.add(s.id));
 
+    // Include skills known by any current party member — combo paths can cross party members
+    const partyMembers = window.currentState?.currentParty || [];
+    partyMembers.forEach(member => {
+        (member.skills || [])
+            .filter(r => r.isStarterSkill || (r.skillLevel || 0) >= 1)
+            .forEach(r => knownIDs.add(r.skillID));
+    });
+
     const discoveredIDs = new Set(
         (character.skills || [])
             .filter(r => r.discovered && (r.skillLevel || 0) >= 1)
