@@ -642,7 +642,7 @@ async function displayCombatLog(combatData) {
                 lootListEl.innerHTML = rewards.lootDropped.map(l => {
                     const itemDef = window.gameData?.gear?.find(g => g.id === l.itemID)
                                  || window.gameData?.consumables?.find(g => g.id === l.itemID);
-                    const displayName = itemDef?.name || l.itemID;
+                    const displayName = (l.itemName && l.itemName.includes(' ')) ? l.itemName : (itemDef?.name || l.itemID);
                     return `<span style="color:${l.rarity === 'legendary' ? '#ffaa00' : l.rarity === 'rare' ? '#00d4ff' : '#fff'}">• ${displayName}</span>`;
                 }).join('<br>');
             } else {
@@ -1535,7 +1535,8 @@ try {
                             } else {
                                 // Preserve flavoured name/description from tag system if present
                                 const inventoryEntry = { itemID: loot.itemID, rarity: loot.rarity || 'common', acquiredAt: Date.now() };
-                                if (loot.itemName && loot.itemName !== itemDef?.name) inventoryEntry.itemName = loot.itemName;
+                                // Only store flavoured name/description — real names (contain a space) that differ from base
+                                if (loot.itemName && loot.itemName.includes(' ') && loot.itemName !== itemDef?.name) inventoryEntry.itemName = loot.itemName;
                                 if (loot.itemDescription && loot.itemDescription !== itemDef?.description) inventoryEntry.itemDescription = loot.itemDescription;
                                 character.inventory.push(inventoryEntry);
                                 lootLines.push(loot.itemName || itemName);
@@ -1544,7 +1545,7 @@ try {
                         } else {
                             // Quest items / misc — always add to inventory, never sell
                             const inventoryEntry = { itemID: loot.itemID, rarity: loot.rarity || 'common', acquiredAt: Date.now() };
-                            if (loot.itemName && loot.itemName !== itemDef?.name) inventoryEntry.itemName = loot.itemName;
+                            if (loot.itemName && loot.itemName.includes(' ') && loot.itemName !== itemDef?.name) inventoryEntry.itemName = loot.itemName;
                             if (loot.itemDescription && loot.itemDescription !== itemDef?.description) inventoryEntry.itemDescription = loot.itemDescription;
                             character.inventory.push(inventoryEntry);
                             lootLines.push(loot.itemName || itemName);

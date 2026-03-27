@@ -994,10 +994,11 @@ calculateRewards(players, challenge, segments = []) {
     lootTable.forEach(lootItem => {
         const dropChance = (lootItem.dropChance || 0.3) * (1 + (players[0]?.stats?.ambition || 0) / 500);
         if (Math.random() <= dropChance) {
+            const itemDef = this.gear.find(g => g.id === lootItem.itemID);
             rewards.lootDropped.push({
                 characterID: players[0].id,
                 itemID: lootItem.itemID,
-                itemName: lootItem.itemID,
+                itemName: itemDef?.name || lootItem.itemID,
                 rarity: lootItem.rarity
             });
         }
@@ -1008,10 +1009,11 @@ calculateRewards(players, challenge, segments = []) {
         challenge.rewards.secretLootTable.forEach(lootItem => {
             const dropChance = (lootItem.dropChance || 0.3) * (1 + (players[0]?.stats?.ambition || 0) / 500);
             if (Math.random() <= dropChance) {
+                const itemDef = this.gear.find(g => g.id === lootItem.itemID);
                 rewards.lootDropped.push({
                     characterID: players[0].id,
                     itemID: lootItem.itemID,
-                    itemName: lootItem.itemID,
+                    itemName: itemDef?.name || lootItem.itemID,
                     rarity: lootItem.rarity
                 });
             }

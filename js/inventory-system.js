@@ -169,8 +169,9 @@ function _renderGearModal(character, activeSlot) {
         const _baseDef = _itemDef(inv.itemID);
         if (!_isGear(_baseDef)) return;
         // Merge instance-level flavour (name/description from loot tag system) onto a copy
-        const def = (inv.itemName || inv.itemDescription)
-            ? { ..._baseDef, name: inv.itemName || _baseDef?.name, description: inv.itemDescription || _baseDef?.description }
+        const _flavouredName = (inv.itemName && inv.itemName.includes(' ')) ? inv.itemName : null;
+        const def = (_flavouredName || inv.itemDescription)
+            ? { ..._baseDef, name: _flavouredName || _baseDef?.name, description: inv.itemDescription || _baseDef?.description }
             : _baseDef;
         const slot1 = _itemSlot(def);
         const slot2 = def?.slot_id2;
@@ -251,7 +252,7 @@ function _renderGearModal(character, activeSlot) {
             rows += `
                 <div class="inv-item">
                     <div class="inv-item__info">
-                        <div class="inv-item__name" style="color:${_rarityColor(inv.rarity)};">${inv.itemName || def?.name || inv.itemID}</div>
+                        <div class="inv-item__name" style="color:${_rarityColor(inv.rarity)};">${(inv.itemName && inv.itemName.includes(' ')) ? inv.itemName : (def?.name || inv.itemID)}</div>
                         ${stats ? `<div class="inv-item__stats">${stats}</div>` : ''}
                     </div>
                     <div class="inv-item__actions">
