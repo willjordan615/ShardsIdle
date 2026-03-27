@@ -2118,10 +2118,9 @@ body:has(#combatlog.active) #headerTopBar {
 .inv-item__stats {
     font-size: 0.68rem;
     color: var(--text-muted);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal;
     margin-top: 1px;
+    line-height: 1.35;
 }
 
 .inv-item__actions {

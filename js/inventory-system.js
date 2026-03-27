@@ -382,8 +382,8 @@ function _renderBeltModal(character, activeSlot) {
             <div class="inv-item inv-item--equipped">
                 <div class="inv-item__info">
                     <div class="inv-item__name">×${slotQty} ${slotDef.name}</div>
-                    ${slotDef.description ? `<div class="inv-item__stats" style="white-space:normal;">${slotDef.description}</div>` : ''}
-                    ${slotEffect ? `<div class="inv-item__stats" style="white-space:normal; color:#a0d4ff; margin-top:2px;">${slotEffect}</div>` : ''}
+                    ${slotDef.description ? `<div class="inv-item__stats">${slotDef.description}</div>` : ''}
+                    ${slotEffect ? `<div class="inv-item__stats" style="color:#a0d4ff; margin-top:2px;">${slotEffect}</div>` : ''}
                 </div>
                 <div class="inv-item__actions">
                     <button class="inv-btn inv-btn--unequip"
@@ -405,8 +405,8 @@ function _renderBeltModal(character, activeSlot) {
                 <div class="inv-item ${isEquippedHere ? 'inv-item--equipped' : ''}">
                     <div class="inv-item__info">
                         <div class="inv-item__name">×${qty} ${def.name}</div>
-                        ${def.description ? `<div class="inv-item__stats" style="white-space:normal;">${def.description}</div>` : ''}
-                        ${effectLine ? `<div class="inv-item__stats" style="white-space:normal; color:#a0d4ff; margin-top:2px;">${effectLine}</div>` : ''}
+                        ${def.description ? `<div class="inv-item__stats">${def.description}</div>` : ''}
+                        ${effectLine ? `<div class="inv-item__stats" style="color:#a0d4ff; margin-top:2px;">${effectLine}</div>` : ''}
                     </div>
                     <div class="inv-item__actions">
                         ${!isEquippedHere
