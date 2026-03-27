@@ -659,6 +659,26 @@ function getUserByUsername(username) {
     });
 }
 
+function getAllUsers() {
+    return new Promise((resolve, reject) => {
+        db.all(
+            `SELECT user_id, username, is_guest, created_at FROM users ORDER BY created_at DESC`,
+            [],
+            (err, rows) => { if (err) reject(err); else resolve(rows || []); }
+        );
+    });
+}
+
+function reassignCharacter(characterId, toUserId) {
+    return new Promise((resolve, reject) => {
+        db.run(
+            `UPDATE characters SET ownerUserId = ? WHERE characterID = ?`,
+            [toUserId, characterId],
+            function(err) { if (err) reject(err); else resolve(this.changes); }
+        );
+    });
+}
+
 function updateUserPassword(userId, passwordHash, username) {
     return new Promise((resolve, reject) => {
         const now = Date.now();
@@ -873,6 +893,8 @@ module.exports = {
     touchSession,
     deleteSession,
     transferCharactersToUser,
+    getAllUsers,
+    reassignCharacter,
     pruneExpiredSessions,
     scheduleSessionPruning,
 };

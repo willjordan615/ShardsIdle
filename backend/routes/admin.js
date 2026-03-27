@@ -273,5 +273,31 @@ router.post('/db/query', (req, res) => {
     });
 });
 
+
+// GET /api/admin/db/users — list all users
+router.get('/db/users', async (req, res) => {
+    try {
+        const db = require('../database');
+        const users = await db.getAllUsers();
+        res.json(users);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// POST /api/admin/db/characters/:id/reassign — reassign character to another user
+router.post('/db/characters/:id/reassign', async (req, res) => {
+    const { id } = req.params;
+    const { toUserId } = req.body;
+    if (!toUserId) return res.status(400).json({ error: 'toUserId required' });
+    try {
+        const db = require('../database');
+        // Verify target user exists
+        const user = await db.getUserById(toUserId);
+        if (!user) return res.status(404).json({ error: 'Target user not found' });
+        const changes = await db.reassignCharacter(id, toUserId);
+        if (!changes) return res.status(404).json({ error: 'Character not found' });
+        res.json({ success: true, characterId: id, toUserId, username: user.username });
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
 module.exports = router;
 module.exports.loadGameData = loadGameData;

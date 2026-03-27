@@ -558,6 +558,47 @@ window.adminDeleteEnemy = async function() {
     } catch(e) { alert('Delete failed: ' + e.message); }
 };
 
+window.adminReassignCharacter = async function(charId, charName) {
+    try {
+        const res = await fetch(BACKEND_URL + '/api/admin/db/users');
+        const users = await res.json();
+        if (!users.length) { alert('No users found.'); return; }
+
+        const lines = users.map((u, i) =>
+            `${i + 1}. ${u.username}${u.is_guest ? ' [guest]' : ''} — ${u.user_id}`
+        ).join('\n');
+
+        const input = prompt(
+            `Reassign "${charName}" to which user?\n\n${lines}\n\nEnter number or paste user_id directly:`
+        );
+        if (!input) return;
+
+        let toUserId;
+        const idx = parseInt(input, 10);
+        if (!isNaN(idx) && idx >= 1 && idx <= users.length) {
+            toUserId = users[idx - 1].user_id;
+        } else {
+            toUserId = input.trim();
+        }
+
+        const confirmUser = users.find(u => u.user_id === toUserId);
+        const confirmName = confirmUser ? confirmUser.username : toUserId;
+        if (!confirm(`Reassign "${charName}" to "${confirmName}"?`)) return;
+
+        const r2 = await fetch(BACKEND_URL + '/api/admin/db/characters/' + encodeURIComponent(charId) + '/reassign', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ toUserId })
+        });
+        const data = await r2.json();
+        if (data.success) {
+            alert(`Reassigned to ${data.username}.`);
+        } else {
+            alert('Reassign failed: ' + JSON.stringify(data));
+        }
+    } catch(e) { alert('Error: ' + e.message); }
+};
+
 // ── Characters Tab ────────────────────────────────────────────────────────────
 
 async function loadAdminCharacters() {
@@ -585,6 +626,7 @@ async function loadAdminCharacters() {
                         <td style="padding:6px;text-align:center;">${(r.experience||0).toLocaleString()}</td>
                         <td style="padding:6px;text-align:right;">
                             <button onclick="adminViewCharacter('${r.id}')" style="margin-right:4px;padding:2px 8px;background:#1a2a3a;border:1px solid #345;color:#8af;cursor:pointer;border-radius:3px;">View</button>
+                            <button onclick="adminReassignCharacter('${r.id}','${r.name}')" style="margin-right:4px;padding:2px 8px;background:#1a2a1a;border:1px solid #353;color:#8f8;cursor:pointer;border-radius:3px;">Reassign</button>
                             <button onclick="adminDeleteCharacter('${r.id}','${r.name}')" style="padding:2px 8px;background:#2a1a1a;border:1px solid #533;color:#f88;cursor:pointer;border-radius:3px;">Delete</button>
                         </td>
                     </tr>`).join('')}
