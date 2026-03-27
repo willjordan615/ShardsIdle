@@ -1533,14 +1533,21 @@ try {
                                 dustGained += d;
                                 soldLines.push(`${itemName} (dupe) → ${g}g`);
                             } else {
-                                character.inventory.push({ itemID: loot.itemID, rarity: loot.rarity || 'common', acquiredAt: Date.now() });
-                                lootLines.push(itemName);
+                                // Preserve flavoured name/description from tag system if present
+                                const inventoryEntry = { itemID: loot.itemID, rarity: loot.rarity || 'common', acquiredAt: Date.now() };
+                                if (loot.itemName && loot.itemName !== itemDef?.name) inventoryEntry.itemName = loot.itemName;
+                                if (loot.itemDescription && loot.itemDescription !== itemDef?.description) inventoryEntry.itemDescription = loot.itemDescription;
+                                character.inventory.push(inventoryEntry);
+                                lootLines.push(loot.itemName || itemName);
                             }
 
                         } else {
                             // Quest items / misc — always add to inventory, never sell
-                            character.inventory.push({ itemID: loot.itemID, rarity: loot.rarity || 'common', acquiredAt: Date.now() });
-                            lootLines.push(itemName);
+                            const inventoryEntry = { itemID: loot.itemID, rarity: loot.rarity || 'common', acquiredAt: Date.now() };
+                            if (loot.itemName && loot.itemName !== itemDef?.name) inventoryEntry.itemName = loot.itemName;
+                            if (loot.itemDescription && loot.itemDescription !== itemDef?.description) inventoryEntry.itemDescription = loot.itemDescription;
+                            character.inventory.push(inventoryEntry);
+                            lootLines.push(loot.itemName || itemName);
                         }
                     });
 

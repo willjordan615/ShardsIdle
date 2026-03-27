@@ -166,8 +166,12 @@ function _renderGearModal(character, activeSlot) {
     GEAR_SLOTS.forEach(s => bySlot[s] = []);
     inventory.forEach((inv, idx) => {
         if (!inv) return;
-        const def = _itemDef(inv.itemID);
-        if (!_isGear(def)) return;
+        const _baseDef = _itemDef(inv.itemID);
+        if (!_isGear(_baseDef)) return;
+        // Merge instance-level flavour (name/description from loot tag system) onto a copy
+        const def = (inv.itemName || inv.itemDescription)
+            ? { ..._baseDef, name: inv.itemName || _baseDef?.name, description: inv.itemDescription || _baseDef?.description }
+            : _baseDef;
         const slot1 = _itemSlot(def);
         const slot2 = def?.slot_id2;
         if (slot1 && GEAR_SLOTS.includes(slot1)) bySlot[slot1].push({ inv, idx, def });
@@ -247,7 +251,7 @@ function _renderGearModal(character, activeSlot) {
             rows += `
                 <div class="inv-item">
                     <div class="inv-item__info">
-                        <div class="inv-item__name" style="color:${_rarityColor(inv.rarity)};">${def?.name || inv.itemID}</div>
+                        <div class="inv-item__name" style="color:${_rarityColor(inv.rarity)};">${inv.itemName || def?.name || inv.itemID}</div>
                         ${stats ? `<div class="inv-item__stats">${stats}</div>` : ''}
                     </div>
                     <div class="inv-item__actions">
