@@ -663,9 +663,10 @@ function _generateBots() {
     const ROLES = [
         {
             role: 'Defender',
+            armorTypes: { chest: ['plate', 'chain'], head: ['plate', 'chain'], accessory: ['ring', 'belt', 'amulet'] },
             race: 'dwarf',
             weaponTypes: ['hammer', 'mace'],
-            statWeights: { conviction: 0.20, endurance: 0.40, ambition: 0.15, harmony: 0.25 },
+            statWeights: { conviction: 0.22, endurance: 0.33, ambition: 0.18, harmony: 0.27 },
             skillPools: {
                 primary: [
                     { minLevel:  1, skills: ['block', 'footwork', 'misdirect', 'shove'] },
@@ -683,6 +684,7 @@ function _generateBots() {
         },
         {
             role: 'Bruiser',
+            armorTypes: { chest: ['plate', 'leather', 'chain'], head: ['plate', 'chain'], accessory: ['ring', 'belt', 'gloves'] },
             race: 'orc',
             weaponTypes: ['axe', 'sword', 'hammer'],
             statWeights: { conviction: 0.38, endurance: 0.30, ambition: 0.22, harmony: 0.10 },
@@ -703,6 +705,7 @@ function _generateBots() {
         },
         {
             role: 'Assassin',
+            armorTypes: { chest: ['leather'], head: ['leather'], accessory: ['cloak', 'gloves', 'boots'] },
             race: 'halfling',
             weaponTypes: ['dagger', 'handaxe'],
             statWeights: { conviction: 0.25, endurance: 0.18, ambition: 0.45, harmony: 0.12 },
@@ -723,6 +726,7 @@ function _generateBots() {
         },
         {
             role: 'Mage',
+            armorTypes: { chest: ['robe', 'vestments', 'cloth'], head: ['cloth', 'diadem'], accessory: ['amulet', 'ring'] },
             race: 'human',
             weaponTypes: ['wand', 'tome'],
             statWeights: { conviction: 0.30, endurance: 0.12, ambition: 0.22, harmony: 0.36 },
@@ -743,6 +747,7 @@ function _generateBots() {
         },
         {
             role: 'Support',
+            armorTypes: { chest: ['vestments', 'tabard', 'robe'], head: ['diadem', 'cloth'], accessory: ['amulet', 'ring'] },
             race: 'human',
             weaponTypes: ['scepter'],
             statWeights: { conviction: 0.15, endurance: 0.22, ambition: 0.18, harmony: 0.45 },
@@ -763,6 +768,7 @@ function _generateBots() {
         },
         {
             role: 'Utility',
+            armorTypes: { chest: ['leather', 'cloth'], head: ['leather', 'mask'], accessory: ['cloak', 'boots', 'belt'] },
             race: 'dwarf',
             weaponTypes: ['totem', 'bell', 'flute'],
             statWeights: { conviction: 0.20, endurance: 0.28, ambition: 0.22, harmony: 0.30 },
@@ -807,19 +813,25 @@ function _generateBots() {
         return eligible[Math.floor(rng() * eligible.length)];
     }
 
-    function pickWeapon(weaponTypes, tier, rng) {
-        const candidates = gear.filter(i =>
-            i.slot_id1 === 'mainHand' &&
-            weaponTypes.includes(i.type) &&
-            (i.tier === tier || i.tier === tier - 1)
-        );
-        if (!candidates.length) {
-            // fallback: any tier for this weapon type
-            const fallback = gear.filter(i => i.slot_id1 === 'mainHand' && weaponTypes.includes(i.type) && (i.tier || 0) >= 0);
-            if (!fallback.length) return null;
-            return fallback[Math.floor(rng() * fallback.length)].id;
+    // Pick a tier-appropriate item for a given slot and optional type preference list.
+    // Tries exact tier first, then tier-1, then any available tier for that slot/type.
+    function pickGear(slot, preferredTypes, tier, rng) {
+        const isAccessory = slot === 'accessory1';
+        const matchSlot = i => isAccessory
+            ? (i.slot_id1 === 'accessory1' || i.slot_id1 === 'accessory2')
+            : i.slot_id1 === slot;
+        const matchType = i => !preferredTypes || !preferredTypes.length || preferredTypes.includes(i.type);
+        const notCreature = i => !i.creatureOnly && (i.tier || 0) >= 0;
+
+        for (const t of [tier, tier - 1]) {
+            if (t < 0) continue;
+            const pool = gear.filter(i => matchSlot(i) && notCreature(i) && matchType(i) && i.tier === t);
+            if (pool.length) return pool[Math.floor(rng() * pool.length)].id;
         }
-        return candidates[Math.floor(rng() * candidates.length)].id;
+        const fallback = gear.filter(i => matchSlot(i) && notCreature(i) && matchType(i));
+        if (fallback.length) return fallback[Math.floor(rng() * fallback.length)].id;
+        const any = gear.filter(i => matchSlot(i) && notCreature(i));
+        return any.length ? any[Math.floor(rng() * any.length)].id : null;
     }
 
     function getIntrinsicSkill(raceName) {
@@ -846,8 +858,12 @@ function _generateBots() {
             const roleDef = available[Math.floor(rng2() * available.length)];
             usedRoles.add(roleDef.role);
 
-            // Stats
-            const budget = 220 + 35 * (level - 1);
+            // Stats — calibrated to sit ~15% below a well-geared player at the same level.
+            // Player stats come entirely from equipment; a full kit at tier T averages ~8*T stats
+            // per slot across 5 slots, plus race base ~330. Bots get a flat base plus a small
+            // per-level increment that tracks equipment growth without matching it.
+            // budget = 280 + 8 * (level - 1)  → ~360 at lvl 1, ~552 at lvl 25, ~920 at lvl 82
+            const budget = 260 + 6 * (level - 1);
             const rng3 = _botRng(level * 2053 + i * 97 ^ _botSessionSeed);
             const jitter = () => Math.floor((rng3() - 0.5) * 20); // ±10
             const raw = {
@@ -879,8 +895,15 @@ function _generateBots() {
 
             // Equipment — tier 0–8 over levels 1–100, each tier spans ~12 levels
             const tier = Math.min(8, Math.floor((level - 1) / 12));
-            const rng6 = _botRng(level * 541 + i * 43 ^ _botSessionSeed);
-            const weaponId = pickWeapon(roleDef.weaponTypes, tier, rng6);
+            const rng6  = _botRng(level * 541  + i * 43  ^ _botSessionSeed);
+            const rng7  = _botRng(level * 613  + i * 53  ^ _botSessionSeed);
+            const rng8  = _botRng(level * 719  + i * 67  ^ _botSessionSeed);
+            const rng9  = _botRng(level * 827  + i * 79  ^ _botSessionSeed);
+            const at = roleDef.armorTypes;
+            const weaponId    = pickGear('mainHand',   roleDef.weaponTypes, tier, rng6);
+            const chestId     = pickGear('chest',      at.chest,            tier, rng7);
+            const headId      = pickGear('head',       at.head,             tier, rng8);
+            const accessoryId = pickGear('accessory1', at.accessory,        tier, rng9);
 
             // Name — deterministic per role+level
             const namePool = NAMES[roleDef.role];
@@ -894,7 +917,12 @@ function _generateBots() {
                 race: roleDef.race,
                 stats: raw,
                 skills: botSkills,
-                equipment: weaponId ? { mainHand: weaponId } : {},
+                equipment: {
+                    ...(weaponId    ? { mainHand:    weaponId    } : {}),
+                    ...(chestId     ? { chest:       chestId     } : {}),
+                    ...(headId      ? { head:        headId      } : {}),
+                    ...(accessoryId ? { accessory1:  accessoryId } : {}),
+                },
                 consumables: {},
             });
         }
