@@ -1017,6 +1017,34 @@ calculateRewards(players, challenge, segments = []) {
         });
     }
 
+    // Global bonus roll — one item, low chance, tier range derived from challenge difficulty.
+    // D1→T0, D2→T0-1, D3→T1, D4→T1-2, D5→T2, D6→T2-3, D7→T3, D8→T3-4
+    {
+        const BASE_CHANCE = 0.005;
+        const ambitionBonus = 1 + (players[0]?.stats?.ambition || 0) / 500;
+        if (Math.random() <= BASE_CHANCE * ambitionBonus) {
+            const difficulty = challenge?.difficulty || 1;
+            const tierRanges = {
+                1: [0, 0], 2: [0, 1], 3: [1, 1], 4: [1, 2],
+                5: [2, 2], 6: [2, 3], 7: [3, 3], 8: [3, 4]
+            };
+            const [minTier, maxTier] = tierRanges[Math.min(difficulty, 8)] || [0, 0];
+            const pool = this.gear.filter(g =>
+                g.tier >= minTier && g.tier <= maxTier &&
+                g.slot_id1 && !g.consumable
+            );
+            if (pool.length) {
+                const pick = pool[Math.floor(Math.random() * pool.length)];
+                rewards.lootDropped.push({
+                    characterID: players[0].id,
+                    itemID: pick.id,
+                    itemName: pick.id,
+                    rarity: 'bonus'
+                });
+            }
+        }
+    }
+
     return rewards;
 }
 

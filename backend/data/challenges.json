@@ -300,6 +300,14 @@
           "itemID": "acc_cloak_rag_tier0",
           "dropChance": 0.1,
           "rarity": "common"
+        },
+        {
+          "itemID": "totem_wood_tier0",
+          "dropChance": 0.22
+        },
+        {
+          "itemID": "totem_bone_tier0",
+          "dropChance": 0.18
         }
       ]
     },
@@ -778,6 +786,14 @@
           "itemID": "ironvein_signet",
           "dropChance": 0.2,
           "rarity": "rare"
+        },
+        {
+          "itemID": "totem_storm_tier1",
+          "dropChance": 0.24
+        },
+        {
+          "itemID": "bell_silver_tier1",
+          "dropChance": 0.22
         }
       ]
     },
@@ -1380,6 +1396,14 @@
           "itemID": "consumable_potion_mana_minor",
           "dropChance": 0.36,
           "rarity": "common"
+        },
+        {
+          "itemID": "flute_wood_tier0",
+          "dropChance": 0.2
+        },
+        {
+          "itemID": "bell_bronze_tier0",
+          "dropChance": 0.2
         }
       ],
       "secretLootTable": [
@@ -2365,6 +2389,18 @@
           "itemID": "scepter_nature_tier1",
           "dropChance": 0.15,
           "rarity": "uncommon"
+        },
+        {
+          "itemID": "flute_bone_tier0",
+          "dropChance": 0.2
+        },
+        {
+          "itemID": "bell_iron_tier0",
+          "dropChance": 0.2
+        },
+        {
+          "itemID": "totem_tribal_tier0",
+          "dropChance": 0.22
         }
       ],
       "secretLootTable": [
@@ -3145,6 +3181,14 @@
           "itemID": "tome_flame_tier1",
           "dropChance": 0.15,
           "rarity": "uncommon"
+        },
+        {
+          "itemID": "flute_willow_tier1",
+          "dropChance": 0.24
+        },
+        {
+          "itemID": "bell_copper_tier1",
+          "dropChance": 0.24
         }
       ],
       "secretLootTable": [
@@ -3953,6 +3997,14 @@
           "itemID": "loyalist_seal",
           "dropChance": 0.25,
           "rarity": "uncommon"
+        },
+        {
+          "itemID": "flute_silver_tier1",
+          "dropChance": 0.24
+        },
+        {
+          "itemID": "totem_death_tier1",
+          "dropChance": 0.22
         }
       ],
       "secretLootTable": [
@@ -4383,6 +4435,14 @@
           "itemID": "unpaid_ledger",
           "dropChance": 0.2,
           "rarity": "uncommon"
+        },
+        {
+          "itemID": "flute_shadow_tier2",
+          "dropChance": 0.24
+        },
+        {
+          "itemID": "bell_holy_tier2",
+          "dropChance": 0.24
         }
       ],
       "secretLootTable": [
@@ -5160,6 +5220,18 @@
           "itemID": "chest_warrior_plate_tier3",
           "dropChance": 0.15,
           "rarity": "rare"
+        },
+        {
+          "itemID": "flute_wind_tier3",
+          "dropChance": 0.26
+        },
+        {
+          "itemID": "bell_storm_tier3",
+          "dropChance": 0.26
+        },
+        {
+          "itemID": "totem_adamant_tier3",
+          "dropChance": 0.26
         }
       ],
       "secretLootTable": [
@@ -5581,6 +5653,14 @@
           "itemID": "hammer_mithril_tier2",
           "dropChance": 0.25,
           "rarity": "uncommon"
+        },
+        {
+          "itemID": "flute_adamant_tier3",
+          "dropChance": 0.24
+        },
+        {
+          "itemID": "bell_adamant_tier3",
+          "dropChance": 0.24
         }
       ],
       "secretLootTable": [
@@ -5972,6 +6052,14 @@
           "itemID": "flute_silver_tier1",
           "dropChance": 0.2,
           "rarity": "uncommon"
+        },
+        {
+          "itemID": "flute_mithril_tier2",
+          "dropChance": 0.26
+        },
+        {
+          "itemID": "bell_mithril_tier2",
+          "dropChance": 0.26
         }
       ],
       "secretLootTable": [
@@ -6386,6 +6474,14 @@
           "itemID": "tome_mithril_tier2",
           "dropChance": 0.18,
           "rarity": "uncommon"
+        },
+        {
+          "itemID": "totem_mithril_tier2",
+          "dropChance": 0.26
+        },
+        {
+          "itemID": "totem_ancient_tier2",
+          "dropChance": 0.22
         }
       ],
       "secretLootTable": [
@@ -8127,6 +8223,18 @@
           "itemID": "head_knight_greathelm_tier3",
           "dropChance": 0.18,
           "rarity": "rare"
+        },
+        {
+          "itemID": "flute_celestial_tier4",
+          "dropChance": 0.28
+        },
+        {
+          "itemID": "bell_celestial_tier4",
+          "dropChance": 0.28
+        },
+        {
+          "itemID": "totem_celestial_tier4",
+          "dropChance": 0.26
         }
       ],
       "secretLootTable": [
@@ -8993,6 +9101,14 @@
           "itemID": "chest_celestial_robe_tier4",
           "dropChance": 0.1,
           "rarity": "rare"
+        },
+        {
+          "itemID": "flute_void_tier4",
+          "dropChance": 0.26
+        },
+        {
+          "itemID": "bell_void_tier4",
+          "dropChance": 0.26
         }
       ],
       "secretLootTable": [
