@@ -1247,7 +1247,7 @@ _applyLootTagFlavour(item, tagDef) {
     function _weightedRandomTarget(pool) {
       const weights = pool.map(p => {
         let w = 1.0;
-        if (tauntCasterId && p.id === tauntCasterId) w *= 4.0;
+        if (tauntCasterId && p.id === tauntCasterId) w *= 8.0;
         if (p.statusEffects?.some(e => e.id === 'stealth' && e.duration > 0)) w *= 0.15;
         p.statusEffects?.forEach(activeStatus => {
           const def = statusEngine?.statusMap?.[activeStatus.id];
@@ -1270,31 +1270,34 @@ _applyLootTagFlavour(item, tagDef) {
     const tauntCasterId = tauntStatus?.sourceId ?? null;
 
     let primaryTarget;
+    // Taunted enemies always go through weighted random so the caster bias applies.
     const usePreferred = Math.random() < focusChance;
-    if (!usePreferred || profile === 'berserker') {
-      primaryTarget = _weightedRandomTarget(aliveOpponents);
-    } else if (profile === 'tactical' || profile === 'disruptor') {
-      // Target the highest-threat enemy
-      primaryTarget = aliveOpponents.reduce((best, p) =>
-        this._threatScore(p) > this._threatScore(best) ? p : best
-      );
+    // Build a candidate pool based on profile preference, then run weighted random
+    // on that pool. Status weights (taunt, stealth, etc.) always apply within the pool.
+    // Pool size: top 2 candidates by profile metric, or all opponents if pool would be 1.
+    let candidatePool;
+    if (tauntCasterId || !usePreferred || profile === 'berserker') {
+      // No profile preference — full pool
+      candidatePool = aliveOpponents;
+    } else if (profile === 'tactical' || profile === 'disruptor' || profile === 'cautious') {
+      // Prefer highest-threat targets
+      const sorted = [...aliveOpponents].sort((a, b) => this._threatScore(b) - this._threatScore(a));
+      candidatePool = sorted.slice(0, Math.max(2, Math.ceil(sorted.length * 0.4)));
     } else if (profile === 'opportunist') {
-      // Target the most debuffed/vulnerable enemy
-      primaryTarget = aliveOpponents.reduce((best, p) => {
-        const debuffCount = (p.statusEffects || []).filter(e => e.duration > 0).length;
-        const bestDebuffs = (best.statusEffects || []).filter(e => e.duration > 0).length;
-        if (debuffCount !== bestDebuffs) return debuffCount > bestDebuffs ? p : best;
-        return p.currentHP < best.currentHP ? p : best;
+      // Prefer most-debuffed, tiebreak lowest HP
+      const sorted = [...aliveOpponents].sort((a, b) => {
+        const aDebuffs = (a.statusEffects || []).filter(e => e.duration > 0).length;
+        const bDebuffs = (b.statusEffects || []).filter(e => e.duration > 0).length;
+        if (bDebuffs !== aDebuffs) return bDebuffs - aDebuffs;
+        return a.currentHP - b.currentHP;
       });
-    } else if (profile === 'cautious') {
-      // Cautious targets highest threat — deal with the most dangerous enemy first
-      primaryTarget = aliveOpponents.reduce((best, p) =>
-        this._threatScore(p) > this._threatScore(best) ? p : best
-      );
+      candidatePool = sorted.slice(0, Math.max(2, Math.ceil(sorted.length * 0.4)));
     } else {
-      // balanced, aggressive, support — lowest HP (finish them)
-      primaryTarget = aliveOpponents.reduce((min, p) => p.currentHP < min.currentHP ? p : min);
+      // aggressive, balanced, support — prefer lowest HP
+      const sorted = [...aliveOpponents].sort((a, b) => a.currentHP - b.currentHP);
+      candidatePool = sorted.slice(0, Math.max(2, Math.ceil(sorted.length * 0.4)));
     }
+    primaryTarget = _weightedRandomTarget(candidatePool);
 
     // ── Build skill pool ─────────────────────────────────────────────────────
     const validCategories = [
