@@ -564,40 +564,84 @@ window.adminReassignCharacter = async function(charId, charName) {
         const users = await res.json();
         if (!users.length) { alert('No users found.'); return; }
 
-        const lines = users.map((u, i) =>
-            `${i + 1}. ${u.username}${u.is_guest ? ' [guest]' : ''} — ${u.user_id}`
-        ).join('\n');
+        // Build modal
+        const overlay = document.createElement('div');
+        overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;';
 
-        const input = prompt(
-            `Reassign "${charName}" to which user?\n\n${lines}\n\nEnter number or paste user_id directly:`
-        );
-        if (!input) return;
+        const modal = document.createElement('div');
+        modal.style.cssText = 'background:#1a1a2e;border:1px solid #334;border-radius:6px;padding:20px;width:480px;max-height:80vh;display:flex;flex-direction:column;gap:12px;';
 
-        let toUserId;
-        const idx = parseInt(input, 10);
-        if (!isNaN(idx) && idx >= 1 && idx <= users.length) {
-            toUserId = users[idx - 1].user_id;
-        } else {
-            toUserId = input.trim();
+        modal.innerHTML = `
+            <div style="font-size:1em;color:#ccc;font-weight:600;">Reassign <span style="color:#8af;">${charName}</span></div>
+            <input id="reassignSearch" placeholder="Filter users..." style="padding:6px 10px;background:#111;border:1px solid #334;color:#ccc;border-radius:4px;font-size:.85em;">
+            <div id="reassignUserList" style="overflow-y:auto;max-height:320px;display:flex;flex-direction:column;gap:4px;"></div>
+            <label style="display:flex;align-items:center;gap:8px;color:#aaa;font-size:.85em;cursor:pointer;">
+                <input type="checkbox" id="reassignSnapshots" checked> Also reassign snapshots
+            </label>
+            <div style="display:flex;gap:8px;justify-content:flex-end;">
+                <button id="reassignCancel" style="padding:5px 14px;background:#222;border:1px solid #445;color:#aaa;border-radius:4px;cursor:pointer;">Cancel</button>
+                <button id="reassignConfirm" disabled style="padding:5px 14px;background:#1a3a1a;border:1px solid #363;color:#8f8;border-radius:4px;cursor:pointer;opacity:0.5;">Reassign</button>
+            </div>
+        `;
+
+        overlay.appendChild(modal);
+        document.body.appendChild(overlay);
+
+        let selectedUserId = null;
+
+        function renderUsers(filter) {
+            const list = document.getElementById('reassignUserList');
+            const filtered = users.filter(u =>
+                !filter || u.username.toLowerCase().includes(filter.toLowerCase()) || u.user_id.includes(filter)
+            );
+            list.innerHTML = filtered.map(u => `
+                <div class="reassign-user-row" data-id="${u.user_id}" style="padding:6px 10px;border-radius:4px;cursor:pointer;border:1px solid transparent;display:flex;justify-content:space-between;align-items:center;background:#111;">
+                    <span style="color:#ccc;">${u.username}${u.is_guest ? ' <span style="color:#888;font-size:.8em;">[guest]</span>' : ''}</span>
+                    <span style="color:#555;font-size:.75em;font-family:monospace;">${u.user_id.slice(0,8)}…</span>
+                </div>
+            `).join('');
+            list.querySelectorAll('.reassign-user-row').forEach(row => {
+                row.addEventListener('click', () => {
+                    list.querySelectorAll('.reassign-user-row').forEach(r => {
+                        r.style.background = '#111';
+                        r.style.borderColor = 'transparent';
+                    });
+                    row.style.background = '#1a2a1a';
+                    row.style.borderColor = '#363';
+                    selectedUserId = row.dataset.id;
+                    const btn = document.getElementById('reassignConfirm');
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                });
+            });
         }
 
-        const confirmUser = users.find(u => u.user_id === toUserId);
-        const confirmName = confirmUser ? confirmUser.username : toUserId;
-        if (!confirm(`Reassign "${charName}" to "${confirmName}"?\nClick OK to confirm.`)) return;
-        const includeSnapshots = confirm(`Also reassign snapshots for "${charName}" to "${confirmName}"?\nOK = yes, Cancel = character only.`);
+        renderUsers('');
+        document.getElementById('reassignSearch').addEventListener('input', e => renderUsers(e.target.value));
+        document.getElementById('reassignCancel').addEventListener('click', () => overlay.remove());
 
-        const r2 = await fetch(BACKEND_URL + '/api/admin/db/characters/' + encodeURIComponent(charId) + '/reassign', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ toUserId, includeSnapshots })
+        document.getElementById('reassignConfirm').addEventListener('click', async () => {
+            if (!selectedUserId) return;
+            const includeSnapshots = document.getElementById('reassignSnapshots').checked;
+            const targetUser = users.find(u => u.user_id === selectedUserId);
+            const targetName = targetUser ? targetUser.username : selectedUserId;
+            overlay.remove();
+            try {
+                const r2 = await fetch(BACKEND_URL + '/api/admin/db/characters/' + encodeURIComponent(charId) + '/reassign', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ toUserId: selectedUserId, includeSnapshots })
+                });
+                const data = await r2.json();
+                if (data.success) {
+                    const snapMsg = data.snapshotChanges > 0 ? ` + ${data.snapshotChanges} snapshot(s)` : '';
+                    alert(`Reassigned "${charName}" to ${data.username}${snapMsg}.`);
+                } else {
+                    alert('Reassign failed: ' + JSON.stringify(data));
+                }
+            } catch(e) { alert('Error: ' + e.message); }
         });
-        const data = await r2.json();
-        if (data.success) {
-            const snapMsg = data.snapshotChanges > 0 ? ` + ${data.snapshotChanges} snapshot(s)` : '';
-            alert(`Reassigned to ${data.username}${snapMsg}.`);
-        } else {
-            alert('Reassign failed: ' + JSON.stringify(data));
-        }
+
     } catch(e) { alert('Error: ' + e.message); }
 };
 
