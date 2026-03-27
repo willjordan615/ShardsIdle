@@ -1067,22 +1067,34 @@ function calculateTotalStats(character) {
     return totalStats;
 }
 
+// Resource scaling constants — must match CONSTANTS in combatEngine.js exactly.
+// When tuning combat balance, update both files.
+const DERIVED_STATS_CONSTANTS = {
+    PLAYER_BASE_HP:       60,
+    PLAYER_BASE_MANA:     80,
+    PLAYER_BASE_STAMINA:  80,
+    HP_GROWTH:            1.05,
+    MANA_GROWTH:          1.02,
+    STAMINA_GROWTH:       1.02,
+    HP_STAT_DIVISOR:      150,
+    MANA_STAT_DIVISOR:    150,
+    STAMINA_STAT_DIVISOR: 150,
+};
+
 /**
- * Calculate derived stats (HP, Mana, Stamina) from base stats.
+ * Calculate derived stats (HP, Mana, Stamina) for a character.
  * Mirrors combatEngine.js calculateMaxHP/Mana/Stamina exactly so the
- * character detail screen shows what will actually be used in combat.
- */
-/**
- * Calculate derived stats (HP, Mana, Stamina) for a character including equipment bonuses.
- * Matches combatEngine.calculateMaxHP/Mana/Stamina exactly — single source of truth.
+ * character sheet shows what will actually be used in combat.
+ * Tune via DERIVED_STATS_CONSTANTS above — keep in sync with combatEngine.js CONSTANTS.
  */
 function calculateDerivedStats(character) {
     const level = character.level || 1;
     const stats = calculateTotalStats(character);
+    const C = DERIVED_STATS_CONSTANTS;
 
-    const hp      = Math.floor(50 * Math.pow(1.12, level - 1) * (1 + (stats.endurance || 0) / 300));
-    const mana    = Math.floor(80 * Math.pow(1.10, level - 1) * (1 + ((stats.harmony || 0) * 0.7 + (stats.endurance || 0) * 0.3) / 300));
-    const stamina = Math.floor(80 * Math.pow(1.10, level - 1) * (1 + ((stats.endurance || 0) * 0.7 + (stats.conviction || 0) * 0.3) / 300));
+    const hp      = Math.floor(C.PLAYER_BASE_HP      * Math.pow(C.HP_GROWTH,      level - 1) * (1 + (stats.endurance || 0) / C.HP_STAT_DIVISOR));
+    const mana    = Math.floor(C.PLAYER_BASE_MANA    * Math.pow(C.MANA_GROWTH,    level - 1) * (1 + ((stats.harmony || 0) * 0.7 + (stats.endurance || 0) * 0.3) / C.MANA_STAT_DIVISOR));
+    const stamina = Math.floor(C.PLAYER_BASE_STAMINA * Math.pow(C.STAMINA_GROWTH, level - 1) * (1 + ((stats.endurance || 0) * 0.7 + (stats.conviction || 0) * 0.3) / C.STAMINA_STAT_DIVISOR));
 
     return { hp, mana, stamina };
 }
