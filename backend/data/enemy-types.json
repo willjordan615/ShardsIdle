@@ -1269,7 +1269,7 @@
     "armorValue": 0,
     "aiProfile": "aggressive",
     "equipment": {
-      "mainHand": "fangs_small"
+      "mainHand": "jaws_small"
     },
     "availableSkills": [
       "basic_attack",
@@ -2141,7 +2141,7 @@
     "armorValue": 0,
     "aiProfile": "aggressive",
     "equipment": {
-      "mainHand": "dagger_rusty_tier0"
+      "mainHand": "jaws_small"
     },
     "availableSkills": [
       "basic_attack",
@@ -2172,7 +2172,7 @@
     "armorValue": 0,
     "aiProfile": "aggressive",
     "equipment": {
-      "mainHand": "dagger_scout_tier0"
+      "mainHand": "jaws_small"
     },
     "availableSkills": [
       "basic_attack",
