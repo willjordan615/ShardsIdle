@@ -1582,6 +1582,11 @@ calculateRewards(players, challenge, segments = []) {
     let score = skill.basePower || 1;
     const cat = skill.category;
 
+    // ── Jitter — prevent deterministic lock-in when two damage skills have similar power ──
+    if (cat && cat.includes('DAMAGE')) {
+        score *= 0.5 + Math.random() * 1.0; // 50%–150% of basePower
+    }
+
     // ── Resource ratio ──
     const resourceRatio = skill.costType === 'stamina'
         ? character.currentStamina / character.maxStamina
