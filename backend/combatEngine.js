@@ -2296,7 +2296,7 @@ _applyLootTagFlavour(item, tagDef) {
 
     const skill = this.skills.find(s => s.id === action.skillID);
     if (!skill) {
-        //console.log(`[DEBUG] Skill not found: ${action.skillID}`);
+        console.warn(`[SKILL NOT FOUND] actor=${actor?.name} skillID=${action.skillID}`);
         return {
             roll: null,
             result: { message: 'Skill not found', success: false, delay: 1000 }
