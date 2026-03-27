@@ -168,14 +168,13 @@ function _updateMediaControls() {
             pauseBtn.classList.remove('media-btn--active');
         }
     }
-    // Loop button active while idleActive, dimmed while stopped
+    // Loop button: active when looping, dimmed when exit pending, off when stopped
     const loopBtn = document.getElementById('mediaBtn_loop');
     if (loopBtn) {
-        if (window.currentState?.idleActive) {
-            loopBtn.classList.add('media-btn--active');
-        } else {
-            loopBtn.classList.remove('media-btn--active');
-        }
+        const active  = window.currentState?.idleActive && !window.currentState?.pendingLoopExit;
+        const pending = window.currentState?.pendingLoopExit;
+        loopBtn.classList.toggle('media-btn--active', !!active);
+        loopBtn.style.opacity = pending ? '0.4' : '';
     }
 }
 
@@ -870,6 +869,8 @@ window.toggleLoop = function() {
         // Turn loop on — start immediately if no combat in flight
         const challengeId = window.currentState.selectedChallenge?.id;
         if (!challengeId) return;
+        window.currentState.idleActive = true;
+        _updateMediaControls();
         if (typeof startCombat === 'function') startCombat(challengeId);
     }
 };

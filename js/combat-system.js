@@ -431,8 +431,8 @@ async function startCombat(forcedChallengeId) {
 
         // Mark the idle loop as active so character detail can show the banner
         currentState.idleActive = true;
-        currentState.pendingLoopExit = false;
         updateChallengeStatusBanner();
+        if (typeof _updateMediaControls === 'function') _updateMediaControls();
 
         console.log('[COMBAT] Starting combat:', requestBody.challengeID);
 
