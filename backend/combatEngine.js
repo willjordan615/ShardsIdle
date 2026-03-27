@@ -191,7 +191,7 @@ class CombatEngine {
           if (val > bestStatValue) { bestStatValue = val; bestActor = p; }
         });
         const margin = bestStatValue - (op.difficultyThreshold || 50);
-        highestChance = Math.max(0.05, Math.min(0.95, 0.5 + margin / CONSTANTS.STAT_SCALE));
+        highestChance = margin >= 0 ? 1.0 : Math.max(0.05, 0.5 + margin / CONSTANTS.STAT_SCALE);
       }
     } else if (checkType === 'stat') {
       // No skill required — any party member can attempt via stats alone
@@ -201,7 +201,7 @@ class CombatEngine {
         if (val > bestStatValue) { bestStatValue = val; bestActor = p; }
       });
       const margin = bestStatValue - (op.difficultyThreshold || 50);
-      highestChance = Math.max(0.05, Math.min(0.95, 0.5 + margin / CONSTANTS.STAT_SCALE));
+      highestChance = margin >= 0 ? 1.0 : Math.max(0.05, 0.5 + margin / CONSTANTS.STAT_SCALE);
     } else if (checkType === 'combo') {
       // Requires BOTH an item AND a stat threshold.
       // Item acts as the gate (no item = fallback); stat determines success chance.
@@ -225,7 +225,7 @@ class CombatEngine {
           if (val > bestStatValue) { bestStatValue = val; bestActor = p; }
         });
         const margin = bestStatValue - (op.difficultyThreshold || 50);
-        highestChance = Math.max(0.05, Math.min(0.95, 0.5 + margin / CONSTANTS.STAT_SCALE));
+        highestChance = margin >= 0 ? 1.0 : Math.max(0.05, 0.5 + margin / CONSTANTS.STAT_SCALE);
       }
     } else if (checkType === 'party_size') {
       const alive = playerCharacters.filter(p => !p.defeated).length;
@@ -279,7 +279,7 @@ class CombatEngine {
           if (val > bestStatValue) { bestStatValue = val; bestActor = p; }
         });
         const margin = bestStatValue - (op.difficultyThreshold || 50);
-        highestChance = Math.max(0.05, Math.min(0.95, 0.5 + margin / CONSTANTS.STAT_SCALE));
+        highestChance = margin >= 0 ? 1.0 : Math.max(0.05, 0.5 + margin / CONSTANTS.STAT_SCALE);
       }
     } else if (checkType === 'random') {
       conditionMet = true;
