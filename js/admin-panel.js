@@ -597,7 +597,11 @@ window.adminViewCharacter = async function(id) {
     try {
         const res = await fetch(BACKEND_URL + '/api/admin/db/characters/' + encodeURIComponent(id));
         const char = await res.json();
-        const info = `Name: ${char.name}\nRace: ${char.race}\nLevel: ${char.level}\nXP: ${char.experience}\nSkills: ${(char.skills||[]).length}\nEquipment: ${JSON.stringify(char.equipment||{},null,2)}`;
+        const skills = (char.skills || []).map((s, i) => {
+            const tag = s.intrinsic ? ' [intrinsic]' : (i <= 2 && !s.intrinsic ? ' [equipped?]' : '');
+            return `  ${i}: ${s.skillID} lv${s.skillLevel || 0}${tag}`;
+        }).join('\n');
+        const info = `${char.name} — Level ${char.level} ${char.race}\n\nSkills (DB order):\n${skills}\n\nEquipment:\n${JSON.stringify(char.equipment||{},null,2)}`;
         alert(info);
     } catch(e) { alert('Error: ' + e.message); }
 };
