@@ -3104,6 +3104,28 @@ _applyLootTagFlavour(item, tagDef) {
                 }
             }
 
+            // weaponTypes: resolve tier-appropriate weapon from a random pick among declared types.
+            // Only fires when no explicit equipment assigned (bosses with hand-crafted loadouts are unaffected).
+            if (!equipment.mainHand && enemyType.weaponTypes && enemyType.weaponTypes.length > 0) {
+                const pickedType = enemyType.weaponTypes[Math.floor(Math.random() * enemyType.weaponTypes.length)];
+                const tier = Math.min(8, Math.floor((enemyLevel - 1) / 12));
+                // Prefer exact tier match, fall back to closest available tier for this type
+                const candidates = this.gear.filter(g =>
+                    g.type === pickedType && g.dmg1 && !g.creatureOnly && g.tier >= 0
+                );
+                if (candidates.length > 0) {
+                    const exact = candidates.filter(g => g.tier === tier);
+                    const pool  = exact.length > 0 ? exact : candidates.sort((a, b) =>
+                        Math.abs(a.tier - tier) - Math.abs(b.tier - tier)
+                    ).slice(0, 3);
+                    equipment.mainHand = pool[Math.floor(Math.random() * pool.length)].id;
+                }
+            }
+            // creatureOnly weapons (fangs, etc.) resolved separately — these are listed in weaponTypes too
+            // but are already tier-0; if picked type has no tier>=0 items the block above finds nothing,
+            // so creature-only types should be listed alone (e.g. weaponTypes: ["dagger"] for a goblin
+            // that should use fangs would be wrong — use the specific fangs via equipment array instead).
+
             const maxHP = this.calculateMaxHP(enemyType.stats, enemyLevel, false);
             const maxMana = this.calculateMaxMana(enemyType.stats, enemyLevel, false);
             const maxStamina = this.calculateMaxStamina(enemyType.stats, enemyLevel, false);

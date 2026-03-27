@@ -42,6 +42,10 @@
       "dwarf",
       "soldier",
       "melee"
+    ],
+    "weaponTypes": [
+      "sword",
+      "axe"
     ]
   },
   {
@@ -86,6 +90,11 @@
       "dwarf",
       "scout",
       "ranged"
+    ],
+    "weaponTypes": [
+      "dagger",
+      "crossbow",
+      "pistol"
     ]
   },
   {
@@ -130,6 +139,11 @@
       "human",
       "scavenger",
       "melee"
+    ],
+    "weaponTypes": [
+      "dagger",
+      "pistol",
+      "handaxe"
     ]
   },
   {
@@ -181,6 +195,10 @@
       "dwarf",
       "soldier",
       "tank"
+    ],
+    "weaponTypes": [
+      "hammer",
+      "sword"
     ]
   },
   {
@@ -243,6 +261,10 @@
       "dwarf",
       "boss",
       "melee"
+    ],
+    "weaponTypes": [
+      "axe",
+      "sword"
     ]
   },
   {
@@ -281,6 +303,10 @@
       "human",
       "undead",
       "melee"
+    ],
+    "weaponTypes": [
+      "handaxe",
+      "dagger"
     ]
   },
   {
@@ -325,6 +351,10 @@
       "human",
       "soldier",
       "melee"
+    ],
+    "weaponTypes": [
+      "mace",
+      "sword"
     ]
   },
   {
@@ -371,6 +401,11 @@
       "human",
       "caster",
       "support"
+    ],
+    "weaponTypes": [
+      "scepter",
+      "wand",
+      "bell"
     ]
   },
   {
@@ -422,6 +457,10 @@
       "human",
       "soldier",
       "tank"
+    ],
+    "weaponTypes": [
+      "hammer",
+      "mace"
     ]
   },
   {
@@ -481,6 +520,10 @@
       "human",
       "boss",
       "caster"
+    ],
+    "weaponTypes": [
+      "scepter",
+      "tome"
     ]
   },
   {
@@ -519,6 +562,10 @@
       "goblin",
       "scrapper",
       "melee"
+    ],
+    "weaponTypes": [
+      "handaxe",
+      "dagger"
     ]
   },
   {
@@ -563,6 +610,10 @@
       "goblin",
       "scout",
       "ranged"
+    ],
+    "weaponTypes": [
+      "dagger",
+      "handaxe"
     ]
   },
   {
@@ -602,6 +653,10 @@
       "goblin",
       "elder",
       "support"
+    ],
+    "weaponTypes": [
+      "totem",
+      "scepter"
     ]
   },
   {
@@ -648,6 +703,10 @@
       "goblin",
       "brute",
       "tank"
+    ],
+    "weaponTypes": [
+      "hammer",
+      "axe"
     ]
   },
   {
@@ -693,6 +752,10 @@
       "goblin",
       "boss",
       "melee"
+    ],
+    "weaponTypes": [
+      "axe",
+      "hammer"
     ]
   },
   {
@@ -720,7 +783,11 @@
       "wisp",
       "melee"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "weaponTypes": [
+      "bell",
+      "flute"
+    ]
   },
   {
     "id": "willow_vine_tender",
@@ -750,7 +817,11 @@
       "support"
     ],
     "lootTable": [],
-    "maxMana": 14
+    "maxMana": 14,
+    "weaponTypes": [
+      "totem",
+      "wand"
+    ]
   },
   {
     "id": "willow_mist_caller",
@@ -778,7 +849,12 @@
       "wisp",
       "support"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "weaponTypes": [
+      "flute",
+      "wand",
+      "bell"
+    ]
   },
   {
     "id": "heart_wisp",
@@ -824,6 +900,10 @@
         "dropChance": 0.3,
         "rarity": "uncommon"
       }
+    ],
+    "weaponTypes": [
+      "bell",
+      "flute"
     ]
   },
   {
@@ -854,7 +934,11 @@
       "melee"
     ],
     "lootTable": [],
-    "maxMana": 14
+    "maxMana": 14,
+    "weaponTypes": [
+      "totem",
+      "wand"
+    ]
   },
   {
     "id": "heart_wisp_unbound",
@@ -902,6 +986,11 @@
         "dropChance": 0.3,
         "rarity": "uncommon"
       }
+    ],
+    "weaponTypes": [
+      "bell",
+      "flute",
+      "wand"
     ]
   },
   {
@@ -929,7 +1018,11 @@
       "spirit",
       "undead"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "weaponTypes": [
+      "handaxe",
+      "mace"
+    ]
   },
   {
     "id": "ferry_oar_specter",
@@ -957,7 +1050,11 @@
       "spirit",
       "undead"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "weaponTypes": [
+      "bell",
+      "flute"
+    ]
   },
   {
     "id": "ferry_toll_collector",
@@ -985,7 +1082,11 @@
       "spirit",
       "caster"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "weaponTypes": [
+      "mace",
+      "hammer"
+    ]
   },
   {
     "id": "ferrymans_echo",
@@ -1026,6 +1127,10 @@
         "dropChance": 0.25,
         "rarity": "uncommon"
       }
+    ],
+    "weaponTypes": [
+      "tome",
+      "bell"
     ]
   },
   {
@@ -1073,6 +1178,11 @@
         "dropChance": 0.6,
         "rarity": "common"
       }
+    ],
+    "weaponTypes": [
+      "flute",
+      "bell",
+      "wand"
     ]
   },
   {
@@ -1101,7 +1211,11 @@
       "human",
       "bandit"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "weaponTypes": [
+      "handaxe",
+      "dagger"
+    ]
   },
   {
     "id": "vulture_roadwarden",
@@ -1136,6 +1250,10 @@
         "dropChance": 0.15,
         "rarity": "uncommon"
       }
+    ],
+    "weaponTypes": [
+      "sword",
+      "axe"
     ]
   },
   {
@@ -1163,7 +1281,10 @@
       "beast",
       "canine"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "weaponTypes": [
+      "dagger"
+    ]
   },
   {
     "id": "vulture_beast_handler",
@@ -1198,6 +1319,10 @@
         "dropChance": 0.25,
         "rarity": "common"
       }
+    ],
+    "weaponTypes": [
+      "handaxe",
+      "mace"
     ]
   },
   {
@@ -1238,6 +1363,10 @@
         "dropChance": 0.15,
         "rarity": "uncommon"
       }
+    ],
+    "weaponTypes": [
+      "axe",
+      "sword"
     ]
   },
   {
@@ -1289,6 +1418,10 @@
         "dropChance": 0.3,
         "rarity": "uncommon"
       }
+    ],
+    "weaponTypes": [
+      "sword",
+      "pistol"
     ]
   },
   {
@@ -1340,6 +1473,10 @@
         "dropChance": 0.25,
         "rarity": "rare"
       }
+    ],
+    "weaponTypes": [
+      "sword",
+      "pistol"
     ]
   },
   {
@@ -1368,7 +1505,11 @@
       "blight",
       "humanoid"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "weaponTypes": [
+      "totem",
+      "wand"
+    ]
   },
   {
     "id": "orchard_thorn_weaver",
@@ -1397,7 +1538,12 @@
       "blight",
       "caster"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "weaponTypes": [
+      "wand",
+      "scepter",
+      "totem"
+    ]
   },
   {
     "id": "orchard_root_shambler",
@@ -1427,7 +1573,11 @@
       "blight",
       "beast"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "weaponTypes": [
+      "totem",
+      "hammer"
+    ]
   },
   {
     "id": "sister_maren",
@@ -1470,6 +1620,10 @@
         "dropChance": 0.2,
         "rarity": "uncommon"
       }
+    ],
+    "weaponTypes": [
+      "bell",
+      "scepter"
     ]
   },
   {
@@ -1523,6 +1677,11 @@
         "dropChance": 0.2,
         "rarity": "rare"
       }
+    ],
+    "weaponTypes": [
+      "flute",
+      "bell",
+      "tome"
     ]
   },
   {
@@ -1559,6 +1718,10 @@
         "dropChance": 0.15,
         "rarity": "uncommon"
       }
+    ],
+    "weaponTypes": [
+      "sword",
+      "axe"
     ]
   },
   {
@@ -1595,6 +1758,9 @@
         "dropChance": 0.18,
         "rarity": "uncommon"
       }
+    ],
+    "weaponTypes": [
+      "crossbow"
     ]
   },
   {
@@ -1644,6 +1810,10 @@
         "dropChance": 0.2,
         "rarity": "uncommon"
       }
+    ],
+    "weaponTypes": [
+      "sword",
+      "axe"
     ]
   },
   {
@@ -1681,6 +1851,10 @@
         "dropChance": 0.3,
         "rarity": "common"
       }
+    ],
+    "weaponTypes": [
+      "dagger",
+      "sword"
     ]
   },
   {
@@ -1736,6 +1910,10 @@
         "dropChance": 0.6,
         "rarity": "common"
       }
+    ],
+    "weaponTypes": [
+      "sword",
+      "axe"
     ]
   },
   {
@@ -1765,7 +1943,11 @@
       "fire",
       "ashen_remnant"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "weaponTypes": [
+      "wand",
+      "scepter"
+    ]
   },
   {
     "id": "ashen_flamekeeper",
@@ -1796,7 +1978,11 @@
       "caster",
       "ashen_remnant"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "weaponTypes": [
+      "wand",
+      "tome"
+    ]
   },
   {
     "id": "ashen_brute",
@@ -1826,7 +2012,11 @@
       "fire",
       "ashen_remnant"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "weaponTypes": [
+      "hammer",
+      "axe"
+    ]
   },
   {
     "id": "captain_ignis",
@@ -1875,6 +2065,10 @@
         "dropChance": 0.55,
         "rarity": "common"
       }
+    ],
+    "weaponTypes": [
+      "wand",
+      "scepter"
     ]
   },
   {
@@ -1927,6 +2121,11 @@
         "dropChance": 0.35,
         "rarity": "uncommon"
       }
+    ],
+    "weaponTypes": [
+      "wand",
+      "tome",
+      "flute"
     ]
   },
   {
@@ -1955,7 +2154,10 @@
       "canine",
       "wolves_head"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "weaponTypes": [
+      "dagger"
+    ]
   },
   {
     "id": "kennel_blooded_hunter",
@@ -1985,7 +2187,11 @@
       "canine",
       "wolves_head"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "weaponTypes": [
+      "dagger",
+      "handaxe"
+    ]
   },
   {
     "id": "kennel_mad_keeper",
@@ -2025,6 +2231,10 @@
         "dropChance": 0.25,
         "rarity": "common"
       }
+    ],
+    "weaponTypes": [
+      "handaxe",
+      "dagger"
     ]
   },
   {
@@ -2066,6 +2276,10 @@
         "dropChance": 0.2,
         "rarity": "uncommon"
       }
+    ],
+    "weaponTypes": [
+      "sword",
+      "mace"
     ]
   },
   {
@@ -2114,6 +2328,10 @@
         "dropChance": 0.2,
         "rarity": "uncommon"
       }
+    ],
+    "weaponTypes": [
+      "axe",
+      "sword"
     ]
   },
   {
@@ -2143,7 +2361,11 @@
       "dwarven_conflict",
       "excavation"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "weaponTypes": [
+      "handaxe",
+      "dagger"
+    ]
   },
   {
     "id": "excavation_wardbreaker",
@@ -2180,6 +2402,10 @@
         "dropChance": 0.15,
         "rarity": "uncommon"
       }
+    ],
+    "weaponTypes": [
+      "hammer",
+      "mace"
     ]
   },
   {
@@ -2210,7 +2436,11 @@
       "spirit",
       "excavation"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "weaponTypes": [
+      "mace",
+      "hammer"
+    ]
   },
   {
     "id": "crystal_sentinel",
@@ -2248,6 +2478,10 @@
         "dropChance": 0.25,
         "rarity": "uncommon"
       }
+    ],
+    "weaponTypes": [
+      "mace",
+      "sword"
     ]
   },
   {
@@ -2303,6 +2537,10 @@
         "dropChance": 0.3,
         "rarity": "uncommon"
       }
+    ],
+    "weaponTypes": [
+      "hammer",
+      "axe"
     ]
   },
   {
@@ -2363,6 +2601,11 @@
         "dropChance": 0.2,
         "rarity": "rare"
       }
+    ],
+    "weaponTypes": [
+      "tome",
+      "scepter",
+      "wand"
     ]
   },
   {
@@ -2392,7 +2635,11 @@
       "human",
       "guild"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "weaponTypes": [
+      "mace",
+      "dagger"
+    ]
   },
   {
     "id": "guild_vault_warden",
@@ -2427,6 +2674,10 @@
         "dropChance": 0.15,
         "rarity": "rare"
       }
+    ],
+    "weaponTypes": [
+      "hammer",
+      "mace"
     ]
   },
   {
@@ -2462,6 +2713,11 @@
         "dropChance": 0.25,
         "rarity": "uncommon"
       }
+    ],
+    "weaponTypes": [
+      "wand",
+      "scepter",
+      "tome"
     ]
   },
   {
@@ -2511,6 +2767,10 @@
         "dropChance": 0.2,
         "rarity": "uncommon"
       }
+    ],
+    "weaponTypes": [
+      "sword",
+      "pistol"
     ]
   },
   {
@@ -2540,7 +2800,11 @@
       "water",
       "pact"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "weaponTypes": [
+      "mace",
+      "hammer"
+    ]
   },
   {
     "id": "shrine_oath_warden",
@@ -2577,6 +2841,10 @@
         "dropChance": 0.3,
         "rarity": "common"
       }
+    ],
+    "weaponTypes": [
+      "sword",
+      "mace"
     ]
   },
   {
@@ -2615,6 +2883,10 @@
         "dropChance": 0.25,
         "rarity": "common"
       }
+    ],
+    "weaponTypes": [
+      "dagger",
+      "sword"
     ]
   },
   {
@@ -2665,6 +2937,10 @@
         "dropChance": 0.3,
         "rarity": "uncommon"
       }
+    ],
+    "weaponTypes": [
+      "scepter",
+      "tome"
     ]
   },
   {
@@ -2716,6 +2992,10 @@
         "dropChance": 0.2,
         "rarity": "rare"
       }
+    ],
+    "weaponTypes": [
+      "hammer",
+      "axe"
     ]
   },
   {
@@ -2745,7 +3025,11 @@
       "dwarf",
       "tidebound"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "weaponTypes": [
+      "sword",
+      "axe"
+    ]
   },
   {
     "id": "watch_tide_warden",
@@ -2774,7 +3058,11 @@
       "tidebound",
       "caster"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "weaponTypes": [
+      "mace",
+      "hammer"
+    ]
   },
   {
     "id": "watch_storm_caller",
@@ -2805,7 +3093,12 @@
       "lightning",
       "cold"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "weaponTypes": [
+      "scepter",
+      "wand",
+      "tome"
+    ]
   },
   {
     "id": "watch_commander_thrain",
@@ -2855,6 +3148,10 @@
         "dropChance": 0.25,
         "rarity": "uncommon"
       }
+    ],
+    "weaponTypes": [
+      "sword",
+      "axe"
     ]
   },
   {
@@ -2884,7 +3181,12 @@
       "salt_wept",
       "water"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "weaponTypes": [
+      "bell",
+      "flute",
+      "wand"
+    ]
   },
   {
     "id": "beacon_salt_singer",
@@ -2921,6 +3223,10 @@
         "dropChance": 0.25,
         "rarity": "common"
       }
+    ],
+    "weaponTypes": [
+      "flute",
+      "bell"
     ]
   },
   {
@@ -2952,7 +3258,12 @@
       "water",
       "caster"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "weaponTypes": [
+      "wand",
+      "flute",
+      "scepter"
+    ]
   },
   {
     "id": "beacon_the_keeper",
@@ -3002,6 +3313,10 @@
         "dropChance": 0.2,
         "rarity": "uncommon"
       }
+    ],
+    "weaponTypes": [
+      "tome",
+      "scepter"
     ]
   },
   {
@@ -3056,6 +3371,11 @@
         "dropChance": 0.3,
         "rarity": "uncommon"
       }
+    ],
+    "weaponTypes": [
+      "flute",
+      "bell",
+      "wand"
     ]
   },
   {
@@ -3084,7 +3404,11 @@
       "inkbound",
       "verdant"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "weaponTypes": [
+      "tome",
+      "wand"
+    ]
   },
   {
     "id": "athenaeum_editor",
@@ -3120,6 +3444,10 @@
         "dropChance": 0.2,
         "rarity": "uncommon"
       }
+    ],
+    "weaponTypes": [
+      "tome",
+      "scepter"
     ]
   },
   {
@@ -3157,6 +3485,10 @@
         "dropChance": 0.25,
         "rarity": "uncommon"
       }
+    ],
+    "weaponTypes": [
+      "dagger",
+      "wand"
     ]
   },
   {
@@ -3206,6 +3538,10 @@
         "dropChance": 0.2,
         "rarity": "uncommon"
       }
+    ],
+    "weaponTypes": [
+      "tome",
+      "scepter"
     ]
   },
   {
@@ -3261,6 +3597,10 @@
         "dropChance": 0.4,
         "rarity": "uncommon"
       }
+    ],
+    "weaponTypes": [
+      "tome",
+      "bell"
     ]
   },
   {
@@ -3290,7 +3630,11 @@
       "undead",
       "royal_guard"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "weaponTypes": [
+      "sword",
+      "axe"
+    ]
   },
   {
     "id": "bastion_spectral_veteran",
@@ -3327,6 +3671,10 @@
         "dropChance": 0.3,
         "rarity": "common"
       }
+    ],
+    "weaponTypes": [
+      "sword",
+      "hammer"
     ]
   },
   {
@@ -3364,6 +3712,10 @@
         "dropChance": 0.2,
         "rarity": "uncommon"
       }
+    ],
+    "weaponTypes": [
+      "mace",
+      "wand"
     ]
   },
   {
@@ -3414,6 +3766,10 @@
         "dropChance": 0.18,
         "rarity": "rare"
       }
+    ],
+    "weaponTypes": [
+      "sword",
+      "scepter"
     ]
   },
   {
@@ -3463,6 +3819,11 @@
         "dropChance": 0.22,
         "rarity": "rare"
       }
+    ],
+    "weaponTypes": [
+      "scepter",
+      "tome",
+      "bell"
     ]
   },
   {
@@ -3493,7 +3854,11 @@
       "water",
       "human"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "weaponTypes": [
+      "dagger",
+      "crossbow"
+    ]
   },
   {
     "id": "marsh_mist_weaver",
@@ -3526,7 +3891,12 @@
       "caster",
       "spirit"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "weaponTypes": [
+      "wand",
+      "flute",
+      "bell"
+    ]
   },
   {
     "id": "marsh_barnacle_brute",
@@ -3556,7 +3926,11 @@
       "water",
       "human"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "weaponTypes": [
+      "hammer",
+      "mace"
+    ]
   },
   {
     "id": "high_chanter_malacor",
@@ -3607,6 +3981,10 @@
         "dropChance": 0.25,
         "rarity": "rare"
       }
+    ],
+    "weaponTypes": [
+      "scepter",
+      "tome"
     ]
   },
   {
@@ -3649,6 +4027,10 @@
         "dropChance": 0.35,
         "rarity": "uncommon"
       }
+    ],
+    "weaponTypes": [
+      "mace",
+      "scepter"
     ]
   },
   {
@@ -3678,7 +4060,11 @@
       "echo_council",
       "verdant"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "weaponTypes": [
+      "tome",
+      "wand"
+    ]
   },
   {
     "id": "spire_muted_judge",
@@ -3715,6 +4101,10 @@
         "dropChance": 0.2,
         "rarity": "uncommon"
       }
+    ],
+    "weaponTypes": [
+      "scepter",
+      "mace"
     ]
   },
   {
@@ -3752,6 +4142,10 @@
         "dropChance": 0.25,
         "rarity": "common"
       }
+    ],
+    "weaponTypes": [
+      "wand",
+      "scepter"
     ]
   },
   {
@@ -3808,6 +4202,11 @@
         "dropChance": 0.18,
         "rarity": "rare"
       }
+    ],
+    "weaponTypes": [
+      "scepter",
+      "tome",
+      "bell"
     ]
   },
   {
@@ -3869,6 +4268,11 @@
         "dropChance": 0.25,
         "rarity": "rare"
       }
+    ],
+    "weaponTypes": [
+      "tome",
+      "bell",
+      "wand"
     ]
   },
   {
@@ -3900,7 +4304,11 @@
       "dwarf",
       "dwarven_conflict"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "weaponTypes": [
+      "sword",
+      "axe"
+    ]
   },
   {
     "id": "hall_ancestor_shade",
@@ -3938,6 +4346,11 @@
         "dropChance": 0.2,
         "rarity": "rare"
       }
+    ],
+    "weaponTypes": [
+      "tome",
+      "scepter",
+      "bell"
     ]
   },
   {
@@ -3969,7 +4382,11 @@
       "ancestor",
       "stone"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "weaponTypes": [
+      "hammer",
+      "mace"
+    ]
   },
   {
     "id": "hall_the_disowned",
@@ -4013,6 +4430,10 @@
         "dropChance": 0.3,
         "rarity": "uncommon"
       }
+    ],
+    "weaponTypes": [
+      "dagger",
+      "sword"
     ]
   },
   {
@@ -4071,6 +4492,10 @@
         "dropChance": 0.3,
         "rarity": "uncommon"
       }
+    ],
+    "weaponTypes": [
+      "hammer",
+      "axe"
     ]
   },
   {
@@ -4098,7 +4523,11 @@
       "orc",
       "wolves_head"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "weaponTypes": [
+      "handaxe",
+      "dagger"
+    ]
   },
   {
     "id": "orc_tusk_brother",
@@ -4132,6 +4561,10 @@
         "dropChance": 0.18,
         "rarity": "uncommon"
       }
+    ],
+    "weaponTypes": [
+      "axe",
+      "sword"
     ]
   },
   {
@@ -4161,7 +4594,11 @@
       "wolves_head",
       "caster"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "weaponTypes": [
+      "totem",
+      "scepter"
+    ]
   },
   {
     "id": "orc_bone_guard",
@@ -4196,6 +4633,10 @@
         "dropChance": 0.15,
         "rarity": "rare"
       }
+    ],
+    "weaponTypes": [
+      "hammer",
+      "axe"
     ]
   },
   {
@@ -4249,6 +4690,10 @@
         "dropChance": 0.2,
         "rarity": "rare"
       }
+    ],
+    "weaponTypes": [
+      "axe",
+      "hammer"
     ]
   },
   {
@@ -4278,7 +4723,11 @@
       "orc",
       "stonetusk"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "weaponTypes": [
+      "handaxe",
+      "dagger"
+    ]
   },
   {
     "id": "stonetusk_tusk_brother",
@@ -4314,6 +4763,10 @@
         "dropChance": 0.15,
         "rarity": "uncommon"
       }
+    ],
+    "weaponTypes": [
+      "axe",
+      "sword"
     ]
   },
   {
@@ -4345,7 +4798,11 @@
       "stonetusk",
       "caster"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "weaponTypes": [
+      "totem",
+      "scepter"
+    ]
   },
   {
     "id": "stonetusk_bone_guard",
@@ -4382,6 +4839,10 @@
         "dropChance": 0.15,
         "rarity": "rare"
       }
+    ],
+    "weaponTypes": [
+      "hammer",
+      "axe"
     ]
   },
   {
@@ -4413,7 +4874,11 @@
       "luminary",
       "nature"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "weaponTypes": [
+      "dagger",
+      "handaxe"
+    ]
   },
   {
     "id": "gallery_silence_weaver",
@@ -4446,7 +4911,12 @@
       "nature",
       "shadow"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "weaponTypes": [
+      "wand",
+      "tome",
+      "flute"
+    ]
   },
   {
     "id": "gallery_mirror_warden",
@@ -4484,6 +4954,10 @@
         "dropChance": 0.2,
         "rarity": "uncommon"
       }
+    ],
+    "weaponTypes": [
+      "sword",
+      "mace"
     ]
   },
   {
@@ -4515,7 +4989,12 @@
       "shadow",
       "fraying"
     ],
-    "lootTable": []
+    "lootTable": [],
+    "weaponTypes": [
+      "wand",
+      "scepter",
+      "bell"
+    ]
   },
   {
     "id": "elara_preservation_core",
@@ -4568,6 +5047,10 @@
         "dropChance": 0.4,
         "rarity": "uncommon"
       }
+    ],
+    "weaponTypes": [
+      "scepter",
+      "tome"
     ]
   }
 ]
