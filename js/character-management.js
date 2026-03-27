@@ -963,13 +963,13 @@ async function showCharacterDetail(characterId, opts = {}) {
         
         const totalStats = calculateTotalStats(character);
         document.getElementById('detailConviction').textContent = totalStats.conviction;
-        addStatTooltip(document.getElementById('detailConviction'), 'conviction', 400);
+        addStatTooltip(document.getElementById('detailConviction'), 'conviction');
         document.getElementById('detailEndurance').textContent = totalStats.endurance;
-        addStatTooltip(document.getElementById('detailEndurance'), 'endurance', 400);
+        addStatTooltip(document.getElementById('detailEndurance'), 'endurance');
         document.getElementById('detailAmbition').textContent = totalStats.ambition;
-        addStatTooltip(document.getElementById('detailAmbition'), 'ambition', 400);
+        addStatTooltip(document.getElementById('detailAmbition'), 'ambition');
         document.getElementById('detailHarmony').textContent = totalStats.harmony;
-        addStatTooltip(document.getElementById('detailHarmony'), 'harmony', 400);
+        addStatTooltip(document.getElementById('detailHarmony'), 'harmony');
         
         const derived = calculateDerivedStatsWithEquipment(character);
         document.getElementById('detailHP').textContent = derived.hp;
@@ -1063,7 +1063,7 @@ function renderEquippedGear(character) {
         `;
         
         if (item) {
-            addEquippedGearTooltip(slotEl, item, 800);
+            addGearCardTooltip(slotEl, item);
         }
         
         container.appendChild(slotEl);
@@ -1138,7 +1138,7 @@ async function renderCharacterSkills(character) {
                 card.appendChild(contentDiv);
                 
                 // Add Tooltip
-                addSkillTooltip(card, skillDef, 500);
+                addSkillTooltip(card, skillDef);
 
                 // Swap Button
                 const btn = document.createElement('button');
@@ -1240,7 +1240,7 @@ async function renderCharacterSkills(character) {
                 <div style="color:#888; font-size:0.78em; margin-top:3px;">${skillDef.description || ''}</div>
                 ${skillDef.costType && skillDef.costType !== 'none' ? `<div style="color:#555; font-size:0.72em; margin-top:2px;">Cost: ${skillDef.costAmount} ${skillDef.costType}</div>` : ''}
             `;
-            addSkillTooltip(card, skillDef, 500);
+            addSkillTooltip(card, skillDef);
             racialSection.appendChild(card);
         });
 
@@ -1568,191 +1568,6 @@ async function deleteCharacter(characterId) {
 // ============================================================================
 // TOOLTIP FUNCTIONS (MISSING FROM OLD FILE)
 // ============================================================================
-
-/**
- * Create and show a tooltip for a skill
- */
-function createSkillTooltip(skill) {
-    const tooltip = document.createElement('div');
-    tooltip.className = 'skill-tooltip';
-    tooltip.style.cssText = `
-        position: fixed; 
-        background: #16213e; 
-        border: 2px solid #4a9eff; 
-        border-radius: 4px; 
-        padding: 0.75rem; 
-        max-width: 350px; 
-        z-index: 10000; 
-        color: #4a9eff; 
-        font-family: 'Courier New', monospace; 
-        font-size: 0.85rem; 
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.8); 
-        pointer-events: none;
-        word-wrap: break-word;
-        white-space: normal;
-    `;
-    
-    let content = `<div style="font-weight: bold; margin-bottom: 0.5rem; font-size: 0.95rem;">${skill.name}</div>`;
-    content += `<div style="color: #aaa; font-size: 0.8rem; margin-bottom: 0.5rem;">${skill.category}</div>`;
-    
-    if (skill.description) {
-        content += `<div style="color: #aaa; margin-bottom: 0.75rem; font-size: 0.85rem;">${skill.description}</div>`;
-    }
-    
-    if (skill.costType && skill.costType !== 'none') {
-        content += `<div style="color: #d4af37;"><strong>Cost:</strong> ${skill.costAmount} ${skill.costType}</div>`;
-    }
-    
-    if (skill.basePower) {
-        content += `<div style="color: #ff6b6b;"><strong>Power:</strong> ${skill.basePower}x</div>`;
-    }
-    
-    if (skill.baseHitChance) {
-        content += `<div style="color: #4eff7f;"><strong>Hit Chance:</strong> ${(skill.baseHitChance * 100).toFixed(0)}%</div>`;
-    }
-    
-    if (skill.critChance) {
-        content += `<div style="color: #ffd700;"><strong>Crit Chance:</strong> ${(skill.critChance * 100).toFixed(0)}%</div>`;
-    }
-    
-    if (skill.delay) {
-        content += `<div style="color: #4a9eff;"><strong>Delay:</strong> ${skill.delay}ms</div>`;
-    }
-    
-    if (skill.hitCount) {
-        if (skill.hitCount.fixed) {
-            content += `<div style="color: #4eff7f;"><strong>Hits:</strong> ${skill.hitCount.fixed}</div>`;
-        } else {
-            content += `<div style="color: #4eff7f;"><strong>Hits:</strong> ${skill.hitCount.min}-${skill.hitCount.max}</div>`;
-        }
-    }
-    
-    if (skill.scalingFactors) {
-        const scaling = Object.entries(skill.scalingFactors)
-            .filter(([k, v]) => v > 0)
-            .map(([k, v]) => `${(v * 100).toFixed(0)}% ${k}`)
-            .join(', ');
-        if (scaling) {
-            content += `<div style="color: #d4af37; margin-top: 0.5rem;"><strong>Scaling:</strong> ${scaling}</div>`;
-        }
-    }
-    
-    if (skill.effects && skill.effects.length > 0) {
-        content += `<div style="color: #ff9999; margin-top: 0.5rem;"><strong>Effects:</strong><br>`;
-        skill.effects.forEach(effect => {
-            let effectText = effect.type.toUpperCase();
-            if (effect.damageType) effectText += ` (${effect.damageType})`;
-            if (effect.debuff) effectText += ` - ${effect.debuff}`;
-            if (effect.buff) effectText += ` - ${effect.buff}`;
-            content += `• ${effectText}<br>`;
-        });
-        content += `</div>`;
-    }
-    
-    tooltip.innerHTML = content;
-    document.body.appendChild(tooltip);
-    return tooltip;
-}
-
-/**
- * Add tooltip behavior to a skill card
- */
-function addSkillTooltip(element, skill, delay = 500) {
-    let tooltip = null;
-    let tooltipTimeout = null;
-    
-    element.addEventListener('mouseenter', (e) => {
-        tooltipTimeout = setTimeout(() => {
-            tooltip = createSkillTooltip(skill);
-            positionTooltip(tooltip, e);
-        }, delay);
-    });
-    
-    element.addEventListener('mousemove', (e) => {
-        if (tooltip) {
-            positionTooltip(tooltip, e);
-        }
-    });
-    
-    element.addEventListener('mouseleave', () => {
-        if (tooltipTimeout) clearTimeout(tooltipTimeout);
-        if (tooltip) {
-            tooltip.remove();
-            tooltip = null;
-        }
-    });
-}
-
-/**
- * Create gear tooltip
- */
-function createGearTooltip(item) {
-    const tooltip = document.createElement('div');
-    tooltip.style.cssText = `
-        position: fixed; 
-        background: #16213e; 
-        border: 2px solid #d4af37; 
-        border-radius: 4px; 
-        padding: 0.75rem; 
-        max-width: 300px; 
-        z-index: 10000; 
-        color: #d4af37; 
-        font-family: 'Courier New', monospace; 
-        font-size: 0.85rem; 
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.8); 
-        pointer-events: none;
-    `;
-    
-    let content = `<div style="font-weight: bold; margin-bottom: 0.5rem;">${item.name}</div>`;
-    content += `<div style="color: #aaa; font-size: 0.8rem; margin-bottom: 0.5rem;">${item.type}</div>`;
-    
-    if (item.description) {
-        content += `<div style="color: #aaa; margin-bottom: 0.75rem;">${item.description}</div>`;
-    }
-    
-    if (item.dmg1) {
-        content += `<div style="color: #ff6b6b;">Damage: ${item.dmg1} ${item.dmg_type_1}</div>`;
-    }
-    if (item.armor) {
-        content += `<div style="color: #4eff7f;">Armor: ${item.armor}</div>`;
-    }
-    if (item.delay) {
-        content += `<div style="color: #4a9eff;">Delay: ${item.delay}</div>`;
-    }
-    
-    tooltip.innerHTML = content;
-    document.body.appendChild(tooltip);
-    return tooltip;
-}
-
-/**
- * Add tooltip behavior to equipped gear
- */
-function addEquippedGearTooltip(element, item, delay = 500) {
-    let tooltip = null;
-    let tooltipTimeout = null;
-    
-    element.addEventListener('mouseenter', (e) => {
-        tooltipTimeout = setTimeout(() => {
-            tooltip = createGearTooltip(item);
-            positionTooltip(tooltip, e);
-        }, delay);
-    });
-    
-    element.addEventListener('mousemove', (e) => {
-        if (tooltip) {
-            positionTooltip(tooltip, e);
-        }
-    });
-    
-    element.addEventListener('mouseleave', () => {
-        if (tooltipTimeout) clearTimeout(tooltipTimeout);
-        if (tooltip) {
-            tooltip.remove();
-            tooltip = null;
-        }
-    });
-}
 
 // addStatTooltip is defined in stat-tooltip.js (richer version with createStatTooltip).
 // The duplicate that used to live here has been removed to prevent the weaker inline

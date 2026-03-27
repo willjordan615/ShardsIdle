@@ -152,17 +152,33 @@ function destroyGearTooltip() {
 }
 
 /**
+ * Global escape hatch — dismiss any stray tooltip on outside tap, click, or scroll.
+ */
+document.addEventListener('touchstart', (e) => {
+    if (!e.target.closest('.gear-tooltip') && !e.target.closest('.skill-tooltip') && !e.target.closest('[data-gear-tooltip]')) {
+        destroyGearTooltip();
+        destroySkillTooltip();
+    }
+}, { passive: true });
+
+document.addEventListener('scroll', () => {
+    destroyGearTooltip();
+    destroySkillTooltip();
+}, { passive: true, capture: true });
+
+/**
  * Add tooltip behavior to a gear card
  */
-function addGearCardTooltip(cardElement, item) {
+function addGearCardTooltip(cardElement, item, delay) {
     let tooltip = null;
     let tooltipTimeout = null;
+    const resolvedDelay = () => delay ?? window.tooltipDelay ?? 500;
 
     cardElement.addEventListener('mouseenter', (e) => {
         tooltipTimeout = setTimeout(() => {
             tooltip = createGearTooltip(item);
             positionTooltip(tooltip, e, null);
-        }, 300);
+        }, resolvedDelay());
     });
 
     cardElement.addEventListener('mousemove', (e) => {
@@ -179,20 +195,279 @@ function addGearCardTooltip(cardElement, item) {
             if (tooltip) { tooltip.remove(); tooltip = null; }
             tooltip = createGearTooltip(item);
             positionTooltip(tooltip, null, cardElement);
-            setTimeout(() => {
-                if (tooltip) { tooltip.remove(); tooltip = null; }
-            }, 2500);
-        }, 400);
+        }, resolvedDelay());
     }, { passive: true });
 
     cardElement.addEventListener('touchend', () => {
         clearTimeout(tooltipTimeout);
+        if (tooltip) { tooltip.remove(); tooltip = null; }
     }, { passive: true });
 
     cardElement.addEventListener('touchmove', () => {
         clearTimeout(tooltipTimeout);
+        if (tooltip) { tooltip.remove(); tooltip = null; }
     }, { passive: true });
 
     // Note: We do NOT define destroyGearTooltip here anymore. 
     // It is now global above.
+}
+
+/**
+ * Force remove any existing skill tooltip
+ */
+function destroySkillTooltip() {
+    const existing = document.querySelector('.skill-tooltip');
+    if (existing) existing.remove();
+}
+
+/**
+ * Create and show a tooltip for a skill
+ */
+function createSkillTooltip(skill) {
+    const tooltip = document.createElement('div');
+    tooltip.className = 'skill-tooltip';
+    tooltip.style.cssText = `
+        position: fixed;
+        background: #16213e;
+        border: 2px solid #4a9eff;
+        border-radius: 4px;
+        padding: 0.75rem;
+        max-width: 350px;
+        z-index: 10000;
+        color: #4a9eff;
+        font-family: 'Courier New', monospace;
+        font-size: 0.85rem;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+        pointer-events: none;
+        word-wrap: break-word;
+        white-space: normal;
+    `;
+
+    let content = `<div style="font-weight: bold; margin-bottom: 0.5rem; font-size: 0.95rem;">${skill.name}</div>`;
+    content += `<div style="color: #aaa; font-size: 0.8rem; margin-bottom: 0.5rem;">${skill.category}</div>`;
+
+    if (skill.description) {
+        content += `<div style="color: #aaa; margin-bottom: 0.75rem; font-size: 0.85rem;">${skill.description}</div>`;
+    }
+    if (skill.costType && skill.costType !== 'none') {
+        content += `<div style="color: #d4af37;"><strong>Cost:</strong> ${skill.costAmount} ${skill.costType}</div>`;
+    }
+    if (skill.basePower) {
+        content += `<div style="color: #ff6b6b;"><strong>Power:</strong> ${skill.basePower}x</div>`;
+    }
+    if (skill.baseHitChance) {
+        content += `<div style="color: #4eff7f;"><strong>Hit Chance:</strong> ${(skill.baseHitChance * 100).toFixed(0)}%</div>`;
+    }
+    if (skill.critChance) {
+        content += `<div style="color: #ffd700;"><strong>Crit Chance:</strong> ${(skill.critChance * 100).toFixed(0)}%</div>`;
+    }
+    if (skill.delay) {
+        content += `<div style="color: #4a9eff;"><strong>Delay:</strong> ${skill.delay}ms</div>`;
+    }
+    if (skill.hitCount) {
+        if (skill.hitCount.fixed) {
+            content += `<div style="color: #4eff7f;"><strong>Hits:</strong> ${skill.hitCount.fixed}</div>`;
+        } else {
+            content += `<div style="color: #4eff7f;"><strong>Hits:</strong> ${skill.hitCount.min}-${skill.hitCount.max}</div>`;
+        }
+    }
+    if (skill.scalingFactors) {
+        const scaling = Object.entries(skill.scalingFactors)
+            .filter(([k, v]) => v > 0)
+            .map(([k, v]) => `${(v * 100).toFixed(0)}% ${k}`)
+            .join(', ');
+        if (scaling) {
+            content += `<div style="color: #d4af37; margin-top: 0.5rem;"><strong>Scaling:</strong> ${scaling}</div>`;
+        }
+    }
+    if (skill.effects && skill.effects.length > 0) {
+        content += `<div style="color: #ff9999; margin-top: 0.5rem;"><strong>Effects:</strong><br>`;
+        skill.effects.forEach(effect => {
+            let effectText = effect.type.toUpperCase();
+            if (effect.damageType) effectText += ` (${effect.damageType})`;
+            if (effect.debuff) effectText += ` - ${effect.debuff}`;
+            if (effect.buff) effectText += ` - ${effect.buff}`;
+            content += `• ${effectText}<br>`;
+        });
+        content += `</div>`;
+    }
+
+    tooltip.innerHTML = content;
+    document.body.appendChild(tooltip);
+    return tooltip;
+}
+
+/**
+ * Add tooltip behavior to a skill card
+ */
+function addSkillTooltip(element, skill, delay) {
+    let tooltip = null;
+    let tooltipTimeout = null;
+    const resolvedDelay = () => delay ?? window.tooltipDelay ?? 500;
+
+    element.addEventListener('mouseenter', (e) => {
+        tooltipTimeout = setTimeout(() => {
+            tooltip = createSkillTooltip(skill);
+            positionTooltip(tooltip, e, null);
+        }, resolvedDelay());
+    });
+
+    element.addEventListener('mousemove', (e) => {
+        if (tooltip) positionTooltip(tooltip, e, null);
+    });
+
+    element.addEventListener('mouseleave', () => {
+        if (tooltipTimeout) clearTimeout(tooltipTimeout);
+        if (tooltip) { tooltip.remove(); tooltip = null; }
+    });
+
+    element.addEventListener('touchstart', (e) => {
+        tooltipTimeout = setTimeout(() => {
+            if (tooltip) { tooltip.remove(); tooltip = null; }
+            tooltip = createSkillTooltip(skill);
+            positionTooltip(tooltip, null, element);
+        }, resolvedDelay());
+    }, { passive: true });
+
+    element.addEventListener('touchend', () => {
+        clearTimeout(tooltipTimeout);
+        if (tooltip) { tooltip.remove(); tooltip = null; }
+    }, { passive: true });
+
+    element.addEventListener('touchmove', () => {
+        clearTimeout(tooltipTimeout);
+        if (tooltip) { tooltip.remove(); tooltip = null; }
+    }, { passive: true });
+}
+// ── Stat tooltips ─────────────────────────────────────────────────────────────
+
+/**
+ * Stat/Attribute definitions and effects
+ */
+const STAT_DEFINITIONS = {
+    conviction: {
+        name: 'Conviction',
+        description: 'Raw force of will and physical power. The primary offensive stat for fighters, bruisers, and fire, arcane, and lightning mages.',
+        effects: [
+            '• Increases maximum HP and Stamina',
+            '• Raises hit chance on all attacks',
+            '• Amplifies damage for fighter and strength-based skills',
+            '• Scales fire, arcane, lightning, holy, and shadow magic',
+            '• A small contributor to critical strike chance',
+        ]
+    },
+    endurance: {
+        name: 'Endurance',
+        description: 'Durability and staying power. A survivability stat first — it contributes modestly to physical damage, but you do not stack it for offense.',
+        effects: [
+            '• Significantly increases maximum HP and Stamina',
+            '• Contributes a small bonus to physical attack damage',
+            '• The defining stat of bruiser-style skills (pummel, earthquake, shove)',
+            '• Does not affect hit chance, crit, or magic damage',
+        ]
+    },
+    ambition: {
+        name: 'Ambition',
+        description: 'Speed, cunning, and precision. The primary offensive stat for rogues and skirmishers, and for fire, arcane, and lightning mages. Also improves loot drop rates.',
+        effects: [
+            '• Primary driver of critical strike chance',
+            '• Amplifies damage for rogue and finesse-based skills',
+            '• Scales lightning, shadow, and arcane magic',
+            '• Raises Mana slightly',
+            '• Improves retreat success chance',
+            '• Increases item drop chance (ambition 150 = +30%, ambition 300 = +60%)',
+        ]
+    },
+    harmony: {
+        name: 'Harmony',
+        description: 'Attunement to magic and the natural world. The primary stat for ice, holy, and nature/poison mages — and the dominant stat for healers and supports. Also accelerates experience gain.',
+        effects: [
+            '• Significantly increases maximum Mana',
+            '• Scales ice and cold magic damage',
+            '• Scales holy magic damage',
+            '• Scales nature and poison magic damage',
+            '• Powers all healing and restoration skills',
+            '• Increases XP earned from combat (harmony 150 = +20%, harmony 300 = +40%)',
+            '• No effect on fire, arcane, lightning, or shadow damage',
+        ]
+    }
+};
+
+/**
+ * Create and show a tooltip for a stat/attribute
+ */
+function createStatTooltip(statKey) {
+    const stat = STAT_DEFINITIONS[statKey];
+    if (!stat) return null;
+
+    const tooltip = document.createElement('div');
+    tooltip.className = 'stat-tooltip-panel gear-tooltip';
+    tooltip.style.cssText = `
+        position: fixed;
+        z-index: 10000;
+        max-width: 460px;
+        min-width: 280px;
+        width: max-content;
+        pointer-events: none;
+        box-sizing: border-box;
+    `;
+
+    let content = `<div style="font-weight: 700; margin-bottom: 0.6rem; font-size: 0.9rem; color: var(--gold); font-family: var(--font-display); letter-spacing: 0.05em;">${stat.name}</div>`;
+    content += `<div style="color: var(--text-secondary); margin-bottom: 0.6rem; font-size: 0.8rem; line-height: 1.5;">${stat.description}</div>`;
+    content += `<div style="color: var(--gold-dim); font-weight: 700; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.4rem;">Effects</div>`;
+    content += `<div style="color: var(--text-secondary); line-height: 1.6; font-size: 0.8rem;">`;
+    stat.effects.forEach(effect => {
+        content += `<div>${effect}</div>`;
+    });
+    content += `</div>`;
+
+    tooltip.innerHTML = content;
+    document.body.appendChild(tooltip);
+    return tooltip;
+}
+
+/**
+ * Add tooltip behavior to a stat label/display element
+ */
+function addStatTooltip(element, statKey, delay) {
+    let tooltip = null;
+    let tooltipTimeout = null;
+    const resolvedDelay = () => delay ?? window.tooltipDelay ?? 500;
+
+    element.addEventListener('mouseenter', (e) => {
+        element.style.cursor = 'help';
+        tooltipTimeout = setTimeout(() => {
+            tooltip = createStatTooltip(statKey);
+            if (tooltip) positionTooltip(tooltip, e, null);
+        }, resolvedDelay());
+    });
+
+    element.addEventListener('mousemove', (e) => {
+        if (tooltip) positionTooltip(tooltip, e, null);
+    });
+
+    element.addEventListener('mouseleave', () => {
+        if (tooltipTimeout) clearTimeout(tooltipTimeout);
+        if (tooltip) { tooltip.remove(); tooltip = null; }
+    });
+
+    let touchLongPress = null;
+
+    element.addEventListener('touchstart', (e) => {
+        touchLongPress = setTimeout(() => {
+            if (tooltip) { tooltip.remove(); tooltip = null; }
+            tooltip = createStatTooltip(statKey);
+            if (tooltip) positionTooltip(tooltip, null, element);
+        }, resolvedDelay());
+    }, { passive: true });
+
+    element.addEventListener('touchend', () => {
+        clearTimeout(touchLongPress);
+        if (tooltip) { tooltip.remove(); tooltip = null; }
+    }, { passive: true });
+
+    element.addEventListener('touchmove', () => {
+        clearTimeout(touchLongPress);
+        if (tooltip) { tooltip.remove(); tooltip = null; }
+    }, { passive: true });
 }
