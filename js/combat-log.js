@@ -168,20 +168,14 @@ function _updateMediaControls() {
             pauseBtn.classList.remove('media-btn--active');
         }
     }
-    // Stop highlights while a graceful loop exit is pending
-    const stopBtn = document.getElementById('mediaBtn_stop');
-    if (stopBtn) {
-        if (window.currentState?.pendingLoopExit) {
-            stopBtn.classList.add('media-btn--active');
+    // Loop button active while idleActive, dimmed while stopped
+    const loopBtn = document.getElementById('mediaBtn_loop');
+    if (loopBtn) {
+        if (window.currentState?.idleActive) {
+            loopBtn.classList.add('media-btn--active');
         } else {
-            stopBtn.classList.remove('media-btn--active');
+            loopBtn.classList.remove('media-btn--active');
         }
-    }
-    // Replay enabled only when loop is fully stopped
-    const replayBtn = document.getElementById('mediaBtn_replay');
-    if (replayBtn) {
-        const stopped = !window.currentState?.idleActive;
-        replayBtn.disabled = !stopped;
     }
 }
 
@@ -865,24 +859,19 @@ window.cancelAutoRestart = function() {
     window.clearSessionLoot();
 };
 
-// Replay — restart the loop with the same party and challenge, no party screen required
-window.replayCombat = function() {
-    if (window.currentState?.idleActive) return;
-    const challengeId = window.currentState?.selectedChallenge?.id;
-    if (!challengeId) return;
-    window.currentState.idleActive     = true;
-    window.currentState.pendingLoopExit = false;
-    _updateMediaControls();
-    if (typeof startCombat === 'function') startCombat(challengeId);
-};
-window.toggleLoopStop = function() {
-    if (!window.currentState?.idleActive) return;
-    if (window.currentState.pendingLoopExit) {
-        if (typeof cancelLoopExit === 'function') cancelLoopExit();
-    } else {
+// Loop toggle — enables/disables auto-restart. Re-enabling while idle fires startCombat immediately.
+window.toggleLoop = function() {
+    if (!window.currentState) return;
+    if (window.currentState.idleActive) {
+        // Turn loop off — request graceful exit after current combat
         if (typeof requestLoopExit === 'function') requestLoopExit();
+        _updateMediaControls();
+    } else {
+        // Turn loop on — start immediately if no combat in flight
+        const challengeId = window.currentState.selectedChallenge?.id;
+        if (!challengeId) return;
+        if (typeof startCombat === 'function') startCombat(challengeId);
     }
-    _updateMediaControls();
 };
 
 // Bottom-right countdown toast — notifies player of next queued run when away from combat log
