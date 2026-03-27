@@ -1199,6 +1199,13 @@ async function renderCharacterSkills(character) {
             const xp   = rec.skillXP || 0;
             const pct  = Math.min(100, Math.floor((xp / UNLOCK_THRESHOLD) * 100));
 
+            const parents = (skillDef?.parentSkills || [])
+                .map(pid => window.gameData?.skills?.find(s => s.id === pid)?.name || pid)
+                .filter(Boolean);
+            const comboLine = parents.length === 2
+                ? `<div style="color:#c8a84b; font-size:0.7em; margin-top:4px;">⚗ Discovered via: ${parents.join(' + ')}</div>`
+                : '';
+
             const row = document.createElement('div');
             row.style.cssText = 'background:rgba(212,175,55,0.07); border:1px solid rgba(212,175,55,0.3); border-radius:6px; padding:8px 10px; margin-bottom:6px;';
             row.innerHTML = `
@@ -1212,6 +1219,7 @@ async function renderCharacterSkills(character) {
                 <div style="color:#888; font-size:0.72em; margin-top:3px;">
                     ${skillDef?.description || 'Discovered in combat — keep fighting to unlock.'}
                 </div>
+                ${comboLine}
             `;
             section.appendChild(row);
         });
