@@ -1053,33 +1053,20 @@ calculateRewards(players, challenge, segments = []) {
                 g.slot_id1 && !g.consumable
             );
 
-            // Tag weighting — items matching challenge tags get higher weight
+            // Pick a random item from the tier pool
             const challengeTags = challenge?.tags || [];
             let pick = null;
 
-            if (challengeTags.length > 0 && Object.keys(this.lootTags).length > 0) {
-                // Build weighted pool: tagged items get 3x weight, untagged get 1x
-                const weighted = [];
-                for (const item of basePool) {
-                    const itemTags = item.tags || [];
-                    const matchingTag = challengeTags.find(t => itemTags.includes(t));
-                    const weight = matchingTag ? 3 : 1;
-                    for (let i = 0; i < weight; i++) weighted.push({ item, matchingTag });
-                }
-                const entry = weighted[Math.floor(Math.random() * weighted.length)];
-                pick = entry?.item;
+            if (basePool.length) {
+                pick = basePool[Math.floor(Math.random() * basePool.length)];
+            }
 
-                // Apply flavour if a tag matched and the tag has variant data
-                if (pick && entry?.matchingTag) {
-                    const tagDef = this.lootTags[entry.matchingTag];
-                    if (tagDef) {
-                        pick = this._applyLootTagFlavour(pick, tagDef);
-                    }
-                }
-            } else {
-                // No tags on challenge — fall back to unweighted pool
-                if (basePool.length) {
-                    pick = basePool[Math.floor(Math.random() * basePool.length)];
+            // Apply flavour from a random challenge tag if any are defined
+            if (pick && challengeTags.length > 0 && Object.keys(this.lootTags).length > 0) {
+                const tag = challengeTags[Math.floor(Math.random() * challengeTags.length)];
+                const tagDef = this.lootTags[tag];
+                if (tagDef) {
+                    pick = this._applyLootTagFlavour(pick, tagDef);
                 }
             }
 
