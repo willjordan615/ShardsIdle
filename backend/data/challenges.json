@@ -1317,16 +1317,16 @@
             "difficultyThreshold": 130,
             "successEffect": {
               "type": "narrative_only",
-              "narrative": "The altar responds to nature-attuned hands and a spirit in deep harmony with the land. The lock beneath is old — it was never meant for casual visitors. The crack at the altar's base opens wide enough to descend."
+              "narrative": "The altar responds to nature-attuned hands and a spirit in deep harmony with the land. Something is sealed here — old, deliberate, and deep. You can feel the mechanism of it. The way down exists. You haven't found the moment yet, but you will."
             },
             "failureEffect": {
               "type": "narrative_only",
-              "narrative": "You sense the lock but cannot turn it. The harmony required is beyond what the party carries."
+              "narrative": "You sense the lock but cannot read it. The harmony required is beyond what the party carries today."
             },
             "fallbackEffect": {
               "type": "narrative_only",
               "magnitude": 0,
-              "narrative": "The altar is cold stone to those without nature-attunement. The lock does not acknowledge you."
+              "narrative": "The altar is cold stone to those without nature-attunement. Whatever is beneath it does not acknowledge you."
             },
             "requiredSkillTag": "nature"
           }
@@ -1353,7 +1353,7 @@
             },
             "nextStageId": 99,
             "overrideDescription": "The lock yields. Something that has been sealed for two hundred years opens. The party descends.",
-            "chance": 0.05
+            "chance": 0.25
           },
           {
             "nextStageId": null
