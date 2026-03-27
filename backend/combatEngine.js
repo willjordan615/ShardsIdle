@@ -854,7 +854,14 @@ class CombatEngine {
     }
 
     const allStagesWon = segments.every(s => s.status === 'victory');
-    const rewards = (allStagesWon && combatResult === 'victory') ? this.calculateRewards(playerCharacters, challenge, segments) : null;
+    const anyStageWon  = segments.some(s  => s.status === 'victory');
+    // Call calculateRewards whenever any stage completed so the global drop ramp
+    // always advances. XP/gold are zeroed out on non-full-victory runs.
+    const rewards = anyStageWon ? this.calculateRewards(playerCharacters, challenge, segments) : null;
+    if (rewards && !allStagesWon) {
+        rewards.experienceGained = {};
+        rewards.goldGained = 0;
+    }
 
     return {
       combatID,
@@ -1020,10 +1027,9 @@ calculateRewards(players, challenge, segments = []) {
         });
     }
 
-    // Global bonus roll — one item, per-character ramping chance, tier range derived from challenge difficulty.
+    // Global bonus roll — rolls once per completed stage, not once per run.
+    // Ramp ticks (up or down) after each stage: grows by 1.15x on a miss, halves on a hit.
     // D1→T0, D2→T0-1, D3→T1, D4→T1-2, D5→T2, D6→T2-3, D7→T3, D8→T3-4
-    // Tags on the challenge weight the pool toward thematically appropriate items.
-    // Chance ramps from 0.5% toward 5% each dry run (* 1.15), halves on a hit, resets on challenge switch.
     {
         const BASE_CHANCE   = 0.01;
         const MAX_CHANCE    = 0.20;
@@ -1031,62 +1037,57 @@ calculateRewards(players, challenge, segments = []) {
         const HIT_DIVISOR   = 2;
 
         const player = players[0];
-
-        // Use DB-sourced chance injected by combat.js (_globalDropChance already accounts for challenge switch)
-        let currentChance = challenge?._globalDropChance ?? BASE_CHANCE;
-        currentChance = Math.max(BASE_CHANCE, Math.min(MAX_CHANCE, currentChance));
-
         const ambitionBonus = 1 + (player?.stats?.ambition || 0) / 500;
+        const difficulty = challenge?.difficulty || 1;
+        const tierRanges = {
+            1: [0, 0], 2: [0, 1], 3: [1, 1], 4: [1, 2],
+            5: [2, 2], 6: [2, 3], 7: [3, 3], 8: [3, 4]
+        };
+        const [minTier, maxTier] = tierRanges[Math.min(difficulty, 8)] || [0, 0];
+        const basePool = this.gear.filter(g =>
+            g.tier >= minTier && g.tier <= maxTier &&
+            g.slot_id1 && !g.consumable
+        );
+        const challengeTags = challenge?.tags || [];
 
-        let globalDropFired = false;
-        if (Math.random() <= currentChance * ambitionBonus) {
-            const difficulty = challenge?.difficulty || 1;
-            const tierRanges = {
-                1: [0, 0], 2: [0, 1], 3: [1, 1], 4: [1, 2],
-                5: [2, 2], 6: [2, 3], 7: [3, 3], 8: [3, 4]
-            };
-            const [minTier, maxTier] = tierRanges[Math.min(difficulty, 8)] || [0, 0];
+        // Use DB-sourced chance injected by combat.js
+        let runningChance = challenge?._globalDropChance ?? BASE_CHANCE;
+        runningChance = Math.max(BASE_CHANCE, Math.min(MAX_CHANCE, runningChance));
 
-            // Base pool: gear items in tier range, non-consumable, slotted
-            const basePool = this.gear.filter(g =>
-                g.tier >= minTier && g.tier <= maxTier &&
-                g.slot_id1 && !g.consumable
-            );
+        // Collect completed stages in order
+        const completedStages = (challenge?.stages || []).filter(stage =>
+            segments.some(seg => seg.stageId === stage.stageId && seg.status === 'victory')
+        );
 
-            // Pick a random item from the tier pool
-            const challengeTags = challenge?.tags || [];
-            let pick = null;
-
-            if (basePool.length) {
-                pick = basePool[Math.floor(Math.random() * basePool.length)];
-            }
-
-            // Apply flavour from a random challenge tag if any are defined
-            if (pick && challengeTags.length > 0 && Object.keys(this.lootTags).length > 0) {
-                const tag = challengeTags[Math.floor(Math.random() * challengeTags.length)];
-                const tagDef = this.lootTags[tag];
-                if (tagDef) {
-                    pick = this._applyLootTagFlavour(pick, tagDef);
+        for (const _stage of completedStages) {
+            if (Math.random() <= runningChance * ambitionBonus) {
+                let pick = null;
+                if (basePool.length) {
+                    pick = basePool[Math.floor(Math.random() * basePool.length)];
                 }
-            }
-
-            if (pick) {
-                rewards.lootDropped.push({
-                    characterID: player.id,
-                    itemID: pick.id,
-                    itemName: pick.name,
-                    itemDescription: pick.description,
-                    rarity: 'bonus'
-                });
-                globalDropFired = true;
+                if (pick && challengeTags.length > 0 && Object.keys(this.lootTags).length > 0) {
+                    const tag = challengeTags[Math.floor(Math.random() * challengeTags.length)];
+                    const tagDef = this.lootTags[tag];
+                    if (tagDef) pick = this._applyLootTagFlavour(pick, tagDef);
+                }
+                if (pick) {
+                    rewards.lootDropped.push({
+                        characterID: player.id,
+                        itemID: pick.id,
+                        itemName: pick.name,
+                        itemDescription: pick.description,
+                        rarity: 'bonus'
+                    });
+                    runningChance = Math.max(BASE_CHANCE, runningChance / HIT_DIVISOR);
+                } else {
+                    runningChance = Math.min(MAX_CHANCE, runningChance * GROWTH_FACTOR);
+                }
+            } else {
+                runningChance = Math.min(MAX_CHANCE, runningChance * GROWTH_FACTOR);
             }
         }
 
-        // Update ramping chance on the rewards object so combat.js can persist it
-        const nextChance = globalDropFired
-            ? Math.max(BASE_CHANCE, currentChance / HIT_DIVISOR)
-            : Math.min(MAX_CHANCE, currentChance * GROWTH_FACTOR);
-        rewards.nextGlobalDropChance = nextChance;
+        rewards.nextGlobalDropChance = runningChance;
     }
 
     return rewards;
