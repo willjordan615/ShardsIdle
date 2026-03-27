@@ -6,6 +6,89 @@
     <title>Shards Idle</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/admin-panel.css">
+    <style>
+        /* ── Codex Modal ─────────────────────────────────────────── */
+        .codex-tab {
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            border-radius: 0;
+            color: #8b7355;
+            cursor: pointer;
+            font-size: 0.78rem;
+            letter-spacing: 0.08em;
+            padding: 0.65rem 1.1rem;
+            text-transform: uppercase;
+            transition: color 0.15s, border-color 0.15s;
+            white-space: nowrap;
+        }
+        .codex-tab:hover { color: var(--gold-bright); }
+        .codex-tab--active {
+            color: var(--gold);
+            border-bottom-color: var(--gold);
+        }
+        .codex-pill {
+            background: rgba(212,175,55,0.09);
+            border: 1px solid var(--gold-border);
+            border-radius: 10px;
+            color: var(--gold-bright);
+            font-size: 0.75rem;
+            padding: 2px 9px;
+        }
+        .codex-callout {
+            background: rgba(212,175,55,0.06);
+            border: 1px solid var(--gold-border);
+            border-radius: 6px;
+            padding: 0.9rem 1rem;
+            margin: 1rem 0;
+        }
+        .codex-callout--tip {
+            background: rgba(76,217,100,0.06);
+            border-color: rgba(76,217,100,0.2);
+        }
+        .codex-callout__label {
+            font-size: 0.72rem;
+            letter-spacing: 0.09em;
+            margin-bottom: 0.4rem;
+            text-transform: uppercase;
+        }
+        .codex-stat-block {
+            border-left: 3px solid currentColor;
+            border-radius: 0 6px 6px 0;
+            background: rgba(212,175,55,0.05);
+            padding: 0.7rem 1rem;
+            margin-bottom: 0.6rem;
+        }
+        .codex-stat-block strong {
+            display: block;
+            font-size: 0.88rem;
+            margin-bottom: 0.2rem;
+        }
+        .codex-combo-row {
+            font-family: monospace;
+            font-size: 0.82rem;
+            display: flex;
+            align-items: baseline;
+            gap: 0.4rem;
+            padding: 0.2rem 0;
+        }
+        .codex-combo-row .arrow { color: #444; }
+        .codex-combo-row .result { color: var(--gold-bright); min-width: 11rem; }
+        .codex-combo-row .note { color: #666; font-size: 0.78rem; }
+        .codex-combo-row .parent { color: #8888cc; }
+        .codex-step {
+            display: flex;
+            gap: 0.6rem;
+            align-items: baseline;
+            padding: 0.25rem 0;
+            font-size: 0.83rem;
+        }
+        .codex-step__num {
+            color: var(--gold-dim);
+            min-width: 1.2rem;
+            font-size: 0.75rem;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -106,6 +189,7 @@
             </div>
             <div class="nav-buttons">
                 <button onclick="showScreen('roster')" class="secondary">← Back to Roster</button>
+                <button onclick="openCodexModal()" class="secondary btn-compact">Field Codex</button>
                 <button id="selectChallengeBtn" onclick="selectCharacterForChallenge(currentState.detailCharacterId)">Select Challenge</button>
             </div>
 
@@ -589,16 +673,17 @@
     </div>
 
     <!-- MODULAR JAVASCRIPT LOADING -->
-    <script src="js/merchant.js?v=2"></script>
-    <script src="js/game-data.js?v=6"></script>
-    <script src="js/ui-helpers.js?v=5"></script>
-    <script src="js/character-management.js?v=6"></script>
-    <script src="js/gear-tooltip.js?v=7"></script>
-    <script src="js/inventory-system.js?v=5"></script>
-    <script src="js/combat-log.js?v=5"></script>
-    <script src="js/admin-panel.js?v=5"></script>
-    <script src="js/combat-system.js?v=5"></script>
-    <script src="js/browse-system.js?v=6"></script>
+    <script src="js/merchant.js?v=1"></script>
+    <script src="js/game-data.js?v=5"></script>
+    <script src="js/ui-helpers.js?v=4"></script>
+    <script src="js/character-management.js?v=5"></script>
+    <script src="js/gear-tooltip.js?v=6"></script>
+    <script src="js/inventory-system.js?v=4"></script>
+    <script src="js/combat-log.js?v=4"></script>
+    <script src="js/admin-panel.js?v=4"></script>
+    <!-- ADDED: Browse System for Share/Import functionality -->
+    <script src="js/combat-system.js?v=4"></script>
+    <script src="js/browse-system.js?v=5"></script>
 
     <!-- COMBAT RESULT MODAL -->
     <div id="combatResultModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; align-items:center; justify-content:center;">
@@ -1423,6 +1508,202 @@
             <button onclick="adminConfirmSaveEffect()" style="width:100%;padding:8px;background:#1a3a2a;border:1px solid #3a6a4a;color:#8fa;cursor:pointer;border-radius:4px;">Save Effect</button>
         </div>
     </div>
+
+
+
+        <!-- CODEX MODAL -->
+        <div id="codexModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.88); z-index:2000; justify-content:center; align-items:center;">
+            <div style="background:#12111a; border:2px solid var(--gold-border); border-radius:10px; width:92%; max-width:700px; max-height:88vh; display:flex; flex-direction:column; box-shadow:0 0 40px var(--gold-glow);">
+
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:1.1rem 1.4rem 0.9rem; border-bottom:1px solid var(--gold-border); flex-shrink:0;">
+                    <div style="color:var(--gold); font-size:0.95rem; letter-spacing:0.08em; text-transform:uppercase; font-weight:bold;">Field Codex</div>
+                    <button onclick="closeCodexModal()" class="danger btn-compact">Close</button>
+                </div>
+
+                <div style="display:flex; border-bottom:1px solid var(--gold-border); flex-shrink:0; overflow-x:auto;">
+                    <button class="codex-tab codex-tab--active" onclick="switchCodexTab('skills')"  id="codex-tab-skills">Skills</button>
+                    <button class="codex-tab"                   onclick="switchCodexTab('combos')"  id="codex-tab-combos">Combinations</button>
+                    <button class="codex-tab"                   onclick="switchCodexTab('stats')"   id="codex-tab-stats">Statistics</button>
+                    <button class="codex-tab"                   onclick="switchCodexTab('combat')"  id="codex-tab-combat">Combat</button>
+                </div>
+
+                <div style="overflow-y:auto; padding:1.4rem; flex:1; font-size:0.87rem; line-height:1.75; color:#b8a88a;">
+
+                    <!-- SKILLS -->
+                    <div id="codex-pane-skills">
+                        <div style="color:var(--gold); font-size:0.8rem; letter-spacing:0.09em; text-transform:uppercase; margin-bottom:0.9rem; border-bottom:1px solid var(--gold-border); padding-bottom:0.4rem;">The Skill System</div>
+
+                        <p>Your character begins with access to sixteen <span style="color:var(--gold-bright);">Starter Skills</span> — the foundational abilities from which everything else grows. These are not the most powerful skills in the game. They are roots.</p>
+
+                        <div class="codex-callout">
+                            <div class="codex-callout__label" style="color:var(--gold-dim);">Starter Skills</div>
+                            <div id="codex-starter-pills" style="display:flex; flex-wrap:wrap; gap:5px; margin-top:0.3rem;"></div>
+                        </div>
+
+                        <p>Skills grow through use. Each time a skill fires in combat it accumulates experience. At <span style="color:var(--gold-bright);">level 3</span> a skill will show a hint about what it might combine with. The skill does not need to be equipped to gain XP — it only needs to be known.</p>
+
+                        <div style="color:var(--gold); font-size:0.8rem; letter-spacing:0.09em; text-transform:uppercase; margin:1.2rem 0 0.6rem; border-bottom:1px solid var(--gold-border); padding-bottom:0.4rem;">Skill Slots</div>
+                        <p>You equip two active skills at a time. These are what your character uses in combat. You can change them freely between challenges. Your combat style determines which equipped skill gets prioritised each turn — choosing a style that matches your skills matters.</p>
+
+                        <div style="color:var(--gold); font-size:0.8rem; letter-spacing:0.09em; text-transform:uppercase; margin:1.2rem 0 0.6rem; border-bottom:1px solid var(--gold-border); padding-bottom:0.4rem;">Skill Categories</div>
+                        <p>Every skill has a category that describes its combat role. The AI profiles use these categories to decide what to cast and when.</p>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.4rem 1.5rem; margin:0.6rem 0 1rem; font-size:0.83rem;">
+                            <div><span style="color:var(--gold-bright);">Damage — Single</span><br>Hits one target hard. Usually your primary offensive option.</div>
+                            <div><span style="color:var(--gold-bright);">Damage — Magic</span><br>Elemental or arcane damage. Bypasses physical armor, subject to resistances.</div>
+                            <div style="margin-top:0.5rem;"><span style="color:var(--gold-bright);">Damage — AOE</span><br>Hits all enemies. Lower per-target but efficient against groups.</div>
+                            <div style="margin-top:0.5rem;"><span style="color:var(--gold-bright);">Control</span><br>Debuffs, disrupts, or repositions. Often sets up other skills.</div>
+                            <div style="margin-top:0.5rem;"><span style="color:var(--gold-bright);">Defense</span><br>Reduces incoming damage or improves evasion.</div>
+                            <div style="margin-top:0.5rem;"><span style="color:var(--gold-bright);">Healing</span><br>Restores HP. Prioritised by cautious and support profiles.</div>
+                            <div style="margin-top:0.5rem;"><span style="color:var(--gold-bright);">Buff</span><br>Strengthens you or allies. Cast early in a fight, rarely after turn 10.</div>
+                            <div style="margin-top:0.5rem;"><span style="color:var(--gold-bright);">Utility</span><br>Manages resources, sets up conditions, or enables other skills.</div>
+                        </div>
+
+                        <div style="color:var(--gold); font-size:0.8rem; letter-spacing:0.09em; text-transform:uppercase; margin:1.2rem 0 0.6rem; border-bottom:1px solid var(--gold-border); padding-bottom:0.4rem;">Resources</div>
+                        <p>Skills cost either <span style="color:#88aaff;">Mana</span> or <span style="color:#88ff99;">Stamina</span>. These pools carry between stages — a character who burns everything in the first fight will be dry by the third. If both resources fall below 15%, your character falls back to a free basic strike rather than going completely silent.</p>
+                    </div>
+
+                    <!-- COMBOS -->
+                    <div id="codex-pane-combos" style="display:none;">
+                        <div style="color:var(--gold); font-size:0.8rem; letter-spacing:0.09em; text-transform:uppercase; margin-bottom:0.9rem; border-bottom:1px solid var(--gold-border); padding-bottom:0.4rem;">Skill Combinations</div>
+
+                        <p>Most skills cannot be learned directly. They are <span style="color:var(--gold-bright);">discovered</span> by combining two skills you already know. When both parent skills are developed enough, the child unlocks automatically — no crafting, no cost, no separate action required.</p>
+
+                        <p>Hints appear on a skill card once it reaches level 3. A hint like <em style="color:#aaa;">"May combine with: physical"</em> means one of its combination partners has a physical tag. Look at your other known skills and find the match.</p>
+
+                        <div class="codex-callout">
+                            <div class="codex-callout__label" style="color:var(--gold-dim);">Example Chains</div>
+                            <div style="margin-top:0.5rem; display:flex; flex-direction:column; gap:0.15rem;">
+                                <div class="codex-combo-row"><span class="parent">Aim</span> + <span class="parent">Sense</span> <span class="arrow">—</span> <span class="result">Weak Point</span> <span class="note">armor-piercing setup strike</span></div>
+                                <div class="codex-combo-row"><span class="parent">Aim</span> + <span class="parent">Footwork</span> <span class="arrow">—</span> <span class="result">Skirmish</span> <span class="note">mobile hit-and-run</span></div>
+                                <div class="codex-combo-row"><span class="parent">Basic Attack</span> + <span class="parent">Footwork</span> <span class="arrow">—</span> <span class="result">Lunge</span> <span class="note">high-damage charge</span></div>
+                                <div class="codex-combo-row"><span class="parent">Lunge</span> + <span class="parent">Arcane Bolt</span> <span class="arrow">—</span> <span class="result">Arcane Lunge</span> <span class="note">magic-infused charge</span></div>
+                                <div class="codex-combo-row"><span class="parent">Channel</span> + <span class="parent">Shock</span> <span class="arrow">—</span> <span class="result">Lightning</span> <span class="note">raw elemental blast</span></div>
+                                <div class="codex-combo-row"><span class="parent">Shock</span> + <span class="parent">Chill</span> <span class="arrow">—</span> <span class="result">Sleet</span> <span class="note">storm AOE</span></div>
+                                <div class="codex-combo-row"><span class="parent">Prayer</span> + <span class="parent">First Aid</span> <span class="arrow">—</span> <span class="result">Holy Light</span> <span class="note">blessed healing</span></div>
+                                <div class="codex-combo-row"><span class="parent">Slash</span> + <span class="parent">Sense</span> <span class="arrow">—</span> <span class="result">Blood Letting</span> <span class="note">inflicts deep bleed</span></div>
+                                <div class="codex-combo-row"><span class="parent">Shadow Bolt</span> + <span class="parent">Misdirect</span> <span class="arrow">—</span> <span class="result">Shadow Veil</span> <span class="note">stealth and concealment</span></div>
+                            </div>
+                        </div>
+
+                        <div style="color:var(--gold); font-size:0.8rem; letter-spacing:0.09em; text-transform:uppercase; margin:1.2rem 0 0.6rem; border-bottom:1px solid var(--gold-border); padding-bottom:0.4rem;">The Tree Goes Deep</div>
+                        <p>Child skills can themselves be parents of deeper combinations. The further down the tree, the more powerful and specialised the skills become. A depth-4 skill requires two depth-3 skills, each of which required two depth-2 skills. The investment is the point — these skills are not meant to be accessible early.</p>
+
+                        <div style="color:var(--gold); font-size:0.8rem; letter-spacing:0.09em; text-transform:uppercase; margin:1.2rem 0 0.6rem; border-bottom:1px solid var(--gold-border); padding-bottom:0.4rem;">Your Build Is a Path, Not a Collection</div>
+                        <p>Combination chains branch. The skills you develop early determine which paths are open later. A character who invested in <em>Aim + Footwork</em> is on a different trajectory than one who went <em>Aim + Sense</em> — even though both started from the same root. Your early choices shape what becomes possible.</p>
+
+                        <p>You cannot develop every branch. Choosing a direction and following it is more effective than spreading attention across many starter skills.</p>
+
+                        <div class="codex-callout codex-callout--tip">
+                            <div class="codex-callout__label" style="color:#4cd964;">Tip</div>
+                            If a skill card shows a combination hint and you cannot find the match, it may be a skill you have not yet unlocked or equipped. Check your full skill list — hints reference skills across the entire tree, not just your current equipped pair.
+                        </div>
+                    </div>
+
+                    <!-- STATS -->
+                    <div id="codex-pane-stats" style="display:none;">
+                        <div style="color:var(--gold); font-size:0.8rem; letter-spacing:0.09em; text-transform:uppercase; margin-bottom:0.9rem; border-bottom:1px solid var(--gold-border); padding-bottom:0.4rem;">The Four Statistics</div>
+
+                        <p>Every character has four statistics. These come from your race and from equipped gear — they do not increase automatically on level up. Finding and equipping better items is how you grow stronger between levels.</p>
+
+                        <div style="margin:1rem 0;">
+                            <div class="codex-stat-block" style="color:#e07040;">
+                                <strong>Conviction</strong>
+                                Drives physical power. Skills that scale with Conviction hit harder through weapons and direct force. The primary stat for fighters, bruisers, and anyone relying on physical techniques.
+                            </div>
+                            <div class="codex-stat-block" style="color:#6090d0;">
+                                <strong>Endurance</strong>
+                                Increases your HP pool and physical resilience. Also contributes to Stamina capacity. High Endurance characters absorb punishment that would fell others — essential for frontliners.
+                            </div>
+                            <div class="codex-stat-block" style="color:#d4af37;">
+                                <strong>Ambition</strong>
+                                The stat of speed, precision, and cunning. Scales rogue and assassin-type skills. Improves hit chance on accuracy-dependent techniques and unlocks more aggressive tactical options.
+                            </div>
+                            <div class="codex-stat-block" style="color:#9060d0;">
+                                <strong>Harmony</strong>
+                                Magical attunement. Scales spells, heals, and nature abilities. Increases Mana capacity. The primary stat for casters, healers, and anyone working with elemental or spiritual forces.
+                            </div>
+                        </div>
+
+                        <div style="color:var(--gold); font-size:0.8rem; letter-spacing:0.09em; text-transform:uppercase; margin:1.2rem 0 0.6rem; border-bottom:1px solid var(--gold-border); padding-bottom:0.4rem;">Stats and Skill Damage</div>
+                        <p>Each skill has scaling factors — weighted contributions from one or more stats to its damage or healing output. A skill with high Ambition scaling rewards characters who have invested in Ambition through their gear. Reading what a skill scales with tells you what build it belongs to and whether your current stats support it.</p>
+
+                        <div style="color:var(--gold); font-size:0.8rem; letter-spacing:0.09em; text-transform:uppercase; margin:1.2rem 0 0.6rem; border-bottom:1px solid var(--gold-border); padding-bottom:0.4rem;">HP, Mana, and Stamina</div>
+                        <p>These derived resources are calculated from your stats and level. Endurance drives HP and contributes to Stamina. Harmony drives Mana. Both grow with level but are strongly amplified by high stat values — a well-geared character at a given level has dramatically more resources than one with bare equipment.</p>
+                    </div>
+
+                    <!-- COMBAT -->
+                    <div id="codex-pane-combat" style="display:none;">
+                        <div style="color:var(--gold); font-size:0.8rem; letter-spacing:0.09em; text-transform:uppercase; margin-bottom:0.9rem; border-bottom:1px solid var(--gold-border); padding-bottom:0.4rem;">How Combat Works</div>
+
+                        <p>Combat is fully automated. Your character acts each turn according to their <span style="color:var(--gold-bright);">Combat Style</span>, which you set on the character screen. The style determines which skills are prioritised, when resources are conserved, and how aggressively the character pushes.</p>
+
+                        <div style="color:var(--gold); font-size:0.8rem; letter-spacing:0.09em; text-transform:uppercase; margin:1.2rem 0 0.6rem; border-bottom:1px solid var(--gold-border); padding-bottom:0.4rem;">Challenges and Stages</div>
+                        <p>Each challenge is made up of multiple stages. HP, Mana, and Stamina carry between stages — there is no reset between fights. A character who burns everything in the first stage will be dry by the third. Resource management across the whole challenge, not just the current fight, is a core part of the game.</p>
+
+                        <div style="color:var(--gold); font-size:0.8rem; letter-spacing:0.09em; text-transform:uppercase; margin:1.2rem 0 0.6rem; border-bottom:1px solid var(--gold-border); padding-bottom:0.4rem;">Damage Resolution</div>
+                        <div style="margin:0.5rem 0 1rem;">
+                            <div class="codex-step"><span class="codex-step__num">1.</span><span>Skill base power, multiplied by skill level bonus</span></div>
+                            <div class="codex-step"><span class="codex-step__num">2.</span><span>Weapon damage added — physical skills use full weapon value, magic skills draw from a blended pool</span></div>
+                            <div class="codex-step"><span class="codex-step__num">3.</span><span>Stat scaling applied across the full damage pool</span></div>
+                            <div class="codex-step"><span class="codex-step__num">4.</span><span>Armor reduction subtracted (diminishing returns — first points matter most)</span></div>
+                            <div class="codex-step"><span class="codex-step__num">5.</span><span>Elemental resistances applied per damage type</span></div>
+                            <div class="codex-step"><span class="codex-step__num">6.</span><span>Critical hit multiplier applied if the roll succeeds</span></div>
+                            <div class="codex-step"><span class="codex-step__num">7.</span><span>Active status effect modifiers applied</span></div>
+                        </div>
+
+                        <div style="color:var(--gold); font-size:0.8rem; letter-spacing:0.09em; text-transform:uppercase; margin:1.2rem 0 0.6rem; border-bottom:1px solid var(--gold-border); padding-bottom:0.4rem;">Armor and Resistances</div>
+                        <p>Physical armor reduces physical damage using a diminishing-returns formula. Elemental resistances are separate and reduce specific damage types. Magic skills bypass physical armor but are still subject to resistances. Skills with <span style="color:var(--gold-bright);">armor ignore</span> bypass a portion of the target's armor regardless of the armor value.</p>
+
+                        <div style="color:var(--gold); font-size:0.8rem; letter-spacing:0.09em; text-transform:uppercase; margin:1.2rem 0 0.6rem; border-bottom:1px solid var(--gold-border); padding-bottom:0.4rem;">Sudden Death</div>
+                        <p>If a fight reaches turn 100 without resolution, sudden death triggers. This is a safety valve and should not be routine. If you are hitting it regularly, your damage output is too low for the challenge. Check your weapon tier, skill levels, and whether your stat distribution matches your equipped skills.</p>
+
+                        <div style="color:var(--gold); font-size:0.8rem; letter-spacing:0.09em; text-transform:uppercase; margin:1.2rem 0 0.6rem; border-bottom:1px solid var(--gold-border); padding-bottom:0.4rem;">Global Drop</div>
+                        <p>A hidden bonus loot chance accumulates as you run challenges. Each stage completed without triggering it increases the chance. When it fires, a random item drops from a broad pool. Switching challenges resets the accumulation — committing to a single challenge builds the stack faster.</p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- END CODEX MODAL -->
+
+
+    <script>
+    // ── Codex ─────────────────────────────────────────────────────────────────
+    const _CODEX_STARTERS = [
+        'Aim','Attunement','Basic Attack','Block','Channel',
+        'Chill','First Aid','Focus','Footwork','Misdirect',
+        'Prayer','Produce Flame','Rest','Sense','Shock','Shout','Shove'
+    ];
+
+    function openCodexModal() {
+        const pills = document.getElementById('codex-starter-pills');
+        if (pills && !pills.dataset.rendered) {
+            pills.innerHTML = _CODEX_STARTERS.map(s =>
+                `<span class="codex-pill">${s}</span>`
+            ).join('');
+            pills.dataset.rendered = '1';
+        }
+        document.getElementById('codexModal').style.display = 'flex';
+        switchCodexTab('skills');
+    }
+
+    function closeCodexModal() {
+        document.getElementById('codexModal').style.display = 'none';
+    }
+
+    function switchCodexTab(tab) {
+        ['skills','combos','stats','combat'].forEach(t => {
+            document.getElementById('codex-pane-' + t).style.display = t === tab ? '' : 'none';
+            const btn = document.getElementById('codex-tab-' + t);
+            if (btn) btn.classList.toggle('codex-tab--active', t === tab);
+        });
+    }
+
+    // Close on backdrop click
+    document.getElementById('codexModal').addEventListener('click', function(e) {
+        if (e.target === this) closeCodexModal();
+    });
+    </script>
 
 </body>
 </html>
