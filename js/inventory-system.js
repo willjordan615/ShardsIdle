@@ -78,17 +78,11 @@ window.renderGearSlots = function(character) {
         const itemId = eq[slot];
         const def    = itemId ? _itemDef(itemId) : null;
         const filled = !!def;
-        const sub    = filled
-            ? [def.dmg1 ? `${def.dmg1} ${def.dmg_type_1||''}`.trim() : null,
-               def.armor ? `${def.armor} armor` : null,
-               _statBonuses(def) || null].filter(Boolean).join(' · ')
-            : null;
 
         return `<div class="loadout-slot ${filled ? 'loadout-slot--filled' : 'loadout-slot--empty'}"
                      onclick="openGearModal('${slot}')" title="${filled ? 'Click to change' : 'Click to equip'}">
             <span class="loadout-slot__label">${SLOT_LABELS[slot]}</span>
             <span class="loadout-slot__item">${filled ? def.name : '—'}</span>
-            ${sub ? `<span class="loadout-slot__sub">${sub}</span>` : ''}
         </div>`;
     }).join('');
 };
