@@ -1281,10 +1281,7 @@
       "beast",
       "canine"
     ],
-    "lootTable": [],
-    "weaponTypes": [
-      "dagger"
-    ]
+    "lootTable": []
   },
   {
     "id": "vulture_beast_handler",
@@ -4062,8 +4059,8 @@
     ],
     "lootTable": [],
     "weaponTypes": [
-      "tome",
-      "wand"
+      "dagger",
+      "sword"
     ]
   },
   {
@@ -4144,8 +4141,8 @@
       }
     ],
     "weaponTypes": [
-      "wand",
-      "scepter"
+      "hammer",
+      "mace"
     ]
   },
   {

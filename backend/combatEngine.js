@@ -1247,7 +1247,7 @@ _applyLootTagFlavour(item, tagDef) {
     function _weightedRandomTarget(pool) {
       const weights = pool.map(p => {
         let w = 1.0;
-        if (p.statusEffects?.some(e => e.id === 'taunt'   && e.duration > 0)) w *= 4.0;
+        if (tauntCasterId && p.id === tauntCasterId) w *= 4.0;
         if (p.statusEffects?.some(e => e.id === 'stealth' && e.duration > 0)) w *= 0.15;
         p.statusEffects?.forEach(activeStatus => {
           const def = statusEngine?.statusMap?.[activeStatus.id];
@@ -1264,16 +1264,15 @@ _applyLootTagFlavour(item, tagDef) {
       return pool[pool.length - 1];
     }
 
-    const tauntTarget = aliveOpponents.find(p =>
-      p.statusEffects?.some(e => e.id === 'taunt' && e.duration > 0)
-    );
+    // If this enemy is taunted, heavily bias targeting toward whoever applied it.
+    // sourceId is stamped on the status instance at application time.
+    const tauntStatus = isEnemy && actor.statusEffects?.find(e => e.id === 'taunt' && e.duration > 0);
+    const tauntCasterId = tauntStatus?.sourceId ?? null;
 
     let primaryTarget;
     const usePreferred = Math.random() < focusChance;
     if (!usePreferred || profile === 'berserker') {
       primaryTarget = _weightedRandomTarget(aliveOpponents);
-    } else if (tauntTarget) {
-      primaryTarget = tauntTarget;
     } else if (profile === 'tactical' || profile === 'disruptor') {
       // Target the highest-threat enemy
       primaryTarget = aliveOpponents.reduce((best, p) =>
