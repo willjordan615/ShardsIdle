@@ -110,9 +110,7 @@ window.renderBeltSlots = function(character) {
         const qty    = itemId ? (character.consumables[itemId] || 0) : 0;
         const filled = !!itemId;
 
-        const sub = filled
-            ? `×${qty}${def?.description ? ` — ${def.description}` : ''}`
-            : null;
+        const sub = filled ? `×${qty}` : null;
 
         return `<div class="loadout-slot ${filled ? 'loadout-slot--filled' : 'loadout-slot--empty'} loadout-slot--belt"
                      onclick="openBeltModal('${character.id}', ${i})" title="Click to manage belt slot">
