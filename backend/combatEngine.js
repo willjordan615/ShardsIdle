@@ -93,12 +93,13 @@ function initializeWeaponVarianceProfiles(gearData) {
 
 
 class CombatEngine {
-    constructor(skillsData, enemyTypesData, racesData, gearData, statusEngine) {
+    constructor(skillsData, enemyTypesData, racesData, gearData, statusEngine, lootTags = {}) {
         this.skills = skillsData;
         this.enemyTypes = enemyTypesData;
         this.races = racesData;
         this.gear = gearData;
         this.statusEngine = statusEngine;
+        this.lootTags = lootTags;
         
         // CRITICAL FIX: Initialize Weapon Variance safely
         try {
@@ -1017,35 +1018,114 @@ calculateRewards(players, challenge, segments = []) {
         });
     }
 
-    // Global bonus roll — one item, low chance, tier range derived from challenge difficulty.
+    // Global bonus roll — one item, per-character ramping chance, tier range derived from challenge difficulty.
     // D1→T0, D2→T0-1, D3→T1, D4→T1-2, D5→T2, D6→T2-3, D7→T3, D8→T3-4
+    // Tags on the challenge weight the pool toward thematically appropriate items.
+    // Chance ramps from 0.5% toward 5% each dry run (* 1.15), halves on a hit, resets on challenge switch.
     {
-        const BASE_CHANCE = 0.005;
-        const ambitionBonus = 1 + (players[0]?.stats?.ambition || 0) / 500;
-        if (Math.random() <= BASE_CHANCE * ambitionBonus) {
+        const BASE_CHANCE   = 0.01;
+        const MAX_CHANCE    = 0.20;
+        const GROWTH_FACTOR = 1.15;
+        const HIT_DIVISOR   = 2;
+
+        const player = players[0];
+
+        // Use DB-sourced chance injected by combat.js (_globalDropChance already accounts for challenge switch)
+        let currentChance = challenge?._globalDropChance ?? BASE_CHANCE;
+        currentChance = Math.max(BASE_CHANCE, Math.min(MAX_CHANCE, currentChance));
+
+        const ambitionBonus = 1 + (player?.stats?.ambition || 0) / 500;
+
+        let globalDropFired = false;
+        if (Math.random() <= currentChance * ambitionBonus) {
             const difficulty = challenge?.difficulty || 1;
             const tierRanges = {
                 1: [0, 0], 2: [0, 1], 3: [1, 1], 4: [1, 2],
                 5: [2, 2], 6: [2, 3], 7: [3, 3], 8: [3, 4]
             };
             const [minTier, maxTier] = tierRanges[Math.min(difficulty, 8)] || [0, 0];
-            const pool = this.gear.filter(g =>
+
+            // Base pool: gear items in tier range, non-consumable, slotted
+            const basePool = this.gear.filter(g =>
                 g.tier >= minTier && g.tier <= maxTier &&
                 g.slot_id1 && !g.consumable
             );
-            if (pool.length) {
-                const pick = pool[Math.floor(Math.random() * pool.length)];
+
+            // Tag weighting — items matching challenge tags get higher weight
+            const challengeTags = challenge?.tags || [];
+            let pick = null;
+
+            if (challengeTags.length > 0 && Object.keys(this.lootTags).length > 0) {
+                // Build weighted pool: tagged items get 3x weight, untagged get 1x
+                const weighted = [];
+                for (const item of basePool) {
+                    const itemTags = item.tags || [];
+                    const matchingTag = challengeTags.find(t => itemTags.includes(t));
+                    const weight = matchingTag ? 3 : 1;
+                    for (let i = 0; i < weight; i++) weighted.push({ item, matchingTag });
+                }
+                const entry = weighted[Math.floor(Math.random() * weighted.length)];
+                pick = entry?.item;
+
+                // Apply flavour if a tag matched and the tag has variant data
+                if (pick && entry?.matchingTag) {
+                    const tagDef = this.lootTags[entry.matchingTag];
+                    if (tagDef) {
+                        pick = this._applyLootTagFlavour(pick, tagDef);
+                    }
+                }
+            } else {
+                // No tags on challenge — fall back to unweighted pool
+                if (basePool.length) {
+                    pick = basePool[Math.floor(Math.random() * basePool.length)];
+                }
+            }
+
+            if (pick) {
                 rewards.lootDropped.push({
-                    characterID: players[0].id,
+                    characterID: player.id,
                     itemID: pick.id,
-                    itemName: pick.id,
+                    itemName: pick.name,
+                    itemDescription: pick.description,
                     rarity: 'bonus'
                 });
+                globalDropFired = true;
             }
         }
+
+        // Update ramping chance on the rewards object so combat.js can persist it
+        const nextChance = globalDropFired
+            ? Math.max(BASE_CHANCE, currentChance / HIT_DIVISOR)
+            : Math.min(MAX_CHANCE, currentChance * GROWTH_FACTOR);
+        rewards.nextGlobalDropChance = nextChance;
     }
 
     return rewards;
+}
+
+_applyLootTagFlavour(item, tagDef) {
+    // Returns a shallow copy of item with name and description flavoured by tag.
+    // Original item object is never mutated.
+    const copy = { ...item };
+
+    const prefixes = tagDef.prefixes || [];
+    const suffixes = tagDef.suffixes || [];
+    const flavourLine = tagDef.flavourLine || '';
+
+    // Pick prefix or suffix randomly (prefer prefix, 70/30)
+    if (prefixes.length && (suffixes.length === 0 || Math.random() < 0.7)) {
+        const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+        copy.name = `${prefix} ${item.name}`;
+    } else if (suffixes.length) {
+        const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
+        copy.name = `${item.name} ${suffix}`;
+    }
+
+    if (flavourLine) {
+        copy.description = flavourLine;
+    }
+
+    return copy;
 }
 
   /**

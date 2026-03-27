@@ -1,0 +1,122 @@
+{
+  "goblin": {
+    "appliesTo": ["weapon", "armor", "accessory"],
+    "prefixes": ["Grizzlethorn", "Grik's", "Clanmarked", "Bonepatch", "Scrapper's"],
+    "suffixes": ["of the Clan", "of the Displaced", "of the Tribe"],
+    "flavourLine": "Marked with crude clan symbols scratched into the surface — the work of hands that have known harder times than yours."
+  },
+  "scavenge": {
+    "appliesTo": ["weapon", "armor", "accessory"],
+    "prefixes": ["Salvaged", "Notched", "Battered", "Crude", "Patched", "Reclaimed"],
+    "suffixes": ["of the Raid", "of Scrap", "of the Cart"],
+    "flavourLine": "Reclaimed from somewhere it was no longer wanted. Repaired with cord and patience. It holds together well enough."
+  },
+  "woodland": {
+    "appliesTo": ["weapon", "armor", "accessory"],
+    "prefixes": ["Ironwood", "Thicket", "Rootbound", "Canopy", "Greenwood"],
+    "suffixes": ["of the Whispering Woods", "of the Deep Root", "of the Thicket"],
+    "flavourLine": "The grain runs deep with ironwood resin. Whatever shaped this knew the forest well."
+  },
+  "nature": {
+    "appliesTo": ["weapon", "armor", "accessory"],
+    "prefixes": ["Verdant", "Bloom-Touched", "Mossgrown", "Sprouting", "Petal"],
+    "suffixes": ["of the Grove", "of the First Growth", "of Living Wood"],
+    "flavourLine": "Something green still stirs in it. Whether that is comfort or warning depends on who is asking."
+  },
+  "sacred": {
+    "appliesTo": ["weapon", "armor", "accessory"],
+    "prefixes": ["Blessed", "Consecrated", "Warded", "Sanctified", "Anointed"],
+    "suffixes": ["of the Faithful", "of Still Prayers", "of the Vigil", "of the Oath"],
+    "flavourLine": "Someone took the time to bless this before it passed into danger. Whether it held is a matter of faith."
+  },
+  "corrupted": {
+    "appliesTo": ["weapon", "armor", "accessory"],
+    "prefixes": ["Blighted", "Frayed", "Tainted", "Rot-Touched", "Soured"],
+    "suffixes": ["of the Decay", "of Broken Rites", "of the Fraying"],
+    "flavourLine": "Something in it feels slightly wrong — not broken, just displaced from what it was meant to be."
+  },
+  "spirit": {
+    "appliesTo": ["weapon", "armor", "accessory"],
+    "prefixes": ["Pact-Bound", "Oath-Touched", "Wraith-Traced", "Echo"],
+    "suffixes": ["of the Binding", "of the Old Pact", "of Lingering Will"],
+    "flavourLine": "It carries the faint impression of something that no longer exists here. The echo is all that remains."
+  },
+  "coastal": {
+    "appliesTo": ["weapon", "armor", "accessory"],
+    "prefixes": ["Salt-Worn", "Tidemarked", "Brine-Cured", "Wrack-Forged", "Driftwood"],
+    "suffixes": ["of the Shore", "of the Undertow", "of the Salt Road"],
+    "flavourLine": "Salt has worked its way into every joint and seam. It was made for weather, and weather found it."
+  },
+  "oath": {
+    "appliesTo": ["weapon", "armor", "accessory"],
+    "prefixes": ["Pledged", "Vow-Marked", "Sworn", "Covenant"],
+    "suffixes": ["of the Broken Word", "of the First Promise", "of Faded Oaths"],
+    "flavourLine": "It was made at the moment of a promise. Whether that promise was kept is written in the weight of it."
+  },
+  "martial": {
+    "appliesTo": ["weapon", "armor", "accessory"],
+    "prefixes": ["Campaigner's", "Garrison", "Ranked", "Drillmaster's", "Standard-Issue"],
+    "suffixes": ["of the Regiment", "of Standing Orders", "of the Line"],
+    "flavourLine": "Standard issue for someone, somewhere. The wear on it suggests it saw real use before ending up here."
+  },
+  "mercenary": {
+    "appliesTo": ["weapon", "armor", "accessory"],
+    "prefixes": ["Contract", "Hired", "Paid", "Vulture's", "Gold-Sought"],
+    "suffixes": ["of the Company", "of the Ledger", "of the Deal"],
+    "flavourLine": "Made for someone who fights for coin, not conviction. The craftsmanship reflects exactly that priority."
+  },
+  "dwarven": {
+    "appliesTo": ["weapon", "armor", "accessory"],
+    "prefixes": ["Khaz-Forged", "Stoneback", "Ironvein", "Mountain-Tempered", "Deep-Cast"],
+    "suffixes": ["of the Hold", "of the Deep Road", "of the Ancestors"],
+    "flavourLine": "Dense and cold-forged at depth. Whoever made this built it to outlast the mountain, and likely will."
+  },
+  "mountain": {
+    "appliesTo": ["weapon", "armor", "accessory"],
+    "prefixes": ["Ridge-Forged", "Highpass", "Rockbound", "Scree", "Summit"],
+    "suffixes": ["of the High Pass", "of the Deep Vein", "of Stone Tooth"],
+    "flavourLine": "Heavy and cold-tempered at altitude. It carries the weight of the mountain it came from."
+  },
+  "arcane": {
+    "appliesTo": ["weapon", "armor", "accessory"],
+    "prefixes": ["Inscribed", "Runemarked", "Channeling", "Sigil-Carved", "Verdant-Traced"],
+    "suffixes": ["of the Weave", "of Residual Power", "of the Inscription"],
+    "flavourLine": "Faint glyphs trace the surface — not decorative. Whatever bound the spell here has mostly faded."
+  },
+  "fire": {
+    "appliesTo": ["weapon", "armor", "accessory"],
+    "prefixes": ["Scorched", "Ember", "Ashmarked", "Cinder", "Char-Tempered"],
+    "suffixes": ["of the Pyre", "of Burning Ground", "of the Hearth Gone Wrong"],
+    "flavourLine": "The surface carries a permanent scorch pattern. It has been through fire and come out harder for it."
+  },
+  "beast": {
+    "appliesTo": ["weapon", "armor", "accessory"],
+    "prefixes": ["Fang-Worked", "Hide-Wrapped", "Claw-Scored", "Pack-Marked", "Pelt"],
+    "suffixes": ["of the Hunt", "of the Pack", "of the Alpha"],
+    "flavourLine": "Worked from hide and bone by someone who knew how to use every part of a kill. Nothing was wasted."
+  },
+  "undead": {
+    "appliesTo": ["weapon", "armor", "accessory"],
+    "prefixes": ["Grave-Cold", "Bleached", "Hollow", "Death-Touched", "Revenant's"],
+    "suffixes": ["of the Risen", "of the Grave", "of Unfinished Duty"],
+    "flavourLine": "Cold to the touch in a way that has nothing to do with temperature. It has been near death long enough to remember it."
+  },
+  "orc": {
+    "appliesTo": ["weapon", "armor", "accessory"],
+    "prefixes": ["Stone-Tusk", "Blood-Forged", "Krog's", "Clan-Marked", "Plains-Tempered"],
+    "suffixes": ["of the Clan", "of the Contract", "of the Red Plains"],
+    "flavourLine": "Heavy, direct, and built to last through sustained violence. The maker had no interest in decoration."
+  },
+  "elven": {
+    "appliesTo": ["weapon", "armor", "accessory"],
+    "prefixes": ["Silverbough", "Starlight-Woven", "Luminary", "Canopy-Grown", "Verdant-Elder"],
+    "suffixes": ["of the First Tree", "of the Gallery", "of Living Glass"],
+    "flavourLine": "Grown rather than made, it seems. The precision is unsettling. Nothing about it is accidental."
+  },
+  "shadow": {
+    "appliesTo": ["weapon", "armor", "accessory"],
+    "prefixes": ["Nightfall", "Hollow-Edged", "Dimmed", "Shrouded", "Unlit"],
+    "suffixes": ["of the Dark Quarter", "of Still Shadows", "of the Unseen"],
+    "flavourLine": "It catches light wrong. Not cursed — just shaped by hands that preferred not to be seen."
+  }
+}

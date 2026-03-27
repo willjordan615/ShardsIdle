@@ -49,9 +49,10 @@ function initializeCombatEngine() {
             const races      = JSON.parse(fs.readFileSync(path.join(dataDir, 'races.json'),         'utf8'));
             const gear       = JSON.parse(fs.readFileSync(path.join(dataDir, 'items.json'),         'utf8'));
             const statuses   = JSON.parse(fs.readFileSync(path.join(dataDir, 'statuses.json'),      'utf8'));
+            const lootTags   = JSON.parse(fs.readFileSync(path.join(dataDir, 'loot-tags.json'),     'utf8'));
 
             const statusEngine = new StatusEngine(statuses);
-            combatEngine = new CombatEngine(skills, enemyTypes, races, gear, statusEngine);
+            combatEngine = new CombatEngine(skills, enemyTypes, races, gear, statusEngine, lootTags);
 
             console.log('[COMBAT] Combat engine initialized');
         } catch (error) {
@@ -140,6 +141,19 @@ router.post('/start', requireAuth, async (req, res) => {
         }));
 
         // 2. Run simulation
+        // Fetch per-character globalDropChance from DB so the engine has reliable state
+        // regardless of what the frontend snapshot includes.
+        const mainSnapshot = hydratedSnapshots.find(s => !s.isImported);
+        if (mainSnapshot) {
+            const freshChar = await db.getCharacter(mainSnapshot.characterID);
+            if (freshChar) {
+                const lastId    = freshChar.lastSuccessfulChallengeId || null;
+                const switched  = lastId && challengeID && lastId !== challengeID;
+                const storedChance = freshChar.combatStats?.globalDropChance ?? 0.01;
+                challenge._globalDropChance            = switched ? 0.01 : storedChance;
+                challenge._lastSuccessfulChallengeId   = lastId;
+            }
+        }
         const result = combatEngine.runCombat(hydratedSnapshots, challenge);
 
         const isVictory = result.result === 'victory';
@@ -311,7 +325,13 @@ router.post('/start', requireAuth, async (req, res) => {
                 });
             }
 
-            // 5. SAVE TO DATABASE
+            // 5. Persist ramping global drop chance into combatStats
+            if (result.rewards?.nextGlobalDropChance !== undefined) {
+                if (!character.combatStats) character.combatStats = {};
+                character.combatStats.globalDropChance = result.rewards.nextGlobalDropChance;
+            }
+
+            // 6. SAVE TO DATABASE
             await db.saveCharacter(character);
             console.log(`[DB SAVE] ✅ Successfully saved ${character.name} (Skills Count: ${character.skills.length})`);
         } else {
