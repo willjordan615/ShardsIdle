@@ -679,6 +679,16 @@ function reassignCharacter(characterId, toUserId) {
     });
 }
 
+function reassignSnapshots(characterId, toUserId) {
+    return new Promise((resolve, reject) => {
+        db.run(
+            `UPDATE character_snapshots SET owner_user_id = ? WHERE character_id = ?`,
+            [toUserId, characterId],
+            function(err) { if (err) reject(err); else resolve(this.changes); }
+        );
+    });
+}
+
 function updateUserPassword(userId, passwordHash, username) {
     return new Promise((resolve, reject) => {
         const now = Date.now();
@@ -895,6 +905,7 @@ module.exports = {
     transferCharactersToUser,
     getAllUsers,
     reassignCharacter,
+    reassignSnapshots,
     pruneExpiredSessions,
     scheduleSessionPruning,
 };

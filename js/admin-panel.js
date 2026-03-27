@@ -583,16 +583,18 @@ window.adminReassignCharacter = async function(charId, charName) {
 
         const confirmUser = users.find(u => u.user_id === toUserId);
         const confirmName = confirmUser ? confirmUser.username : toUserId;
-        if (!confirm(`Reassign "${charName}" to "${confirmName}"?`)) return;
+        if (!confirm(`Reassign "${charName}" to "${confirmName}"?\nClick OK to confirm.`)) return;
+        const includeSnapshots = confirm(`Also reassign snapshots for "${charName}" to "${confirmName}"?\nOK = yes, Cancel = character only.`);
 
         const r2 = await fetch(BACKEND_URL + '/api/admin/db/characters/' + encodeURIComponent(charId) + '/reassign', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ toUserId })
+            body: JSON.stringify({ toUserId, includeSnapshots })
         });
         const data = await r2.json();
         if (data.success) {
-            alert(`Reassigned to ${data.username}.`);
+            const snapMsg = data.snapshotChanges > 0 ? ` + ${data.snapshotChanges} snapshot(s)` : '';
+            alert(`Reassigned to ${data.username}${snapMsg}.`);
         } else {
             alert('Reassign failed: ' + JSON.stringify(data));
         }
