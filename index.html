@@ -73,6 +73,7 @@
         <div id="headerTopBar">
             <div id="authUserDisplay" style="font-size:0.8rem; display:flex; align-items:center;"></div>
             <div id="serverStatusIndicator" title="Server status"><span id="serverStatusDot" class="server-dot"></span><span id="serverStatusLabel" class="server-label">Connecting...</span></div>
+            <button onclick="openCodexModal()" class="settings-btn secondary" title="Field Codex">Field Codex</button>
             <button id="settingsOpenBtn" class="settings-btn secondary" title="Settings">⚙ Settings</button>
         </div>
         <header>
@@ -167,7 +168,6 @@
             </div>
             <div class="nav-buttons">
                 <button onclick="showScreen('roster')" class="secondary">← Back to Roster</button>
-                <button onclick="openCodexModal()" class="secondary btn-compact">Field Codex</button>
                 <button id="selectChallengeBtn" onclick="selectCharacterForChallenge(currentState.detailCharacterId)">Select Challenge</button>
             </div>
 
@@ -1522,10 +1522,10 @@
                             <div id="codex-starter-pills" style="display:flex; flex-wrap:wrap; gap:5px;"></div>
                         </div>
 
-                        <p>Skills grow through use. Each time a skill fires in combat it accumulates experience. At <strong style="color:var(--gold-bright);">level 3</strong> a skill will show a hint about what it might combine with. A skill does not need to be equipped to gain XP — it only needs to be known.</p>
+                        <p>Skills grow through use. Each time a skill fires in combat it accumulates experience. At <strong style="color:var(--gold-bright);">level 3</strong> a skill will show a hint about what it might combine with. Higher skill levels increase the damage and effectiveness of that skill directly. A skill does not need to be equipped to gain XP — it only needs to be known.</p>
 
-                        <div class="codex-section-label">Skill Slots</div>
-                        <p>You equip two active skills at a time. These are what your character uses in combat. You can change them freely between challenges. Your combat style determines which equipped skill gets prioritised each turn — choosing a style that matches your skills matters.</p>
+                        <div class="codex-section-label">Learning Skills</div>
+                        <p>There is no cap on how many skills your character can learn — the only gate is time and development. You can know dozens of skills. You equip <strong style="color:var(--gold-bright);">two active skills</strong> at a time, which are what your character uses in combat. You can change which two are equipped freely between challenges. Your combat style determines which equipped skill gets prioritised each turn.</p>
 
                         <div class="codex-section-label">Skill Categories</div>
                         <p>Every skill has a category that describes its combat role. The AI profiles use these to decide what to cast and when.</p>
@@ -1541,7 +1541,7 @@
                         </div>
 
                         <div class="codex-section-label">Resources</div>
-                        <p>Skills cost either <span style="color:var(--blue);">Mana</span> or <span style="color:var(--green);">Stamina</span>. These pools carry between stages — a character who burns everything in the first fight will be dry by the third. If both fall below 15%, your character falls back to a free basic strike rather than going silent.</p>
+                        <p>Skills cost either <span style="color:var(--blue);">Mana</span> or <span style="color:var(--gold);">Stamina</span>. These pools carry between stages — a character who burns everything in the first fight will be dry by the third. When resources run low, your character shifts to desperation skills — a reduced set chosen for low cost — rather than going completely silent.</p>
                     </div>
 
                     <!-- ── COMBOS ── -->
@@ -1585,19 +1585,47 @@
                         <div style="margin:1rem 0;">
                             <div class="codex-stat-bar" style="color:#e07040;">
                                 <strong>Conviction</strong>
-                                Drives physical power. Skills that scale with Conviction hit harder through weapons and direct force. The primary stat for fighters, bruisers, and anyone relying on physical techniques.
+                                Raw force of will and physical power. The primary offensive stat for fighters, bruisers, and fire, arcane, and lightning mages.
+                                <ul style="margin:0.4rem 0 0 1rem; padding:0; font-size:0.81rem; color:var(--text-muted); list-style:none;">
+                                    <li>Increases maximum HP and Stamina</li>
+                                    <li>Raises hit chance on all attacks</li>
+                                    <li>Amplifies damage for fighter and strength-based skills</li>
+                                    <li>Scales fire, arcane, lightning, holy, and shadow magic</li>
+                                    <li>Small contributor to critical strike chance</li>
+                                </ul>
                             </div>
                             <div class="codex-stat-bar" style="color:#6090d0;">
                                 <strong>Endurance</strong>
-                                Increases your HP pool and contributes to Stamina capacity. High Endurance characters absorb punishment that would fell others — essential for anyone fighting on the front line.
+                                Durability and staying power. A survivability stat first — it contributes modestly to physical damage, but you do not stack it for offense.
+                                <ul style="margin:0.4rem 0 0 1rem; padding:0; font-size:0.81rem; color:var(--text-muted); list-style:none;">
+                                    <li>Significantly increases maximum HP and Stamina</li>
+                                    <li>Contributes a small bonus to physical attack damage</li>
+                                    <li>The defining stat of bruiser-style skills</li>
+                                    <li>Does not affect hit chance, crit, or magic damage</li>
+                                </ul>
                             </div>
                             <div class="codex-stat-bar" style="color:var(--gold);">
                                 <strong>Ambition</strong>
-                                The stat of speed, precision, and cunning. Scales rogue and assassin-type skills. Improves hit chance on accuracy-dependent techniques and unlocks more aggressive tactical options.
+                                Speed, cunning, and precision. The primary offensive stat for rogues and skirmishers, and for fire, arcane, and lightning mages. Also improves loot drop rates.
+                                <ul style="margin:0.4rem 0 0 1rem; padding:0; font-size:0.81rem; color:var(--text-muted); list-style:none;">
+                                    <li>Primary driver of critical strike chance</li>
+                                    <li>Amplifies damage for rogue and finesse-based skills</li>
+                                    <li>Scales lightning, shadow, and arcane magic</li>
+                                    <li>Raises Mana slightly</li>
+                                    <li>Improves retreat success chance</li>
+                                    <li>Increases item drop chance</li>
+                                </ul>
                             </div>
                             <div class="codex-stat-bar" style="color:#9060d0;">
                                 <strong>Harmony</strong>
-                                Magical attunement. Scales spells, heals, and nature abilities. Increases Mana capacity. The primary stat for casters, healers, and anyone working with elemental or spiritual forces.
+                                Attunement to magic and the natural world. The primary stat for ice, holy, and nature mages — and the dominant stat for healers and supports. Also accelerates experience gain.
+                                <ul style="margin:0.4rem 0 0 1rem; padding:0; font-size:0.81rem; color:var(--text-muted); list-style:none;">
+                                    <li>Significantly increases maximum Mana</li>
+                                    <li>Scales ice, holy, nature, and poison magic damage</li>
+                                    <li>Powers all healing and restoration skills</li>
+                                    <li>Increases XP earned from combat</li>
+                                    <li>No effect on fire, arcane, lightning, or shadow damage</li>
+                                </ul>
                             </div>
                         </div>
 
@@ -1605,7 +1633,7 @@
                         <p>Each skill has scaling factors — weighted contributions from one or more stats to its damage or healing. A skill with high Ambition scaling rewards characters who have invested in Ambition through their gear. Reading what a skill scales with tells you what build it belongs to.</p>
 
                         <div class="codex-section-label">HP, Mana, and Stamina</div>
-                        <p>These derived resources are calculated from your stats and level. Endurance drives HP and contributes to Stamina. Harmony drives Mana. Both grow with level but are strongly amplified by stat values — a well-geared character at a given level has dramatically more resources than one with bare equipment.</p>
+                        <p>These derived resources are calculated from your stats and level. Endurance drives HP and Stamina. Harmony drives Mana. Both grow with level but are strongly amplified by stat values — a well-geared character at a given level has dramatically more resources than one with bare equipment.</p>
                     </div>
 
                     <!-- ── COMBAT ── -->
