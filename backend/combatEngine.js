@@ -1247,7 +1247,7 @@ _applyLootTagFlavour(item, tagDef) {
     function _weightedRandomTarget(pool) {
       const weights = pool.map(p => {
         let w = 1.0;
-        if (tauntCasterId && p.id === tauntCasterId) w *= 8.0;
+        if (tauntCasterId && p.id === tauntCasterId) w *= 4.0;
         if (p.statusEffects?.some(e => e.id === 'stealth' && e.duration > 0)) w *= 0.15;
         p.statusEffects?.forEach(activeStatus => {
           const def = statusEngine?.statusMap?.[activeStatus.id];
