@@ -177,6 +177,12 @@ function _updateMediaControls() {
             stopBtn.classList.remove('media-btn--active');
         }
     }
+    // Replay enabled only when loop is fully stopped
+    const replayBtn = document.getElementById('mediaBtn_replay');
+    if (replayBtn) {
+        const stopped = !window.currentState?.idleActive;
+        replayBtn.disabled = !stopped;
+    }
 }
 
 // Initialise speed from localStorage on load
@@ -859,8 +865,16 @@ window.cancelAutoRestart = function() {
     window.clearSessionLoot();
 };
 
-// Stop button in media controls: request graceful loop exit (highlights while pending).
-// Clicking again while pending cancels the request.
+// Replay — restart the loop with the same party and challenge, no party screen required
+window.replayCombat = function() {
+    if (window.currentState?.idleActive) return;
+    const challengeId = window.currentState?.selectedChallenge?.id;
+    if (!challengeId) return;
+    window.currentState.idleActive     = true;
+    window.currentState.pendingLoopExit = false;
+    _updateMediaControls();
+    if (typeof startCombat === 'function') startCombat(challengeId);
+};
 window.toggleLoopStop = function() {
     if (!window.currentState?.idleActive) return;
     if (window.currentState.pendingLoopExit) {
