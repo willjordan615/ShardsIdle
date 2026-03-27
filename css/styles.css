@@ -2080,7 +2080,7 @@ body:has(#combatlog.active) #headerTopBar {
 /* Item row */
 .inv-item {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 8px;
     padding: 6px 8px;
     margin-bottom: 2px;
@@ -2108,10 +2108,10 @@ body:has(#combatlog.active) #headerTopBar {
     font-size: 0.8rem;
     font-weight: 600;
     color: var(--gold);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal;
+    word-break: break-word;
     letter-spacing: 0.03em;
+    line-height: 1.2;
 }
 .inv-item--equipped .inv-item__name { color: #4cd964; }
 .inv-item--empty .inv-item__name { color: var(--text-muted); font-style: italic; font-family: var(--font-body); font-weight: 400; }
