@@ -1038,7 +1038,7 @@ function renderEquippedGear(character) {
     const displaySlots = ['mainHand', 'offHand', 'head', 'chest', 'accessory1', 'accessory2'];
     
     displaySlots.forEach(slot => {
-        const itemId = character.equipment[slot];
+        const itemId = (v => v && typeof v === 'object' ? v.itemID : v)(character.equipment[slot]);
         const item = itemId ? gameData.gear.find(g => g.id === itemId) : null;
         
         const slotEl = document.createElement('div');
@@ -1634,7 +1634,7 @@ function renderGearUpgradeBadge(character) {
     // Score each currently equipped item per slot
     const equippedScores = {};
     GEAR_SLOTS.forEach(slot => {
-        const itemId  = equipped[slot];
+        const itemId  = (v => v && typeof v === 'object' ? v.itemID : v)(equipped[slot]);
         const itemDef = itemId ? window.gameData?.gear?.find(g => g.id === itemId) : null;
         equippedScores[slot] = _gearScore(itemDef);
     });

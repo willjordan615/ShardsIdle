@@ -373,6 +373,10 @@ class CombatEngine {
 /**
    * Run a complete combat simulation
    */
+  // Unwrap an equipment slot value — accepts either a bare itemID string (legacy)
+  // or an object { itemID, itemName, itemDescription } (current format).
+  _eqId(val) { return (val && typeof val === 'object') ? val.itemID : val; }
+
   runCombat(partySnapshots, challenge) {
     const combatID = 'combat_' + crypto.randomBytes(8).toString('hex');
     const startTime = Date.now();
@@ -389,7 +393,7 @@ class CombatEngine {
       const equipmentSlots = ['mainHand', 'offHand', 'head', 'chest', 'accessory1', 'accessory2'];
       const boostedStats = { ...stats }; // don't mutate the original snapshot stats
       equipmentSlots.forEach(slot => {
-        const itemId = equipment[slot];
+        const itemId = this._eqId(equipment[slot]);
         if (!itemId) return;
         const itemDef = this.gear.find(g => g.id === itemId);
         if (!itemDef) return;
@@ -405,7 +409,7 @@ class CombatEngine {
       let totalPhysEv = 0;
       let totalMagEv  = 0;
       armorSlots.forEach(slot => {
-        const itemId = equipment[slot];
+        const itemId = this._eqId(equipment[slot]);
         if (!itemId) return;
         const itemDef = this.gear.find(g => g.id === itemId);
         if (!itemDef) return;
@@ -1046,7 +1050,7 @@ calculateRewards(players, challenge, segments = []) {
         const [minTier, maxTier] = tierRanges[Math.min(difficulty, 8)] || [0, 0];
         const basePool = this.gear.filter(g =>
             g.tier >= minTier && g.tier <= maxTier &&
-            g.slot_id1 && !g.consumable
+            g.slot_id1 && !g.consumable && !g.creatureOnly && g.tier >= 0
         );
         const challengeTags = challenge?.tags || [];
 
@@ -2204,7 +2208,7 @@ _applyLootTagFlavour(item, tagDef) {
     if (!actor.equipment?.mainHand || !this.gear) return;
     // Never proc on self — heals and buffs targeting the caster shouldn't trigger weapon effects
     if (target.id === actor.id) return;
-    const weapon = this.gear.find(g => g.id === actor.equipment.mainHand);
+    const weapon = this.gear.find(g => g.id === this._eqId(actor.equipment.mainHand));
     if (!weapon) return;
     const procs = [];
     
@@ -2312,7 +2316,7 @@ _applyLootTagFlavour(item, tagDef) {
     const isOffensive = !NON_OFFENSIVE.has(skill.category);
 
     // Weapon Delay Modification
-    const weapon = actor.equipment?.mainHand ? this.gear.find(g => g.id === actor.equipment.mainHand) : null;
+    const weapon = actor.equipment?.mainHand ? this.gear.find(g => g.id === this._eqId(actor.equipment.mainHand)) : null;
     const delayMultiplier = weapon?.delay ? (weapon.delay === 1 ? 0.8 : weapon.delay === 3 ? 1.2 : 1.0) : 1.0;
 
     // Status delay multiplier (slow, haste, freeze, knockback, evasion_boost, speed_boost etc.)
@@ -2561,7 +2565,7 @@ _applyLootTagFlavour(item, tagDef) {
     // We fetch this now so it's available for the Variance Debug Log later
     let weapon = null;
     if (actor.equipment?.mainHand && this.gear) {
-      weapon = this.gear.find(g => g.id === actor.equipment.mainHand);
+      weapon = this.gear.find(g => g.id === this._eqId(actor.equipment.mainHand));
     }
 
     // ===== STEP 1: Calculate Base Skill Damage (NO stat scaling yet) =====

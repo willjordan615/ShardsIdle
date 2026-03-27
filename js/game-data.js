@@ -324,7 +324,7 @@ function getCharacterClass(character, skills) {
 
         // ── GEAR ANALYSIS ─────────────────────────────────────────────────────
         // Get main hand weapon
-        const weaponId = equipment.mainHand;
+        const weaponId = (v => v && typeof v === 'object' ? v.itemID : v)(equipment.mainHand);
         const weapon = weaponId && gearData.length > 0
             ? gearData.find(g => g && g.id === weaponId)
             : null;
@@ -1045,7 +1045,8 @@ function calculateTotalStats(character) {
     const statFieldMap = { con: 'conviction', end: 'endurance', amb: 'ambition', har: 'harmony' };
 
     if (character.equipment) {
-        Object.values(character.equipment).forEach(itemId => {
+        Object.values(character.equipment).forEach(val => {
+            const itemId = val && typeof val === 'object' ? val.itemID : val;
             if (!itemId) return;
             const item = gameData.gear.find(g => g.id === itemId);
             if (!item) return;

@@ -17,6 +17,10 @@ function _safeBeltOrder(c) {
 function _goldValue(def)   { return def ? (def.goldValue || ((def.tier || 0) * 8 + 5)) : 5; }
 function _dustYield(g)     { return parseFloat((g * 0.01).toFixed(4)); }
 
+// Unwrap equipment slot — accepts bare itemID string or { itemID, itemName, itemDescription }
+function _eqId(val)    { return (val && typeof val === 'object') ? val.itemID : val; }
+function _eqEntry(val) { return (val && typeof val === 'object') ? val : { itemID: val }; }
+
 const GEAR_SLOTS  = ['mainHand','offHand','head','chest','accessory1','accessory2'];
 const SLOT_LABELS = { mainHand:'Main Hand', offHand:'Off Hand', head:'Head', chest:'Chest', accessory1:'Accessory 1', accessory2:'Accessory 2' };
 
@@ -208,8 +212,15 @@ function _renderGearModal(character, activeSlot) {
     let anyItem = false;
 
     visibleSlots.forEach(slot => {
-        const equippedId  = eq[slot];
-        const equippedDef = equippedId ? _itemDef(equippedId) : null;
+        const equippedId  = _eqId(eq[slot]);
+        const _eqSlotEntry = eq[slot] ? _eqEntry(eq[slot]) : null;
+        const _eqBaseDef  = equippedId ? _itemDef(equippedId) : null;
+        const equippedDef = (_eqBaseDef && _eqSlotEntry)
+            ? { ..._eqBaseDef,
+                ...(_eqSlotEntry.itemName        ? { name:        _eqSlotEntry.itemName        } : {}),
+                ...(_eqSlotEntry.itemDescription ? { description: _eqSlotEntry.itemDescription } : {}),
+              }
+            : _eqBaseDef;
         const invItems    = bySlot[slot] || [];
         const hasContent  = equippedDef || invItems.length > 0;
 
@@ -522,14 +533,23 @@ async function equipItemNew(characterId, itemId, inventoryIndex) {
     }
 
     // 4. Perform Swap (Move current equipment to inventory)
-    const currentId = character.equipment?.[targetSlot];
-    if (currentId) {
-        _safeInventory(character).push({ itemID: currentId, rarity: 'common', acquiredAt: Date.now() });
+    const currentSlotVal = character.equipment?.[targetSlot];
+    if (currentSlotVal) {
+        const cur = _eqEntry(currentSlotVal);
+        _safeInventory(character).push({ itemID: cur.itemID, rarity: 'common', acquiredAt: Date.now(),
+            ...(cur.itemName        ? { itemName:        cur.itemName        } : {}),
+            ...(cur.itemDescription ? { itemDescription: cur.itemDescription } : {}),
+        });
     }
 
-    // 5. Equip New Item
+    // 5. Equip New Item — store { itemID, itemName, itemDescription } to preserve flavour
+    const invEntry = _safeInventory(character)[inventoryIndex] || {};
     _safeInventory(character).splice(inventoryIndex, 1);
-    character.equipment[targetSlot] = itemId;
+    character.equipment[targetSlot] = {
+        itemID: itemId,
+        ...(invEntry.itemName        ? { itemName:        invEntry.itemName        } : {}),
+        ...(invEntry.itemDescription ? { itemDescription: invEntry.itemDescription } : {}),
+    };
     character.lastModified = Date.now();
 
     // 6. Save & Refresh
@@ -544,10 +564,13 @@ async function unequipItemNew(characterId, slot) {
     const character = await getCharacter(characterId);
     if (!character) return;
 
-    const itemId = character.equipment?.[slot];
-    if (!itemId) return;
-
-    _safeInventory(character).push({ itemID: itemId, rarity: 'common', acquiredAt: Date.now() });
+    const _slotVal = character.equipment?.[slot];
+    if (!_slotVal) return;
+    const _slotEntry = _eqEntry(_slotVal);
+    _safeInventory(character).push({ itemID: _slotEntry.itemID, rarity: 'common', acquiredAt: Date.now(),
+        ...(_slotEntry.itemName        ? { itemName:        _slotEntry.itemName        } : {}),
+        ...(_slotEntry.itemDescription ? { itemDescription: _slotEntry.itemDescription } : {}),
+    });
     character.equipment[slot] = null;
     character.lastModified = Date.now();
 

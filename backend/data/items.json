@@ -16907,7 +16907,8 @@
     "dmg1": 8,
     "dmg_type_1": "Slashing",
     "dmg2": 5,
-    "dmg_type_2": "Nature"
+    "dmg_type_2": "Nature",
+    "creatureOnly": true
   },
   {
     "id": "weapon_ashen_fist",
@@ -16939,7 +16940,8 @@
     "dmg1": 10,
     "dmg_type_1": "Piercing",
     "dmg2": 3,
-    "dmg_type_2": "Physical"
+    "dmg_type_2": "Physical",
+    "creatureOnly": true
   },
   {
     "id": "weapon_ancestral_hammer",

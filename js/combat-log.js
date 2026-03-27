@@ -1501,7 +1501,8 @@ try {
 
                     // Helper: is item a duplicate (equipped or already in inventory)?
                     function _isDuplicate(itemId) {
-                        const equippedIds = Object.values(character.equipment || {}).filter(Boolean);
+                        const equippedIds = Object.values(character.equipment || {})
+                            .filter(Boolean).map(v => v && typeof v === 'object' ? v.itemID : v);
                         if (equippedIds.includes(itemId)) return true;
                         return (character.inventory || []).some(i => i && i.itemID === itemId);
                     }
