@@ -52,13 +52,19 @@ function _migrateBelt(character) {
         character.consumables = {};
     }
 
-    // Sync beltOrder → consumables: ensure consumables only contains items in beltOrder
-    // and rebuild consumables from beltOrder counts
-    const newBelt = {};
+    // Ensure consumables has an entry for every item in beltOrder.
+    // Does NOT overwrite existing counts — stack quantities are now authoritative.
     order.forEach(itemId => {
-        if (itemId) newBelt[itemId] = (newBelt[itemId] || 0) + 1;
+        if (itemId && !(itemId in character.consumables)) {
+            character.consumables[itemId] = 1;
+        }
     });
-    character.consumables = newBelt;
+
+    // Remove consumables entries for items no longer in beltOrder
+    const inOrder = new Set(order.filter(Boolean));
+    Object.keys(character.consumables).forEach(id => {
+        if (!inOrder.has(id)) delete character.consumables[id];
+    });
 }
 
 // ── Inline gear slot panel ────────────────────────────────────────────────────
@@ -95,9 +101,7 @@ window.renderBeltSlots = function(character) {
     _safeStash(character); _safeBelt(character); _safeBeltOrder(character);
     _migrateBelt(character);
 
-    const order = character.beltOrder;   // [itemId|null, ...] length 4
-    const stash = character.consumableStash;
-    const stashOptions = Object.entries(stash).filter(([, qty]) => qty > 0);
+    const order = character.beltOrder;
 
     el.innerHTML = [0, 1, 2, 3].map(i => {
         const itemId = order[i] || null;
@@ -105,25 +109,15 @@ window.renderBeltSlots = function(character) {
         const qty    = itemId ? (character.consumables[itemId] || 0) : 0;
         const filled = !!itemId;
 
-        // Dropdown: all stash items (items already in other belt slots still show)
-        const opts = stashOptions
-            .map(([id, q]) => {
-                const d = _itemDef(id);
-                return `<option value="${id}">${d?.name || id} ×${q}</option>`;
-            }).join('');
+        const sub = filled
+            ? `×${qty}${def?.description ? ` — ${def.description}` : ''}`
+            : null;
 
-        return `<div class="loadout-slot ${filled ? 'loadout-slot--filled' : 'loadout-slot--empty'} loadout-slot--belt" style="position:relative; cursor:pointer;">
+        return `<div class="loadout-slot ${filled ? 'loadout-slot--filled' : 'loadout-slot--empty'} loadout-slot--belt"
+                     onclick="openBeltModal('${character.id}', ${i})" title="Click to manage belt slot">
             <span class="loadout-slot__label">Slot ${i + 1}</span>
-            <span class="loadout-slot__item">${filled ? def?.name || itemId : '—'}</span>
-            ${filled ? `<span class="loadout-slot__sub">×${qty} &nbsp;
-                <span class="loadout-slot__remove" style="position:relative; z-index:2;"
-                      onclick="clearBeltSlot('${character.id}','${itemId}'); event.stopPropagation();">✕</span>
-            </span>` : ''}
-            <select style="position:absolute; inset:0; width:100%; height:100%; opacity:0; cursor:pointer; z-index:1; font-size:16px;"
-                    onchange="setBeltSlot('${character.id}',${i},this.value); this.value='';">
-                <option value="">—</option>
-                ${opts}
-            </select>
+            <span class="loadout-slot__item">${filled ? (def?.name || itemId) : '—'}</span>
+            ${sub ? `<span class="loadout-slot__sub" style="white-space:normal; line-height:1.3;">${sub}</span>` : ''}
         </div>`;
     }).join('');
 };
@@ -152,7 +146,9 @@ window.closeInventory = function() {
     if (typeof destroyGearTooltip === 'function') destroyGearTooltip();
     const modal = document.getElementById('inventoryModal');
     if (modal) modal.style.display = 'none';
-    _activeGearSlot = null;
+    _activeGearSlot   = null;
+    _activeBeltSlot   = null;
+    _activeBeltCharId = null;
 };
 
 // Legacy aliases
@@ -278,6 +274,157 @@ function _renderGearModal(character, activeSlot) {
 }
 
 
+// ── Belt modal ────────────────────────────────────────────────────────────────
+
+let _activeBeltSlot = null;
+let _activeBeltCharId = null;
+
+window.openBeltModal = async function(characterId, slotIdx) {
+    _activeBeltSlot   = slotIdx ?? null;
+    _activeBeltCharId = characterId;
+    const character = await getCharacter(characterId);
+    if (!character) return;
+    _safeStash(character); _safeBelt(character); _safeBeltOrder(character);
+    _migrateBelt(character);
+    _renderBeltModal(character, slotIdx);
+    const modal = document.getElementById('inventoryModal');
+    if (modal) modal.style.display = 'flex';
+};
+
+function _consumableEffectLine(def) {
+    if (!def) return '';
+    const sid = def.skillID;
+    if (!sid) return '';
+    const skill = window.gameData?.skills?.find(s => s.id === sid);
+    if (!skill) return '';
+    const effects = skill.effects || [];
+    if (!effects.length) return '';
+
+    const targetLabel = { self: 'self', single_ally: 'one ally', all_allies: 'all allies',
+                          single_enemy: 'one enemy', all_enemies: 'all enemies' };
+    const resourceLabel = { hp: 'HP', health: 'HP', mana: 'MP', stamina: 'Stamina', stamina: 'Stamina' };
+
+    const parts = effects.map(e => {
+        const tgt = targetLabel[e.targets] || e.targets || '';
+        const pct = e.magnitude ? `${Math.round(e.magnitude * 100)}%` : '';
+        const dur = e.duration  ? ` for ${e.duration} turn${e.duration > 1 ? 's' : ''}` : '';
+
+        switch (e.type) {
+            case 'heal':
+                return `Restores ${pct} HP (${tgt})`;
+            case 'restore_resource': {
+                const res = resourceLabel[e.resource] || e.resource || 'resource';
+                return `Restores ${pct} ${res} (${tgt})`;
+            }
+            case 'apply_buff': {
+                const buffName = e.buff ? e.buff.replace(/_/g, ' ') : 'buff';
+                return pct
+                    ? `Applies ${buffName} +${pct}${dur} (${tgt})`
+                    : `Applies ${buffName}${dur} (${tgt})`;
+            }
+            case 'apply_debuff': {
+                const debuffName = e.debuff ? e.debuff.replace(/_/g, ' ') : 'debuff';
+                const chance = e.chance && e.chance < 1 ? ` (${Math.round(e.chance * 100)}% chance)` : '';
+                return `Applies ${debuffName}${dur}${chance} (${tgt})`;
+            }
+            case 'damage': {
+                const dmgType = e.damageType ? ` ${e.damageType}` : '';
+                return `Deals ${pct}${dmgType} damage (${tgt})`;
+            }
+            case 'utility':
+                return e.utility ? e.utility.replace(/_/g, ' ') : 'utility effect';
+            default:
+                return '';
+        }
+    }).filter(Boolean);
+
+    return parts.join(' · ');
+}
+
+function _renderBeltModal(character, activeSlot) {
+    const inner = document.getElementById('inventoryModalInner');
+    if (!inner) return;
+    window._currentModalChar = character;
+
+    const order = character.beltOrder;
+    const stash = character.consumableStash;
+
+    const header = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--space-sm); flex-shrink:0;">
+            <h3 style="margin:0; font-size:0.88rem; letter-spacing:0.08em;">BELT MANAGEMENT</h3>
+            <button class="secondary" onclick="closeInventory()" style="padding:3px 10px; font-size:0.72rem;">&#10005; Close</button>
+        </div>`;
+
+    // Slot tabs
+    const tabs = `
+        <div class="inv-tabs">
+            ${[0,1,2,3].map(i => {
+                const id  = order[i];
+                const def = id ? _itemDef(id) : null;
+                return `<button class="inv-tab ${activeSlot === i ? 'inv-tab--active' : ''}"
+                                onclick="_renderBeltModal(window._currentModalChar, ${i})">
+                    Slot ${i + 1}${def ? ` — ${def.name}` : ''}
+                </button>`;
+            }).join('')}
+        </div>`;
+
+    const slotItemId  = order[activeSlot] ?? null;
+    const slotDef     = slotItemId ? _itemDef(slotItemId) : null;
+    const slotQty     = slotItemId ? (character.consumables[slotItemId] || 0) : 0;
+
+    let rows = '';
+
+    // Equipped row
+    if (slotDef) {
+        const slotEffect = _consumableEffectLine(slotDef);
+        rows += `
+            <div class="inv-slot-header">Equipped</div>
+            <div class="inv-item inv-item--equipped">
+                <div class="inv-item__info">
+                    <div class="inv-item__name">×${slotQty} ${slotDef.name}</div>
+                    ${slotDef.description ? `<div class="inv-item__stats" style="white-space:normal;">${slotDef.description}</div>` : ''}
+                    ${slotEffect ? `<div class="inv-item__stats" style="white-space:normal; color:#a0d4ff; margin-top:2px;">${slotEffect}</div>` : ''}
+                </div>
+                <div class="inv-item__actions">
+                    <button class="inv-btn inv-btn--unequip"
+                            onclick="clearBeltSlot('${character.id}', '${slotItemId}', ${activeSlot})">Unequip</button>
+                </div>
+            </div>`;
+    }
+
+    // Stash rows
+    const stashEntries = Object.entries(stash).filter(([, q]) => q > 0);
+    if (stashEntries.length > 0) {
+        rows += `<div class="inv-slot-header">Available</div>`;
+        stashEntries.forEach(([itemId, qty]) => {
+            const def = _itemDef(itemId);
+            if (!def) return;
+            const isEquippedHere = slotItemId === itemId;
+            const effectLine = _consumableEffectLine(def);
+            rows += `
+                <div class="inv-item ${isEquippedHere ? 'inv-item--equipped' : ''}">
+                    <div class="inv-item__info">
+                        <div class="inv-item__name">×${qty} ${def.name}</div>
+                        ${def.description ? `<div class="inv-item__stats" style="white-space:normal;">${def.description}</div>` : ''}
+                        ${effectLine ? `<div class="inv-item__stats" style="white-space:normal; color:#a0d4ff; margin-top:2px;">${effectLine}</div>` : ''}
+                    </div>
+                    <div class="inv-item__actions">
+                        ${!isEquippedHere
+                            ? `<button class="inv-btn inv-btn--equip"
+                                       onclick="setBeltSlot('${character.id}', ${activeSlot}, '${itemId}')">Equip ×${qty}</button>`
+                            : ''}
+                    </div>
+                </div>`;
+        });
+    }
+
+    if (!slotDef && stashEntries.length === 0) {
+        rows = '<div class="inv-empty-msg">No consumables in stash.</div>';
+    }
+
+    inner.innerHTML = header + tabs + `<div class="inv-list">${rows}</div>`;
+}
+
 // ── Belt slot actions ─────────────────────────────────────────────────────────
 
 window.setBeltSlot = async function(characterId, slotIdx, itemId) {
@@ -290,40 +437,33 @@ window.setBeltSlot = async function(characterId, slotIdx, itemId) {
     const order = character.beltOrder;
     const stash = character.consumableStash;
 
-    // If this slot already has this item, do nothing
-    if (order[slotIdx] === itemId) return;
-
-    // If slot has a different item, return it to stash first
+    // Return displaced stack to stash first
     const prevId = order[slotIdx];
-    if (prevId) {
-        stash[prevId] = (parseInt(stash[prevId]) || 0) + 1;
+    if (prevId && prevId !== itemId) {
+        const prevQty = character.consumables[prevId] || 0;
+        stash[prevId] = (parseInt(stash[prevId]) || 0) + prevQty;
+        delete character.consumables[prevId];
     }
 
     // Check stash has the item
     const avail = parseInt(stash[itemId]) || 0;
     if (avail <= 0) {
-        if (typeof showError === 'function') showError('Not enough in stash.');
-        renderBeltSlots(character);
+        if (typeof showError === 'function') showError('Not in stash.');
         return;
     }
 
-    // Assign to slot
-    stash[itemId] = avail - 1;
-    if (stash[itemId] <= 0) delete stash[itemId];
+    // Move full stack from stash to belt slot
     order[slotIdx] = itemId;
+    character.consumables[itemId] = avail;
+    delete stash[itemId];
 
-    // Rebuild consumables from beltOrder
-    const newBelt = {};
-    order.forEach(id => { if (id) newBelt[id] = (newBelt[id] || 0) + 1; });
-    character.consumables = newBelt;
     character.lastModified = Date.now();
-
     await saveCharacterToServer(character);
     renderBeltSlots(character);
-    renderGearSlots(character);
+    _renderBeltModal(character, slotIdx);
 };
 
-window.clearBeltSlot = async function(characterId, itemId) {
+window.clearBeltSlot = async function(characterId, itemId, slotIdx) {
     const character = await getCharacter(characterId);
     if (!character) return;
     _safeStash(character); _safeBelt(character); _safeBeltOrder(character);
@@ -332,24 +472,21 @@ window.clearBeltSlot = async function(characterId, itemId) {
     const order = character.beltOrder;
     const stash = character.consumableStash;
 
-    // Find and clear all slots containing this item
-    let returned = 0;
-    order.forEach((id, i) => {
-        if (id === itemId) { order[i] = null; returned++; }
-    });
-    if (returned > 0) {
-        stash[itemId] = (parseInt(stash[itemId]) || 0) + returned;
-    }
+    // Return full stack to stash
+    const qty = character.consumables[itemId] || 0;
+    if (qty > 0) stash[itemId] = (parseInt(stash[itemId]) || 0) + qty;
+    delete character.consumables[itemId];
 
-    // Rebuild consumables from beltOrder
-    const newBelt = {};
-    order.forEach(id => { if (id) newBelt[id] = (newBelt[id] || 0) + 1; });
-    character.consumables = newBelt;
+    // Clear all slots holding this item (normally just one)
+    order.forEach((id, i) => { if (id === itemId) order[i] = null; });
+
     character.lastModified = Date.now();
-
     await saveCharacterToServer(character);
     renderBeltSlots(character);
-    renderGearSlots(character);
+
+    // Re-render modal on the same slot if open
+    const activeSlot = slotIdx ?? _activeBeltSlot ?? 0;
+    _renderBeltModal(character, activeSlot);
 };
 
 // ── Equip / Unequip ───────────────────────────────────────────────────────────
