@@ -72,6 +72,23 @@ function _statBonuses(def) {
     return p.join(' · ');
 }
 
+// Returns a compact damage+delay string, e.g. "14 Slashing + 4 Dark · Delay 3"
+function _dmgDelay(def, rolls) {
+    if (!def) return '';
+    const r = rolls || def._rolls || {};
+    const parts = [];
+    const dmgParts = [];
+    [[1],[2],[3],[4]].forEach(([n]) => {
+        const val = r[`dmg${n}`] ?? def[`dmg${n}`];
+        const type = def[`dmg_type_${n}`];
+        if (val) dmgParts.push(type ? `${val} ${type}` : `${val}`);
+    });
+    if (def.armor) dmgParts.push(`${r.armor ?? def.armor} Armor`);
+    if (dmgParts.length) parts.push(dmgParts.join(' + '));
+    if (def.delay != null) parts.push(`Delay ${def.delay}`);
+    return parts.join(' · ');
+}
+
 // ── One-time belt migration ───────────────────────────────────────────────────
 function _migrateBelt(character) {
     const belt  = _safeBelt(character);
@@ -265,16 +282,16 @@ function _renderGearModal(character, activeSlot) {
         // Equipped row
         if (equippedDef) {
             anyItem = true;
-            const stats = [
-                equippedDef.dmg1 ? `${equippedDef.dmg1} ${equippedDef.dmg_type_1 || ''}`.trim() : null,
-                equippedDef.armor ? `${equippedDef.armor} armor` : null,
-                _statBonuses(equippedDef) || null,
-            ].filter(Boolean).join(' · ');
+            const dmgDelay = _dmgDelay(equippedDef);
+            const bonuses  = _statBonuses(equippedDef);
+            const desc     = equippedDef.description || '';
             rows += `
                 <div class="inv-item inv-item--equipped">
                     <div class="inv-item__info">
                         <div class="inv-item__name">${equippedDef.name}</div>
-                        ${stats ? `<div class="inv-item__stats">${stats}</div>` : ''}
+                        ${dmgDelay ? `<div class="inv-item__stats">${dmgDelay}</div>` : ''}
+                        ${bonuses  ? `<div class="inv-item__stats">${bonuses}</div>`  : ''}
+                        ${desc     ? `<div class="inv-item__desc">${desc}</div>`      : ''}
                     </div>
                     <div class="inv-item__actions">
                         <button class="inv-btn inv-btn--unequip"
@@ -288,20 +305,18 @@ function _renderGearModal(character, activeSlot) {
         // Inventory rows for this slot
         invItems.forEach(({ inv, idx, def }) => {
             anyItem = true;
-            const g = _goldValue(def);
-            const dmg1 = inv._rolls?.dmg1 ?? def?.dmg1;
-            const armor = inv._rolls?.armor ?? def?.armor;
-            const stats = [
-                dmg1  ? `${dmg1} ${def?.dmg_type_1 || ''}`.trim() : null,
-                armor ? `${armor} armor` : null,
-                _statBonuses(def) || null,
-            ].filter(Boolean).join(' · ');
+            const g        = _goldValue(def);
+            const dmgDelay = _dmgDelay(def, inv._rolls);
+            const bonuses  = _statBonuses(def);
+            const desc     = inv.itemDescription || def?.description || '';
             const nameColor = _rollQualityColor(inv) || _rarityColor(inv.rarity);
             rows += `
                 <div class="inv-item">
                     <div class="inv-item__info">
                         <div class="inv-item__name" style="color:${nameColor};">${(inv.itemName && inv.itemName.includes(' ')) ? inv.itemName : (def?.name || inv.itemID)}</div>
-                        ${stats ? `<div class="inv-item__stats">${stats}</div>` : ''}
+                        ${dmgDelay ? `<div class="inv-item__stats">${dmgDelay}</div>` : ''}
+                        ${bonuses  ? `<div class="inv-item__stats">${bonuses}</div>`  : ''}
+                        ${desc     ? `<div class="inv-item__desc">${desc}</div>`      : ''}
                     </div>
                     <div class="inv-item__actions">
                         <button class="inv-btn inv-btn--equip"

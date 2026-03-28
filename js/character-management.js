@@ -1045,21 +1045,35 @@ function renderEquippedGear(character) {
         slotEl.className = 'equipment-slot';
         
         let bonusText = '';
+        let dmgText   = '';
+        let descText  = '';
         if (item) {
             const bonuses = [];
-            if (item.hp) bonuses.push(`+${item.hp} HP`);
+            if (item.hp)   bonuses.push(`+${item.hp} HP`);
             if (item.mana) bonuses.push(`+${item.mana} Mana`);
-            if (item.con) bonuses.push(`+${item.con} CON`);
-            if (item.end) bonuses.push(`+${item.end} END`);
-            if (item.amb) bonuses.push(`+${item.amb} AMB`);
-            if (item.har) bonuses.push(`+${item.har} HAR`);
+            if (item.con)  bonuses.push(`+${item.con} CON`);
+            if (item.end)  bonuses.push(`+${item.end} END`);
+            if (item.amb)  bonuses.push(`+${item.amb} AMB`);
+            if (item.har)  bonuses.push(`+${item.har} HAR`);
             bonusText = bonuses.length > 0 ? `<div class="slot-bonus">${bonuses.join(', ')}</div>` : '';
+            const dmgParts = [];
+            [1,2,3,4].forEach(n => {
+                if (item[`dmg${n}`]) dmgParts.push(item[`dmg_type_${n}`] ? `${item[`dmg${n}`]} ${item[`dmg_type_${n}`]}` : `${item[`dmg${n}`]}`);
+            });
+            if (item.armor) dmgParts.push(`${item.armor} Armor`);
+            const dmgStr   = dmgParts.join(' + ');
+            const delayStr = item.delay != null ? `Delay ${item.delay}` : '';
+            const combined = [dmgStr, delayStr].filter(Boolean).join(' · ');
+            dmgText  = combined ? `<div class="slot-bonus">${combined}</div>` : '';
+            descText = item.description ? `<div class="slot-desc">${item.description}</div>` : '';
         }
-        
+
         slotEl.innerHTML = `
             <div class="slot-type">${slot}</div>
             <div class="slot-item">${item ? item.name : '(Empty)'}</div>
+            ${dmgText}
             ${bonusText}
+            ${descText}
         `;
         
         if (item) {
