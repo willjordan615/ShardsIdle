@@ -56,7 +56,7 @@ function createGearTooltip(item) {
 
     // Item type and tier
     content += `<div style="color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 0.5rem;">`;
-    content += `${item.type.toUpperCase()}`;
+    content += `${item.type.toUpperCase()}${item.two_handed ? ' • Two-Handed' : ''}`;
     if (item.tier !== undefined) content += ` • Tier ${item.tier}`;
     content += `</div>`;
 

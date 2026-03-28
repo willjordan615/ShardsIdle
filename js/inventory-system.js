@@ -569,6 +569,18 @@ async function equipItemNew(characterId, itemId, inventoryIndex) {
         targetSlot = character.equipment?.accessory1 ? 'accessory2' : 'accessory1';
     }
 
+    // 4a. Block equipping into offHand if mainHand holds a two-handed weapon
+    if (targetSlot === 'offHand') {
+        const mainHandVal = character.equipment?.mainHand;
+        if (mainHandVal) {
+            const mainHandDef = _itemDef(_eqId(mainHandVal));
+            if (mainHandDef?.two_handed) {
+                if (typeof showError === 'function') showError(`${mainHandDef.name} requires both hands.`);
+                return;
+            }
+        }
+    }
+
     // 4. Perform Swap (Move current equipment to inventory)
     const currentSlotVal = character.equipment?.[targetSlot];
     if (currentSlotVal) {
@@ -578,6 +590,20 @@ async function equipItemNew(characterId, itemId, inventoryIndex) {
             ...(cur.itemDescription ? { itemDescription: cur.itemDescription } : {}),
             ...(cur._rolls          ? { _rolls:          cur._rolls          } : {}),
         });
+    }
+
+    // 4b. If equipping a two-handed weapon, clear offHand and return it to inventory
+    if (def.two_handed && targetSlot === 'mainHand') {
+        const offHandVal = character.equipment?.offHand;
+        if (offHandVal) {
+            const oh = _eqEntry(offHandVal);
+            _safeInventory(character).push({ itemID: oh.itemID, rarity: 'common', acquiredAt: Date.now(),
+                ...(oh.itemName        ? { itemName:        oh.itemName        } : {}),
+                ...(oh.itemDescription ? { itemDescription: oh.itemDescription } : {}),
+                ...(oh._rolls          ? { _rolls:          oh._rolls          } : {}),
+            });
+            character.equipment.offHand = null;
+        }
     }
 
     // 5. Equip New Item — store { itemID, itemName, itemDescription, _rolls } to preserve instance data
