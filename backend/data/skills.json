@@ -11926,5 +11926,196 @@
       }
     ],
     "enemyUsable": false
+  },
+  {
+    "id": "purge",
+    "name": "Purge",
+    "description": "Forces a toxic agent from the body through brute chemistry rather than magical technique. Crude. Effective. Tastes terrible.",
+    "category": "CONSUMABLE_HEALING",
+    "isChildSkill": false,
+    "isStarterSkill": false,
+    "parentSkills": [],
+    "basePower": 0.0,
+    "cost": {},
+    "delay": 0,
+    "enemyUsable": false,
+    "effects": [
+      {
+        "type": "cleanse_debuffs",
+        "targets": "self"
+      }
+    ],
+    "tags": [
+      "healing"
+    ]
+  },
+  {
+    "id": "elixir_of_vitality",
+    "name": "Elixir of Vitality",
+    "description": "A draught refined beyond ordinary alchemy \u2014 it mends wounds and scours the body of afflictions simultaneously.",
+    "category": "CONSUMABLE_HEALING",
+    "isChildSkill": false,
+    "isStarterSkill": false,
+    "parentSkills": [],
+    "basePower": 1.5,
+    "cost": {},
+    "delay": 0,
+    "enemyUsable": false,
+    "effects": [
+      {
+        "type": "heal",
+        "targets": "self",
+        "scalesBy": "harmony",
+        "magnitude": 1.5
+      },
+      {
+        "type": "cleanse_debuffs",
+        "targets": "self"
+      }
+    ],
+    "tags": [
+      "healing"
+    ]
+  },
+  {
+    "id": "heal_minor",
+    "name": "Minor Heal",
+    "description": "A small restorative draught. Closes surface wounds.",
+    "category": "CONSUMABLE_HEALING",
+    "isChildSkill": false,
+    "isStarterSkill": false,
+    "parentSkills": [],
+    "basePower": 0.0,
+    "cost": {},
+    "delay": 0,
+    "enemyUsable": false,
+    "effects": [
+      {
+        "type": "heal",
+        "targets": "self",
+        "scalesBy": "flat",
+        "flatAmount": 15
+      }
+    ],
+    "tags": [
+      "healing"
+    ]
+  },
+  {
+    "id": "restore_stam",
+    "name": "Stamina Restoration",
+    "description": "Drives back exhaustion meaningfully.",
+    "category": "RESTORATION",
+    "isChildSkill": false,
+    "isStarterSkill": false,
+    "parentSkills": [],
+    "basePower": 0.45,
+    "cost": {},
+    "delay": 0,
+    "enemyUsable": false,
+    "effects": [
+      {
+        "type": "restore_resource",
+        "targets": "self",
+        "resource": "stamina",
+        "scalesBy": "basePower",
+        "magnitude": 0.45
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "restore_stam_major",
+    "name": "Major Stamina Restoration",
+    "description": "Banishes fatigue entirely.",
+    "category": "RESTORATION",
+    "isChildSkill": false,
+    "isStarterSkill": false,
+    "parentSkills": [],
+    "basePower": 0.9,
+    "cost": {},
+    "delay": 0,
+    "enemyUsable": false,
+    "effects": [
+      {
+        "type": "restore_resource",
+        "targets": "self",
+        "resource": "stamina",
+        "scalesBy": "basePower",
+        "magnitude": 0.9
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "restore_mana_major2",
+    "name": "Major Mana Restoration",
+    "description": "Fully replenishes most casters' reserves.",
+    "category": "RESTORATION",
+    "isChildSkill": false,
+    "isStarterSkill": false,
+    "parentSkills": [],
+    "basePower": 0.9,
+    "cost": {},
+    "delay": 0,
+    "enemyUsable": false,
+    "effects": [
+      {
+        "type": "restore_resource",
+        "targets": "self",
+        "resource": "mana",
+        "scalesBy": "basePower",
+        "magnitude": 0.9
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "heal_standard",
+    "name": "Heal",
+    "description": "A reliable healing draught that mends significant wounds.",
+    "category": "CONSUMABLE_HEALING",
+    "isChildSkill": false,
+    "isStarterSkill": false,
+    "parentSkills": [],
+    "basePower": 0.0,
+    "cost": {},
+    "delay": 0,
+    "enemyUsable": false,
+    "effects": [
+      {
+        "type": "heal",
+        "targets": "self",
+        "scalesBy": "flat",
+        "flatAmount": 60
+      }
+    ],
+    "tags": [
+      "healing"
+    ]
+  },
+  {
+    "id": "heal_major2",
+    "name": "Major Heal",
+    "description": "A powerful restorative that closes even grievous wounds.",
+    "category": "CONSUMABLE_HEALING",
+    "isChildSkill": false,
+    "isStarterSkill": false,
+    "parentSkills": [],
+    "basePower": 0.0,
+    "cost": {},
+    "delay": 0,
+    "enemyUsable": false,
+    "effects": [
+      {
+        "type": "heal",
+        "targets": "self",
+        "scalesBy": "flat",
+        "flatAmount": 150
+      }
+    ],
+    "tags": [
+      "healing"
+    ]
   }
 ]

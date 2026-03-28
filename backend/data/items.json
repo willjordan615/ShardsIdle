@@ -14838,7 +14838,8 @@
     "extra_cost": null,
     "description": "A bubbling crimson potion that grants temporary strength.",
     "tier": 1,
-    "skillID": "buff_strength"
+    "skillID": "buff_strength",
+    "goldValue": 18
   },
   {
     "id": "consumable_potion_defense_buff",
@@ -14879,7 +14880,8 @@
     "extra_cost": null,
     "description": "A shimmering silver potion that grants temporary defense.",
     "tier": 1,
-    "skillID": "buff_defense"
+    "skillID": "buff_defense",
+    "goldValue": 18
   },
   {
     "id": "consumable_potion_speed_buff",
@@ -14920,7 +14922,8 @@
     "extra_cost": null,
     "description": "A clear liquid that grants temporary movement speed.",
     "tier": 1,
-    "skillID": "buff_speed"
+    "skillID": "buff_speed",
+    "goldValue": 18
   },
   {
     "id": "consumable_scroll_fireball",
@@ -14961,7 +14964,8 @@
     "extra_cost": null,
     "description": "A parchment inscribed with fire magic runes.",
     "tier": 1,
-    "skillID": "skill_fireball"
+    "skillID": "skill_fireball",
+    "goldValue": 35
   },
   {
     "id": "consumable_scroll_lightning",
@@ -15002,7 +15006,8 @@
     "extra_cost": null,
     "description": "A crackling scroll that releases electric energy.",
     "tier": 2,
-    "skillID": "skill_lightning"
+    "skillID": "skill_lightning",
+    "goldValue": 40
   },
   {
     "id": "consumable_scroll_teleport",
@@ -15043,7 +15048,8 @@
     "extra_cost": null,
     "description": "A mystical scroll that bends space for instant travel.",
     "tier": 3,
-    "skillID": "skill_teleport"
+    "skillID": "skill_teleport",
+    "goldValue": 60
   },
   {
     "id": "consumable_scroll_resurrection",
@@ -15084,7 +15090,8 @@
     "extra_cost": 100,
     "description": "A sacred scroll that returns the fallen to life.",
     "tier": 5,
-    "skillID": "skill_resurrect"
+    "skillID": "skill_resurrect",
+    "goldValue": 150
   },
   {
     "id": "consumable_bomb_fire",
@@ -15125,7 +15132,8 @@
     "extra_cost": null,
     "description": "An explosive device that ignites everything nearby.",
     "tier": 2,
-    "skillID": "proc_burn_aoe"
+    "skillID": "proc_burn_aoe",
+    "goldValue": 25
   },
   {
     "id": "consumable_bomb_ice",
@@ -15166,48 +15174,8 @@
     "extra_cost": null,
     "description": "A crystalline bomb that freezes the battlefield.",
     "tier": 2,
-    "skillID": "proc_chill_aoe"
-  },
-  {
-    "id": "consumable_bomb_smoke",
-    "name": "Smoke Bomb",
-    "type": "bomb",
-    "slot_id1": "consumable",
-    "slot_id2": null,
-    "dmg_type_1": null,
-    "dmg1": null,
-    "dmg_type_2": null,
-    "dmg2": null,
-    "dmg_type_3": null,
-    "dmg3": null,
-    "dmg_type_4": null,
-    "dmg4": null,
-    "delay": null,
-    "armor": null,
-    "phys_ev": null,
-    "mag_ev": null,
-    "hp": null,
-    "mana": null,
-    "stam": null,
-    "con": null,
-    "end": null,
-    "amb": null,
-    "har": null,
-    "effect_skillid": "proc_stealth",
-    "effect_ct": 1,
-    "consumable": true,
-    "stackable": true,
-    "unique": false,
-    "onhit_skillid_1": null,
-    "onhit_skillchance_1": null,
-    "onhit_skillid_2": null,
-    "onhit_skillchance_2": null,
-    "onhit_skillid_3": null,
-    "onhit_skillchance_3": null,
-    "extra_cost": null,
-    "description": "Creates a thick cloud for escaping combat.",
-    "tier": 1,
-    "skillID": "proc_stealth"
+    "skillID": "proc_chill_aoe",
+    "goldValue": 25
   },
   {
     "id": "consumable_bomb_flash",
@@ -15248,7 +15216,8 @@
     "extra_cost": null,
     "description": "Blinds and disorients enemies with brilliant light.",
     "tier": 2,
-    "skillID": "proc_stun_aoe"
+    "skillID": "proc_stun_aoe",
+    "goldValue": 20
   },
   {
     "id": "consumable_poison_blade",
@@ -15619,7 +15588,8 @@
     "extra_cost": null,
     "description": "Spiked balls that slow pursuing enemies.",
     "tier": 1,
-    "skillID": "deploy_caltrops"
+    "skillID": "deploy_caltrops",
+    "goldValue": 12
   },
   {
     "id": "consumable_trap_bear",
@@ -15660,7 +15630,8 @@
     "extra_cost": null,
     "description": "Heavy trap that immobilizes large creatures.",
     "tier": 2,
-    "skillID": "deploy_trap_stun"
+    "skillID": "deploy_trap_stun",
+    "goldValue": 22
   },
   {
     "id": "consumable_crystal_resurrection",
@@ -16056,8 +16027,8 @@
     "end": null,
     "amb": null,
     "har": null,
-    "skillID": "first_aid",
-    "effect_skillid": "first_aid",
+    "skillID": "heal_minor",
+    "effect_skillid": "heal_minor",
     "effect_ct": 1,
     "consumable": true,
     "stackable": true,
@@ -16100,8 +16071,8 @@
     "end": null,
     "amb": null,
     "har": null,
-    "skillID": "heal_major",
-    "effect_skillid": "heal_major",
+    "skillID": "heal_standard",
+    "effect_skillid": "heal_standard",
     "effect_ct": 1,
     "consumable": true,
     "stackable": true,
@@ -20665,7 +20636,7 @@
     "end": null,
     "amb": null,
     "har": null,
-    "effect_skillid": "restore_stam_minor",
+    "effect_skillid": "restore_stam",
     "effect_ct": 1,
     "consumable": true,
     "stackable": true,
@@ -20680,7 +20651,7 @@
     "description": "An amber vial that drives back exhaustion and restores meaningful stamina.",
     "tier": 3,
     "goldValue": 28,
-    "skillID": "restore_stam_minor",
+    "skillID": "restore_stam",
     "rarity": "uncommon",
     "maxStack": 10
   },
@@ -20709,7 +20680,7 @@
     "end": null,
     "amb": null,
     "har": null,
-    "effect_skillid": "heal_major",
+    "effect_skillid": "heal_major2",
     "effect_ct": 1,
     "consumable": true,
     "stackable": true,
@@ -20724,7 +20695,7 @@
     "description": "A deep red vial pulsing with restorative energy. Closes even grievous wounds.",
     "tier": 5,
     "goldValue": 80,
-    "skillID": "heal_major",
+    "skillID": "heal_major2",
     "rarity": "rare",
     "maxStack": 10
   },
@@ -20753,7 +20724,7 @@
     "end": null,
     "amb": null,
     "har": null,
-    "effect_skillid": "restore_mana_major",
+    "effect_skillid": "restore_mana_major2",
     "effect_ct": 1,
     "consumable": true,
     "stackable": true,
@@ -20768,7 +20739,7 @@
     "description": "A vial of condensed arcane essence. Fully replenishes most casters's reserves.",
     "tier": 5,
     "goldValue": 80,
-    "skillID": "restore_mana_major",
+    "skillID": "restore_mana_major2",
     "rarity": "rare",
     "maxStack": 10
   },
@@ -20797,7 +20768,7 @@
     "end": null,
     "amb": null,
     "har": null,
-    "effect_skillid": "restore_stam_minor",
+    "effect_skillid": "restore_stam_major",
     "effect_ct": 1,
     "consumable": true,
     "stackable": true,
@@ -20812,7 +20783,7 @@
     "description": "A potent amber draught that banishes fatigue entirely and restores full stamina reserves.",
     "tier": 5,
     "goldValue": 75,
-    "skillID": "restore_stam_minor",
+    "skillID": "restore_stam_major",
     "rarity": "rare",
     "maxStack": 10
   },
@@ -20841,7 +20812,7 @@
     "end": null,
     "amb": null,
     "har": null,
-    "effect_skillid": "cleanse",
+    "effect_skillid": "purge",
     "effect_ct": 1,
     "consumable": true,
     "stackable": true,
@@ -20856,7 +20827,7 @@
     "description": "A bitter tincture that purges poison, disease, and minor curses from the body.",
     "tier": 2,
     "goldValue": 18,
-    "skillID": "cleanse",
+    "skillID": "purge",
     "rarity": "common",
     "maxStack": 10
   },
@@ -20885,7 +20856,7 @@
     "end": null,
     "amb": null,
     "har": null,
-    "effect_skillid": "heal_major",
+    "effect_skillid": "elixir_of_vitality",
     "effect_ct": 1,
     "consumable": true,
     "stackable": false,
@@ -20900,7 +20871,7 @@
     "description": "A luminous golden draught that fully restores health and cleanses all debuffs. Alchemists guard the recipe jealously.",
     "tier": 6,
     "goldValue": 200,
-    "skillID": "heal_major",
+    "skillID": "elixir_of_vitality",
     "rarity": "rare",
     "maxStack": 1
   },
