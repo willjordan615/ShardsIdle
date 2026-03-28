@@ -505,7 +505,7 @@
     "name": "Deploy Caltrops",
     "category": "TRAP",
     "description": "Deploy caltrops to damage enemies.",
-    "basePower": 0.8,
+    "basePower": 0.0,
     "costType": "none",
     "costAmount": 0,
     "requiredLevel": 1,
@@ -521,11 +521,17 @@
     },
     "effects": [
       {
-        "type": "damage",
+        "type": "apply_debuff",
         "targets": "all_enemies",
-        "scalesBy": "basePower",
-        "damageType": "physical",
-        "magnitude": 0.8
+        "debuff": "slow",
+        "duration": 2
+      },
+      {
+        "type": "apply_debuff",
+        "targets": "all_enemies",
+        "debuff": "bleed",
+        "duration": 2,
+        "magnitude": 1
       }
     ]
   },
@@ -553,7 +559,7 @@
         "type": "apply_debuff",
         "targets": "all_enemies",
         "debuff": "stun",
-        "chance": 0.6,
+        "chance": 0.25,
         "duration": 1
       }
     ],
@@ -1513,7 +1519,7 @@
     "effects": [
       {
         "type": "restore_resource",
-        "targets": "single_ally",
+        "targets": "self",
         "resource": "mana",
         "scalesBy": "basePower",
         "magnitude": 0.8
@@ -2031,206 +2037,6 @@
         "type": "utility",
         "targets": "self",
         "utility": "unlock"
-      }
-    ]
-  },
-  {
-    "id": "use_escape_rope",
-    "name": "Use Escape Rope",
-    "category": "CONSUMABLE_ESCAPE",
-    "description": "Use a rope to escape from danger.",
-    "basePower": 0.0,
-    "costType": "none",
-    "costAmount": 0,
-    "requiredLevel": 1,
-    "scalingFactors": {
-      "conviction": 0.5,
-      "ambition": 0.5
-    },
-    "baseHitChance": 1.0,
-    "critChance": 0.0,
-    "delay": 1000,
-    "hitCount": {
-      "fixed": 1
-    },
-    "effects": [
-      {
-        "type": "utility",
-        "targets": "self",
-        "utility": "escape"
-      }
-    ]
-  },
-  {
-    "id": "use_health_potion",
-    "name": "Use Health Potion",
-    "category": "CONSUMABLE_HEALING",
-    "description": "Drink a health potion to restore HP.",
-    "basePower": 0.4,
-    "costType": "none",
-    "costAmount": 0,
-    "requiredLevel": 1,
-    "scalingFactors": {
-      "conviction": 0.3,
-      "harmony": 0.7
-    },
-    "baseHitChance": 1.0,
-    "critChance": 0.0,
-    "delay": 900,
-    "hitCount": {
-      "fixed": 1
-    },
-    "effects": [
-      {
-        "type": "heal",
-        "targets": "self",
-        "scalesBy": "basePower",
-        "magnitude": 0.4
-      }
-    ]
-  },
-  {
-    "id": "use_health_potion_minor",
-    "name": "Use Health Potion",
-    "category": "CONSUMABLE_HEALING",
-    "description": "Drink a health potion to restore HP.",
-    "basePower": 0.25,
-    "costType": "none",
-    "costAmount": 0,
-    "requiredLevel": 1,
-    "scalingFactors": {
-      "conviction": 0.3,
-      "harmony": 0.7
-    },
-    "baseHitChance": 1.0,
-    "critChance": 0.0,
-    "delay": 800,
-    "hitCount": {
-      "fixed": 1
-    },
-    "effects": [
-      {
-        "type": "heal",
-        "targets": "self",
-        "scalesBy": "basePower",
-        "magnitude": 0.25
-      }
-    ]
-  },
-  {
-    "id": "use_mana_potion",
-    "name": "Use Mana Potion",
-    "category": "CONSUMABLE_RESTORATION",
-    "description": "Drink a mana potion to restore mana.",
-    "basePower": 0.35,
-    "costType": "none",
-    "costAmount": 0,
-    "requiredLevel": 1,
-    "scalingFactors": {
-      "conviction": 0.2,
-      "endurance": 0.5,
-      "harmony": 0.3
-    },
-    "baseHitChance": 1.0,
-    "critChance": 0.0,
-    "delay": 800,
-    "hitCount": {
-      "fixed": 1
-    },
-    "effects": [
-      {
-        "type": "restore_resource",
-        "targets": "self",
-        "resource": "mana",
-        "scalesBy": "basePower",
-        "magnitude": 0.35
-      }
-    ]
-  },
-  {
-    "id": "use_mana_potion_minor",
-    "name": "Use Mana Potion",
-    "category": "CONSUMABLE_RESTORATION",
-    "description": "Drink a mana potion to restore mana.",
-    "basePower": 0.2,
-    "costType": "none",
-    "costAmount": 0,
-    "requiredLevel": 1,
-    "scalingFactors": {
-      "conviction": 0.2,
-      "endurance": 0.5,
-      "harmony": 0.3
-    },
-    "baseHitChance": 1.0,
-    "critChance": 0.0,
-    "delay": 700,
-    "hitCount": {
-      "fixed": 1
-    },
-    "effects": [
-      {
-        "type": "restore_resource",
-        "targets": "self",
-        "resource": "mana",
-        "scalesBy": "basePower",
-        "magnitude": 0.2
-      }
-    ]
-  },
-  {
-    "id": "use_smoke_bomb",
-    "name": "Use Smoke Bomb",
-    "category": "CONSUMABLE_ESCAPE",
-    "description": "Use a smoke bomb to escape from danger.",
-    "basePower": 0.0,
-    "costType": "none",
-    "costAmount": 0,
-    "requiredLevel": 1,
-    "scalingFactors": {
-      "conviction": 0.5,
-      "ambition": 0.5
-    },
-    "baseHitChance": 1.0,
-    "critChance": 0.0,
-    "delay": 800,
-    "hitCount": {
-      "fixed": 1
-    },
-    "effects": [
-      {
-        "type": "utility",
-        "targets": "self",
-        "utility": "escape"
-      }
-    ]
-  },
-  {
-    "id": "use_stamina_potion_minor",
-    "name": "Use Stamina Potion",
-    "category": "CONSUMABLE_RESTORATION",
-    "description": "Drink a stamina potion to restore stamina.",
-    "basePower": 0.25,
-    "costType": "none",
-    "costAmount": 0,
-    "requiredLevel": 1,
-    "scalingFactors": {
-      "conviction": 0.2,
-      "endurance": 0.5,
-      "harmony": 0.3
-    },
-    "baseHitChance": 1.0,
-    "critChance": 0.0,
-    "delay": 800,
-    "hitCount": {
-      "fixed": 1
-    },
-    "effects": [
-      {
-        "type": "restore_resource",
-        "targets": "self",
-        "resource": "stamina",
-        "scalesBy": "basePower",
-        "magnitude": 0.25
       }
     ]
   },
@@ -2989,10 +2795,10 @@
     "isStarterSkill": false,
     "parentSkills": [
       "first_aid",
-      "use_health_potion_minor"
+      "heal_major"
     ],
     "procChance": 0.05,
-    "basePower": 0.9,
+    "basePower": 0.52,
     "costType": "stamina",
     "costAmount": 8,
     "requiredLevel": 1,
@@ -3011,7 +2817,7 @@
         "type": "heal",
         "targets": "single_ally",
         "scalesBy": "harmony",
-        "magnitude": 0.35
+        "magnitude": 0.52
       }
     ],
     "masteryUnlockAt": 300,
@@ -11848,7 +11654,7 @@
       "arcane"
     ]
   },
-   {
+  {
     "id": "proc_slow",
     "name": "Slow",
     "category": "DAMAGE_PROC",
