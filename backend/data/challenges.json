@@ -1070,6 +1070,10 @@
           "itemID": "mana_potion_minor",
           "dropChance": 0.35,
           "rarity": "common"
+        },
+        {
+          "itemID": "polearm_aethelgard_tier4",
+          "dropChance": 0.12
         }
       ]
     },
@@ -1712,6 +1716,10 @@
           "itemID": "oath_stone",
           "dropChance": 0.2,
           "rarity": "uncommon"
+        },
+        {
+          "itemID": "polearm_ferryman_tier1",
+          "dropChance": 0.12
         }
       ],
       "secretLootTable": [
@@ -3229,6 +3237,10 @@
         {
           "itemID": "bell_copper_tier1",
           "dropChance": 0.24
+        },
+        {
+          "itemID": "staff_hearth_tier2",
+          "dropChance": 0.12
         }
       ],
       "secretLootTable": [
@@ -6570,6 +6582,10 @@
         {
           "itemID": "totem_ancient_tier2",
           "dropChance": 0.22
+        },
+        {
+          "itemID": "staff_scribe_tier3",
+          "dropChance": 0.12
         }
       ],
       "secretLootTable": [
@@ -8343,6 +8359,10 @@
         {
           "itemID": "totem_celestial_tier4",
           "dropChance": 0.26
+        },
+        {
+          "itemID": "greatsword_verdict_tier5",
+          "dropChance": 0.12
         }
       ],
       "secretLootTable": [
