@@ -1,3 +1,40 @@
+// Color a rolled stat value relative to its base value.
+// Returns a CSS color string.
+function _rollColor(base, rolled) {
+    if (!base || base === 0) return 'inherit';
+    const ratio = rolled / base;
+    if (ratio < 1.0)   return '#888888'; // gray  — below base
+    if (ratio < 1.10)  return '#cccccc'; // white — at or near base
+    if (ratio < 1.25)  return '#4cd964'; // green
+    if (ratio < 1.50)  return '#5ab4ff'; // blue
+    if (ratio < 1.80)  return '#c77dff'; // purple
+    return '#ffd700';                    // gold  — exceptional
+}
+
+// Resolve display value and color for a stat, considering _rolls.
+function _statDisplay(item, key, base) {
+    const rolled = item._rolls?.[key];
+    if (rolled == null) return { val: base, color: '#cccccc' };
+    return { val: rolled, color: _rollColor(base, rolled) };
+}
+
+// Overall item quality color for the name — driven by best single-stat roll ratio.
+function _itemQualityColor(item) {
+    if (!item._rolls) return 'var(--gold)';
+    const STAT_KEYS = ['dmg1','dmg2','dmg3','armor','phys_ev','mag_ev','hp','mana','stam','con','end','amb','har'];
+    let best = 1.0;
+    STAT_KEYS.forEach(k => {
+        const base = item[k];
+        const rolled = item._rolls[k];
+        if (base && rolled) best = Math.max(best, rolled / base);
+    });
+    if (best < 1.10)  return '#cccccc';
+    if (best < 1.25)  return '#4cd964';
+    if (best < 1.50)  return '#5ab4ff';
+    if (best < 1.80)  return '#c77dff';
+    return '#ffd700';
+}
+
 /**
  * Create and show a tooltip for a gear item
  */
@@ -13,59 +50,75 @@ function createGearTooltip(item) {
         pointer-events: none;
         box-sizing: border-box;
     `;
-    
-    let content = `<div style="font-weight: 700; margin-bottom: 0.4rem; font-size: 0.9rem; color: var(--gold); font-family: var(--font-display); letter-spacing: 0.04em;">${item.name}</div>`;
-    
+
+    const nameColor = _itemQualityColor(item);
+    let content = `<div style="font-weight: 700; margin-bottom: 0.4rem; font-size: 0.9rem; color: ${nameColor}; font-family: var(--font-display); letter-spacing: 0.04em;">${item.name}</div>`;
+
     // Item type and tier
     content += `<div style="color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 0.5rem;">`;
     content += `${item.type.toUpperCase()}`;
     if (item.tier !== undefined) content += ` • Tier ${item.tier}`;
     content += `</div>`;
-    
+
     // Description
     if (item.description) {
         content += `<div style="color: var(--text-secondary); margin-bottom: 0.5rem; font-size: 0.8rem;">${item.description}</div>`;
     }
-    
+
     // Damage
     if (item.dmg1) {
+        const d1 = _statDisplay(item, 'dmg1', item.dmg1);
         content += `<div style="color: #ff7070; margin-top: 0.5rem;">`;
-        content += `<strong>Damage:</strong> ${item.dmg1} ${item.dmg_type_1}`;
-        if (item.dmg2) content += ` + ${item.dmg2} ${item.dmg_type_2}`;
+        content += `<strong>Damage:</strong> <span style="color:${d1.color}">${d1.val}</span> ${item.dmg_type_1}`;
+        if (item.dmg2) {
+            const d2 = _statDisplay(item, 'dmg2', item.dmg2);
+            content += ` + <span style="color:${d2.color}">${d2.val}</span> ${item.dmg_type_2}`;
+        }
         content += `</div>`;
     }
-    
+
     // Delay
     if (item.delay !== undefined) {
         content += `<div style="color: #5ab4ff;"><strong>Delay:</strong> ${item.delay}ms</div>`;
     }
-    
+
     // Armor/Defense
     if (item.armor) {
-        content += `<div style="color: #4cd964;"><strong>Armor:</strong> ${item.armor}</div>`;
+        const a = _statDisplay(item, 'armor', item.armor);
+        content += `<div style="color: #4cd964;"><strong>Armor:</strong> <span style="color:${a.color}">${a.val}</span></div>`;
     }
-    
+
     // Evasion
     if (item.phys_ev) {
-        content += `<div style="color: #4cd964;"><strong>Phys EV:</strong> ${item.phys_ev}</div>`;
+        const ev = _statDisplay(item, 'phys_ev', item.phys_ev);
+        content += `<div style="color: #4cd964;"><strong>Phys EV:</strong> <span style="color:${ev.color}">${ev.val}</span></div>`;
     }
     if (item.mag_ev) {
-        content += `<div style="color: #4cd964;"><strong>Mag EV:</strong> ${item.mag_ev}</div>`;
+        const ev = _statDisplay(item, 'mag_ev', item.mag_ev);
+        content += `<div style="color: #4cd964;"><strong>Mag EV:</strong> <span style="color:${ev.color}">${ev.val}</span></div>`;
     }
-    
+
     // Stat bonuses
-    const statBonuses = [];
-    if (item.hp) statBonuses.push(`+${item.hp} HP`);
-    if (item.mana) statBonuses.push(`+${item.mana} Mana`);
-    if (item.con) statBonuses.push(`+${item.con} CON`);
-    if (item.end) statBonuses.push(`+${item.end} END`);
-    if (item.amb) statBonuses.push(`+${item.amb} AMB`);
-    if (item.har) statBonuses.push(`+${item.har} HAR`);
-    
+    const statBonusMap = [
+        ['hp',   'HP'],
+        ['mana', 'Mana'],
+        ['stam', 'Stam'],
+        ['con',  'CON'],
+        ['end',  'END'],
+        ['amb',  'AMB'],
+        ['har',  'HAR'],
+    ];
+    const statBonuses = statBonusMap
+        .filter(([key]) => item[key])
+        .map(([key, label]) => {
+            const d = _statDisplay(item, key, item[key]);
+            return `<span style="color:${d.color}">+${d.val} ${label}</span>`;
+        });
+
     if (statBonuses.length > 0) {
-        content += `<div style="color: var(--gold); margin-top: 0.5rem;"><strong>Bonuses:</strong><br>${statBonuses.join(', ')}</div>`;
+        content += `<div style="margin-top: 0.5rem;"><strong style="color:var(--gold)">Bonuses:</strong><br>${statBonuses.join(', ')}</div>`;
     }
-    
+
     // On-hit effects
     if (item.onhit_skillid) {
         const skill = gameData.skills.find(s => s.id === item.onhit_skillid);
@@ -75,23 +128,20 @@ function createGearTooltip(item) {
             content += `</div>`;
         }
     }
-    
+
     // Proc effects
     const procEffects = [];
     for (let key in item) {
         if (key.startsWith('proc_') && item[key]) {
             const skillId = item[key];
             const skill = gameData.skills.find(s => s.id === skillId);
-            if (skill) {
-                procEffects.push(skill.name);
-            }
+            if (skill) procEffects.push(skill.name);
         }
     }
-    
     if (procEffects.length > 0) {
         content += `<div style="color: #ffaaaa; margin-top: 0.5rem;"><strong>Procs:</strong> ${procEffects.join(', ')}</div>`;
     }
-    
+
     // Effect skill (for consumables)
     if (item.effect_skillid) {
         const skill = gameData.skills.find(s => s.id === item.effect_skillid);
@@ -101,7 +151,7 @@ function createGearTooltip(item) {
             content += `</div>`;
         }
     }
-    
+
     tooltip.innerHTML = content;
     document.body.appendChild(tooltip);
     return tooltip;

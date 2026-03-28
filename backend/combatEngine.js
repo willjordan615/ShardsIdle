@@ -469,6 +469,16 @@ class CombatEngine {
   // or an object { itemID, itemName, itemDescription } (current format).
   _eqId(val) { return (val && typeof val === 'object') ? val.itemID : val; }
 
+  // Resolve a full item object from a slot value, merging any _rolls over the base def.
+  _eqItem(val) {
+      const id = this._eqId(val);
+      if (!id) return null;
+      const base = this.gear.find(g => g.id === id);
+      if (!base) return null;
+      const rolls = (val && typeof val === 'object') ? val._rolls : null;
+      return rolls ? { ...base, ...rolls } : base;
+  }
+
   runCombat(partySnapshots, challenge) {
     const combatID = 'combat_' + crypto.randomBytes(8).toString('hex');
     const startTime = Date.now();
@@ -485,9 +495,7 @@ class CombatEngine {
       const equipmentSlots = ['mainHand', 'offHand', 'head', 'chest', 'accessory1', 'accessory2'];
       const boostedStats = { ...stats }; // don't mutate the original snapshot stats
       equipmentSlots.forEach(slot => {
-        const itemId = this._eqId(equipment[slot]);
-        if (!itemId) return;
-        const itemDef = this.gear.find(g => g.id === itemId);
+        const itemDef = this._eqItem(equipment[slot]);
         if (!itemDef) return;
         Object.entries(statFieldMap).forEach(([shortKey, longKey]) => {
           if (itemDef[shortKey]) boostedStats[longKey] = (boostedStats[longKey] || 0) + itemDef[shortKey];
@@ -501,9 +509,7 @@ class CombatEngine {
       let totalPhysEv = 0;
       let totalMagEv  = 0;
       armorSlots.forEach(slot => {
-        const itemId = this._eqId(equipment[slot]);
-        if (!itemId) return;
-        const itemDef = this.gear.find(g => g.id === itemId);
+        const itemDef = this._eqItem(equipment[slot]);
         if (!itemDef) return;
         totalArmor  += itemDef.armor   || 0;
         totalPhysEv += itemDef.phys_ev || 0;
@@ -1098,11 +1104,13 @@ calculateRewards(players, challenge, segments = []) {
         const dropChance = (lootItem.dropChance || 0.3) * (1 + (players[0]?.stats?.ambition || 0) / 500);
         if (Math.random() <= dropChance) {
             const itemDef = this.gear.find(g => g.id === lootItem.itemID);
+            const _rolls = itemDef ? this._rollItemVariance(itemDef) : null;
             rewards.lootDropped.push({
                 characterID: players[0].id,
                 itemID: lootItem.itemID,
                 itemName: itemDef?.name || lootItem.itemID,
-                rarity: lootItem.rarity
+                rarity: lootItem.rarity,
+                ...(_rolls ? { _rolls } : {})
             });
         }
     });
@@ -1113,11 +1121,13 @@ calculateRewards(players, challenge, segments = []) {
             const dropChance = (lootItem.dropChance || 0.3) * (1 + (players[0]?.stats?.ambition || 0) / 500);
             if (Math.random() <= dropChance) {
                 const itemDef = this.gear.find(g => g.id === lootItem.itemID);
+                const _rolls = itemDef ? this._rollItemVariance(itemDef) : null;
                 rewards.lootDropped.push({
                     characterID: players[0].id,
                     itemID: lootItem.itemID,
                     itemName: itemDef?.name || lootItem.itemID,
-                    rarity: lootItem.rarity
+                    rarity: lootItem.rarity,
+                    ...(_rolls ? { _rolls } : {})
                 });
             }
         });
@@ -1167,12 +1177,14 @@ calculateRewards(players, challenge, segments = []) {
                     if (tagDef) pick = this._applyLootTagFlavour(pick, tagDef);
                 }
                 if (pick) {
+                    const _rolls = this._rollItemVariance(pick);
                     rewards.lootDropped.push({
                         characterID: player.id,
                         itemID: pick.id,
                         itemName: pick.name,
                         itemDescription: pick.description,
-                        rarity: 'bonus'
+                        rarity: 'bonus',
+                        ...(_rolls ? { _rolls } : {})
                     });
                     runningChance = Math.max(BASE_CHANCE, runningChance / HIT_DIVISOR);
                 } else {
@@ -1187,6 +1199,25 @@ calculateRewards(players, challenge, segments = []) {
     }
 
     return rewards;
+}
+
+_rollItemVariance(item) {
+    // Roll variance for all non-null numeric stats on an item.
+    // Returns a _rolls object containing only the stats that exist on the item.
+    const STAT_KEYS = ['dmg1','dmg2','dmg3','armor','phys_ev','mag_ev','hp','mana','stam','con','end','amb','har'];
+    const MIN_MULT = 0.65;
+    const MAX_MULT = 1.35;
+    const rolls = {};
+    let hasRoll = false;
+    STAT_KEYS.forEach(key => {
+        const base = item[key];
+        if (base == null || base === 0) return;
+        const mult = MIN_MULT + Math.random() * (MAX_MULT - MIN_MULT);
+        const rolled = Math.max(1, Math.round(base * mult));
+        rolls[key] = rolled;
+        hasRoll = true;
+    });
+    return hasRoll ? rolls : null;
 }
 
 _applyLootTagFlavour(item, tagDef) {
