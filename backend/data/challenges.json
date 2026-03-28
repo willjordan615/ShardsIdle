@@ -240,7 +240,7 @@
             "name": "He Was Waiting",
             "spawnChance": 0.35,
             "checkType": "random",
-            "successChance": 0.0,
+            "successChance": 0,
             "successEffect": {
               "type": "narrative_only",
               "narrative": "The tent is empty. Grik drops from the ceiling."
@@ -409,7 +409,7 @@
             "name": "Poorly Timed Arrival",
             "spawnChance": 0.3,
             "checkType": "random",
-            "successChance": 0.0,
+            "successChance": 0,
             "successEffect": {
               "type": "narrative_only",
               "narrative": "The timing is perfect — the soldiers are distracted."
@@ -696,7 +696,7 @@
             "name": "Coming in Wounded",
             "spawnChance": 0.4,
             "checkType": "random",
-            "successChance": 0.0,
+            "successChance": 0,
             "successEffect": {
               "type": "narrative_only",
               "narrative": "The party arrives in better shape than expected."
@@ -1198,7 +1198,7 @@
             "name": "The Mist Thickens",
             "spawnChance": 0.3,
             "checkType": "random",
-            "successChance": 0.0,
+            "successChance": 0,
             "successEffect": {
               "type": "narrative_only",
               "narrative": "The mist parts unexpectedly, drawn back by a change in the wind."
@@ -1309,7 +1309,7 @@
           {
             "id": "roots_below_sense",
             "name": "The Lock Beneath",
-            "spawnChance": 1.0,
+            "spawnChance": 1,
             "checkType": "skill",
             "requiredSkillID": "nature_touch",
             "checkStat": "harmony",
@@ -1572,7 +1572,7 @@
           {
             "id": "ferry_bell_inscription",
             "name": "The Bell Inscription",
-            "spawnChance": 1.0,
+            "spawnChance": 1,
             "checkType": "skill",
             "requiredSkillID": "holy_light",
             "successEffect": {
@@ -1893,7 +1893,7 @@
           {
             "id": "vulture_vault_door",
             "name": "The Vault Door",
-            "spawnChance": 1.0,
+            "spawnChance": 1,
             "checkType": "skill",
             "requiredSkillID": "sense",
             "successEffect": {
@@ -2284,7 +2284,7 @@
           {
             "id": "orchard_well_inscription",
             "name": "The Well's Edge",
-            "spawnChance": 1.0,
+            "spawnChance": 1,
             "checkType": "skill",
             "requiredSkillID": "nature_touch",
             "successEffect": {
@@ -2997,7 +2997,7 @@
           {
             "id": "outpost_hearth_reading",
             "name": "The Hearth",
-            "spawnChance": 1.0,
+            "spawnChance": 1,
             "checkType": "skill",
             "requiredSkillID": "sleet",
             "successEffect": {
@@ -3403,7 +3403,7 @@
           {
             "id": "kennels_read_pack",
             "name": "Reading the Pack",
-            "spawnChance": 1.0,
+            "spawnChance": 1,
             "checkType": "skill",
             "requiredSkillID": "stalk",
             "successEffect": {
@@ -3808,7 +3808,7 @@
           {
             "id": "excavation_ward_core_resonance",
             "name": "The Breach Frequency",
-            "spawnChance": 1.0,
+            "spawnChance": 1,
             "checkType": "skill",
             "requiredSkillTag": "nature",
             "successEffect": {
@@ -4670,7 +4670,7 @@
           {
             "id": "shrine_elara_sense",
             "name": "Elara's Presence",
-            "spawnChance": 1.0,
+            "spawnChance": 1,
             "checkType": "skill",
             "requiredSkillTag": "holy",
             "successEffect": {
@@ -5061,7 +5061,7 @@
           {
             "id": "forge_kings_bench",
             "name": "The King's Bench",
-            "spawnChance": 1.0,
+            "spawnChance": 1,
             "checkType": "item",
             "requiredItemID": "ironvein_signet",
             "successEffect": {
@@ -5297,6 +5297,10 @@
         {
           "itemID": "totem_adamant_tier3",
           "dropChance": 0.26
+        },
+        {
+          "itemID": "greatsword_flame_tier3",
+          "dropChance": 0.12
         }
       ],
       "secretLootTable": [
@@ -5499,7 +5503,7 @@
           {
             "id": "watch_crystal_read",
             "name": "Thrain's Recordings",
-            "spawnChance": 1.0,
+            "spawnChance": 1,
             "checkType": "skill",
             "requiredSkillTag": "cold",
             "successEffect": {
@@ -5731,6 +5735,10 @@
         {
           "itemID": "bell_adamant_tier3",
           "dropChance": 0.24
+        },
+        {
+          "itemID": "polearm_storm_tier4",
+          "dropChance": 0.12
         }
       ],
       "secretLootTable": [
@@ -5903,7 +5911,7 @@
           {
             "id": "beacon_lyra_pulse",
             "name": "The Pulse in the Light",
-            "spawnChance": 1.0,
+            "spawnChance": 1,
             "checkType": "skill",
             "requiredSkillTag": "holy",
             "successEffect": {
@@ -6330,7 +6338,7 @@
           {
             "id": "athenaeum_sealed_section",
             "name": "The Sealed Section",
-            "spawnChance": 1.0,
+            "spawnChance": 1,
             "checkType": "skill",
             "requiredSkillTag": "shadow",
             "successEffect": {
@@ -6734,7 +6742,7 @@
           {
             "id": "bastion_ward_core",
             "name": "The Ward's Heart",
-            "spawnChance": 1.0,
+            "spawnChance": 1,
             "checkType": "skill",
             "requiredSkillTag": "nature",
             "successEffect": {
@@ -7139,7 +7147,7 @@
           {
             "id": "marsh_ley_line",
             "name": "The Corrupted Ley Line",
-            "spawnChance": 1.0,
+            "spawnChance": 1,
             "checkType": "skill",
             "requiredSkillTag": "nature",
             "successEffect": {
@@ -7577,7 +7585,7 @@
           {
             "id": "spire_vote_read",
             "name": "Read the Vote",
-            "spawnChance": 1.0,
+            "spawnChance": 1,
             "checkType": "skill",
             "requiredSkillTag": "shadow",
             "successEffect": {
@@ -8051,7 +8059,7 @@
           {
             "id": "hall_sealed_record",
             "name": "The Record Room",
-            "spawnChance": 1.0,
+            "spawnChance": 1,
             "checkType": "item",
             "requiredItemID": "ironvein_signet",
             "successEffect": {
@@ -8776,6 +8784,10 @@
           "itemID": "chest_warrior_plate_tier3",
           "dropChance": 0.15,
           "rarity": "rare"
+        },
+        {
+          "itemID": "greataxe_rage_tier5",
+          "dropChance": 0.12
         }
       ],
       "secretLootTable": [
@@ -8977,7 +8989,7 @@
           {
             "id": "gallery_oath_stone_sense",
             "name": "The First Tree Responds",
-            "spawnChance": 1.0,
+            "spawnChance": 1,
             "checkType": "item",
             "requiredItemID": "oath_stone",
             "successEffect": {
@@ -9219,6 +9231,10 @@
         {
           "itemID": "bell_void_tier4",
           "dropChance": 0.26
+        },
+        {
+          "itemID": "staff_void_tier3",
+          "dropChance": 0.12
         }
       ],
       "secretLootTable": [
