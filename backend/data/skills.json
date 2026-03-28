@@ -10216,7 +10216,7 @@
     "enemyUsable": true,
     "effects": [
       {
-        "type": "cleanse_debuffs",
+        "type": "cleanse",
         "targets": "single_ally"
       }
     ],
@@ -11941,7 +11941,7 @@
     "enemyUsable": false,
     "effects": [
       {
-        "type": "cleanse_debuffs",
+        "type": "cleanse",
         "targets": "self"
       }
     ],
@@ -11969,7 +11969,7 @@
         "magnitude": 1.5
       },
       {
-        "type": "cleanse_debuffs",
+        "type": "cleanse",
         "targets": "self"
       }
     ],

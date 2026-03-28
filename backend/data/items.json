@@ -15328,8 +15328,8 @@
     "har": null,
     "effect_skillid": "unlock_door",
     "effect_ct": 1,
-    "consumable": true,
-    "stackable": true,
+    "consumable": false,
+    "stackable": false,
     "unique": false,
     "onhit_skillid_1": null,
     "onhit_skillchance_1": null,
@@ -15338,9 +15338,10 @@
     "onhit_skillid_3": null,
     "onhit_skillchance_3": null,
     "extra_cost": null,
-    "description": "Delicate tools for opening locked containers.",
-    "tier": 0,
-    "skillID": "unlock_door"
+    "description": "A set of fine picks for guild-standard locks. Reusable.",
+    "tier": 2,
+    "skillID": "unlock_door",
+    "goldValue": 120
   },
   {
     "id": "consumable_tool_rope",
@@ -15369,8 +15370,8 @@
     "har": null,
     "effect_skillid": "climb_surface",
     "effect_ct": 1,
-    "consumable": true,
-    "stackable": true,
+    "consumable": false,
+    "stackable": false,
     "unique": false,
     "onhit_skillid_1": null,
     "onhit_skillchance_1": null,
@@ -15379,9 +15380,10 @@
     "onhit_skillid_3": null,
     "onhit_skillchance_3": null,
     "extra_cost": null,
-    "description": "Sturdy rope for scaling walls and cliffs.",
-    "tier": 0,
-    "skillID": "climb_surface"
+    "description": "Thirty feet of braided rope with iron anchor pins. Reusable.",
+    "tier": 2,
+    "skillID": "climb_surface",
+    "goldValue": 90
   },
   {
     "id": "consumable_tool_torch",
@@ -16541,7 +16543,7 @@
   {
     "id": "verdant_word_seal",
     "name": "Verdant Word Seal",
-    "description": "A seal used by the Order of the Verdant Word to mark sites under their protection. Still functional — the ward magic bound into it recognizes other Order sites and responds to them. At locations where the Order once worked, presenting this changes how the remaining spirits behave.",
+    "description": "A seal used by the Order of the Verdant Word to mark sites under their protection. Still functional \u2014 the ward magic bound into it recognizes other Order sites and responds to them. At locations where the Order once worked, presenting this changes how the remaining spirits behave.",
     "slot_id1": "consumable",
     "tier": 2,
     "skillID": "use_mana_potion_minor",
@@ -16552,7 +16554,7 @@
   {
     "id": "guild_seal",
     "name": "Merchant Guild Seal",
-    "description": "The Merchant Guild's official seal of authorization. In the Capital it opens certain doors. At the Bastion of the Fractured Ward, the Guild-funded guards still recognize it. Guildmaster Vane's personal seal carries additional weight — evidence of his family's involvement in the Verdant Word coup that someone with the right connections might find very useful.",
+    "description": "The Merchant Guild's official seal of authorization. In the Capital it opens certain doors. At the Bastion of the Fractured Ward, the Guild-funded guards still recognize it. Guildmaster Vane's personal seal carries additional weight \u2014 evidence of his family's involvement in the Verdant Word coup that someone with the right connections might find very useful.",
     "slot_id1": "consumable",
     "tier": 2,
     "skillID": "use_stamina_potion_minor",
@@ -16562,7 +16564,7 @@
   {
     "id": "oath_stone",
     "name": "Oath Stone",
-    "description": "A pact-rune stone from the Shrine of the First Oath, still holding a fragment of the original binding frequency between the halfling elders and Lyra. At sites where the pact is actively breaking — the Marsh of Broken Oaths, the Salt-Wept Beacon — presenting this temporarily stabilizes the ward. It does not fix anything. It buys time.",
+    "description": "A pact-rune stone from the Shrine of the First Oath, still holding a fragment of the original binding frequency between the halfling elders and Lyra. At sites where the pact is actively breaking \u2014 the Marsh of Broken Oaths, the Salt-Wept Beacon \u2014 presenting this temporarily stabilizes the ward. It does not fix anything. It buys time.",
     "slot_id1": "consumable",
     "tier": 2,
     "skillID": "use_mana_potion_minor",
@@ -16573,7 +16575,7 @@
   {
     "id": "ironvein_signet",
     "name": "Ironvein Ancestral Signet",
-    "description": "A signet ring bearing the mark of the Ironvein Forge-Kings — not the current Loyalist faction, but the original line that the ancestors served. At the Hall of Ancestral Echoes, the spirits recognize it. It does not grant safe passage. It grants acknowledgment, which is different and more useful.",
+    "description": "A signet ring bearing the mark of the Ironvein Forge-Kings \u2014 not the current Loyalist faction, but the original line that the ancestors served. At the Hall of Ancestral Echoes, the spirits recognize it. It does not grant safe passage. It grants acknowledgment, which is different and more useful.",
     "slot_id1": "consumable",
     "tier": 3,
     "skillID": "use_stamina_potion_minor",
@@ -16583,7 +16585,7 @@
   {
     "id": "monitoring_crystal",
     "name": "Monitoring Crystal",
-    "description": "A calibrated crystal from the joint dwarven watchtower above the Sunken Sanctum. It was designed to track the water spirit's resonance frequency. At the Sanctum itself, it still works — revealing patterns in Archbishop Malacor's movements that a party without it cannot see.",
+    "description": "A calibrated crystal from the joint dwarven watchtower above the Sunken Sanctum. It was designed to track the water spirit's resonance frequency. At the Sanctum itself, it still works \u2014 revealing patterns in Archbishop Malacor's movements that a party without it cannot see.",
     "slot_id1": "consumable",
     "tier": 3,
     "skillID": "use_mana_potion_minor",
@@ -16594,7 +16596,7 @@
   {
     "id": "athenaeum_scroll",
     "name": "Athenaeum Sealed Scroll",
-    "description": "A scroll from the Whispering Athenaeum's restricted archive. The wax seal bears the mark of the High Council of the Verdant Word — the same council whose disappearance the Capital sealed the Spire of Silent Conviction to contain. The scroll is addressed to someone by name. The name has been redacted.",
+    "description": "A scroll from the Whispering Athenaeum's restricted archive. The wax seal bears the mark of the High Council of the Verdant Word \u2014 the same council whose disappearance the Capital sealed the Spire of Silent Conviction to contain. The scroll is addressed to someone by name. The name has been redacted.",
     "slot_id1": "consumable",
     "tier": 2,
     "skillID": "use_mana_potion_minor",
@@ -16605,7 +16607,7 @@
   {
     "id": "ancestral_verdict",
     "name": "Ancestral Verdict",
-    "description": "A sealed record from the Hall of Ancestral Echoes bearing the High Judge's mark — the formal outcome of Thorgrim's assessment of the succession claimants. Both factions know this document exists. Neither faction wants it read publicly. In the right hands at the right location, it is the most dangerous piece of paper in Khaz-Morad.",
+    "description": "A sealed record from the Hall of Ancestral Echoes bearing the High Judge's mark \u2014 the formal outcome of Thorgrim's assessment of the succession claimants. Both factions know this document exists. Neither faction wants it read publicly. In the right hands at the right location, it is the most dangerous piece of paper in Khaz-Morad.",
     "slot_id1": "consumable",
     "tier": 3,
     "skillID": "use_stamina_potion_minor",
@@ -16635,7 +16637,7 @@
   {
     "id": "seed_of_first_tree",
     "name": "Seed of the First Tree",
-    "description": "A seed from the First Tree of the Silverbough, given by the Preservation Core or taken from the Fragment's Reckoning. It carries the oldest nature magic in the Vale — pre-Verdant Word, pre-pact, pre-Fraying. At the Sunken Sanctum of Aethelgard, it can purify a portion of the water corruption permanently, reducing the Archbishop's power in the final encounter. The elves made this possible fifty years ago by choosing not to use it.",
+    "description": "A seed from the First Tree of the Silverbough, given by the Preservation Core or taken from the Fragment's Reckoning. It carries the oldest nature magic in the Vale \u2014 pre-Verdant Word, pre-pact, pre-Fraying. At the Sunken Sanctum of Aethelgard, it can purify a portion of the water corruption permanently, reducing the Archbishop's power in the final encounter. The elves made this possible fifty years ago by choosing not to use it.",
     "slot_id1": "consumable",
     "tier": 3,
     "skillID": "use_mana_potion_minor",
@@ -16646,7 +16648,7 @@
   {
     "id": "weapon_lyra_current",
     "name": "Lyra's Current",
-    "description": "Not a weapon — the force of a river spirit's attention made physical. Contact with it carries the cold weight of deep water.",
+    "description": "Not a weapon \u2014 the force of a river spirit's attention made physical. Contact with it carries the cold weight of deep water.",
     "slot_id1": "mainHand",
     "tier": 2,
     "rarity": "unique",
@@ -16711,7 +16713,7 @@
   {
     "id": "weapon_alpha_bite",
     "name": "Corrupted Bite",
-    "description": "The Alpha's jaw has been reshaping for five years under exposure to the Whispering Woods' residual magic. What its bite transfers now is not venom — it is a low-grade nature confusion that the woods have been perfecting for centuries.",
+    "description": "The Alpha's jaw has been reshaping for five years under exposure to the Whispering Woods' residual magic. What its bite transfers now is not venom \u2014 it is a low-grade nature confusion that the woods have been perfecting for centuries.",
     "slot_id1": "mainHand",
     "tier": 2,
     "rarity": "unique",
@@ -16744,7 +16746,7 @@
   {
     "id": "weapon_purifying_touch",
     "name": "Purifying Touch",
-    "description": "Elara's hands carry fifty years of the First Tree's magic. Contact with them applies the Gallery's purification protocol directly — stripping mana access the way a surgeon strips infected tissue. She does not experience this as violence.",
+    "description": "Elara's hands carry fifty years of the First Tree's magic. Contact with them applies the Gallery's purification protocol directly \u2014 stripping mana access the way a surgeon strips infected tissue. She does not experience this as violence.",
     "slot_id1": "mainHand",
     "tier": 3,
     "rarity": "unique",
@@ -16793,7 +16795,7 @@
     "onhit_skillid_3": null,
     "onhit_skillchance_3": null,
     "extra_cost": null,
-    "description": "The bite of a hunting hound — not venomous, but the tearing grip draws blood.",
+    "description": "The bite of a hunting hound \u2014 not venomous, but the tearing grip draws blood.",
     "tier": -1,
     "type": "dagger",
     "creatureOnly": true
@@ -20912,7 +20914,7 @@
     "onhit_skillid_3": null,
     "onhit_skillchance_3": null,
     "extra_cost": null,
-    "description": "A proper cooked meal — bread, broth, and salted meat. Restores stamina and a measure of focus.",
+    "description": "A proper cooked meal \u2014 bread, broth, and salted meat. Restores stamina and a measure of focus.",
     "tier": 2,
     "goldValue": 25,
     "skillID": "rest",
