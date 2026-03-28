@@ -3085,7 +3085,7 @@ _applyLootTagFlavour(item, tagDef) {
             let statValue = 0;
             const scaleStat = effect.scalesBy || 'basePower';
             if (scaleStat === 'basePower') statValue = skill.basePower || 1;
-            else if (actor.stats) statValue = actor.stats[scaleStat] || 0;
+            else if (scaleStat !== 'flat' && actor.stats) statValue = actor.stats[scaleStat] || 0;
 
             let maxPoolValue = 0;
             let currentPoolValue = 0;
@@ -3098,8 +3098,13 @@ _applyLootTagFlavour(item, tagDef) {
                 return;
             }
 
-            const scaleMultiplier = 1 + (statValue / CONSTANTS.STAT_SCALE);
-            let restoreAmount = Math.floor(maxPoolValue * effect.magnitude * scaleMultiplier);
+            let restoreAmount;
+            if (scaleStat === 'flat') {
+                restoreAmount = effect.flatAmount || 0;
+            } else {
+                const scaleMultiplier = 1 + (statValue / CONSTANTS.STAT_SCALE);
+                restoreAmount = Math.floor(maxPoolValue * effect.magnitude * scaleMultiplier);
+            }
 
             // Sudden death — healing drops sharply to ensure stalled fights end.
             // Starts at 20%, drops 8% per 10 turns. Floor: 0% (no healing at all eventually).
