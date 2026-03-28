@@ -1,56 +1,57 @@
-Right, fixed. Looks good. Write up a handoff.9:35 PMSession Handoff
+Session Handoff
 Delivered This Session
 combatEngine.js
 
-STAT_SCALE 300 → 200 — stat investment now meaningfully affects damage for all combatants
-Enemy spawn-time stat scaling: 240 + 6*(level-1) budget, data stats define distribution shape
-Procedural enemy weapon generation via generateEnemyWeapon() — replaces weaponTypes entirely. Tags drive damage type and style (fast/standard/heavy), level drives damage value on a smooth curve. weaponTypes field is now dead but still present in the data — can be stripped when convenient
-Tuning constants extracted to generateEnemyWeapon.TUNING with hot-reload support via CombatEngine.applyTuning()
-Taunt reworked: applied to enemies (not players), redirects to sourceId (the caster) via 4x weight in _weightedRandomTarget
-Profile targeting completely overhauled — all profiles now run through _weightedRandomTarget on a preference-sorted candidate pool. Status weights (taunt, stealth, etc.) now apply universally regardless of enemy AI profile
-spire_silent_acolyte weaponTypes fixed to ['dagger','sword'], spire_ward_keeper to ['hammer','mace'], vulture_wolf weaponTypes removed (creatureOnly jaws take over)
+AOE target resolution fixed — enemy actors now correctly target the player party with all_enemies effects. Malacor was icing himself.
+_buildSkillDepthCache() — walks parent graph on construction, memoises depth for every skill
+_childProcChance() — depth-based proc rates replacing flat 0.05. Depth 2: 18%, 3: 10%, 4: 6%, 5: 3%, 6: 1.5%, 7: 0.7%. Explicit procChance on skill data still overrides
+CombatEngine.TUNING.PROC_DEPTH_RATES — hot-reloadable via applyTuning
+_rollItemVariance() — rolls 0.65–1.35 multiplier per existing stat at drop time, minimum 1
+_eqItem() — resolves equipped slot value to base item merged with _rolls, used in stat boost and armor loops so rolled stats affect combat
+_applyLootTagFlavour() — now applies small flat affixes by tag (see map below) on top of variance rolls. _tag key passed from call site
+JSDoc syntax error fixed (duplicate /** that crashed the server)
+
+Tag affixes: sacred +1 HAR +3 HP · corrupted +1 AMB −1 armor · arcane +1 HAR +5 mana · fire +1 CON +1 dmg · dwarven +1 END +2 armor · orc +1 CON +1 END · elven +1 AMB +1 HAR · shadow +2 AMB · beast +1 CON +1 dmg · spirit +1 HAR +5 mana · nature +1 HAR +1 phys_ev · martial +1 CON +1 END · goblin +1 AMB · scavenge +1 END · undead +1 END +1 HAR · coastal +1 END +1 phys_ev · mountain +2 END +1 armor · woodland +1 AMB +1 phys_ev · oath +1 CON +3 HP · mercenary +1 AMB +1 CON
+gear-tooltip.js
+
+_rollColor() — gray/white/green/blue/purple/gold by ratio to base
+_itemQualityColor() — colors item name by best single-stat roll
+All stat lines now show rolled values with per-stat color
+
+inventory-system.js
+
+_itemDefResolved() and _rollQualityColor() helpers added
+_statBonuses() reads _rolls where present
+_rolls carried through equip, unequip, slot swap, and inventory def merge
+Inventory item names colored by roll quality
 
 combat-log.js
 
-DAMAGE_SINGLE base XP: 2.0 → 20.0
-Skill XP bonus pool: 5% of xpGained distributed proportionally by usage count per skill
-Skill level soft cap: XP awards reduced to 10% past level 20, levels continue indefinitely
+_rolls preserved when gear lands in character.inventory
+Damage skill XP base: 20.0 → 4.0 (DAMAGE_SINGLE and DAMAGE_AOE both)
 
-database.js
+admin-panel.js
 
-getAllUsers() — lists all users with guest status
-reassignCharacter(characterId, toUserId) — reassigns character ownership
-reassignSnapshots(characterId, toUserId) — reassigns snapshot ownership
+adminViewCharacter replaced with full inline character editor — identity, stats, equipment slots, skill table (level/XP/uses/flags all editable)
+Tuning tab: proc depth rate sliders added (depth 2–7), damage preview moved above
 
 backend/routes/admin.js
 
-GET /api/admin/db/users
-POST /api/admin/db/characters/:id/reassign — accepts toUserId and includeSnapshots
-GET /api/admin/tuning — reads tuning.json
-POST /api/admin/tuning — writes tuning.json and hot-applies via CombatEngine.applyTuning()
+PUT /api/admin/db/characters/:id — writes all character fields and upserts skill_progression
 
-backend/routes/combat.js
+backend/data/tuning.json
 
-Loads tuning.json on engine init and applies via applyTuning()
+procDepth array added: [0.18, 0.10, 0.06, 0.03, 0.015, 0.007]
 
-js/admin-panel.js
+backend/data/skills.json
 
-Characters tab: Reassign button per character — modal with searchable user list, snapshot checkbox
-Tuning tab: sliders for all 6 genWeapon constants, live damage preview table, Save & Apply
-
-index.html
-
-Tuning tab button and content div added to admin panel
-admin-panel.js version bumped to v5
-
-backend/data/tuning.json — new file, deploy to backend/data/
+silent_prayer parents changed from prayer + misdirect to prayer + footwork, renamed to Humble Steps
+shadow_step parents changed from misdirect + footwork to stalk + footwork
 
 Outstanding / Notes
 
-weaponTypes field still present on all enemies in enemy-types.json — dead code now, can be stripped in a future cleanup pass
-Archbishop Malacor hitting himself with Blizzard — noted, not investigated
-claws_small/large exist in items but no enemies assigned yet
-Two-handed weapons / dual-wield — blocked on design decisions
-Spear/polearm — blocked on two-handed
-Enemy damage tuning still in progress — new procedural system gives much finer control via the Tuning tab; recommend a few smoketests across challenge levels to dial in BASE_PER_LVL and style multipliers
-Version numbers on all changed files should be bumped in index.html
+Smoketest recommended on proc rates — depth 2 at 18% is a meaningful change from the old flat 5%
+Tag affixes only apply to global bonus loot (the flavoured drop path) — standard loot table drops get variance but no affixes
+Existing equipped items are bare ID strings and show no roll colors until replaced — degrades cleanly, no migration needed
+weaponTypes field still dead on enemy data — noted last session, still present
+Archbishop Malacor self-hit fixed but worth confirming in a smoketest that other AOE enemies (blizzard, frost nova users) now correctly target players

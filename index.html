@@ -1509,6 +1509,7 @@
                     <button class="settings-tab"                     id="codex-tab-combos"  onclick="switchCodexTab('combos')">Combinations</button>
                     <button class="settings-tab"                     id="codex-tab-stats"   onclick="switchCodexTab('stats')">Statistics</button>
                     <button class="settings-tab"                     id="codex-tab-combat"  onclick="switchCodexTab('combat')">Combat</button>
+                    <button class="settings-tab"                     id="codex-tab-statuses" onclick="switchCodexTab('statuses')">Statuses</button>
                 </div>
 
                 <!-- Scrollable content -->
@@ -1667,6 +1668,14 @@
                         <p>A hidden bonus loot chance accumulates as you run challenges. Each stage completed without triggering it increases the chance. When it fires, a random item drops from a broad pool. Switching challenges resets the accumulation — committing to a single challenge builds the stack faster.</p>
                     </div>
 
+                    <!-- ── STATUSES ── -->
+                    <div id="codex-pane-statuses" style="display:none;">
+                        <div class="codex-section-label">Debuffs</div>
+                        <div id="codex-statuses-debuffs"></div>
+                        <div class="codex-section-label" style="margin-top:1.2rem;">Buffs</div>
+                        <div id="codex-statuses-buffs"></div>
+                    </div>
+
                 </div><!-- end scroll area -->
             </div>
         </div>
@@ -1698,13 +1707,36 @@
     }
 
     function switchCodexTab(tab) {
-        ['skills','combos','stats','combat'].forEach(t => {
+        ['skills','combos','stats','combat','statuses'].forEach(t => {
             document.getElementById('codex-pane-' + t).style.display = t === tab ? '' : 'none';
             const btn = document.getElementById('codex-tab-' + t);
             if (btn) {
                 btn.classList.toggle('settings-tab-active', t === tab);
             }
         });
+        if (tab === 'statuses') _renderCodexStatuses();
+    }
+
+    function _renderCodexStatuses() {
+        const debuffsEl = document.getElementById('codex-statuses-debuffs');
+        const buffsEl   = document.getElementById('codex-statuses-buffs');
+        if (debuffsEl.dataset.rendered) return;
+
+        const statuses = (gameData && gameData.statuses) ? gameData.statuses : [];
+        const debuffs  = statuses.filter(s => s.type === 'debuff');
+        const buffs    = statuses.filter(s => s.type === 'buff');
+
+        function renderGroup(el, list) {
+            el.innerHTML = list.map(s => `
+                <div id="codex-status-${s.id}" style="margin-bottom:0.9rem; padding-bottom:0.9rem; border-bottom:1px solid rgba(255,255,255,0.06);">
+                    <div style="font-weight:700; color:var(--gold-bright); font-size:0.85rem; margin-bottom:0.2rem;">${s.name}</div>
+                    <div style="color:var(--text-secondary); font-size:0.8rem; line-height:1.5;">${s.description}</div>
+                </div>`).join('');
+        }
+
+        renderGroup(debuffsEl, debuffs);
+        renderGroup(buffsEl,   buffs);
+        debuffsEl.dataset.rendered = '1';
     }
 
     document.getElementById('codexModal').addEventListener('click', function(e) {

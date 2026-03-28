@@ -270,6 +270,13 @@ function destroySkillTooltip() {
     if (existing) existing.remove();
 }
 
+// Resolve a status ID to its display name, falling back to a formatted version of the ID.
+function _resolveStatusName(statusId) {
+    const status = (gameData.statuses || []).find(s => s.id === statusId);
+    if (status) return status.name;
+    return statusId.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
 /**
  * Create and show a tooltip for a skill
  */
@@ -330,16 +337,28 @@ function createSkillTooltip(skill) {
             content += `<div style="color: #d4af37; margin-top: 0.5rem;"><strong>Scaling:</strong> ${scaling}</div>`;
         }
     }
+    let hasStatus = false;
     if (skill.effects && skill.effects.length > 0) {
         content += `<div style="color: #ff9999; margin-top: 0.5rem;"><strong>Effects:</strong><br>`;
         skill.effects.forEach(effect => {
             let effectText = effect.type.toUpperCase();
             if (effect.damageType) effectText += ` (${effect.damageType})`;
-            if (effect.debuff) effectText += ` - ${effect.debuff}`;
-            if (effect.buff) effectText += ` - ${effect.buff}`;
+            if (effect.debuff) {
+                const statusName = _resolveStatusName(effect.debuff);
+                effectText += ` — <strong style="color:#ffbbbb;">${statusName}</strong>`;
+                hasStatus = true;
+            }
+            if (effect.buff) {
+                const statusName = _resolveStatusName(effect.buff);
+                effectText += ` — <strong style="color:#aaffbb;">${statusName}</strong>`;
+                hasStatus = true;
+            }
             content += `• ${effectText}<br>`;
         });
         content += `</div>`;
+    }
+    if (hasStatus) {
+        content += `<div style="color: var(--text-muted); font-size: 0.72rem; margin-top: 0.6rem; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.4rem;">Status effects listed in Field Codex → Statuses</div>`;
     }
 
     tooltip.innerHTML = content;
