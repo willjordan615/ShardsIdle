@@ -42,8 +42,8 @@ const MERCHANTS = [
     icon: '📜',
     itemPool: [
       'consumable_scroll_fireball', 'consumable_scroll_lightning',
-      'consumable_scroll_resurrection', 'consumable_scroll_teleport',
-      'consumable_crystal_teleport', 'consumable_crystal_resurrection',
+      'consumable_scroll_teleport',
+      'consumable_crystal_teleport',
       'consumable_tool_map', 'consumable_tool_torch',
       'consumable_charm_luck',
     ],

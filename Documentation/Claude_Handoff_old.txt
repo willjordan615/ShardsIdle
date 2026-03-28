@@ -2,55 +2,98 @@ Session Handoff
 
 Delivered This Session
 
-gear-tooltip.js
+skills.json
 
-Status effects in createSkillTooltip now display as bolded names (debuffs in #ffbbbb, buffs in #aaffbb) rather than raw type strings
-_resolveStatusName() helper — looks up status ID in gameData.statuses, falls back to formatted ID string
-Footer line appended to skill tooltips when any status is present: "Status effects listed in Field Codex → Statuses"
-Item type line now shows "Two-Handed" badge: e.g. GREATSWORD • Two-Handed • Tier 3
+deploy_caltrops — damage effect replaced with slow + bleed (both AOE, duration 2, basePower 0)
+deploy_trap_stun — stun chance dropped 0.6 → 0.25
+restore_mana_major, restore_stam_minor, restore_stam_small — targets fixed from single_ally to self
+use_health_potion, use_health_potion_minor — now scalesBy harmony; major bumped to 0.65
+mend — parents changed from [first_aid, use_health_potion_minor] to [first_aid, heal_major]; magnitude 0.35 → 0.52
+15 use_* wrapper skills removed entirely (use_health_potion, use_mana_potion, use_stamina_potion, etc.)
+New skills added:
+  heal_minor — flat 15hp, scalesBy flat, CONSUMABLE_HEALING, no parents
+  heal_standard — flat 60hp, same pattern
+  heal_major2 — flat 150hp, same pattern
+  restore_stam — magnitude 0.45, CONSUMABLE_RESTORATION
+  restore_stam_major — magnitude 0.9, CONSUMABLE_RESTORATION
+  restore_mana_major2 — magnitude 0.9, CONSUMABLE_RESTORATION
+  purge — cleanse_debuffs self, CONSUMABLE_HEALING, no parents (antidote skill)
+  elixir_of_vitality — heal 1.5 harmony + cleanse_debuffs, CONSUMABLE_HEALING
+20 consumable-linked skills recategorised to CONSUMABLE_* categories:
+  proc_burn_aoe, proc_chill_aoe, skill_fireball, skill_lightning → CONSUMABLE_DAMAGE
+  proc_stun_aoe, deploy_caltrops, deploy_trap_stun → CONSUMABLE_CONTROL
+  proc_stealth, skill_teleport → CONSUMABLE_ESCAPE
+  buff_all_stats, buff_strength, buff_defense, buff_speed → CONSUMABLE_BUFF
+  restore_stam_small, restore_mana_minor, restore_mana_major, restore_stam,
+    restore_mana_major2, restore_stam_major → CONSUMABLE_RESTORATION
+  skill_resurrect → CONSUMABLE_HEALING
+NOT recategorised (combo tree parents — do not change):
+  rest, bloodlust, restore_stam_minor
 
-index.html (Field Codex)
+items.json
 
-Statuses tab added to Field Codex alongside Skills / Combinations / Statistics / Combat
-codex-pane-statuses — renders from gameData.statuses on first open, split into Debuffs and Buffs sections
-switchCodexTab updated to include statuses; render is lazy and cached
-Dual Wielding section added to Combat pane — documents 40% echo rate, 30% power, offhand weapon/proc behaviour, DAMAGE_SINGLE only restriction
+consumable_bomb_smoke removed (duplicate of smoke_bomb)
+consumable_potion_health_minor/major, mana_minor/major, stamina_minor removed (duplicates with no challenge refs)
+Legacy items fixed in place — tiers, goldValues, descriptions corrected
+  health_potion_minor t1 $8, health_potion t3 $30, mana/stamina equivalents
+New items added: stamina_potion (t3), health_potion_major (t5), mana_potion_major (t5),
+  stamina_potion_major (t5), antidote (t2), elixir_vitality (t6), food_hearty_meal (t2)
+All consumable skillID refs now point to real skills — no use_* wrappers remain
+  health_potion_minor → heal_minor
+  health_potion → heal_standard
+  health_potion_major → heal_major2
+  mana_potion_minor → restore_mana_minor
+  mana_potion → restore_mana_major
+  mana_potion_major → restore_mana_major2
+  stamina_potion_minor → restore_stam_minor (second_wind parent — do not change)
+  stamina_potion → restore_stam
+  stamina_potion_major → restore_stam_major
+  antidote → purge
+  elixir_vitality → elixir_of_vitality
+  food items → restore_stam_small / rest / buff_all_stats
+  scrolls → skill_fireball / skill_lightning / skill_teleport / skill_resurrect
+  bombs → proc_burn_aoe / proc_chill_aoe / proc_stun_aoe / proc_stealth
+  traps → deploy_caltrops / deploy_trap_stun
+Gold values added to all bombs, scrolls, buff potions, traps
+
+merchant.js
+
+Herbalist stock updated to clean tier ladder (minor/standard/major for all three lines)
+Antidote and elixir added
+Duplicate smoke bomb entries removed
+Alchemist pool cleaned up
 
 combatEngine.js
 
-_triggerDualWieldEcho(actor, skill, target, skillLevel) — new method
-  Fires on DAMAGE_SINGLE hits only
-  40% chance per hit
-  Builds shallow actor proxy with offHand swapped into mainHand so calculateDamage resolves offhand weapon naturally
-  Full damage calculation, then multiplied by 0.3 on output (not basePower scaling — full weapon damage is calculated then modulated)
-  Offhand weapon procs fire independently via triggerWeaponProcs on the echo actor
-  Returns 0 if offHand is empty or has no dmg1 (shields without damage values are safe)
-Echo damage folds into hitDamage and totalDamage — appears in existing log messages as part of the hit total
-
-inventory-system.js
-
-Step 4a: equipping into offHand blocked if mainHand holds a two_handed item — showError fired, equip aborted
-Step 4b: equipping a two_handed item into mainHand returns existing offHand to inventory and nulls the slot
-
-backend/data/items.json
-
-90 two-handed weapons appended across 6 classes: greatsword, greataxe, polearm, maul, bow, staff
-All items carry two_handed: true, slot_id1: "mainHand", slot_id2: null
-Tiers 0–8, 2 items per tier for tiers 0–5, 1 item per tier for tiers 6–8
-Proc collision fixes applied across classes per design matrix recommendations
-
-backend/data/skills.json
-
-9 new proc skills appended — these statuses existed but had no proc skill wired:
-  proc_slow, proc_freeze, proc_sleep, proc_confused, proc_ambition_falter,
-  proc_taunt, proc_cursed, proc_bloodlust_buff, proc_fortify_buff
-All follow standard proc skill structure: no cost, no delay, basePower 0, enemyUsable false
+scalesBy: flat support added to heal/restore resolver — uses effect.flatAmount directly,
+  bypasses maxPool * magnitude * scaleMultiplier path. Sudden death penalty still applies.
+Both isConsumable checks expanded to include CONSUMABLE_BUFF and CONSUMABLE_CONTROL
+CONSUMABLE_BUFF scoring: cautious/support favour early fight use; aggressive/berserker
+  save for boss fights; others only on hard difficulty
+CONSUMABLE_CONTROL scoring: tactical/disruptor favour when outnumbered; aggressive
+  mostly ignores traps; others use sparingly
+NON_OFFENSIVE set expanded: CONSUMABLE_BUFF, CONSUMABLE_CONTROL, CONSUMABLE_ESCAPE
+  added so they bypass damage calculation entirely
 
 Outstanding / Notes
 
-Smoketest on proc rates and AOE targeting still not run — carried from last session, still worth doing
-Dual wield echo is not separately logged — folds into the main hit total. If you want echo hits identifiable in the log, that's a small addition once the mechanic confirms working
-Two-handed weapons are in items.json but not yet in any loot tables or merchant pools — they won't drop or appear for purchase until wired into those
-Enemy equip logic does not check two_handed — enemies are assigned weapons by ID directly, so no conflict there, but worth noting if enemies ever get two-handed weapons assigned
-Spiked/damage-value shields would trigger dual wield echo — this is intentional by design, noted for awareness
-Consumable pass and content work remain on the docket
+Consumable system design established: items fire real skills directly — no wrapper skills.
+  The skill lands in the character's pool; children can discover off it via normal proc tree.
+  Consumable charges decrement when a child procs. This is the intended mechanic.
+
+use_* skills are gone. Do not re-introduce them.
+
+stamina_potion_minor → restore_stam_minor is intentional. second_wind parents off
+  restore_stam_minor + first_aid at 8% procChance. Do not change that item's skillID.
+
+skill_teleport (utility: teleport_random) is non-functional — engine has no utility effect handler.
+  Teleport scroll should trigger guaranteed retreat via the existing retreat clause.
+  Wiring deferred — combat engine change needed, not data.
+
+heal_major (the original combat skill, scalesBy harmony) is still used by mend's effect.
+  health_potion and health_potion_major use their own flat heal skills (heal_standard, heal_major2)
+  to avoid harmony dependency on consumables. heal_major the combat skill is untouched.
+
+Smoketest recommended — verify flat heal amounts on health potions fire correctly,
+  CONSUMABLE_BUFF/CONTROL scoring behaves as expected in combat log,
+  proc_stealth on smoke_bomb, purge on antidote.

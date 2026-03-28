@@ -1872,64 +1872,6 @@
     ]
   },
   {
-    "id": "skill_resurrect",
-    "name": "Resurrect",
-    "category": "CONSUMABLE_HEALING",
-    "description": "Bring an ally back to life.",
-    "basePower": 0,
-    "costType": "mana",
-    "costAmount": 80,
-    "requiredLevel": 15,
-    "scalingFactors": {
-      "conviction": 0.2,
-      "endurance": 0.5,
-      "harmony": 0.3
-    },
-    "baseHitChance": 1.0,
-    "critChance": 0.0,
-    "delay": 2500,
-    "hitCount": {
-      "fixed": 1
-    },
-    "effects": [
-      {
-        "type": "heal",
-        "targets": "single_ally",
-        "scalesBy": "harmony",
-        "magnitude": 0.5
-      }
-    ]
-  },
-  {
-    "id": "skill_resurrect_party",
-    "name": "Mass Resurrect",
-    "category": "HEALING",
-    "description": "Bring all defeated allies back to life.",
-    "basePower": 0,
-    "costType": "mana",
-    "costAmount": 120,
-    "requiredLevel": 20,
-    "scalingFactors": {
-      "conviction": 0.2,
-      "endurance": 0.5,
-      "harmony": 0.3
-    },
-    "baseHitChance": 1.0,
-    "critChance": 0.0,
-    "delay": 3000,
-    "hitCount": {
-      "fixed": 1
-    },
-    "effects": [
-      {
-        "type": "heal",
-        "targets": "all_allies",
-        "scalesBy": "harmony",
-        "magnitude": 0.3
-      }
-    ]
-  },
-  {
     "id": "skill_teleport",
     "name": "Teleport",
     "category": "CONSUMABLE_ESCAPE",
@@ -7906,8 +7848,8 @@
   },
   {
     "id": "resurrection_rite",
-    "name": "Resurrection Rite",
-    "description": "A holy word combined with first aid to revive fallen allies.",
+    "name": "Bless",
+    "description": "A holy word that mends wounds and shields the spirit.",
     "category": "HEALING",
     "parentSkills": [
       "holy_word",
