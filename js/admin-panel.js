@@ -1248,7 +1248,7 @@ async function loadAdminTuning() {
             document.getElementById('tuning_' + f.key)?.addEventListener('input', updateTuningPreview);
         });
 
-    } catch(e) { el.innerHTML = \`<p style="color:#f88;padding:12px;">Error: \${e.message}</p>\`; }
+    } catch(e) { el.innerHTML = `<p style="color:#f88;padding:12px;">Error: ${e.message}</p>`; }
 }
 
 function getTuningValues() {
