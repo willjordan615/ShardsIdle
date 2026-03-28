@@ -116,3 +116,46 @@ Tier intentional exceptions — greatsword_verdict_tier5 (Hall of Ancestral Echo
 
 Smoketest recommended — escape consumable flow end to end, cleanse fix on purge/elixir,
   flat heals still firing correctly after all the skills.json edits this session.
+
+───────────────────────────────────────────────────────────────────────────────
+DEVELOPMENT STATUS: Early Alpha
+───────────────────────────────────────────────────────────────────────────────
+
+TASK LIST
+
+Bugs / Gaps
+  [ ] Belt display — reusable items (lockpick, rope) and quest items show a
+        quantity that never moves. Needs UI pass to suppress count or show
+        carried/equipped indicator for non-consumable belt items.
+  [ ] Challenge opportunity balance — new rope/lockpick ops untested in play.
+        Spawn chances and effect magnitudes may need tuning.
+
+Systems Incomplete
+  [ ] Sound effects — none implemented
+  [ ] Music — none implemented
+  [ ] Graphics / icons — none implemented
+
+Smoketests Needed
+  [ ] Escape consumable flow end to end (smoke bomb at stage boundary,
+        teleport mid-combat, item decrement, returnToHub)
+  [ ] cleanse fix — purge and elixir_of_vitality actually cleansing debuffs
+  [ ] Flat heals — health potions firing correct fixed amounts in combat log
+  [ ] CONSUMABLE_BUFF / CONSUMABLE_CONTROL AI scoring visible in combat log
+  [ ] Two-handed weapons appearing in loot and feeling correct in play
+  [ ] Named unique items dropping from correct challenges
+
+Hardening (pre-Beta)
+  [ ] Dual wield echo edge cases — spiked shields, offhand procs
+  [ ] Child proc double-decrement — child with two consumable parents
+  [ ] AI consumable scoring audit against actual combat logs
+  [ ] Loot table coverage review — gaps in challenge reward pools
+  [ ] Balance pass on consumable usage frequency in practice
+
+Art / Audio Workstream (blocking Beta, not Alpha)
+  [ ] Visual direction decision — tone is low fantasy, institutional decay,
+        moral grey. Manuscript/woodcut aesthetic fits better than bright fantasy.
+  [ ] Character portraits
+  [ ] Item icons
+  [ ] UI accent illustrations
+  [ ] Sound effects pack (single source for coherence)
+  [ ] Music — understated folk/medieval, not heroic fantasy
