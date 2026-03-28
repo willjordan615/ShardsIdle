@@ -672,7 +672,7 @@ function getAllUsers() {
 function reassignCharacter(characterId, toUserId) {
     return new Promise((resolve, reject) => {
         db.run(
-            `UPDATE characters SET ownerUserId = ? WHERE characterID = ?`,
+            `UPDATE characters SET ownerUserId = ? WHERE id = ?`,
             [toUserId, characterId],
             function(err) { if (err) reject(err); else resolve(this.changes); }
         );
