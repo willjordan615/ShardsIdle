@@ -284,7 +284,7 @@
   {
     "id": "buff_all_stats",
     "name": "All Stats Buff",
-    "category": "BUFF",
+    "category": "CONSUMABLE_BUFF",
     "description": "Increase all attributes.",
     "basePower": 1.0,
     "costType": "none",
@@ -313,7 +313,7 @@
   {
     "id": "buff_defense",
     "name": "Defense Buff",
-    "category": "BUFF",
+    "category": "CONSUMABLE_BUFF",
     "description": "Increase armor and damage resistance.",
     "basePower": 0.6,
     "costType": "stamina",
@@ -371,7 +371,7 @@
   {
     "id": "buff_speed",
     "name": "Speed Buff",
-    "category": "BUFF",
+    "category": "CONSUMABLE_BUFF",
     "description": "Increase attack speed and evasion.",
     "basePower": 0.8,
     "costType": "none",
@@ -400,7 +400,7 @@
   {
     "id": "buff_strength",
     "name": "Strength Buff",
-    "category": "BUFF",
+    "category": "CONSUMABLE_BUFF",
     "description": "Increase conviction and damage output.",
     "basePower": 0.8,
     "costType": "none",
@@ -503,7 +503,7 @@
   {
     "id": "deploy_caltrops",
     "name": "Deploy Caltrops",
-    "category": "TRAP",
+    "category": "CONSUMABLE_CONTROL",
     "description": "Deploy caltrops to damage enemies.",
     "basePower": 0.0,
     "costType": "none",
@@ -538,7 +538,7 @@
   {
     "id": "deploy_trap_stun",
     "name": "Deploy Stun Trap",
-    "category": "TRAP",
+    "category": "CONSUMABLE_CONTROL",
     "description": "Deploy a trap that stuns enemies.",
     "basePower": 0.0,
     "costType": "none",
@@ -844,7 +844,7 @@
   {
     "id": "proc_burn_aoe",
     "name": "Burn (AOE)",
-    "category": "DAMAGE_PROC",
+    "category": "CONSUMABLE_DAMAGE",
     "description": "Burn all nearby enemies.",
     "basePower": 0.4,
     "costType": "none",
@@ -907,7 +907,7 @@
   {
     "id": "proc_chill_aoe",
     "name": "Chill (AOE)",
-    "category": "DAMAGE_PROC",
+    "category": "CONSUMABLE_DAMAGE",
     "description": "Chill all nearby enemies.",
     "basePower": 0.3,
     "costType": "none",
@@ -1306,7 +1306,7 @@
   {
     "id": "proc_stealth",
     "name": "Stealth",
-    "category": "DEFENSE_PROC",
+    "category": "CONSUMABLE_ESCAPE",
     "description": "Become harder to hit.",
     "basePower": 0.0,
     "costType": "none",
@@ -1365,7 +1365,7 @@
   {
     "id": "proc_stun_aoe",
     "name": "Stun (AOE)",
-    "category": "CONTROL_PROC",
+    "category": "CONSUMABLE_CONTROL",
     "description": "Stun all nearby enemies.",
     "basePower": 0.0,
     "costType": "none",
@@ -1499,7 +1499,7 @@
   {
     "id": "restore_mana_major",
     "name": "Major Mana Restoration",
-    "category": "RESTORATION",
+    "category": "CONSUMABLE_RESTORATION",
     "description": "Restore a large amount of mana.",
     "basePower": 0.8,
     "costType": "none",
@@ -1529,7 +1529,7 @@
   {
     "id": "restore_mana_minor",
     "name": "Minor Mana Restoration",
-    "category": "RESTORATION",
+    "category": "CONSUMABLE_RESTORATION",
     "description": "Restore a small amount of mana.",
     "basePower": 0.3,
     "costType": "none",
@@ -1589,7 +1589,7 @@
   {
     "id": "restore_stam_small",
     "name": "Small Stamina Restoration",
-    "category": "RESTORATION",
+    "category": "CONSUMABLE_RESTORATION",
     "description": "Restore a small amount of stamina.",
     "basePower": 0.2,
     "costType": "none",
@@ -1809,7 +1809,7 @@
   {
     "id": "skill_fireball",
     "name": "Fireball",
-    "category": "DAMAGE_MAGIC",
+    "category": "CONSUMABLE_DAMAGE",
     "description": "Launch a ball of fire at all enemies.",
     "basePower": 1.8,
     "costType": "mana",
@@ -1841,7 +1841,7 @@
   {
     "id": "skill_lightning",
     "name": "Lightning Strike",
-    "category": "DAMAGE_MAGIC",
+    "category": "CONSUMABLE_DAMAGE",
     "description": "Strike a target with lightning.",
     "basePower": 1.5,
     "costType": "mana",
@@ -1874,7 +1874,7 @@
   {
     "id": "skill_resurrect",
     "name": "Resurrect",
-    "category": "HEALING",
+    "category": "CONSUMABLE_HEALING",
     "description": "Bring an ally back to life.",
     "basePower": 0,
     "costType": "mana",
@@ -1932,7 +1932,7 @@
   {
     "id": "skill_teleport",
     "name": "Teleport",
-    "category": "UTILITY",
+    "category": "CONSUMABLE_ESCAPE",
     "description": "Teleport to a random location.",
     "basePower": 0.0,
     "costType": "mana",
@@ -12005,7 +12005,7 @@
     "id": "restore_stam",
     "name": "Stamina Restoration",
     "description": "Drives back exhaustion meaningfully.",
-    "category": "RESTORATION",
+    "category": "CONSUMABLE_RESTORATION",
     "isChildSkill": false,
     "isStarterSkill": false,
     "parentSkills": [],
@@ -12028,7 +12028,7 @@
     "id": "restore_stam_major",
     "name": "Major Stamina Restoration",
     "description": "Banishes fatigue entirely.",
-    "category": "RESTORATION",
+    "category": "CONSUMABLE_RESTORATION",
     "isChildSkill": false,
     "isStarterSkill": false,
     "parentSkills": [],
@@ -12051,7 +12051,7 @@
     "id": "restore_mana_major2",
     "name": "Major Mana Restoration",
     "description": "Fully replenishes most casters' reserves.",
-    "category": "RESTORATION",
+    "category": "CONSUMABLE_RESTORATION",
     "isChildSkill": false,
     "isStarterSkill": false,
     "parentSkills": [],

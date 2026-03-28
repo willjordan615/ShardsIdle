@@ -1692,8 +1692,9 @@ _applyLootTagFlavour(item, tagDef) {
         }
 
         // Consumable use — gated by fight difficulty
-        const isConsumable = cat === 'CONSUMABLE_HEALING' || cat === 'CONSUMABLE_RESTORATION' ||
-                             cat === 'CONSUMABLE_DAMAGE'  || cat === 'CONSUMABLE_ESCAPE';
+        const isConsumable = cat === 'CONSUMABLE_HEALING'     || cat === 'CONSUMABLE_RESTORATION' ||
+                             cat === 'CONSUMABLE_DAMAGE'      || cat === 'CONSUMABLE_ESCAPE'      ||
+                             cat === 'CONSUMABLE_BUFF'        || cat === 'CONSUMABLE_CONTROL';
         if (isConsumable) {
           const difficulty = this._assessFightDifficulty(actor, allies, aliveOpponents, context);
           if (difficulty === 'easy') { score = 0; return { skill, target, score }; }
@@ -1725,6 +1726,20 @@ _applyLootTagFlavour(item, tagDef) {
                 (targetCombatant.statusEffects || []).some(e => e.duration > 0);
               score *= (isBossFight || targetDebuffed) ? 1.2 : 0.1;
             } else score *= 0.05;
+          }
+          if (cat === 'CONSUMABLE_BUFF') {
+            // Use buffs early in hard fights; cautious/support pop them proactively
+            const earlyFight = (context.turnCount || 0) <= 3;
+            if (profile === 'cautious' || profile === 'support') score *= earlyFight ? 1.4 : 0.6;
+            else if (profile === 'aggressive' || profile === 'berserker') score *= isBossFight ? 1.3 : 0.7;
+            else score *= difficulty === 'hard' ? 1.0 : 0.3;
+          }
+          if (cat === 'CONSUMABLE_CONTROL') {
+            // Traps and AOE control — best used early or when outnumbered
+            const outnumbered = aliveOpponents.length > allies.filter(a => !a.defeated).length;
+            if (profile === 'tactical' || profile === 'disruptor') score *= outnumbered ? 1.5 : 1.0;
+            else if (profile === 'aggressive') score *= 0.4;
+            else score *= outnumbered ? 0.8 : 0.2;
           }
           if (cat === 'CONSUMABLE_ESCAPE') {
             score *= hasBadDebuff ? 1.8 : 0.05;
@@ -2025,8 +2040,9 @@ _applyLootTagFlavour(item, tagDef) {
     }
 
     // ── Consumable use — gated by fight difficulty ───────────────────────────
-    const isConsumable = cat === 'CONSUMABLE_HEALING' || cat === 'CONSUMABLE_RESTORATION' ||
-                         cat === 'CONSUMABLE_DAMAGE'  || cat === 'CONSUMABLE_ESCAPE';
+    const isConsumable = cat === 'CONSUMABLE_HEALING'     || cat === 'CONSUMABLE_RESTORATION' ||
+                         cat === 'CONSUMABLE_DAMAGE'      || cat === 'CONSUMABLE_ESCAPE'      ||
+                         cat === 'CONSUMABLE_BUFF'        || cat === 'CONSUMABLE_CONTROL';
 
     if (isConsumable) {
       const difficulty = this._assessFightDifficulty(character, players, aliveEnemies, context);
@@ -2095,6 +2111,20 @@ _applyLootTagFlavour(item, tagDef) {
         } else {
           score *= 0.05;  // other profiles almost never throw damage consumables
         }
+      }
+
+      if (cat === 'CONSUMABLE_BUFF') {
+        const earlyFight = (context.turnCount || 0) <= 3;
+        if (profile === 'cautious' || profile === 'support') score *= earlyFight ? 1.4 : 0.6;
+        else if (profile === 'aggressive' || profile === 'berserker') score *= isBossFight ? 1.3 : 0.7;
+        else score *= difficulty === 'hard' ? 1.0 : 0.3;
+      }
+
+      if (cat === 'CONSUMABLE_CONTROL') {
+        const outnumbered = aliveEnemies.length > players.filter(p => !p.defeated).length;
+        if (profile === 'tactical' || profile === 'disruptor') score *= outnumbered ? 1.5 : 1.0;
+        else if (profile === 'aggressive') score *= 0.4;
+        else score *= outnumbered ? 0.8 : 0.2;
       }
 
       // Cleanse consumable — activated by bad debuff regardless of profile
@@ -2543,7 +2573,8 @@ _applyLootTagFlavour(item, tagDef) {
     // They only apply skill effects (heals, buffs, resource restoration).
     const NON_OFFENSIVE = new Set([
         'HEALING','HEALING_AOE','BUFF','DEFENSE','UTILITY','RESTORATION',
-        'CONSUMABLE_HEALING','CONSUMABLE_RESTORATION'
+        'CONSUMABLE_HEALING','CONSUMABLE_RESTORATION','CONSUMABLE_BUFF',
+        'CONSUMABLE_CONTROL','CONSUMABLE_ESCAPE'
     ]);
     const isOffensive = !NON_OFFENSIVE.has(skill.category);
 
