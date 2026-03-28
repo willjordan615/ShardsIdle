@@ -2494,6 +2494,39 @@ _applyLootTagFlavour(item, tagDef) {
     });
   }
 
+  /**
+   * Dual-wield echo: on a DAMAGE_SINGLE hit, 40% chance to fire the skill again
+   * at 0.3 power using the offhand weapon for damage and procs.
+   * Character stats are unchanged — only weapon damage and procs swap to offhand.
+   */
+  _triggerDualWieldEcho(actor, skill, target, skillLevel) {
+    if (!actor.equipment?.offHand) return 0;
+    const offhandItem = this.gear?.find(g => g.id === this._eqId(actor.equipment.offHand));
+    if (!offhandItem || !offhandItem.dmg1) return 0; // offhand must be a weapon
+
+    if (Math.random() > 0.40) return 0;
+
+    // Build a temporary actor proxy with offHand swapped into mainHand position
+    // so calculateDamage picks up offhand weapon stats without engine surgery.
+    const echoActor = Object.assign({}, actor, {
+        equipment: Object.assign({}, actor.equipment, { mainHand: actor.equipment.offHand })
+    });
+
+    // Scale skill power down to 0.3 for the echo
+    const echoSkill = Object.assign({}, skill, { basePower: (skill.basePower ?? 1) * 0.3 });
+
+    const echoDamage = this.calculateDamage(echoActor, echoSkill, target, false, skillLevel);
+
+    target.currentHP -= echoDamage;
+    if (target.currentHP <= 0) { target.currentHP = 0; target.defeated = true; }
+
+    // Fire offhand weapon procs
+    this.triggerWeaponProcs(echoActor, target, skillLevel);
+
+    //console.log(`[DUAL WIELD] Echo: ${actor.name} ${skill.name} offhand hit ${target.name} for ${echoDamage}`);
+    return echoDamage;
+  }
+
   resolveAction(action, actor, players, enemies) {
     if (action.type === 'retreat') {
         return this.resolveRetreat(actor, players);
@@ -2695,6 +2728,13 @@ _applyLootTagFlavour(item, tagDef) {
         this.applySkillEffects(skill, actor, target, null, players.concat(enemies));
         this.triggerWeaponProcs(actor, target, skillLevel);
         this.triggerStatusProcs(actor, target, skillLevel);
+        if (skill.category === 'DAMAGE_SINGLE') {
+            const echoDamage = this._triggerDualWieldEcho(actor, skill, target, skillLevel);
+            if (echoDamage > 0) {
+                hitDamage += echoDamage;
+                totalDamage += echoDamage;
+            }
+        }
 
         // ── Reverse damage shield: healAttackerOnHit ──
         // If the target has a siphon_ward-type debuff, the attacker (actor) is healed.
