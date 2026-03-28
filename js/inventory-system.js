@@ -21,6 +21,33 @@ function _dustYield(g)     { return parseFloat((g * 0.01).toFixed(4)); }
 function _eqId(val)    { return (val && typeof val === 'object') ? val.itemID : val; }
 function _eqEntry(val) { return (val && typeof val === 'object') ? val : { itemID: val }; }
 
+// Resolve a full item def from an inventory entry or equipment slot value,
+// merging any _rolls over the base definition.
+function _itemDefResolved(entryOrId) {
+    const id    = _eqId(entryOrId);
+    const base  = _itemDef(id);
+    if (!base) return null;
+    const rolls = (entryOrId && typeof entryOrId === 'object') ? entryOrId._rolls : null;
+    return rolls ? { ...base, ...rolls, _rolls: rolls } : base;
+}
+
+// Best roll ratio for an item instance — drives name color in inventory list.
+function _rollQualityColor(entry) {
+    const rolls = (entry && typeof entry === 'object') ? entry._rolls : null;
+    if (!rolls) return null;
+    const base = _itemDef(_eqId(entry));
+    if (!base) return null;
+    let best = 1.0;
+    Object.keys(rolls).forEach(k => {
+        if (base[k]) best = Math.max(best, rolls[k] / base[k]);
+    });
+    if (best < 1.10) return '#cccccc';
+    if (best < 1.25) return '#4cd964';
+    if (best < 1.50) return '#5ab4ff';
+    if (best < 1.80) return '#c77dff';
+    return '#ffd700';
+}
+
 const GEAR_SLOTS  = ['mainHand','offHand','head','chest','accessory1','accessory2'];
 const SLOT_LABELS = { mainHand:'Main Hand', offHand:'Off Hand', head:'Head', chest:'Chest', accessory1:'Accessory 1', accessory2:'Accessory 2' };
 
@@ -34,13 +61,14 @@ function _itemDef(id)      {
 function _rarityColor(r)   { return { legendary:'#ffaa00', rare:'#00d4ff', uncommon:'#4eff7f', common:'#aaa' }[r] || '#aaa'; }
 function _statBonuses(def) {
     if (!def) return '';
+    const r = def._rolls || {};
     const p = [];
-    if (def.hp)   p.push(`+${def.hp} HP`);
-    if (def.mana) p.push(`+${def.mana} MP`);
-    if (def.con)  p.push(`+${def.con} CON`);
-    if (def.end)  p.push(`+${def.end} END`);
-    if (def.amb)  p.push(`+${def.amb} AMB`);
-    if (def.har)  p.push(`+${def.har} HAR`);
+    if (def.hp   || r.hp)   p.push(`+${r.hp   ?? def.hp}   HP`);
+    if (def.mana || r.mana) p.push(`+${r.mana  ?? def.mana} MP`);
+    if (def.con  || r.con)  p.push(`+${r.con   ?? def.con}  CON`);
+    if (def.end  || r.end)  p.push(`+${r.end   ?? def.end}  END`);
+    if (def.amb  || r.amb)  p.push(`+${r.amb   ?? def.amb}  AMB`);
+    if (def.har  || r.har)  p.push(`+${r.har   ?? def.har}  HAR`);
     return p.join(' · ');
 }
 
@@ -173,10 +201,14 @@ function _renderGearModal(character, activeSlot) {
         if (!inv) return;
         const _baseDef = _itemDef(inv.itemID);
         if (!_isGear(_baseDef)) return;
-        // Merge instance-level flavour (name/description from loot tag system) onto a copy
+        // Merge instance-level flavour and rolls onto a copy
         const _flavouredName = (inv.itemName && inv.itemName.includes(' ')) ? inv.itemName : null;
-        const def = (_flavouredName || inv.itemDescription)
-            ? { ..._baseDef, name: _flavouredName || _baseDef?.name, description: inv.itemDescription || _baseDef?.description }
+        const def = (_flavouredName || inv.itemDescription || inv._rolls)
+            ? { ..._baseDef,
+                name:        _flavouredName || _baseDef?.name,
+                description: inv.itemDescription || _baseDef?.description,
+                ...(inv._rolls ? { _rolls: inv._rolls, ...inv._rolls } : {}),
+              }
             : _baseDef;
         const slot1 = _itemSlot(def);
         const slot2 = def?.slot_id2;
@@ -220,6 +252,7 @@ function _renderGearModal(character, activeSlot) {
             ? { ..._eqBaseDef,
                 ...(_eqSlotEntry.itemName        ? { name:        _eqSlotEntry.itemName        } : {}),
                 ...(_eqSlotEntry.itemDescription ? { description: _eqSlotEntry.itemDescription } : {}),
+                ...(_eqSlotEntry._rolls          ? { _rolls: _eqSlotEntry._rolls, ..._eqSlotEntry._rolls } : {}),
               }
             : _eqBaseDef;
         const invItems    = bySlot[slot] || [];
@@ -256,15 +289,18 @@ function _renderGearModal(character, activeSlot) {
         invItems.forEach(({ inv, idx, def }) => {
             anyItem = true;
             const g = _goldValue(def);
+            const dmg1 = inv._rolls?.dmg1 ?? def?.dmg1;
+            const armor = inv._rolls?.armor ?? def?.armor;
             const stats = [
-                def?.dmg1 ? `${def.dmg1} ${def.dmg_type_1 || ''}`.trim() : null,
-                def?.armor ? `${def.armor} armor` : null,
+                dmg1  ? `${dmg1} ${def?.dmg_type_1 || ''}`.trim() : null,
+                armor ? `${armor} armor` : null,
                 _statBonuses(def) || null,
             ].filter(Boolean).join(' · ');
+            const nameColor = _rollQualityColor(inv) || _rarityColor(inv.rarity);
             rows += `
                 <div class="inv-item">
                     <div class="inv-item__info">
-                        <div class="inv-item__name" style="color:${_rarityColor(inv.rarity)};">${(inv.itemName && inv.itemName.includes(' ')) ? inv.itemName : (def?.name || inv.itemID)}</div>
+                        <div class="inv-item__name" style="color:${nameColor};">${(inv.itemName && inv.itemName.includes(' ')) ? inv.itemName : (def?.name || inv.itemID)}</div>
                         ${stats ? `<div class="inv-item__stats">${stats}</div>` : ''}
                     </div>
                     <div class="inv-item__actions">
@@ -540,16 +576,18 @@ async function equipItemNew(characterId, itemId, inventoryIndex) {
         _safeInventory(character).push({ itemID: cur.itemID, rarity: 'common', acquiredAt: Date.now(),
             ...(cur.itemName        ? { itemName:        cur.itemName        } : {}),
             ...(cur.itemDescription ? { itemDescription: cur.itemDescription } : {}),
+            ...(cur._rolls          ? { _rolls:          cur._rolls          } : {}),
         });
     }
 
-    // 5. Equip New Item — store { itemID, itemName, itemDescription } to preserve flavour
+    // 5. Equip New Item — store { itemID, itemName, itemDescription, _rolls } to preserve instance data
     const invEntry = _safeInventory(character)[inventoryIndex] || {};
     _safeInventory(character).splice(inventoryIndex, 1);
     character.equipment[targetSlot] = {
         itemID: itemId,
         ...(invEntry.itemName        ? { itemName:        invEntry.itemName        } : {}),
         ...(invEntry.itemDescription ? { itemDescription: invEntry.itemDescription } : {}),
+        ...(invEntry._rolls          ? { _rolls:          invEntry._rolls          } : {}),
     };
     character.lastModified = Date.now();
 
@@ -571,6 +609,7 @@ async function unequipItemNew(characterId, slot) {
     _safeInventory(character).push({ itemID: _slotEntry.itemID, rarity: 'common', acquiredAt: Date.now(),
         ...(_slotEntry.itemName        ? { itemName:        _slotEntry.itemName        } : {}),
         ...(_slotEntry.itemDescription ? { itemDescription: _slotEntry.itemDescription } : {}),
+        ...(_slotEntry._rolls          ? { _rolls:          _slotEntry._rolls          } : {}),
     });
     character.equipment[slot] = null;
     character.lastModified = Date.now();

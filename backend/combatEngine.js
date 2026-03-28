@@ -1174,7 +1174,7 @@ calculateRewards(players, challenge, segments = []) {
                 if (pick && challengeTags.length > 0 && Object.keys(this.lootTags).length > 0) {
                     const tag = challengeTags[Math.floor(Math.random() * challengeTags.length)];
                     const tagDef = this.lootTags[tag];
-                    if (tagDef) pick = this._applyLootTagFlavour(pick, tagDef);
+                    if (tagDef) pick = this._applyLootTagFlavour(pick, { ...tagDef, _tag: tag });
                 }
                 if (pick) {
                     const _rolls = this._rollItemVariance(pick);
@@ -1240,6 +1240,44 @@ _applyLootTagFlavour(item, tagDef) {
 
     if (flavourLine) {
         copy.description = flavourLine;
+    }
+
+    // Small flat stat affixes by tag. Clamped to minimum 0 to avoid negatives on stats that don't exist.
+    const TAG_AFFIXES = {
+        sacred:    { har: 1, hp: 3 },
+        corrupted: { amb: 1, armor: -1 },
+        arcane:    { har: 1, mana: 5 },
+        fire:      { con: 1, dmg1: 1 },
+        dwarven:   { end: 1, armor: 2 },
+        orc:       { con: 1, end: 1 },
+        elven:     { amb: 1, har: 1 },
+        shadow:    { amb: 2 },
+        beast:     { con: 1, dmg1: 1 },
+        spirit:    { har: 1, mana: 5 },
+        nature:    { har: 1, phys_ev: 1 },
+        martial:   { con: 1, end: 1 },
+        goblin:    { amb: 1 },
+        scavenge:  { end: 1 },
+        undead:    { end: 1, har: 1 },
+        coastal:   { end: 1, phys_ev: 1 },
+        mountain:  { end: 2, armor: 1 },
+        woodland:  { amb: 1, phys_ev: 1 },
+        oath:      { con: 1, hp: 3 },
+        mercenary: { amb: 1, con: 1 },
+    };
+
+    const affixes = TAG_AFFIXES[tagDef._tag];
+    if (affixes) {
+        Object.entries(affixes).forEach(([stat, bonus]) => {
+            const current = copy[stat] || 0;
+            const next = current + bonus;
+            // Don't add a stat that didn't exist and ends up at 0 or below
+            if (next <= 0 && !item[stat]) {
+                delete copy[stat];
+            } else {
+                copy[stat] = Math.max(0, next);
+            }
+        });
     }
 
     return copy;

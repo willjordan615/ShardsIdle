@@ -1562,11 +1562,11 @@ try {
                                 dustGained += d;
                                 soldLines.push(`${itemName} (dupe) → ${g}g`);
                             } else {
-                                // Preserve flavoured name/description from tag system if present
+                                // Preserve flavoured name/description and rolls from loot instance
                                 const inventoryEntry = { itemID: loot.itemID, rarity: loot.rarity || 'common', acquiredAt: Date.now() };
-                                // Only store flavoured name/description — real names (contain a space) that differ from base
                                 if (loot.itemName && loot.itemName.includes(' ') && loot.itemName !== itemDef?.name) inventoryEntry.itemName = loot.itemName;
                                 if (loot.itemDescription && loot.itemDescription !== itemDef?.description) inventoryEntry.itemDescription = loot.itemDescription;
+                                if (loot._rolls) inventoryEntry._rolls = loot._rolls;
                                 character.inventory.push(inventoryEntry);
                                 lootLines.push(loot.itemName || itemName);
                             }
@@ -1576,6 +1576,7 @@ try {
                             const inventoryEntry = { itemID: loot.itemID, rarity: loot.rarity || 'common', acquiredAt: Date.now() };
                             if (loot.itemName && loot.itemName.includes(' ') && loot.itemName !== itemDef?.name) inventoryEntry.itemName = loot.itemName;
                             if (loot.itemDescription && loot.itemDescription !== itemDef?.description) inventoryEntry.itemDescription = loot.itemDescription;
+                            if (loot._rolls) inventoryEntry._rolls = loot._rolls;
                             character.inventory.push(inventoryEntry);
                             lootLines.push(loot.itemName || itemName);
                         }
