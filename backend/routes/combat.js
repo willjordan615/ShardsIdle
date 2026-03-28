@@ -383,6 +383,79 @@ router.post('/start', requireAuth, async (req, res) => {
     }
 });
 
+// ── Escape endpoint ───────────────────────────────────────────────────────────
+// Called by the client after a combat result arrives when the player used an
+// escape consumable mid-run. Marks the log as escaped, strips rewards past the
+// last completed stage, decrements the consumed item, saves the character.
+router.post('/escape', requireAuth, async (req, res) => {
+    const { combatID, characterID, itemUsed, lastCompletedStageIndex } = req.body;
+    if (!combatID || !characterID || !itemUsed) {
+        return res.status(400).json({ error: 'combatID, characterID, and itemUsed are required' });
+    }
+
+    let releaseLocks;
+    try {
+        releaseLocks = await acquireCharacterLocks([characterID]);
+
+        // Load combat log
+        const logEntry = await db.getCombatLog(combatID);
+        if (!logEntry) return res.status(404).json({ error: 'Combat log not found' });
+
+        const combatData = logEntry.log;
+
+        // Mark as escaped
+        combatData.result = 'escaped';
+        combatData.escapedAtStage = lastCompletedStageIndex ?? null;
+
+        // Strip rewards past the last completed stage.
+        // If no stages were completed (smoke bomb unused / teleport mid-stage-0),
+        // null out rewards entirely.
+        const completedCount = typeof lastCompletedStageIndex === 'number'
+            ? lastCompletedStageIndex + 1
+            : 0;
+
+        if (completedCount === 0 || !combatData.rewards) {
+            combatData.rewards = null;
+        }
+        // If rewards exist and some stages were won, they already only reflect
+        // completed stages via calculateRewards — no further stripping needed.
+
+        // Update the combat log record
+        await db.saveCombatLog({
+            id: combatID,
+            challengeID: logEntry.challengeID,
+            partyID: logEntry.partyID,
+            startTime: logEntry.startTime,
+            result: 'escaped',
+            totalTurns: logEntry.totalTurns,
+            log: combatData,
+        });
+
+        // Decrement the item from the character's belt
+        const character = await db.getCharacter(characterID);
+        if (!character) return res.status(404).json({ error: 'Character not found' });
+
+        const consumables = character.consumables || {};
+        if (consumables[itemUsed] && consumables[itemUsed] > 0) {
+            consumables[itemUsed]--;
+            if (consumables[itemUsed] <= 0) delete consumables[itemUsed];
+            character.consumables = consumables;
+            await db.saveCharacter(character);
+            console.log(`[ESCAPE] ${character.name} used ${itemUsed} — ${consumables[itemUsed] ?? 0} remaining`);
+        } else {
+            console.warn(`[ESCAPE] ${character.name} escape item ${itemUsed} not found in belt — no decrement`);
+        }
+
+        res.json({ success: true, result: 'escaped' });
+
+    } catch (err) {
+        console.error('[ESCAPE] Error:', err);
+        res.status(500).json({ error: 'Escape processing failed', details: err.message });
+    } finally {
+        if (releaseLocks) releaseLocks();
+    }
+});
+
 router.get('/:combatID', async (req, res) => {
     try {
         const log = await db.getCombatLog(req.params.combatID);

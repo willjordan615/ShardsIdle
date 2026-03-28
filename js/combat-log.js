@@ -149,6 +149,31 @@ window.toggleCombatPause = function() {
 };
 
 // Sync the active highlight on all media control buttons
+// ── Escape consumable state ──────────────────────────────────────────────────
+window._escapeRequested  = false;
+window._escapeStageIndex = null;
+window._escapeItemUsed   = null;
+window._escapeStageReady = false;
+
+function _escapeItemInBelt() {
+    const member = window.currentState?.currentParty?.[0];
+    if (!member) return null;
+    const consumables = member.consumables || {};
+    if ((consumables['consumable_scroll_teleport'] || 0) > 0) return 'consumable_scroll_teleport';
+    if ((consumables['smoke_bomb'] || 0) > 0) return 'smoke_bomb';
+    return null;
+}
+
+window.triggerEscape = function() {
+    const item = _escapeItemInBelt();
+    if (!item) return;
+    const isTeleport = item === 'consumable_scroll_teleport';
+    if (!isTeleport && !window._escapeStageReady) return; // smoke bomb not ready yet
+    window._escapeRequested = true;
+    window._escapeItemUsed  = item;
+    _updateMediaControls();
+};
+
 function _updateMediaControls() {
     const speedKey = _getSavedSpeed();
     ['slow', 'normal', 'fast'].forEach(key => {
@@ -175,6 +200,23 @@ function _updateMediaControls() {
         const pending = window.currentState?.pendingLoopExit;
         loopBtn.classList.toggle('media-btn--active', !!active);
         loopBtn.style.opacity = pending ? '0.4' : '';
+    }
+    // Stop button: visible when an escape item is in belt
+    const stopBtn = document.getElementById('mediaBtn_stop');
+    if (stopBtn) {
+        const item = _escapeItemInBelt();
+        if (item) {
+            stopBtn.style.display = '';
+            const isTeleport = item === 'consumable_scroll_teleport';
+            const isReady    = isTeleport || window._escapeStageReady;
+            stopBtn.style.opacity = isReady ? '' : '0.4';
+            stopBtn.title = isTeleport
+                ? 'Teleport — escape combat immediately'
+                : (isReady ? 'Smoke Bomb — escape now' : 'Smoke Bomb — available after stage clear');
+        } else {
+            stopBtn.style.display = 'none';
+            stopBtn.style.opacity = '';
+        }
     }
 }
 
@@ -277,6 +319,11 @@ async function displayCombatLog(combatData) {
 
         // Reset pause state for new combat; speed persists from localStorage
         window.combatPaused = false;
+        // Reset escape state for new combat
+        window._escapeRequested  = false;
+        window._escapeStageIndex = null;
+        window._escapeItemUsed   = null;
+        window._escapeStageReady = false;
         _userScrolledUp = false;
         window.combatSpeedMultiplier = _SPEED_MAP[_getSavedSpeed()] || 1.0;
         _updateMediaControls();
@@ -597,8 +644,22 @@ async function displayCombatLog(combatData) {
                     overallResult = 'victory';
                 }
 
+                // After a stage victory: smoke bomb becomes available, teleport escape is checked
+                if (overallResult === 'victory') {
+                    const segIdx = combatData.segments.indexOf(segment);
+                    window._escapeStageReady = true;
+                    window._escapeStageIndex = segIdx;
+                    _updateMediaControls();
+                    // Check if teleport was triggered mid-stage (flag set during turn playback)
+                    if (window._escapeRequested) {
+                        break;
+                    }
+                }
+
                 if (segment !== combatData.segments[combatData.segments.length - 1]) {
+                    // Pause here — smoke bomb player can hit stop during this gap
                     await sleep(1800);
+                    if (window._escapeRequested) break;
                 }
             }
         } else {

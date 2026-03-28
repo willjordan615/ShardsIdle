@@ -450,6 +450,32 @@ async function startCombat(forcedChallengeId) {
 
         console.log('[COMBAT] Server response received. Result:', combatResult.result);
 
+        // If the player used an escape consumable, POST to the escape endpoint,
+        // then return to hub without displaying the combat log.
+        if (window._escapeRequested && combatResult.combatID) {
+            const characterID = currentState.currentParty?.[0]?.characterID || currentState.currentParty?.[0]?.id;
+            try {
+                await authFetch(`${BACKEND_URL}/api/combat/escape`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        combatID:               combatResult.combatID,
+                        characterID,
+                        itemUsed:               window._escapeItemUsed,
+                        lastCompletedStageIndex: window._escapeStageIndex,
+                    })
+                });
+                console.log('[ESCAPE] Escape processed — returning to hub.');
+            } catch (err) {
+                console.warn('[ESCAPE] Escape endpoint failed:', err);
+            }
+            window._escapeRequested  = false;
+            window._escapeStageIndex = null;
+            window._escapeItemUsed   = null;
+            if (typeof returnToHub === 'function') returnToHub();
+            return;
+        }
+
         // If the player navigated away during the idle loop, don't drag them back to
         // the combat screen — just run the log silently and let the toast notify them.
         const silent = window._silentCombatRestart;
