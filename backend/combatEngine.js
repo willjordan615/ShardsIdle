@@ -3437,4 +3437,11 @@ _applyLootTagFlavour(item, tagDef) {
   }
 }
 
+CombatEngine.applyTuning = function(tuning) {
+    if (tuning.genWeapon) {
+        generateEnemyWeapon.TUNING = { ...(generateEnemyWeapon.TUNING || {}), ...tuning.genWeapon };
+        console.log('[TUNING] genWeapon applied:', generateEnemyWeapon.TUNING);
+    }
+};
+
 module.exports = CombatEngine;

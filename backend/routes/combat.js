@@ -54,6 +54,12 @@ function initializeCombatEngine() {
             const statusEngine = new StatusEngine(statuses);
             combatEngine = new CombatEngine(skills, enemyTypes, races, gear, statusEngine, lootTags);
 
+            // Apply persisted tuning overrides
+            try {
+                const tuning = JSON.parse(fs.readFileSync(path.join(dataDir, 'tuning.json'), 'utf8'));
+                if (tuning.genWeapon) CombatEngine.applyTuning(tuning);
+            } catch(e) { console.warn('[COMBAT] No tuning.json or parse error — using defaults.'); }
+
             console.log('[COMBAT] Combat engine initialized');
         } catch (error) {
             console.error('[COMBAT] Failed to initialize combat engine:', error);

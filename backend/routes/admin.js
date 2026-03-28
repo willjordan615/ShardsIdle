@@ -302,5 +302,29 @@ router.post('/db/characters/:id/reassign', async (req, res) => {
     } catch(e) { res.status(500).json({ error: e.message }); }
 });
 
+
+// ── Tuning Routes ─────────────────────────────────────────────────────────────
+const TUNING_PATH = require('path').join(__dirname, '../data/tuning.json');
+
+// GET /api/admin/tuning — read current tuning values
+router.get('/tuning', (req, res) => {
+    try {
+        const tuning = JSON.parse(fs.readFileSync(TUNING_PATH, 'utf8'));
+        res.json(tuning);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// POST /api/admin/tuning — save and hot-apply tuning values
+router.post('/tuning', (req, res) => {
+    try {
+        const tuning = req.body;
+        fs.writeFileSync(TUNING_PATH, JSON.stringify(tuning, null, 2), 'utf8');
+        // Hot-apply to running engine
+        const CombatEngine = require('../combatEngine');
+        CombatEngine.applyTuning(tuning);
+        res.json({ success: true, tuning });
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
 module.exports = router;
 module.exports.loadGameData = loadGameData;

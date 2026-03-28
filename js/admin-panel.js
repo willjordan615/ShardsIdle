@@ -276,7 +276,7 @@
 // ── Tab switcher ──────────────────────────────────────────────────────────────
 
 window.switchAdminTab = function(tab) {
-    const tabs = ['items', 'skills', 'enemies', 'characters', 'snapshots', 'db'];
+    const tabs = ['items', 'skills', 'enemies', 'characters', 'snapshots', 'db', 'tuning'];
     tabs.forEach(t => {
         const content = document.getElementById('adminTabContent_' + t);
         if (content) content.style.display = t === tab ? 'block' : 'none';
@@ -292,6 +292,7 @@ window.switchAdminTab = function(tab) {
     if (tab === 'skills')     switchSkillSubTab('edit');
     if (tab === 'enemies')    loadAdminEnemies();
     if (tab === 'characters') loadAdminCharacters();
+    if (tab === 'tuning') loadAdminTuning();
     if (tab === 'snapshots')  loadAdminSnapshots();
     if (tab === 'db')         renderAdminDB();
 };
@@ -1194,3 +1195,120 @@ window.adminDeleteSkill = async function() {
         document.getElementById('adminSkillEditor').style.display = 'none';
     } catch(e) { alert('Delete failed: ' + e.message); }
 };
+
+// ── Tuning Tab ────────────────────────────────────────────────────────────────
+
+const GEN_WEAPON_FIELDS = [
+    { key: 'BASE_FLAT',    label: 'Base flat damage',         min: 0,   max: 20,  step: 0.5  },
+    { key: 'BASE_PER_LVL',label: 'Damage per level',         min: 0,   max: 5,   step: 0.05 },
+    { key: 'FAST_MULT',   label: 'Fast style multiplier',    min: 0.1, max: 2.0, step: 0.05 },
+    { key: 'STD_MULT',    label: 'Standard style multiplier',min: 0.1, max: 2.0, step: 0.05 },
+    { key: 'HEAVY_MULT',  label: 'Heavy style multiplier',   min: 0.1, max: 2.0, step: 0.05 },
+    { key: 'MAGIC_MULT',  label: 'Magic enemy multiplier',   min: 0.1, max: 2.0, step: 0.05 },
+];
+
+async function loadAdminTuning() {
+    const el = document.getElementById('adminTabContent_tuning');
+    if (!el) return;
+    el.innerHTML = '<p style="color:#aaa;padding:12px;">Loading...</p>';
+    try {
+        const res = await fetch(BACKEND_URL + '/api/admin/tuning');
+        const tuning = await res.json();
+        const gw = tuning.genWeapon || {};
+
+        el.innerHTML = `
+            <div style="padding:16px;max-width:520px;">
+                <div style="color:#ccc;font-size:.95em;font-weight:600;margin-bottom:16px;">Generated Enemy Weapons</div>
+                ${GEN_WEAPON_FIELDS.map(f => `
+                    <div style="display:flex;align-items:center;margin-bottom:12px;gap:12px;">
+                        <label style="color:#aaa;font-size:.85em;width:200px;flex-shrink:0;">${f.label}</label>
+                        <input type="range" id="tuning_${f.key}"
+                            min="${f.min}" max="${f.max}" step="${f.step}"
+                            value="${gw[f.key] ?? f.min}"
+                            style="flex:1;"
+                            oninput="document.getElementById('tuning_val_${f.key}').textContent=parseFloat(this.value).toFixed(2)">
+                        <span id="tuning_val_${f.key}" style="color:#8af;font-size:.85em;width:36px;text-align:right;font-family:monospace;">
+                            ${(gw[f.key] ?? f.min).toFixed(2)}
+                        </span>
+                    </div>
+                `).join('')}
+                <div style="margin-top:8px;display:flex;gap:8px;align-items:center;">
+                    <button onclick="saveTuning()" style="padding:6px 18px;background:#1a2a3a;border:1px solid #345;color:#8af;border-radius:4px;cursor:pointer;">Save & Apply</button>
+                    <button onclick="resetTuning()" style="padding:6px 18px;background:#222;border:1px solid #334;color:#888;border-radius:4px;cursor:pointer;">Reset Defaults</button>
+                    <span id="tuningStatus" style="color:#8f8;font-size:.8em;"></span>
+                </div>
+                <div style="margin-top:16px;padding:10px;background:#111;border:1px solid #223;border-radius:4px;">
+                    <div style="color:#666;font-size:.75em;margin-bottom:6px;">Preview — damage at level:</div>
+                    <div id="tuningPreview" style="font-size:.8em;font-family:monospace;color:#aaa;"></div>
+                </div>
+            </div>`;
+
+        updateTuningPreview();
+        GEN_WEAPON_FIELDS.forEach(f => {
+            document.getElementById('tuning_' + f.key)?.addEventListener('input', updateTuningPreview);
+        });
+
+    } catch(e) { el.innerHTML = \`<p style="color:#f88;padding:12px;">Error: \${e.message}</p>\`; }
+}
+
+function getTuningValues() {
+    const gw = {};
+    GEN_WEAPON_FIELDS.forEach(f => {
+        const el = document.getElementById('tuning_' + f.key);
+        if (el) gw[f.key] = parseFloat(el.value);
+    });
+    return { genWeapon: gw };
+}
+
+function updateTuningPreview() {
+    const el = document.getElementById('tuningPreview');
+    if (!el) return;
+    const gw = getTuningValues().genWeapon;
+    const levels = [10, 20, 30, 50];
+    const styles = [
+        { name: 'Fast',     mult: gw.FAST_MULT,  magic: false },
+        { name: 'Standard', mult: gw.STD_MULT,   magic: false },
+        { name: 'Heavy',    mult: gw.HEAVY_MULT, magic: false },
+        { name: 'Caster',   mult: gw.STD_MULT,   magic: true  },
+    ];
+    const header = 'Style      ' + levels.map(l => ('L' + l).padStart(5)).join('');
+    const rows = styles.map(s => {
+        const dmgs = levels.map(l => {
+            const base = gw.BASE_FLAT + l * gw.BASE_PER_LVL;
+            const mm = s.magic ? gw.MAGIC_MULT : 1.0;
+            return Math.round(base * s.mult * mm).toString().padStart(5);
+        });
+        return s.name.padEnd(10) + dmgs.join('');
+    });
+    el.textContent = [header, ...rows].join('\n');
+}
+
+window.saveTuning = async function() {
+    const tuning = getTuningValues();
+    try {
+        const res = await fetch(BACKEND_URL + '/api/admin/tuning', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(tuning)
+        });
+        const data = await res.json();
+        const st = document.getElementById('tuningStatus');
+        if (data.success) {
+            if (st) { st.textContent = 'Saved.'; setTimeout(() => { if(st) st.textContent=''; }, 2000); }
+        } else {
+            if (st) st.textContent = 'Error: ' + JSON.stringify(data);
+        }
+    } catch(e) { alert('Error: ' + e.message); }
+};
+
+window.resetTuning = function() {
+    const defaults = { BASE_FLAT:2, BASE_PER_LVL:0.8, FAST_MULT:0.70, STD_MULT:1.0, HEAVY_MULT:1.35, MAGIC_MULT:0.65 };
+    GEN_WEAPON_FIELDS.forEach(f => {
+        const el = document.getElementById('tuning_' + f.key);
+        const val = document.getElementById('tuning_val_' + f.key);
+        if (el) el.value = defaults[f.key];
+        if (val) val.textContent = defaults[f.key].toFixed(2);
+    });
+    updateTuningPreview();
+};
+
