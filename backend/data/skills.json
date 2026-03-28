@@ -9154,12 +9154,12 @@
   },
   {
     "id": "silent_prayer",
-    "name": "Humble Steps",
-    "description": "Have faith that whatever entity will protect you from harm.",
+    "name": "Silent Prayer",
+    "description": "A prayer cast without sound to avoid detection.",
     "category": "UTILITY",
     "parentSkills": [
       "prayer",
-      "footwork"
+      "misdirect"
     ],
     "basePower": 0,
     "baseHitChance": 1.0,
@@ -9175,8 +9175,8 @@
       {
         "type": "apply_buff",
         "buff": "stealth",
-        "duration": 6,
-        "chance": 0.75
+        "duration": 8,
+        "chance": 1.0
       }
     ],
     "isChildSkill": true

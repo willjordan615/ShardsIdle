@@ -2193,7 +2193,6 @@ _applyLootTagFlavour(item, tagDef) {
   }
 
   /**
-  /**
    * Build a skill-id → depth map by walking the parent graph.
    * Depth 1 = no parents. Depth N = max(parent depths) + 1.
    * Cycles are ignored (depth stays at whatever was last computed).
@@ -2231,7 +2230,8 @@ _applyLootTagFlavour(item, tagDef) {
       return rates[Math.max(0, idx)];
   }
 
-   
+  /**
+   * After the AI selects a skill, check whether a child skill should proc
    * and replace it. Returns the action to execute (may be unchanged).
    */
   checkChildSkillProc(character, selectedAction, players, enemies) {
