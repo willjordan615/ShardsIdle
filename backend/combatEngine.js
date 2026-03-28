@@ -2475,9 +2475,10 @@ _applyLootTagFlavour(item, tagDef) {
 
     let targetList;
     if (hasAOEEffect) {
+        const isEnemyActor = actor.type === 'enemy';
         targetList = isAllyAOE
-            ? players.filter(p => !p.defeated)
-            : enemies.filter(e => !e.defeated);
+            ? (isEnemyActor ? enemies.filter(e => !e.defeated) : players.filter(p => !p.defeated))
+            : (isEnemyActor ? players.filter(p => !p.defeated) : enemies.filter(e => !e.defeated));
         if (targetList.length === 0) {
             return { roll: null, result: { message: 'No targets found', success: false, delay: finalDelay } };
         }

@@ -211,7 +211,60 @@ router.get('/db/characters/:id', (req, res) => {
     });
 });
 
-// DELETE /api/admin/db/characters/:id — delete a character
+// PUT /api/admin/db/characters/:id — full character editor save
+router.put('/db/characters/:id', (req, res) => {
+    const db = getDB();
+    const { id } = req.params;
+    const {
+        name, race, level, experience,
+        conviction, endurance, ambition, harmony,
+        gold, arcaneDust, aiProfile, roleTag,
+        equipment, skills,
+    } = req.body;
+
+    // Write the characters row
+    db.run(`UPDATE characters SET
+        name = ?, race = ?, level = ?, experience = ?,
+        conviction = ?, endurance = ?, ambition = ?, harmony = ?,
+        gold = ?, arcaneDust = ?, aiProfile = ?, roleTag = ?,
+        equipment = ?, skills = ?, lastModified = ?
+        WHERE id = ?`,
+        [
+            name, race, level, experience,
+            conviction, endurance, ambition, harmony,
+            gold, arcaneDust, aiProfile || 'balanced', roleTag || null,
+            JSON.stringify(equipment || {}),
+            JSON.stringify(skills || []),
+            Date.now(),
+            id,
+        ],
+        function(err) {
+            if (err) return res.status(500).json({ error: err.message });
+            if (this.changes === 0) return res.status(404).json({ error: 'Character not found' });
+
+            // Also upsert skill_progression for each skill so the two tables stay in sync
+            if (!skills || !skills.length) return res.json({ success: true });
+            const stmt = db.prepare(`INSERT INTO skill_progression
+                (characterID, skillID, skillXP, skillLevel, usageCount, lastUsedAt)
+                VALUES (?, ?, ?, ?, ?, ?)
+                ON CONFLICT(characterID, skillID) DO UPDATE SET
+                skillXP = ?, skillLevel = ?, usageCount = ?, lastUsedAt = ?`);
+            const now = Date.now();
+            for (const s of skills) {
+                stmt.run([
+                    id, s.skillID, s.skillXP, s.skillLevel, s.usageCount, now,
+                    s.skillXP, s.skillLevel, s.usageCount, now,
+                ]);
+            }
+            stmt.finalize(err2 => {
+                if (err2) return res.status(500).json({ error: err2.message });
+                res.json({ success: true });
+            });
+        }
+    );
+});
+
+
 router.delete('/db/characters/:id', (req, res) => {
     const db = getDB();
     db.run(`DELETE FROM characters WHERE id = ?`, [req.params.id], function(err) {

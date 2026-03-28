@@ -1409,8 +1409,8 @@ try {
                 const multiplier = (!turn.result?.success && isPreCombatSkill) ? 0.5 : 1.0;
                 
                 let baseSkillXP = 50.0;
-                if (skillDef?.category?.includes('DAMAGE_SINGLE')) { 
-                    baseSkillXP = 20.0; 
+                if (skillDef?.category?.includes('DAMAGE_SINGLE') || skillDef?.category?.includes('DAMAGE_AOE')) { 
+                    baseSkillXP = 4.0; 
                 }
 
                 xpToAward = (baseSkillXP * multiplier) / Math.log(skillRef.skillLevel + 2);

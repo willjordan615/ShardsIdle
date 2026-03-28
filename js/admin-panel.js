@@ -683,16 +683,222 @@ async function loadAdminCharacters() {
 }
 
 window.adminViewCharacter = async function(id) {
+    const el = document.getElementById('adminTabContent_characters');
+    if (!el) return;
+    el.innerHTML = '<p style="color:#aaa;padding:12px;">Loading character...</p>';
     try {
         const res = await fetch(BACKEND_URL + '/api/admin/db/characters/' + encodeURIComponent(id));
         const char = await res.json();
-        const skills = (char.skills || []).map((s, i) => {
-            const tag = s.intrinsic ? ' [intrinsic]' : (i <= 2 && !s.intrinsic ? ' [equipped?]' : '');
-            return `  ${i}: ${s.skillID} lv${s.skillLevel || 0}${tag}`;
-        }).join('\n');
-        const info = `${char.name} — Level ${char.level} ${char.race}\n\nSkills (DB order):\n${skills}\n\nEquipment:\n${JSON.stringify(char.equipment||{},null,2)}`;
-        alert(info);
-    } catch(e) { alert('Error: ' + e.message); }
+        if (char.error) throw new Error(char.error);
+
+        const eq = char.equipment || {};
+        const skills = char.skills || [];
+
+        const EQUIPMENT_SLOTS = ['mainHand','offHand','head','chest','legs','feet','hands','ring','amulet','back'];
+
+        const eqRows = EQUIPMENT_SLOTS.map(slot => `
+            <tr>
+                <td style="padding:4px 8px;color:#aaa;font-size:.82em;">${slot}</td>
+                <td style="padding:4px 8px;"><input type="text" id="ceq_${slot}" value="${eq[slot]||''}"
+                    style="width:100%;background:#111;border:1px solid #334;color:#ccc;padding:3px 6px;border-radius:3px;font-family:monospace;font-size:.82em;"></td>
+            </tr>`).join('');
+
+        const skillRows = skills.map((s, i) => `
+            <tr style="border-bottom:1px solid #1a1a1a;">
+                <td style="padding:4px 6px;font-family:monospace;font-size:.8em;color:#8af;">${s.skillID}</td>
+                <td style="padding:4px 6px;text-align:center;">
+                    <input type="checkbox" id="csk_learned_${i}" ${s.learned ? 'checked' : ''}>
+                </td>
+                <td style="padding:4px 6px;text-align:center;">
+                    <input type="checkbox" id="csk_intrinsic_${i}" ${s.intrinsic ? 'checked' : ''}>
+                </td>
+                <td style="padding:4px 6px;text-align:center;">
+                    <input type="checkbox" id="csk_discovered_${i}" ${s.discovered ? 'checked' : ''}>
+                </td>
+                <td style="padding:4px 6px;">
+                    <input type="number" id="csk_level_${i}" value="${s.skillLevel||0}" min="0"
+                        style="width:55px;background:#111;border:1px solid #334;color:#cfc;padding:2px 4px;border-radius:3px;text-align:center;">
+                </td>
+                <td style="padding:4px 6px;">
+                    <input type="number" id="csk_xp_${i}" value="${Math.round(s.skillXP||0)}" min="0"
+                        style="width:70px;background:#111;border:1px solid #334;color:#aaa;padding:2px 4px;border-radius:3px;text-align:center;">
+                </td>
+                <td style="padding:4px 6px;">
+                    <input type="number" id="csk_usage_${i}" value="${s.usageCount||0}" min="0"
+                        style="width:65px;background:#111;border:1px solid #334;color:#aaa;padding:2px 4px;border-radius:3px;text-align:center;">
+                </td>
+            </tr>`).join('');
+
+        el.innerHTML = `
+            <div style="padding:10px 14px;">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+                    <button onclick="loadAdminCharacters()" style="padding:3px 10px;background:#1a2a1a;border:1px solid #3a5a3a;color:#8fa;cursor:pointer;border-radius:4px;">← Back</button>
+                    <span style="color:#aaa;font-size:.85em;font-family:monospace;">${char.id}</span>
+                    <span id="charEditorStatus" style="margin-left:auto;color:#8f8;font-size:.82em;"></span>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+
+                    <!-- Identity -->
+                    <div style="background:#111;border:1px solid #2a2a2a;border-radius:6px;padding:12px;">
+                        <div style="color:#888;font-size:.75em;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Identity</div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+                            <div><label style="font-size:.78em;color:#777;">Name</label>
+                                <input type="text" id="ce_name" value="${char.name||''}"
+                                    style="width:100%;background:#0a0a0a;border:1px solid #333;color:#eee;padding:4px 7px;border-radius:3px;font-size:.88em;box-sizing:border-box;"></div>
+                            <div><label style="font-size:.78em;color:#777;">Race</label>
+                                <input type="text" id="ce_race" value="${char.race||''}"
+                                    style="width:100%;background:#0a0a0a;border:1px solid #333;color:#eee;padding:4px 7px;border-radius:3px;font-size:.88em;box-sizing:border-box;"></div>
+                            <div><label style="font-size:.78em;color:#777;">Level</label>
+                                <input type="number" id="ce_level" value="${char.level||1}" min="1"
+                                    style="width:100%;background:#0a0a0a;border:1px solid #333;color:#cfc;padding:4px 7px;border-radius:3px;font-size:.88em;box-sizing:border-box;"></div>
+                            <div><label style="font-size:.78em;color:#777;">Experience</label>
+                                <input type="number" id="ce_experience" value="${char.experience||0}" min="0"
+                                    style="width:100%;background:#0a0a0a;border:1px solid #333;color:#eee;padding:4px 7px;border-radius:3px;font-size:.88em;box-sizing:border-box;"></div>
+                            <div><label style="font-size:.78em;color:#777;">AI Profile</label>
+                                <select id="ce_aiProfile" style="width:100%;background:#0a0a0a;border:1px solid #333;color:#eee;padding:4px 7px;border-radius:3px;font-size:.88em;box-sizing:border-box;">
+                                    ${['balanced','aggressive','defensive','opportunist','disruptor','support'].map(p =>
+                                        `<option value="${p}" ${char.aiProfile===p?'selected':''}>${p}</option>`).join('')}
+                                </select></div>
+                            <div><label style="font-size:.78em;color:#777;">Role Tag</label>
+                                <input type="text" id="ce_roleTag" value="${char.roleTag||''}"
+                                    style="width:100%;background:#0a0a0a;border:1px solid #333;color:#eee;padding:4px 7px;border-radius:3px;font-size:.88em;box-sizing:border-box;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Stats & Resources -->
+                    <div style="background:#111;border:1px solid #2a2a2a;border-radius:6px;padding:12px;">
+                        <div style="color:#888;font-size:.75em;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Stats &amp; Resources</div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+                            ${[['conviction','CON'],['endurance','END'],['ambition','AMB'],['harmony','HAR']].map(([f,l]) => `
+                            <div><label style="font-size:.78em;color:#777;">${l}</label>
+                                <input type="number" id="ce_${f}" value="${char[f]||0}" min="0"
+                                    style="width:100%;background:#0a0a0a;border:1px solid #333;color:#adf;padding:4px 7px;border-radius:3px;font-size:.88em;box-sizing:border-box;"></div>`).join('')}
+                            <div><label style="font-size:.78em;color:#777;">Gold</label>
+                                <input type="number" id="ce_gold" value="${char.gold||0}" min="0" step="0.01"
+                                    style="width:100%;background:#0a0a0a;border:1px solid #333;color:#fd8;padding:4px 7px;border-radius:3px;font-size:.88em;box-sizing:border-box;"></div>
+                            <div><label style="font-size:.78em;color:#777;">Arcane Dust</label>
+                                <input type="number" id="ce_arcaneDust" value="${char.arcaneDust||0}" min="0" step="0.01"
+                                    style="width:100%;background:#0a0a0a;border:1px solid #333;color:#c8f;padding:4px 7px;border-radius:3px;font-size:.88em;box-sizing:border-box;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Equipment -->
+                <div style="background:#111;border:1px solid #2a2a2a;border-radius:6px;padding:12px;margin-bottom:14px;">
+                    <div style="color:#888;font-size:.75em;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Equipment</div>
+                    <table style="width:100%;border-collapse:collapse;">
+                        <colgroup><col style="width:110px"><col></colgroup>
+                        ${eqRows}
+                    </table>
+                </div>
+
+                <!-- Skills -->
+                <div style="background:#111;border:1px solid #2a2a2a;border-radius:6px;padding:12px;margin-bottom:14px;">
+                    <div style="color:#888;font-size:.75em;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Skills</div>
+                    <table style="width:100%;border-collapse:collapse;">
+                        <thead><tr style="color:#666;font-size:.75em;border-bottom:1px solid #2a2a2a;">
+                            <th style="text-align:left;padding:4px 6px;">Skill ID</th>
+                            <th style="padding:4px 6px;">Learned</th>
+                            <th style="padding:4px 6px;">Intrinsic</th>
+                            <th style="padding:4px 6px;">Discovered</th>
+                            <th style="padding:4px 6px;">Level</th>
+                            <th style="padding:4px 6px;">XP</th>
+                            <th style="padding:4px 6px;">Uses</th>
+                        </tr></thead>
+                        <tbody>${skillRows}</tbody>
+                    </table>
+                </div>
+
+                <div style="display:flex;gap:8px;">
+                    <button onclick="adminSaveCharacter('${char.id}', ${skills.length})"
+                        style="padding:6px 18px;background:#1a3a1a;border:1px solid #3a6a3a;color:#8f8;cursor:pointer;border-radius:4px;font-size:.9em;">
+                        💾 Save Changes
+                    </button>
+                    <button onclick="loadAdminCharacters()"
+                        style="padding:6px 14px;background:#222;border:1px solid #444;color:#aaa;cursor:pointer;border-radius:4px;font-size:.9em;">
+                        Cancel
+                    </button>
+                    <button onclick="adminDeleteCharacter('${char.id}','${char.name}')"
+                        style="margin-left:auto;padding:6px 14px;background:#2a1a1a;border:1px solid #533;color:#f88;cursor:pointer;border-radius:4px;font-size:.9em;">
+                        🗑️ Delete Character
+                    </button>
+                </div>
+            </div>`;
+    } catch(e) {
+        el.innerHTML = `<div style="padding:12px;">
+            <button onclick="loadAdminCharacters()" style="margin-bottom:10px;padding:3px 10px;background:#1a2a1a;border:1px solid #3a5a3a;color:#8fa;cursor:pointer;border-radius:4px;">← Back</button>
+            <p style="color:#f88;">Error: ${e.message}</p></div>`;
+    }
+};
+
+window.adminSaveCharacter = async function(id, skillCount) {
+    const status = document.getElementById('charEditorStatus');
+    if (status) status.textContent = 'Saving...';
+
+    const EQUIPMENT_SLOTS = ['mainHand','offHand','head','chest','legs','feet','hands','ring','amulet','back'];
+    const equipment = {};
+    EQUIPMENT_SLOTS.forEach(slot => {
+        const val = (document.getElementById('ceq_' + slot)?.value || '').trim();
+        if (val) equipment[slot] = val;
+    });
+
+    const skills = [];
+    for (let i = 0; i < skillCount; i++) {
+        const learnedEl    = document.getElementById('csk_learned_'    + i);
+        const intrinsicEl  = document.getElementById('csk_intrinsic_'  + i);
+        const discoveredEl = document.getElementById('csk_discovered_' + i);
+        const levelEl      = document.getElementById('csk_level_'      + i);
+        const xpEl         = document.getElementById('csk_xp_'         + i);
+        const usageEl      = document.getElementById('csk_usage_'      + i);
+        if (!levelEl) continue;
+        // Recover skillID from the row's first cell
+        const row = levelEl.closest('tr');
+        const skillID = row?.querySelector('td:first-child')?.textContent?.trim();
+        if (!skillID) continue;
+        skills.push({
+            skillID,
+            learned:    learnedEl?.checked    ?? true,
+            intrinsic:  intrinsicEl?.checked   ?? false,
+            discovered: discoveredEl?.checked  ?? true,
+            skillLevel: parseInt(levelEl.value) || 0,
+            skillXP:    parseFloat(xpEl.value)  || 0,
+            usageCount: parseInt(usageEl.value) || 0,
+        });
+    }
+
+    const payload = {
+        name:        document.getElementById('ce_name')?.value?.trim(),
+        race:        document.getElementById('ce_race')?.value?.trim(),
+        level:       parseInt(document.getElementById('ce_level')?.value)       || 1,
+        experience:  parseInt(document.getElementById('ce_experience')?.value)  || 0,
+        conviction:  parseInt(document.getElementById('ce_conviction')?.value)  || 0,
+        endurance:   parseInt(document.getElementById('ce_endurance')?.value)   || 0,
+        ambition:    parseInt(document.getElementById('ce_ambition')?.value)    || 0,
+        harmony:     parseInt(document.getElementById('ce_harmony')?.value)     || 0,
+        gold:        parseFloat(document.getElementById('ce_gold')?.value)      || 0,
+        arcaneDust:  parseFloat(document.getElementById('ce_arcaneDust')?.value)|| 0,
+        aiProfile:   document.getElementById('ce_aiProfile')?.value,
+        roleTag:     document.getElementById('ce_roleTag')?.value?.trim() || null,
+        equipment,
+        skills,
+    };
+
+    try {
+        const res = await fetch(BACKEND_URL + '/api/admin/db/characters/' + encodeURIComponent(id), {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (data.success) {
+            if (status) { status.textContent = 'Saved ✓'; setTimeout(() => { if (status) status.textContent = ''; }, 2500); }
+        } else {
+            if (status) status.textContent = 'Error: ' + (data.error || JSON.stringify(data));
+        }
+    } catch(e) {
+        if (status) status.textContent = 'Error: ' + e.message;
+    }
 };
 
 window.adminDeleteCharacter = async function(id, name) {
