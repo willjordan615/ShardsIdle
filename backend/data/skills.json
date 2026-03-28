@@ -3556,7 +3556,7 @@
     "description": "Uses misdirection and footwork to vanish momentarily.",
     "category": "UTILITY",
     "parentSkills": [
-      "misdirect",
+      "stalk",
       "footwork"
     ],
     "basePower": 0,
