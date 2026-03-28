@@ -32,6 +32,76 @@ const CONSTANTS = {
 };
 
 /**
+/**
+ * Generate a procedural weapon for an enemy based on its tags and level.
+ * Returns a plain weapon object — never touches items.json.
+ * Type maps to a real variance-profile key so existing variance logic applies.
+ */
+function generateEnemyWeapon(tags, level) {
+    const t = tags || [];
+
+    // ── Tuning constants ─────────────────────────────────────────────────────
+    const GEN_WEAPON = generateEnemyWeapon.TUNING || {
+        BASE_FLAT:    2,    // flat damage added at all levels
+        BASE_PER_LVL: 0.8,  // damage added per enemy level
+        FAST_MULT:    0.70, // fast style (dagger) damage multiplier
+        STD_MULT:     1.0,  // standard style (sword) damage multiplier
+        HEAVY_MULT:   1.35, // heavy style (hammer) damage multiplier
+        MAGIC_MULT:   0.65, // penalty for magic-dominant enemies (caster/spirit/wisp)
+    };
+
+    // ── Damage type from thematic tags ──────────────────────────────────────
+    const DAMAGE_TYPE_MAP = [
+        [['beast', 'canine'],                              ['slashing', 'piercing']],
+        [['undead', 'shadow', 'blight'],                   ['shadow', 'cold']],
+        [['fire', 'ashen_remnant'],                        ['fire', 'physical']],
+        [['water', 'tidebound', 'salt_wept'],              ['cold', 'physical']],
+        [['nature', 'verdant', 'plant'],                   ['nature', 'physical']],
+        [['construct', 'earth', 'stone'],                  ['bludgeoning', 'physical']],
+        [['spirit', 'wisp', 'luminary', 'holy'],           ['holy', 'arcane']],
+        [['inkbound', 'echo_council', 'ancestor', 'pact'], ['arcane', 'shadow']],
+        [['lightning'],                                    ['lightning', 'physical']],
+        [['cold'],                                         ['cold', 'physical']],
+        [['caster'],                                       ['arcane', 'physical']],
+    ];
+
+    let damageTypes = ['physical'];
+    for (const [matchTags, types] of DAMAGE_TYPE_MAP) {
+        if (matchTags.some(mt => t.includes(mt))) { damageTypes = types; break; }
+    }
+
+    // ── Weapon style ─────────────────────────────────────────────────────────
+    // fast  → dagger variance [0.70,1.40]
+    // standard → sword variance [0.85,1.25]
+    // heavy → hammer variance [0.90,1.15]
+    let style = 'standard';
+    if (t.some(x => ['beast', 'canine', 'scout', 'ranged'].includes(x)))              style = 'fast';
+    if (t.some(x => ['tank', 'brute', 'construct', 'soldier', 'earth', 'stone'].includes(x))) style = 'heavy';
+
+    // ── Damage value ─────────────────────────────────────────────────────────
+    const base = GEN_WEAPON.BASE_FLAT + level * GEN_WEAPON.BASE_PER_LVL;
+    const styleMult  = style === 'fast' ? GEN_WEAPON.FAST_MULT : style === 'heavy' ? GEN_WEAPON.HEAVY_MULT : GEN_WEAPON.STD_MULT;
+    const magicTypes = new Set(['fire','cold','lightning','arcane','holy','shadow','nature','poison']);
+    const isMagicDominant = t.some(x => ['caster','spirit','wisp'].includes(x)) ||
+        damageTypes.every(dt => magicTypes.has(dt));
+    const magicMult  = isMagicDominant ? GEN_WEAPON.MAGIC_MULT : 1.0;
+    const totalDamage = Math.round(base * styleMult * magicMult);
+
+    const dmg1 = damageTypes.length === 1 ? totalDamage : Math.ceil(totalDamage * 0.65);
+    const dmg2 = damageTypes.length > 1   ? totalDamage - dmg1 : null;
+
+    return {
+        id:         `__generated_${style}`,
+        name:       `Generated ${style} weapon`,
+        type:       style === 'fast' ? 'dagger' : style === 'heavy' ? 'hammer' : 'sword',
+        dmg1,       dmg_type_1: damageTypes[0],
+        dmg2,       dmg_type_2: dmg2 ? damageTypes[1] : null,
+        dmg3: null, dmg4: null,
+        generated:  true,
+    };
+}
+
+/**
  * DYNAMIC WEAPON VARIANCE CONFIGURATION
  * Scans gearData to find all unique weapon types and assigns variance profiles.
  */
@@ -2591,7 +2661,10 @@ _applyLootTagFlavour(item, tagDef) {
     // ===== PRE-STEP: Fetch Weapon Early for Scope Access =====
     // We fetch this now so it's available for the Variance Debug Log later
     let weapon = null;
-    if (actor.equipment?.mainHand && this.gear) {
+    if (actor.equipment?._generatedWeapon) {
+      // Procedurally generated weapon — use directly, skip gear lookup
+      weapon = actor.equipment._generatedWeapon;
+    } else if (actor.equipment?.mainHand && this.gear) {
       weapon = this.gear.find(g => g.id === this._eqId(actor.equipment.mainHand));
     }
 
@@ -3103,31 +3176,16 @@ _applyLootTagFlavour(item, tagDef) {
                 equipment = { ...equipment, ...enemyType.equipment };
             }
 
-            // Resolve tier-appropriate mainHand from weaponTypes if present.
-            // This runs whether or not explicit equipment was set — weaponTypes always wins
-            // over a hardcoded mainHand, using the hardcoded item only as a fallback.
-            // Exception: creatureOnly weapons (fangs, jaws, etc.) are intentionally fixed — skip.
-            if (enemyType.weaponTypes && enemyType.weaponTypes.length > 0) {
-                const existingWeapon = equipment.mainHand
-                    ? this.gear.find(g => g.id === equipment.mainHand)
-                    : null;
-                const isCreatureOnly = existingWeapon?.creatureOnly;
+            // Generate a procedural weapon from enemy tags and level.
+            // Skipped if mainHand is a creatureOnly item (fangs, jaws, claws — fixed by design).
+            // Falls back to hardcoded mainHand if present and no generation needed.
+            const existingWeapon = equipment.mainHand
+                ? this.gear.find(g => g.id === equipment.mainHand)
+                : null;
+            const isCreatureOnly = existingWeapon?.creatureOnly;
 
-                if (!isCreatureOnly) {
-                    const pickedType = enemyType.weaponTypes[Math.floor(Math.random() * enemyType.weaponTypes.length)];
-                    const tier = Math.min(8, Math.floor((enemyLevel - 1) / 12));
-                    const candidates = this.gear.filter(g =>
-                        g.type === pickedType && g.dmg1 && !g.creatureOnly && g.tier >= 0
-                    );
-                    if (candidates.length > 0) {
-                        const exact = candidates.filter(g => g.tier === tier);
-                        const pool  = exact.length > 0 ? exact : candidates.sort((a, b) =>
-                            Math.abs(a.tier - tier) - Math.abs(b.tier - tier)
-                        ).slice(0, 3);
-                        equipment.mainHand = pool[Math.floor(Math.random() * pool.length)].id;
-                    }
-                    // If no tier match found, keep the hardcoded fallback (or null)
-                }
+            if (!isCreatureOnly) {
+                equipment._generatedWeapon = generateEnemyWeapon(enemyType.tags, enemyLevel);
             }
 
             // Scale enemy stats to level. Data stats define the distribution
