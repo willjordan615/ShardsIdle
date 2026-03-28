@@ -191,6 +191,7 @@ class CombatEngine {
         this.gear = gearData;
         this.statusEngine = statusEngine;
         this.lootTags = lootTags;
+        this._skillDepthCache = this._buildSkillDepthCache();
         
         // CRITICAL FIX: Initialize Weapon Variance safely
         try {
@@ -2192,7 +2193,45 @@ _applyLootTagFlavour(item, tagDef) {
   }
 
   /**
-   * After the AI selects a skill, check whether a child skill should proc
+  /**
+   * Build a skill-id → depth map by walking the parent graph.
+   * Depth 1 = no parents. Depth N = max(parent depths) + 1.
+   * Cycles are ignored (depth stays at whatever was last computed).
+   */
+  _buildSkillDepthCache() {
+      const cache = new Map();
+      const depth = (id, visited = new Set()) => {
+          if (cache.has(id)) return cache.get(id);
+          if (visited.has(id)) return 1;
+          visited.add(id);
+          const skill = this.skills.find(s => s.id === id);
+          if (!skill || !skill.parentSkills || skill.parentSkills.length === 0) {
+              cache.set(id, 1);
+              return 1;
+          }
+          const d = Math.max(...skill.parentSkills.map(p => depth(p, new Set(visited)))) + 1;
+          cache.set(id, d);
+          return d;
+      };
+      this.skills.forEach(s => depth(s.id));
+      return cache;
+  }
+
+  /**
+   * Resolve proc chance for a child skill.
+   * Explicit procChance on the skill data always wins.
+   * Otherwise, depth-based rates from PROC_DEPTH_RATES tuning apply.
+   */
+  _childProcChance(childSkill) {
+      if (childSkill.procChance != null) return childSkill.procChance;
+      const rates = CombatEngine.TUNING.PROC_DEPTH_RATES;
+      const depth = this._skillDepthCache.get(childSkill.id) || 2;
+      // rates is indexed from depth 2 upward; clamp to last entry for depth 7+
+      const idx = Math.min(depth - 2, rates.length - 1);
+      return rates[Math.max(0, idx)];
+  }
+
+   
    * and replace it. Returns the action to execute (may be unchanged).
    */
   checkChildSkillProc(character, selectedAction, players, enemies) {
@@ -2217,7 +2256,7 @@ _applyLootTagFlavour(item, tagDef) {
     const shuffled = eligibleChildSkills.sort(() => Math.random() - 0.5);
 
     for (const childSkill of shuffled) {
-        const procChance = childSkill.procChance || 0.05;
+        const procChance = this._childProcChance(childSkill);
         if (Math.random() >= procChance) continue;
 
         // --- CRITICAL FIX: Prevent "Lunge replacing Lunge" ---
@@ -3438,10 +3477,19 @@ _applyLootTagFlavour(item, tagDef) {
   }
 }
 
+CombatEngine.TUNING = {
+    // Proc chance by skill depth (index 0 = depth 2, index 1 = depth 3, etc.)
+    PROC_DEPTH_RATES: [0.18, 0.10, 0.06, 0.03, 0.015, 0.007],
+};
+
 CombatEngine.applyTuning = function(tuning) {
     if (tuning.genWeapon) {
         generateEnemyWeapon.TUNING = { ...(generateEnemyWeapon.TUNING || {}), ...tuning.genWeapon };
         console.log('[TUNING] genWeapon applied:', generateEnemyWeapon.TUNING);
+    }
+    if (tuning.procDepth) {
+        CombatEngine.TUNING.PROC_DEPTH_RATES = tuning.procDepth;
+        console.log('[TUNING] procDepth applied:', CombatEngine.TUNING.PROC_DEPTH_RATES);
     }
 };
 

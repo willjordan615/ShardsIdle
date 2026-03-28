@@ -1421,6 +1421,7 @@ async function loadAdminTuning() {
         const res = await fetch(BACKEND_URL + '/api/admin/tuning');
         const tuning = await res.json();
         const gw = tuning.genWeapon || {};
+        const pd = tuning.procDepth || [0.18, 0.10, 0.06, 0.03, 0.015, 0.007];
 
         el.innerHTML = `
             <div style="padding:16px;max-width:520px;">
@@ -1438,14 +1439,31 @@ async function loadAdminTuning() {
                         </span>
                     </div>
                 `).join('')}
+                <div style="margin-top:8px;padding:10px;background:#111;border:1px solid #223;border-radius:4px;margin-bottom:24px;">
+                    <div style="color:#666;font-size:.75em;margin-bottom:6px;">Preview — damage at level:</div>
+                    <div id="tuningPreview" style="font-size:.8em;font-family:monospace;color:#aaa;"></div>
+                </div>
+
+                <div style="color:#ccc;font-size:.95em;font-weight:600;margin-bottom:4px;">Child Skill Proc Rates</div>
+                <div style="color:#666;font-size:.78em;margin-bottom:14px;">Chance per turn a child skill procs, by depth. Explicit procChance in skill data overrides.</div>
+                ${pd.map((v, i) => `
+                    <div style="display:flex;align-items:center;margin-bottom:12px;gap:12px;">
+                        <label style="color:#aaa;font-size:.85em;width:200px;flex-shrink:0;">Depth ${i + 2}</label>
+                        <input type="range" id="tuning_pd_${i}"
+                            min="0" max="0.5" step="0.001"
+                            value="${v}"
+                            style="flex:1;"
+                            oninput="document.getElementById('tuning_pdv_${i}').textContent=parseFloat(this.value).toFixed(3)">
+                        <span id="tuning_pdv_${i}" style="color:#fa8;font-size:.85em;width:42px;text-align:right;font-family:monospace;">
+                            ${v.toFixed(3)}
+                        </span>
+                    </div>
+                `).join('')}
+
                 <div style="margin-top:8px;display:flex;gap:8px;align-items:center;">
                     <button onclick="saveTuning()" style="padding:6px 18px;background:#1a2a3a;border:1px solid #345;color:#8af;border-radius:4px;cursor:pointer;">Save & Apply</button>
                     <button onclick="resetTuning()" style="padding:6px 18px;background:#222;border:1px solid #334;color:#888;border-radius:4px;cursor:pointer;">Reset Defaults</button>
                     <span id="tuningStatus" style="color:#8f8;font-size:.8em;"></span>
-                </div>
-                <div style="margin-top:16px;padding:10px;background:#111;border:1px solid #223;border-radius:4px;">
-                    <div style="color:#666;font-size:.75em;margin-bottom:6px;">Preview — damage at level:</div>
-                    <div id="tuningPreview" style="font-size:.8em;font-family:monospace;color:#aaa;"></div>
                 </div>
             </div>`;
 
@@ -1463,7 +1481,12 @@ function getTuningValues() {
         const el = document.getElementById('tuning_' + f.key);
         if (el) gw[f.key] = parseFloat(el.value);
     });
-    return { genWeapon: gw };
+    const pd = [];
+    for (let i = 0; i < 6; i++) {
+        const el = document.getElementById('tuning_pd_' + i);
+        pd.push(el ? parseFloat(el.value) : [0.18, 0.10, 0.06, 0.03, 0.015, 0.007][i]);
+    }
+    return { genWeapon: gw, procDepth: pd };
 }
 
 function updateTuningPreview() {
@@ -1514,6 +1537,13 @@ window.resetTuning = function() {
         const val = document.getElementById('tuning_val_' + f.key);
         if (el) el.value = defaults[f.key];
         if (val) val.textContent = defaults[f.key].toFixed(2);
+    });
+    const pdDefaults = [0.18, 0.10, 0.06, 0.03, 0.015, 0.007];
+    pdDefaults.forEach((v, i) => {
+        const el = document.getElementById('tuning_pd_' + i);
+        const val = document.getElementById('tuning_pdv_' + i);
+        if (el) el.value = v;
+        if (val) val.textContent = v.toFixed(3);
     });
     updateTuningPreview();
 };
