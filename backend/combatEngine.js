@@ -2512,10 +2512,8 @@ _applyLootTagFlavour(item, tagDef) {
         equipment: Object.assign({}, actor.equipment, { mainHand: actor.equipment.offHand })
     });
 
-    // Scale skill power down to 0.3 for the echo
-    const echoSkill = Object.assign({}, skill, { basePower: (skill.basePower ?? 1) * 0.3 });
-
-    const echoDamage = this.calculateDamage(echoActor, echoSkill, target, false, skillLevel);
+    // Full calculation, then modulate output to 30%
+    const echoDamage = Math.max(1, Math.floor(this.calculateDamage(echoActor, skill, target, false, skillLevel) * 0.3));
 
     target.currentHP -= echoDamage;
     if (target.currentHP <= 0) { target.currentHP = 0; target.defeated = true; }

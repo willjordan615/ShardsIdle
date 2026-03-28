@@ -11847,5 +11847,278 @@
       "spirit",
       "arcane"
     ]
+  },
+   {
+    "id": "proc_slow",
+    "name": "Slow",
+    "category": "DAMAGE_PROC",
+    "description": "Hamper the target, slowing their actions.",
+    "basePower": 0.0,
+    "costType": "none",
+    "costAmount": 0,
+    "requiredLevel": 1,
+    "scalingFactors": {
+      "ambition": 0.6,
+      "conviction": 0.4
+    },
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "delay": 0,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_debuff",
+        "targets": "single_enemy",
+        "debuff": "slow",
+        "magnitude": 0.5,
+        "duration": 2
+      }
+    ],
+    "enemyUsable": false
+  },
+  {
+    "id": "proc_freeze",
+    "name": "Freeze",
+    "category": "DAMAGE_PROC",
+    "description": "Immobilize the target with intense cold.",
+    "basePower": 0.0,
+    "costType": "none",
+    "costAmount": 0,
+    "requiredLevel": 1,
+    "scalingFactors": {
+      "harmony": 0.7,
+      "conviction": 0.3
+    },
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "delay": 0,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_debuff",
+        "targets": "single_enemy",
+        "debuff": "freeze",
+        "magnitude": 1.0,
+        "duration": 1
+      }
+    ],
+    "enemyUsable": false,
+    "tags": [
+      "cold"
+    ]
+  },
+  {
+    "id": "proc_sleep",
+    "name": "Sleep",
+    "category": "DAMAGE_PROC",
+    "description": "Send the target into a sudden deep sleep.",
+    "basePower": 0.0,
+    "costType": "none",
+    "costAmount": 0,
+    "requiredLevel": 1,
+    "scalingFactors": {
+      "harmony": 0.8,
+      "ambition": 0.2
+    },
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "delay": 0,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_debuff",
+        "targets": "single_enemy",
+        "debuff": "sleep",
+        "magnitude": 1.0,
+        "duration": 2
+      }
+    ],
+    "enemyUsable": false
+  },
+  {
+    "id": "proc_confused",
+    "name": "Confuse",
+    "category": "DAMAGE_PROC",
+    "description": "Disorient the target, scrambling their senses.",
+    "basePower": 0.0,
+    "costType": "none",
+    "costAmount": 0,
+    "requiredLevel": 1,
+    "scalingFactors": {
+      "ambition": 0.5,
+      "harmony": 0.5
+    },
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "delay": 0,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_debuff",
+        "targets": "single_enemy",
+        "debuff": "confused",
+        "magnitude": 0.6,
+        "duration": 2
+      }
+    ],
+    "enemyUsable": false
+  },
+  {
+    "id": "proc_ambition_falter",
+    "name": "Falter",
+    "category": "DAMAGE_PROC",
+    "description": "Disrupt the target's focus, reducing their precision.",
+    "basePower": 0.0,
+    "costType": "none",
+    "costAmount": 0,
+    "requiredLevel": 1,
+    "scalingFactors": {
+      "ambition": 0.7,
+      "conviction": 0.3
+    },
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "delay": 0,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_debuff",
+        "targets": "single_enemy",
+        "debuff": "ambition_falter",
+        "magnitude": 0.5,
+        "duration": 2
+      }
+    ],
+    "enemyUsable": false
+  },
+  {
+    "id": "proc_taunt",
+    "name": "Taunt",
+    "category": "DAMAGE_PROC",
+    "description": "Draw enemy aggression, forcing them to target you.",
+    "basePower": 0.0,
+    "costType": "none",
+    "costAmount": 0,
+    "requiredLevel": 1,
+    "scalingFactors": {
+      "conviction": 0.6,
+      "endurance": 0.4
+    },
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "delay": 0,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_debuff",
+        "targets": "single_enemy",
+        "debuff": "taunt",
+        "magnitude": 1.0,
+        "duration": 2
+      }
+    ],
+    "enemyUsable": false
+  },
+  {
+    "id": "proc_cursed",
+    "name": "Curse",
+    "category": "DAMAGE_PROC",
+    "description": "Afflict the target with a weakening curse.",
+    "basePower": 0.0,
+    "costType": "none",
+    "costAmount": 0,
+    "requiredLevel": 1,
+    "scalingFactors": {
+      "harmony": 0.5,
+      "ambition": 0.5
+    },
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "delay": 0,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_debuff",
+        "targets": "single_enemy",
+        "debuff": "cursed",
+        "magnitude": 0.7,
+        "duration": 3
+      }
+    ],
+    "enemyUsable": false
+  },
+  {
+    "id": "proc_bloodlust_buff",
+    "name": "Bloodlust",
+    "category": "DAMAGE_PROC",
+    "description": "A surge of primal aggression heightens conviction.",
+    "basePower": 0.0,
+    "costType": "none",
+    "costAmount": 0,
+    "requiredLevel": 1,
+    "scalingFactors": {
+      "conviction": 0.8,
+      "ambition": 0.2
+    },
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "delay": 0,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "targets": "self",
+        "buff": "bloodlust_buff",
+        "magnitude": 1.0,
+        "duration": 2
+      }
+    ],
+    "enemyUsable": false
+  },
+  {
+    "id": "proc_fortify_buff",
+    "name": "Fortify",
+    "category": "DAMAGE_PROC",
+    "description": "Brace for impact, significantly reducing incoming damage.",
+    "basePower": 0.0,
+    "costType": "none",
+    "costAmount": 0,
+    "requiredLevel": 1,
+    "scalingFactors": {
+      "endurance": 0.8,
+      "conviction": 0.2
+    },
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "delay": 0,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "targets": "self",
+        "buff": "fortify_buff",
+        "magnitude": 1.0,
+        "duration": 2
+      }
+    ],
+    "enemyUsable": false
   }
 ]
