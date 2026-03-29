@@ -988,7 +988,7 @@ async function showCharacterDetail(characterId, opts = {}) {
                     img.style.position  = 'absolute';
                     img.style.left      = '0';
                     img.style.right     = '0';
-                    img.style.animation = 'detail-portrait-pan 8s ease-in-out infinite alternate';
+                    img.style.animation = 'detail-portrait-pan 14s ease-in-out infinite alternate';
                 }
             }
         }
