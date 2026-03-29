@@ -194,20 +194,19 @@
                 background:rgba(0,0,0,0.92);
                 z-index:1000;
                 backdrop-filter:blur(4px);
-                animation: modalBackdropIn 0.2s ease;
-                flex-direction:column;
-                align-items:stretch;
+                overflow:hidden;
                 width:100vw;
                 height:100vh;
                 box-sizing:border-box;
             `;
             modal.innerHTML = `
-                <div style="
+                <div id="skillTreeHeader" style="
+                    position:absolute; top:0; left:0; right:0;
                     display:flex; align-items:center; justify-content:space-between;
                     padding:0.75rem 1.25rem;
                     background:linear-gradient(135deg, #1a2240 0%, #10162d 100%);
                     border-bottom:1px solid rgba(212,175,55,0.2);
-                    flex-shrink:0;
+                    z-index:2; height:52px; box-sizing:border-box;
                 ">
                     <div>
                         <span style="font-family:'Cinzel',serif; color:#d4af37; font-size:1rem; font-weight:600; letter-spacing:0.05em;">
@@ -228,8 +227,8 @@
                     </div>
                 </div>
                 <div id="skillTreeCanvasWrap" style="
-                    flex:1; overflow:hidden; position:relative; cursor:grab;
-                    min-height:0;
+                    position:absolute; top:52px; left:0; right:0; bottom:28px;
+                    overflow:hidden; cursor:grab;
                 ">
                     <svg id="skillTreeSVG" style="display:block; width:100%; height:100%;"></svg>
                     <div id="skillTreeTooltip" style="
@@ -244,8 +243,9 @@
                     "></div>
                 </div>
                 <div style="
+                    position:absolute; bottom:0; left:0; right:0; height:28px;
                     text-align:center; font-size:0.72rem; color:#3a3a5a;
-                    padding:0.4rem; flex-shrink:0;
+                    line-height:28px;
                     font-family:'Lato',sans-serif;
                 ">Drag to pan · Scroll to zoom</div>
             `;
@@ -258,7 +258,7 @@
 
         document.getElementById('skillTreeCharName').textContent = _character?.name || '';
 
-        modal.style.display = 'flex';
+        modal.style.display = 'block';
 
         // Show loading indicator until data arrives
         const wrap = document.getElementById('skillTreeCanvasWrap');
