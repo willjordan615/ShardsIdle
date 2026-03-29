@@ -1413,6 +1413,21 @@ const GEN_WEAPON_FIELDS = [
     { key: 'MAGIC_MULT',  label: 'Magic enemy multiplier',   min: 0.1, max: 2.0, step: 0.05 },
 ];
 
+const SKILL_XP_CATEGORIES = [
+    { key: 'DAMAGE_SINGLE', label: 'Damage (Single)' },
+    { key: 'DAMAGE_AOE',    label: 'Damage (AOE)' },
+    { key: 'DAMAGE_MAGIC',  label: 'Damage (Magic)' },
+    { key: 'CONTROL',       label: 'Control' },
+    { key: 'DEFENSE',       label: 'Defense' },
+    { key: 'BUFF',          label: 'Buff' },
+    { key: 'HEALING',       label: 'Healing' },
+    { key: 'HEALING_AOE',   label: 'Healing (AOE)' },
+    { key: 'RESTORATION',   label: 'Restoration' },
+    { key: 'UTILITY',       label: 'Utility' },
+    { key: 'WEAPON_SKILL',  label: 'Weapon Skill' },
+    { key: 'PROGRESSION',   label: 'Progression' },
+];
+
 async function loadAdminTuning() {
     const el = document.getElementById('adminTabContent_tuning');
     if (!el) return;
@@ -1422,6 +1437,8 @@ async function loadAdminTuning() {
         const tuning = await res.json();
         const gw = tuning.genWeapon || {};
         const pd = tuning.procDepth || [0.18, 0.10, 0.06, 0.03, 0.015, 0.007];
+        const sx = tuning.skillXP || {};
+        const sxRates = sx.rates || {};
 
         el.innerHTML = `
             <div style="padding:16px;max-width:520px;">
@@ -1460,6 +1477,25 @@ async function loadAdminTuning() {
                     </div>
                 `).join('')}
 
+                <div style="color:#ccc;font-size:.95em;font-weight:600;margin-bottom:4px;margin-top:24px;">Skill XP Rates</div>
+                <div style="color:#666;font-size:.78em;margin-bottom:14px;">Base XP per use by category (before log scaling). Combat bonus: flat % of char XP awarded once per skill per combat.</div>
+                <div style="display:flex;align-items:center;margin-bottom:12px;gap:12px;">
+                    <label style="color:#aaa;font-size:.85em;width:200px;flex-shrink:0;">Combat bonus %</label>
+                    <input type="number" id="tuning_sxp_bonus"
+                        min="0" max="0.1" step="0.001"
+                        value="${(sx.combatBonusPercent ?? 0.005).toFixed(3)}"
+                        style="width:80px;background:#111;border:1px solid #334;color:#8af;padding:3px 6px;border-radius:3px;font-family:monospace;">
+                </div>
+                ${SKILL_XP_CATEGORIES.map(c => `
+                    <div style="display:flex;align-items:center;margin-bottom:10px;gap:12px;">
+                        <label style="color:#aaa;font-size:.85em;width:200px;flex-shrink:0;">${c.label}</label>
+                        <input type="number" id="tuning_sxp_${c.key}"
+                            min="0" max="200" step="1"
+                            value="${sxRates[c.key] ?? 50}"
+                            style="width:80px;background:#111;border:1px solid #334;color:#8af;padding:3px 6px;border-radius:3px;font-family:monospace;">
+                    </div>
+                `).join('')}
+
                 <div style="margin-top:8px;display:flex;gap:8px;align-items:center;">
                     <button onclick="saveTuning()" style="padding:6px 18px;background:#1a2a3a;border:1px solid #345;color:#8af;border-radius:4px;cursor:pointer;">Save & Apply</button>
                     <button onclick="resetTuning()" style="padding:6px 18px;background:#222;border:1px solid #334;color:#888;border-radius:4px;cursor:pointer;">Reset Defaults</button>
@@ -1486,7 +1522,17 @@ function getTuningValues() {
         const el = document.getElementById('tuning_pd_' + i);
         pd.push(el ? parseFloat(el.value) : [0.18, 0.10, 0.06, 0.03, 0.015, 0.007][i]);
     }
-    return { genWeapon: gw, procDepth: pd };
+    const sxRates = {};
+    SKILL_XP_CATEGORIES.forEach(c => {
+        const el = document.getElementById('tuning_sxp_' + c.key);
+        if (el) sxRates[c.key] = parseFloat(el.value);
+    });
+    const bonusEl = document.getElementById('tuning_sxp_bonus');
+    const skillXP = {
+        combatBonusPercent: bonusEl ? parseFloat(bonusEl.value) : 0.005,
+        rates: sxRates
+    };
+    return { genWeapon: gw, procDepth: pd, skillXP };
 }
 
 function updateTuningPreview() {
@@ -1545,6 +1591,13 @@ window.resetTuning = function() {
         if (el) el.value = v;
         if (val) val.textContent = v.toFixed(3);
     });
+    const sxDefaults = { DAMAGE_SINGLE:2, DAMAGE_AOE:2, DAMAGE_MAGIC:8, CONTROL:50, DEFENSE:50, BUFF:50, HEALING:50, HEALING_AOE:50, RESTORATION:50, UTILITY:50, WEAPON_SKILL:30, PROGRESSION:30 };
+    SKILL_XP_CATEGORIES.forEach(c => {
+        const el = document.getElementById('tuning_sxp_' + c.key);
+        if (el) el.value = sxDefaults[c.key] ?? 50;
+    });
+    const bonusEl = document.getElementById('tuning_sxp_bonus');
+    if (bonusEl) bonusEl.value = 0.005;
     updateTuningPreview();
 };
 

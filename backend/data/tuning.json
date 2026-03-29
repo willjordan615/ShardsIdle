@@ -7,6 +7,22 @@
     "HEAVY_MULT": 1.35,
     "MAGIC_MULT": 0.65
   },
-  "procDepth": [0.18, 0.10, 0.06, 0.03, 0.015, 0.007]
+  "procDepth": [0.18, 0.10, 0.06, 0.03, 0.015, 0.007],
+  "skillXP": {
+    "combatBonusPercent": 0.005,
+    "rates": {
+      "DAMAGE_SINGLE": 2,
+      "DAMAGE_AOE":    2,
+      "DAMAGE_MAGIC":  8,
+      "CONTROL":       50,
+      "DEFENSE":       50,
+      "BUFF":          50,
+      "HEALING":       50,
+      "HEALING_AOE":   50,
+      "RESTORATION":   50,
+      "UTILITY":       50,
+      "WEAPON_SKILL":  30,
+      "PROGRESSION":   30
+    }
+  }
 }
-

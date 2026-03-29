@@ -1380,9 +1380,8 @@ try {
         });
         // ------------------------------------------------------
 
-        // --- PRE-PASS: count skill uses for xpGained bonus distribution ---
+        // --- PRE-PASS: count skill uses for combat bonus tracking ---
         const skillUseCounts = {};
-        let totalSkillUses = 0;
         allTurns.forEach(turn => {
             const isMyTurn = (turn.actor === charId) || (turn.actorName === character.name);
             if (!isMyTurn) return;
@@ -1395,12 +1394,15 @@ try {
                 : turn.action?.skillID;
             if (!sid) return;
             skillUseCounts[sid] = (skillUseCounts[sid] || 0) + 1;
-            totalSkillUses++;
         });
-        // 5% of character XP gained this combat feeds into the skill bonus pool,
-        // distributed proportionally by usage — rewards active skills naturally.
-        const skillBonusPool = xpGained * 0.05;
-        const bonusXPPerUse  = totalSkillUses > 0 ? skillBonusPool / totalSkillUses : 0;
+
+        // Tuning rates — fall back to safe defaults if not loaded yet
+        const skillXPTuning   = window.gameData?.tuning?.skillXP || {};
+        const xpRates         = skillXPTuning.rates || {};
+        const combatBonusPct  = skillXPTuning.combatBonusPercent ?? 0.005;
+        // Skills that used this combat get a one-time bonus of combatBonusPct * charXP,
+        // awarded once per skill (not per use) — tracked by skillID below.
+        const skillBonusPaid  = {};
 
         // Apply skill XP
         allTurns.forEach(turn => {
@@ -1450,25 +1452,27 @@ try {
             }
             // --- LOGIC BRANCH B: MASTERY PHASE (Level >= 1) ---
             else {
-                // Standard XP for intentional use
-                const multiplier = (!turn.result?.success && isPreCombatSkill) ? 0.5 : 1.0;
-                
-                let baseSkillXP = 50.0;
-                if (skillDef?.category?.includes('DAMAGE_SINGLE') || skillDef?.category?.includes('DAMAGE_AOE')) { 
-                    baseSkillXP = 4.0; 
+                const category = skillDef?.category || '';
+
+                // Skip consumable skills entirely
+                if (category.startsWith('CONSUMABLE_')) {
+                    return;
                 }
 
-                xpToAward = (baseSkillXP * multiplier) / Math.log(skillRef.skillLevel + 2);
-                if (skillRef.skillLevel > 20) xpToAward *= 0.1;
-                
                 if (turn.isDesperation) {
-                    xpToAward = 0; 
-                }
-            }
+                    xpToAward = 0;
+                } else {
+                    const multiplier = (!turn.result?.success && isPreCombatSkill) ? 0.5 : 1.0;
+                    const baseSkillXP = xpRates[category] ?? 50.0;
+                    xpToAward = (baseSkillXP * multiplier) / Math.log(skillRef.skillLevel + 2);
+                    if (skillRef.skillLevel > 20) xpToAward *= 0.1;
 
-            // Add enemy-level bonus XP proportional to this skill's share of combat usage
-            if (!turn.isDesperation && skillRef.skillLevel >= 1) {
-                xpToAward += bonusXPPerUse;
+                    // One-time combat bonus per skill: combatBonusPercent * charXP
+                    if (!skillBonusPaid[skillID]) {
+                        xpToAward += xpGained * combatBonusPct;
+                        skillBonusPaid[skillID] = true;
+                    }
+                }
             }
 
             if (xpToAward > 0) {
