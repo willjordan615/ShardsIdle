@@ -972,7 +972,7 @@ class CombatEngine {
       segments,  
       turns: segments.flatMap(s => s.turns), 
       participants: {
-        playerCharacters: playerCharacters.map(p => ({
+        playerCharacters: playerCharacters.map((p, idx) => ({
           characterID: p.id, 
           characterName: p.name, 
           maxHP: p.maxHP, 
@@ -982,8 +982,10 @@ class CombatEngine {
           maxStamina: p.maxStamina, 
           finalStamina: p.currentStamina, 
           defeated: p.defeated,
-          skills: p.skills, // preserve updated skills
-          consumables: p.consumables // preserve decremented consumable quantities
+          skills: p.skills,
+          consumables: p.consumables,
+          avatarId: partySnapshots[idx]?.avatarId || null,
+          avatarColor: partySnapshots[idx]?.avatarColor || null
         })),
         enemies: segments[segments.length-1]?.participantsSnapshot.enemies || []
       },
