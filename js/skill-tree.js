@@ -52,14 +52,23 @@
 
     // ── Public entry point ───────────────────────────────────────────────────
 
-    window.openSkillTree = function () {
-        _skillsData = (gameData?.skills) || [];
+    window.openSkillTree = async function () {
+        _skillsData = (window.gameData?.skills) || [];
         const charId = currentState?.detailCharacterId;
-        _character  = currentState?.roster?.find(c => c.id === charId);
-        if (!_character) return;
+        if (!charId) return;
+
+        // Show modal immediately with loading state
+        _renderModal(true);
+
+        _character = await getCharacter(charId);
+        if (!_character) {
+            const wrap = document.getElementById('skillTreeCanvasWrap');
+            if (wrap) wrap.innerHTML = '<div style="color:#8b7355;padding:2rem;text-align:center;font-family:Lato,sans-serif;">Could not load character data.</div>';
+            return;
+        }
 
         _buildGraph();
-        _renderModal();
+        requestAnimationFrame(() => _initSVG());
     };
 
     // ── Graph construction ───────────────────────────────────────────────────
@@ -175,7 +184,7 @@
 
     // ── Modal render ─────────────────────────────────────────────────────────
 
-    function _renderModal() {
+    function _renderModal(loading = false) {
         let modal = document.getElementById('skillTreeModal');
         if (!modal) {
             modal = document.createElement('div');
@@ -248,14 +257,58 @@
 
         modal.style.display = 'flex';
 
-        // Wire up SVG after display so dimensions are available
-        requestAnimationFrame(() => _initSVG());
+        // Show loading indicator until data arrives
+        const wrap = document.getElementById('skillTreeCanvasWrap');
+        if (wrap && loading) {
+            wrap.innerHTML = `
+                <div style="
+                    display:flex; align-items:center; justify-content:center;
+                    height:100%; color:#8b7355;
+                    font-family:'Lato',sans-serif; font-size:0.9rem;
+                    letter-spacing:0.05em;
+                ">
+                    <span style="opacity:0.6;">Reading the paths…</span>
+                </div>`;
+            // Re-attach SVG and tooltip after clearing
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.id = 'skillTreeSVG';
+            svg.style.cssText = 'display:none; width:100%; height:100%;';
+            wrap.appendChild(svg);
+            const tip = document.createElement('div');
+            tip.id = 'skillTreeTooltip';
+            tip.style.cssText = `
+                display:none; position:absolute;
+                background:linear-gradient(135deg,#1a2240,#10162d);
+                border:1px solid rgba(212,175,55,0.35);
+                border-radius:6px; padding:0.6rem 0.8rem;
+                font-family:'Lato',sans-serif; font-size:0.8rem;
+                color:#e8e0d0; pointer-events:none;
+                max-width:220px; z-index:10;
+                box-shadow:0 4px 20px rgba(0,0,0,0.6);
+            `;
+            wrap.appendChild(tip);
+        }
     }
 
     // ── SVG setup ────────────────────────────────────────────────────────────
 
     function _initSVG() {
         const wrap = document.getElementById('skillTreeCanvasWrap');
+
+        // Clear loading state, rebuild canvas
+        wrap.innerHTML = `
+            <svg id="skillTreeSVG" style="display:block; width:100%; height:100%;"></svg>
+            <div id="skillTreeTooltip" style="
+                display:none; position:absolute;
+                background:linear-gradient(135deg,#1a2240,#10162d);
+                border:1px solid rgba(212,175,55,0.35);
+                border-radius:6px; padding:0.6rem 0.8rem;
+                font-family:'Lato',sans-serif; font-size:0.8rem;
+                color:#e8e0d0; pointer-events:none;
+                max-width:220px; z-index:10;
+                box-shadow:0 4px 20px rgba(0,0,0,0.6);
+            "></div>`;
+
         _svg  = document.getElementById('skillTreeSVG');
         _tooltip = document.getElementById('skillTreeTooltip');
 
