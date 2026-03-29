@@ -392,8 +392,11 @@ async function displayCombatLog(combatData) {
         combatData.participants.playerCharacters.forEach(pc => {
             const div = document.createElement('div');
             div.className = 'combatant';
+            div.style.cssText = 'position:relative; overflow:hidden;';
             div.id = `party-${pc.characterID}`;
+            const avatarBg = window.AVATARS?.renderCardBg(pc.avatarId, pc.avatarColor) ?? '';
             div.innerHTML = `
+                ${avatarBg}
                 <div class="combatant-inner">
                     <div class="combatant-header">
                         <div class="combatant-name">${pc.characterName}</div>

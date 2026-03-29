@@ -3615,3 +3615,73 @@ body:has(#combatlog.active) #headerTopBar {
 }
 
 
+
+/* ── Avatar system ── */
+.avatar-card-bg {
+    position: absolute;
+    right: -8px;
+    bottom: -6px;
+    width: 72px;
+    height: 96px;
+    opacity: 0.13;
+    pointer-events: none;
+    z-index: 0;
+    filter: saturate(0.4);
+}
+.avatar-card-bg svg {
+    width: 100%;
+    height: 100%;
+}
+/* Ensure card content sits above the bg */
+.roster-card > *:not(.avatar-card-bg),
+.combatant-inner {
+    position: relative;
+    z-index: 1;
+}
+
+/* Avatar picker in character creation */
+.avatar-picker {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+.avatar-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.6rem;
+    border: 1px solid rgba(139,115,85,0.25);
+    border-radius: var(--radius-md);
+    background: var(--window-base);
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    width: 90px;
+}
+.avatar-option:hover {
+    border-color: var(--gold-border);
+    background: var(--window-raised);
+}
+.avatar-option--selected {
+    border-color: var(--gold);
+    background: rgba(212,175,55,0.08);
+    box-shadow: 0 0 8px rgba(212,175,55,0.2);
+}
+.avatar-option__art {
+    width: 54px;
+    height: 72px;
+}
+.avatar-option__art svg {
+    width: 100%;
+    height: 100%;
+}
+.avatar-option__label {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    text-align: center;
+}
+.avatar-option--selected .avatar-option__label {
+    color: var(--gold-dim);
+}

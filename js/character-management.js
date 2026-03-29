@@ -115,7 +115,24 @@ function selectRace(race, element) {
     if (allocationSection) {
         allocationSection.style.display = 'block';
     }
-    
+
+    // Show avatar picker for this race
+    const pickerSection   = document.getElementById('avatarPickerSection');
+    const pickerContainer = document.getElementById('avatarPickerContainer');
+    if (pickerSection && pickerContainer && window.AVATARS) {
+        // Default to first variant when race changes
+        if (!currentState.selectedAvatarId?.startsWith(race.id)) {
+            currentState.selectedAvatarId = window.AVATARS.defaultForRace(race.id);
+        }
+        pickerContainer.innerHTML = '';
+        pickerContainer.appendChild(
+            window.AVATARS.renderPicker(race.id, currentState.selectedAvatarId, (id) => {
+                currentState.selectedAvatarId = id;
+            })
+        );
+        pickerSection.style.display = 'block';
+    }
+
     updateStatDisplay();
     renderStatAllocation();
     renderSkillSelection();
@@ -721,8 +738,8 @@ async function createCharacter() {
         buildDescription: null,
         importCount: 0,
         lastSharedAt: null,
-        avatarId: null,
-        avatarColor: null,
+        avatarId: currentState.selectedAvatarId || (window.AVATARS?.defaultForRace(currentState.selectedRace.id) ?? null),
+        avatarColor: window.AVATARS?.defaultColor(currentState.selectedRace.id) ?? null,
         avatarFrame: null,
         title: null,
         aiProfile: document.getElementById('aiProfileSelect')?.value || 'balanced',
@@ -821,9 +838,12 @@ async function renderRoster(page) {
 
             const card = document.createElement('div');
             card.className = 'card roster-card';
+            card.style.cssText = 'position:relative; overflow:hidden;';
             card.onclick = async () => await showCharacterDetail(character.id);
 
+            const avatarBg = window.AVATARS?.renderCardBg(character.avatarId, character.avatarColor) ?? '';
             card.innerHTML = `
+                ${avatarBg}
                 <div class="roster-card__header">
                     <h3 class="roster-card__name">${character.name}</h3>
                     <span class="roster-card__race">${race?.name || 'Unknown'}</span>
