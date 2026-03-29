@@ -677,7 +677,7 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
 .inventory-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(155px,1fr)); gap:0.75rem; margin-top:var(--space-md); }
 
 .item-card {
-    background: rgba(16,22,45,0.72);
+    background: var(--window-subtle);
     border: 1px solid rgba(139,115,85,0.3);
     border-radius: var(--radius-md);
     padding: 0.85rem;
@@ -727,7 +727,7 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
 .combatants-display { display:grid; grid-template-columns:1fr 1fr; gap:var(--space-xl); margin-bottom:var(--space-xl); }
 
 .combatant-group {
-    background: linear-gradient(135deg, rgba(16,22,45,0.82) 0%, rgba(10,14,30,0.92) 100%);
+    background: linear-gradient(135deg, var(--window-base) 0%, var(--window-deep) 100%);
     border: 1px solid var(--gold-border);
     border-radius: var(--radius-md);
     padding: var(--space-lg);
@@ -745,7 +745,7 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
     padding: 0.65rem 0.75rem;
     border: 1px solid rgba(139,115,85,0.22);
     border-radius: 6px;
-    background: rgba(10,14,39,0.5);
+    background: var(--window-subtle);
 }
 .combatant:last-child { margin-bottom: 0; }
 .combatant-inner { display: block; }
@@ -934,7 +934,7 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
     border: 1px solid var(--gold-border);
     border-radius: var(--radius-md);
     overflow:hidden;
-    background: linear-gradient(135deg, rgba(10,14,39,0.97) 0%, rgba(20,22,50,0.97) 100%);
+    background: linear-gradient(135deg, var(--window-deep) 0%, var(--window-base) 100%);
     box-shadow: var(--shadow-depth), 0 0 30px rgba(212,175,55,0.06);
 }
 #stageBannerTitle {
@@ -1238,7 +1238,7 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
         position: sticky;
         top: 0;
         z-index: 10;
-        background: rgba(10,14,30,0.97);
+        background: var(--window-muted);
         padding: 0.3rem var(--space-md) 0.3rem;
         border-bottom: 1px solid rgba(139,115,85,0.25);
     }
@@ -1330,7 +1330,7 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
         position: sticky;
         bottom: 0;
         z-index: 10;
-        background: rgba(10,14,30,0.97);
+        background: var(--window-muted);
         padding: 0.3rem var(--space-md);
         border-top: 1px solid rgba(139,115,85,0.25);
     }
@@ -2276,7 +2276,7 @@ body:has(#combatlog.active) #headerTopBar {
 }
 .loadout-slot--empty {
     border-color: rgba(255,255,255,0.04);
-    background: rgba(10,14,26,0.4);
+    background: var(--window-subtle);
 }
 .loadout-slot__label {
     color: #555;
@@ -2518,7 +2518,7 @@ body:has(#combatlog.active) #headerTopBar {
 /* ── Stat Allocation — new layout ───────────────────────────────────────── */
 .stat-alloc-row {
     margin-bottom: 0.75rem;
-    background: rgba(10,14,39,0.4);
+    background: var(--window-subtle);
     border: 1px solid #1a2a3a;
     border-radius: 6px;
     padding: 0.6rem 0.75rem;
@@ -3303,103 +3303,140 @@ body:has(#combatlog.active) #headerTopBar {
     font-weight: 400;
 }
 
+
 /* ============================================================
    COMBAT REWARDS MODAL — Animated
    ============================================================ */
 
-/* Modal inner resets for animation layout */
 #combatResultModal .result-modal-inner {
     position: relative;
     overflow: hidden;
     padding: 1.5rem 1.75rem 1.25rem;
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.6rem;
     max-height: 88vh;
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: var(--gold-dim) transparent;
+    background: linear-gradient(135deg, var(--window-deep) 0%, var(--window-base) 100%);
+    border: 2px solid var(--gold-border);
+    border-radius: var(--radius-lg);
+    max-width: 520px;
+    width: 92%;
+    box-shadow: 0 0 60px rgba(212,175,55,0.2), 0 0 120px rgba(0,0,0,0.8);
 }
 
-/* Title */
+/* ── Skill tree SVG node fills (themed) ── */
+#skillTreeModal .st-node-owned      { fill: var(--window-raised); }
+#skillTreeModal .st-node-discovering { fill: var(--window-base); }
+#skillTreeModal .st-node-reachable  { fill: var(--window-deep); }
+#skillTreeModal .st-bar-bg          { fill: var(--window-muted); }
+
+/* ── Title ── */
 .rm-title {
     font-family: var(--font-display);
-    font-size: 2.2rem;
+    font-size: 2.4rem;
     font-weight: 700;
-    letter-spacing: 0.18em;
+    letter-spacing: 0.2em;
     text-align: center;
     opacity: 0;
-    transform: scale(0.85) translateY(-8px);
-    transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.16,1,0.3,1);
+    transform: scale(0.82) translateY(-10px);
+    transition: opacity 0.32s ease, transform 0.38s cubic-bezier(0.16,1,0.3,1);
     text-shadow: 0 0 40px currentColor;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.1rem;
 }
 .rm-title--in {
     opacity: 1;
     transform: scale(1) translateY(0);
 }
 
-/* Section label */
+/* ── Sections — fade + rise in with CSS delay ── */
+.rm-section {
+    opacity: 0;
+    transform: translateY(8px);
+    animation: rmSectionIn 0.32s cubic-bezier(0.16,1,0.3,1) var(--rm-delay, 0.2s) forwards;
+    background: var(--window-subtle);
+    border-radius: var(--radius-md);
+    padding: 0.65rem 0.9rem;
+    border: 1px solid rgba(212,175,55,0.1);
+}
+@keyframes rmSectionIn {
+    to { opacity: 1; transform: translateY(0); }
+}
+
 .rm-section-label {
     font-family: var(--font-display);
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     font-weight: 600;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--gold-dim);
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.45rem;
 }
 .rm-section-label--unlock { color: var(--green); }
 
-/* Section fade-in */
-.rm-loot-section,
-.rm-xp-section,
-.rm-skill-section,
-.rm-unlocks,
-.rm-footer {
-    opacity: 0;
-    transform: translateY(6px);
-    transition: opacity 0.28s ease, transform 0.28s ease;
-    background: rgba(10,14,39,0.55);
-    border-radius: var(--radius-md);
-    padding: 0.7rem 0.9rem;
-    border: 1px solid rgba(212,175,55,0.1);
-}
-.rm-section--in {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* Loot rows */
+/* ── Loot rows — slide in + optional shake ── */
 .rm-loot-row {
     font-family: var(--font-body);
     font-size: 0.88rem;
-    padding: 0.18rem 0;
+    padding: 0.15rem 0;
     opacity: 0;
-    transform: translateX(-10px);
-    animation: rmLootIn 0.22s cubic-bezier(0.16,1,0.3,1) forwards;
+    animation: rmLootIn 0.22s cubic-bezier(0.16,1,0.3,1) both;
 }
 @keyframes rmLootIn {
-    to { opacity: 1; transform: translateX(0); }
-}
-.rm-loot-bullet { color: var(--gold-dim); margin-right: 0.3rem; }
-.rm-rarity {
-    font-size: 0.72rem;
-    font-style: italic;
-    opacity: 0.75;
-    margin-left: 0.3rem;
-    text-transform: capitalize;
+    from { opacity: 0; transform: translateX(-12px); }
+    to   { opacity: 1; transform: translateX(0); }
 }
 
-/* XP / skill rows */
-.rm-xp-row, .rm-skill-row {
-    margin-bottom: 0.55rem;
+/* Shake animations — fire after slide-in completes */
+.rm-shake--uncommon { animation: rmLootIn 0.22s cubic-bezier(0.16,1,0.3,1) both, rmShakeLight 0.38s ease calc(var(--rm-shake-delay, 0s) + 0.22s) both; }
+.rm-shake--rare     { animation: rmLootIn 0.22s cubic-bezier(0.16,1,0.3,1) both, rmShakeMed   0.45s ease calc(var(--rm-shake-delay, 0s) + 0.22s) both; }
+.rm-shake--legendary{ animation: rmLootIn 0.22s cubic-bezier(0.16,1,0.3,1) both, rmShakeHeavy 0.55s ease calc(var(--rm-shake-delay, 0s) + 0.22s) both; }
+
+@keyframes rmShakeLight {
+    0%,100% { transform: translateX(0); }
+    20%     { transform: translateX(-3px) rotate(-0.5deg); }
+    40%     { transform: translateX(3px)  rotate(0.5deg); }
+    60%     { transform: translateX(-2px); }
+    80%     { transform: translateX(2px); }
 }
+@keyframes rmShakeMed {
+    0%,100% { transform: translateX(0) scale(1); }
+    15%     { transform: translateX(-5px) rotate(-1deg) scale(1.03); }
+    35%     { transform: translateX(5px)  rotate(1deg)  scale(1.03); }
+    55%     { transform: translateX(-4px) rotate(-0.5deg); }
+    75%     { transform: translateX(4px); }
+}
+@keyframes rmShakeHeavy {
+    0%,100% { transform: translateX(0) scale(1); }
+    10%     { transform: translateX(-7px) rotate(-2deg) scale(1.05); }
+    25%     { transform: translateX(7px)  rotate(2deg)  scale(1.06); }
+    40%     { transform: translateX(-6px) rotate(-1.5deg) scale(1.04); }
+    55%     { transform: translateX(6px)  rotate(1deg); }
+    70%     { transform: translateX(-3px); }
+    85%     { transform: translateX(3px); }
+}
+
+.rm-loot-bullet { color: var(--gold-dim); margin-right: 0.3rem; }
+.rm-rarity {
+    font-size: 0.7rem;
+    font-style: italic;
+    opacity: 0.8;
+    margin-left: 0.4rem;
+    text-transform: capitalize;
+}
+.rm-rarity--legendary { color: #ffaa00; }
+.rm-rarity--rare      { color: #00d4ff; }
+.rm-rarity--uncommon  { color: #b060ff; }
+
+/* ── XP / skill rows ── */
+.rm-xp-row, .rm-skill-row { margin-bottom: 0.5rem; }
 .rm-xp-header, .rm-skill-header {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.22rem;
 }
 .rm-xp-name, .rm-skill-name {
     font-family: var(--font-body);
@@ -3407,93 +3444,50 @@ body:has(#combatlog.active) #headerTopBar {
     color: var(--text-primary);
 }
 .rm-skill-name--disc { color: var(--gold); }
-.rm-skill-level {
-    font-size: 0.72rem;
-    color: var(--gold-dim);
-    margin-left: 0.3rem;
-}
-.rm-xp-gain, .rm-skill-xp {
-    font-family: var(--font-body);
-    font-size: 0.75rem;
-    color: var(--green);
-}
+.rm-skill-level { font-size: 0.72rem; color: var(--gold-dim); margin-left: 0.3rem; }
+.rm-xp-gain, .rm-skill-xp { font-family: var(--font-body); font-size: 0.75rem; color: var(--green); }
+
 .rm-levelup {
     color: var(--gold-bright);
     font-weight: 700;
-    font-size: 0.78rem;
-    letter-spacing: 0.06em;
-    animation: rmLevelUpPulse 0.6s ease infinite alternate;
+    font-size: 0.76rem;
+    letter-spacing: 0.05em;
+    animation: rmLevelPulse 0.55s ease infinite alternate;
 }
-@keyframes rmLevelUpPulse {
-    from { opacity: 0.7; }
+@keyframes rmLevelPulse {
+    from { opacity: 0.65; }
     to   { opacity: 1; text-shadow: 0 0 8px var(--gold); }
 }
 
-/* Progress bars */
+/* ── Progress bars ── */
 .rm-bar-track {
-    height: 6px;
-    background: rgba(255,255,255,0.06);
+    height: 5px;
+    background: rgba(255,255,255,0.05);
     border-radius: 3px;
     overflow: hidden;
-    position: relative;
 }
-.rm-bar {
-    height: 100%;
-    border-radius: 3px;
-    transition: none; /* JS-driven */
-    position: relative;
-}
-.rm-bar--char  { background: linear-gradient(90deg, #2a8a3a, var(--green)); }
-.rm-bar--skill { background: linear-gradient(90deg, #1a4a7a, var(--blue)); }
+.rm-bar { height: 100%; border-radius: 3px; }
+.rm-bar--char  { background: linear-gradient(90deg, #1f6e2e, var(--green)); }
+.rm-bar--skill { background: linear-gradient(90deg, #1a3f6a, var(--blue)); }
 .rm-bar--disc  { background: linear-gradient(90deg, var(--gold-dim), var(--gold-bright)); }
 
-/* Bar level-up flash */
 .rm-bar--flash {
-    animation: rmBarFlash 0.45s ease forwards;
+    animation: rmBarFlash 0.42s ease forwards;
 }
 @keyframes rmBarFlash {
     0%   { filter: brightness(1); }
-    30%  { filter: brightness(2.5) saturate(0.3); }
-    60%  { filter: brightness(1.8); }
+    25%  { filter: brightness(2.8) saturate(0.2); }
+    55%  { filter: brightness(1.9); }
     100% { filter: brightness(1); }
 }
 
-/* Skill unlock entry */
-.rm-unlock-entry {
-    margin-bottom: 0.5rem;
-}
-.rm-unlock-name {
-    color: var(--green);
-    font-weight: 700;
-    font-size: 0.95rem;
-    font-family: var(--font-display);
-}
-.rm-unlock-desc {
-    color: var(--text-secondary);
-    font-size: 0.82rem;
-    font-style: italic;
-    margin-top: 2px;
-}
-.rm-unlock-cat {
-    color: var(--gold-dim);
-    font-size: 0.72rem;
-    margin-top: 2px;
-}
+/* ── Unlocks ── */
+.rm-unlock-entry   { margin-bottom: 0.45rem; }
+.rm-unlock-name    { color: var(--green); font-weight: 700; font-size: 0.95rem; font-family: var(--font-display); }
+.rm-unlock-desc    { color: var(--text-secondary); font-size: 0.82rem; font-style: italic; margin-top: 2px; }
+.rm-unlock-cat     { color: var(--gold-dim); font-size: 0.72rem; margin-top: 2px; }
 
-/* Footer */
-.rm-footer {
-    text-align: center;
-    border: none;
-    background: none;
-    padding: 0.5rem 0 0;
-}
-.rm-countdown {
-    color: var(--gold);
-    font-size: 0.9rem;
-    margin-bottom: 0.75rem;
-}
-.rm-footer-btns {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-}
+/* ── Footer ── */
+.rm-footer { text-align: center; background: none !important; border: none !important; padding: 0.4rem 0 0 !important; }
+.rm-countdown  { color: var(--gold); font-size: 0.9rem; margin-bottom: 0.7rem; font-family: var(--font-body); }
+.rm-footer-btns { display: flex; gap: 10px; justify-content: center; }

@@ -323,7 +323,7 @@
 
         <!-- COMBAT HISTORY MODAL -->
         <div id="combatHistoryModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:2000; justify-content:center; align-items:center;">
-            <div style="background:#1a1a2e; border:2px solid #d4af37; border-radius:8px; padding:20px; width:90%; max-width:640px; max-height:82vh; display:flex; flex-direction:column;">
+            <div style="background:linear-gradient(135deg,var(--window-base),var(--window-deep)); border:2px solid var(--gold-border); border-radius:8px; padding:20px; width:90%; max-width:640px; max-height:82vh; display:flex; flex-direction:column;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-shrink:0;">
                     <h3 style="color:#ffd700; margin:0;">📜 Combat History</h3>
                     <button onclick="document.getElementById('combatHistoryModal').style.display='none'" class="danger btn-compact">✕ Close</button>
@@ -672,7 +672,7 @@
 
     <!-- COMBAT RESULT MODAL -->
     <div id="combatResultModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.88); z-index:9999; align-items:center; justify-content:center;">
-        <div class="result-modal-inner" style="background: linear-gradient(135deg, #0a0e27 0%, #1a1a2e 100%); border: 2px solid var(--gold-border); border-radius: 12px; max-width: 520px; width: 92%; box-shadow: 0 0 60px rgba(212,175,55,0.2), 0 0 120px rgba(0,0,0,0.8);">
+        <div class="result-modal-inner">
             <!-- Content injected by animateCombatRewards -->
         </div>
     </div>

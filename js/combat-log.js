@@ -696,7 +696,12 @@ async function displayCombatLog(combatData) {
         const currentScreen = document.querySelector('.screen.active')?.id || '';
         const onCombatLog   = currentScreen === 'combatlog' || currentScreen === 'combat';
 
-        if (modal) modal.style.display = onCombatLog ? 'flex' : 'none';
+        // Clear inner content immediately so old state never flickers through
+        if (modal) {
+            const inner = modal.querySelector('.result-modal-inner');
+            if (inner) inner.innerHTML = '';
+            modal.style.display = onCombatLog ? 'flex' : 'none';
+        }
 
         // Trigger rewards (computes XP, builds skillXPGains, calls animateCombatRewards)
         await applyCombatRewards(combatData);
@@ -1681,11 +1686,14 @@ try {
     });
 
     const lootPayload = (combatData.rewards?.lootDropped || []).map(l => {
-        const itemDef = window.gameData?.gear?.find(g => g.id === l.itemID)
-                     || window.gameData?.consumables?.find(g => g.id === l.itemID);
+        const itemDef    = window.gameData?.gear?.find(g => g.id === l.itemID)
+                        || window.gameData?.consumables?.find(g => g.id === l.itemID);
+        const slot       = itemDef?.slot_id1 || itemDef?.slot || '';
+        const isConsumable = slot === 'consumable' || itemDef?.consumable === true;
         return {
-            name:   l.itemName || itemDef?.name || l.itemID,
-            rarity: l.rarity || 'common',
+            name:        l.itemName || itemDef?.name || l.itemID,
+            rarity:      l.rarity || 'common',
+            isConsumable,
         };
     });
 

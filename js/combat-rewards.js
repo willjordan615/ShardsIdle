@@ -1,64 +1,74 @@
 /**
  * combat-rewards.js — Animated result modal
  *
- * Call window.animateCombatRewards(payload) after applyCombatRewards computes
- * its data. Replaces the static modal content with a sequenced animation:
- *
- *   1. Title flash (victory/defeat)
- *   2. Skill unlocks fanfare (if any)
- *   3. Loot items cascade in one by one
- *   4. Character XP bar sweeps, flashes on level-up
- *   5. Skill XP bars animate from before→after, shutter on level boundary
- *
- * payload shape:
- * {
- *   result:       'victory' | 'defeat' | 'retreated'
- *   loot:         [ { name, rarity } ]
- *   charXP:       [ { name, xpGained, levelBefore, levelAfter, xpBefore, xpAfter, xpToNext } ]
- *   skillXP:      { skillID: { name, before, after, level, discovered, xpAwarded, leveledUp } }
- *   newUnlocks:   [ { skillID, skillDef } ]
- * }
+ * Fully CSS-driven stagger animation. No JS sleep loops for item flow.
+ * Gear items shake on entry (intensity scales with rarity).
+ * XP bars animate via JS after a stagger delay.
  */
 
 (function () {
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
-
-    function sleep(ms) {
-        return new Promise(r => setTimeout(r, ms));
-    }
-
     function rarityColor(rarity) {
-        return { legendary: '#ffaa00', rare: '#00d4ff', uncommon: '#b060ff' }[rarity] || '#e8e0d0';
+        return { legendary: '#ffaa00', rare: '#00d4ff', uncommon: '#b060ff' }[rarity] || 'var(--text-primary)';
     }
 
-    function rarityGlow(rarity) {
-        return {
-            legendary: '0 0 18px rgba(255,170,0,0.7), 0 0 6px rgba(255,170,0,0.4)',
-            rare:      '0 0 14px rgba(0,212,255,0.6), 0 0 5px rgba(0,212,255,0.3)',
-            uncommon:  '0 0 10px rgba(176,96,255,0.5)',
-        }[rarity] || 'none';
+    function rarityShakeClass(rarity) {
+        return { legendary: 'rm-shake--legendary', rare: 'rm-shake--rare', uncommon: 'rm-shake--uncommon' }[rarity] || '';
     }
 
-    // ── Particle burst ────────────────────────────────────────────────────────
+    function animateBar(barEl, fromPct, toPct, duration, onCross) {
+        return new Promise(resolve => {
+            const start   = performance.now();
+            const crosses = toPct > 100 && fromPct < 100;
+            let crossed   = false;
+
+            function frame(now) {
+                const t    = Math.min(1, (now - start) / duration);
+                const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+                const cur  = fromPct + (toPct - fromPct) * ease;
+
+                if (crosses && !crossed && cur >= 100) {
+                    crossed = true;
+                    barEl.style.width = '100%';
+                    barEl.classList.add('rm-bar--flash');
+                    onCross && onCross();
+                    setTimeout(() => {
+                        barEl.classList.remove('rm-bar--flash');
+                        barEl.style.width = '0%';
+                    }, 180);
+                } else if (!crosses || cur < 100) {
+                    barEl.style.width = Math.min(cur, 100) + '%';
+                }
+
+                if (t < 1) {
+                    requestAnimationFrame(frame);
+                } else {
+                    const finalPct = toPct >= 100 ? (toPct % 100 || 100) : toPct;
+                    barEl.style.width = Math.min(finalPct, 100) + '%';
+                    resolve();
+                }
+            }
+            requestAnimationFrame(frame);
+        });
+    }
 
     function spawnParticles(container, count, color, opts = {}) {
-        const { x = 50, y = 50, spread = 60, life = 900 } = opts;
+        const { spread = 55, life = 800 } = opts;
         for (let i = 0; i < count; i++) {
-            const p = document.createElement('div');
-            const angle  = Math.random() * 360;
-            const dist   = 20 + Math.random() * spread;
-            const dx     = Math.cos(angle * Math.PI / 180) * dist;
-            const dy     = Math.sin(angle * Math.PI / 180) * dist;
-            const size   = 3 + Math.random() * 4;
+            const p     = document.createElement('div');
+            const angle = Math.random() * 360;
+            const dist  = 15 + Math.random() * spread;
+            const dx    = Math.cos(angle * Math.PI / 180) * dist;
+            const dy    = Math.sin(angle * Math.PI / 180) * dist;
+            const size  = 2.5 + Math.random() * 4;
             p.style.cssText = `
                 position:absolute; border-radius:50%;
                 width:${size}px; height:${size}px;
                 background:${color};
-                left:${x}%; top:${y}%;
+                left:50%; top:15%;
                 transform:translate(-50%,-50%);
                 pointer-events:none; z-index:20;
-                transition: transform ${life}ms cubic-bezier(0,.8,.2,1), opacity ${life}ms ease;
+                transition: transform ${life}ms cubic-bezier(0,.9,.2,1), opacity ${life}ms ease-in;
                 opacity:1;
             `;
             container.appendChild(p);
@@ -66,270 +76,174 @@
                 p.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
                 p.style.opacity   = '0';
             });
-            setTimeout(() => p.remove(), life + 50);
+            setTimeout(() => p.remove(), life + 60);
         }
     }
-
-    // ── Bar animator ──────────────────────────────────────────────────────────
-
-    /**
-     * Animate a progress bar from startPct to endPct over duration ms.
-     * Calls onLevelUp() if the bar crosses 100% mid-animation.
-     * Returns a promise that resolves when animation completes.
-     */
-    function animateBar(barEl, startPct, endPct, duration, onLevelUp) {
-        return new Promise(resolve => {
-            const start = performance.now();
-            const range = endPct - startPct;
-
-            // If bar crosses 100 (level-up), split into two phases
-            if (endPct > 100 && startPct < 100) {
-                const fillTime = duration * ((100 - startPct) / range);
-                _animate(barEl, startPct, 100, fillTime, () => {
-                    onLevelUp && onLevelUp();
-                    setTimeout(() => {
-                        // Reset to 0 and fill to remainder
-                        barEl.style.width = '0%';
-                        const remainder = endPct - 100;
-                        _animate(barEl, 0, Math.min(remainder, 100), duration - fillTime, null, resolve);
-                    }, 120);
-                });
-            } else {
-                _animate(barEl, startPct, Math.min(endPct, 100), duration, null, resolve);
-            }
-        });
-    }
-
-    function _animate(barEl, from, to, duration, onDone, onResolve) {
-        const start = performance.now();
-        const range = to - from;
-        function frame(now) {
-            const t   = Math.min(1, (now - start) / duration);
-            const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t; // ease in-out quad
-            barEl.style.width = (from + range * ease) + '%';
-            if (t < 1) {
-                requestAnimationFrame(frame);
-            } else {
-                onDone && onDone();
-                onResolve && onResolve();
-            }
-        }
-        requestAnimationFrame(frame);
-    }
-
-    // ── Main entry point ──────────────────────────────────────────────────────
 
     window.animateCombatRewards = async function (payload) {
-        const modal     = document.getElementById('combatResultModal');
-        const inner     = modal?.querySelector('.result-modal-inner');
+        const modal = document.getElementById('combatResultModal');
+        const inner = modal?.querySelector('.result-modal-inner');
         if (!modal || !inner) return;
 
         const isVictory = payload.result === 'victory';
         const isDefeat  = payload.result === 'defeat' || payload.result === 'loss';
+        const UNLOCK_XP = 120;
 
-        // Clear existing static content, rebuild with animated sections
-        inner.innerHTML = _buildShell(payload.result);
-
-        // ── 1. Title animation ────────────────────────────────────────────────
-        const titleEl = inner.querySelector('.rm-title');
-        await sleep(80);
-        titleEl.classList.add('rm-title--in');
-        if (isVictory) {
-            spawnParticles(inner, 28, '#d4af37', { x: 50, y: 8, spread: 80, life: 1100 });
-            spawnParticles(inner, 16, '#ffe066', { x: 30, y: 8, spread: 50, life: 900 });
-            spawnParticles(inner, 16, '#ffe066', { x: 70, y: 8, spread: 50, life: 900 });
-        }
-        await sleep(320);
-
-        // ── 2. Skill unlocks fanfare ──────────────────────────────────────────
-        if (payload.newUnlocks?.length) {
-            const fanfareEl = inner.querySelector('.rm-unlocks');
-            if (fanfareEl) {
-                fanfareEl.style.display = 'block';
-                await sleep(80);
-                fanfareEl.classList.add('rm-section--in');
-                spawnParticles(inner, 20, '#4cd964', { x: 50, y: 22, spread: 60, life: 900 });
-                await sleep(400);
-            }
-        }
-
-        // ── 3. Loot cascade ───────────────────────────────────────────────────
-        const lootSection = inner.querySelector('.rm-loot-section');
-        if (lootSection && payload.loot?.length) {
-            lootSection.style.display = 'block';
-            lootSection.classList.add('rm-section--in');
-            const lootList = lootSection.querySelector('.rm-loot-list');
-            await sleep(100);
-
-            for (const item of payload.loot) {
-                const row = document.createElement('div');
-                row.className = 'rm-loot-row rm-loot-row--in';
-                const color = rarityColor(item.rarity);
-                const glow  = rarityGlow(item.rarity);
-                row.style.color = color;
-                if (glow !== 'none') row.style.textShadow = glow;
-                row.innerHTML = `<span class="rm-loot-bullet">▸</span> ${item.name}${item.rarity && item.rarity !== 'common' ? ` <span class="rm-rarity">${item.rarity}</span>` : ''}`;
-                lootList.appendChild(row);
-
-                if (item.rarity === 'legendary') {
-                    spawnParticles(inner, 18, '#ffaa00', { x: 50, y: 45, spread: 55, life: 800 });
-                } else if (item.rarity === 'rare') {
-                    spawnParticles(inner, 10, '#00d4ff', { x: 50, y: 45, spread: 40, life: 700 });
-                }
-
-                await sleep(item.rarity === 'legendary' ? 260 : item.rarity === 'rare' ? 180 : 110);
-            }
-            await sleep(180);
-        }
-
-        // ── 4. Character XP bars ──────────────────────────────────────────────
-        const xpSection = inner.querySelector('.rm-xp-section');
-        if (xpSection && payload.charXP?.length) {
-            xpSection.style.display = 'block';
-            xpSection.classList.add('rm-section--in');
-            const xpList = xpSection.querySelector('.rm-xp-list');
-
-            for (const entry of payload.charXP) {
-                const row      = document.createElement('div');
-                row.className  = 'rm-xp-row';
-                const beforePct = Math.min(100, (entry.xpBefore / entry.xpToNext) * 100);
-                const afterPct  = (entry.xpAfter  / entry.xpToNext) * 100;
-                const leveled   = entry.levelAfter > entry.levelBefore;
-
-                row.innerHTML = `
-                    <div class="rm-xp-header">
-                        <span class="rm-xp-name">${entry.name}</span>
-                        <span class="rm-xp-gain">+${entry.xpGained} XP${leveled ? ' <span class="rm-levelup">LEVEL UP!</span>' : ''}</span>
-                    </div>
-                    <div class="rm-bar-track">
-                        <div class="rm-bar rm-bar--char" style="width:${beforePct}%"></div>
-                    </div>`;
-                xpList.appendChild(row);
-                await sleep(60);
-
-                const bar = row.querySelector('.rm-bar--char');
-                await animateBar(bar, beforePct, afterPct, 700, () => {
-                    bar.classList.add('rm-bar--flash');
-                    spawnParticles(inner, leveled ? 24 : 10, '#4cd964', { x: 50, y: 65, spread: leveled ? 70 : 30, life: 700 });
-                    setTimeout(() => bar.classList.remove('rm-bar--flash'), 500);
-                });
-                await sleep(120);
-            }
-            await sleep(150);
-        }
-
-        // ── 5. Skill XP bars ──────────────────────────────────────────────────
-        const skillSection = inner.querySelector('.rm-skill-section');
-        if (skillSection && payload.skillXP && Object.keys(payload.skillXP).length) {
-            skillSection.style.display = 'block';
-            skillSection.classList.add('rm-section--in');
-            const skillList = skillSection.querySelector('.rm-skill-list');
-            const UNLOCK_XP = 120;
-
-            const entries = Object.entries(payload.skillXP);
-            // Sort: leveled-up first, then discovering, then mastery
-            entries.sort(([,a],[,b]) => {
-                const aScore = (a.leveledUp ? 100 : 0) + (a.discovered ? 10 : 0);
-                const bScore = (b.leveledUp ? 100 : 0) + (b.discovered ? 10 : 0);
-                return bScore - aScore;
-            });
-
-            for (const [skillID, data] of entries) {
-                const isDisc   = data.discovered && data.level < 1;
-                const threshold = isDisc ? UNLOCK_XP : Math.round(100 * (data.level || 1) * 1.2);
-                const beforePct = Math.min(100, (data.before / threshold) * 100);
-                const afterPct  = (data.after / threshold) * 100;
-                const leveled   = data.leveledUp;
-
-                const row = document.createElement('div');
-                row.className = 'rm-skill-row';
-                row.innerHTML = `
-                    <div class="rm-skill-header">
-                        <span class="rm-skill-name ${isDisc ? 'rm-skill-name--disc' : ''}">${isDisc ? '🔮 ' : ''}${data.name}${!isDisc ? ` <span class="rm-skill-level">Lv.${data.level}</span>` : ''}</span>
-                        <span class="rm-skill-xp">+${data.xpAwarded.toFixed(0)} XP${leveled ? ' <span class="rm-levelup">UNLOCKED!</span>' : ''}</span>
-                    </div>
-                    <div class="rm-bar-track">
-                        <div class="rm-bar ${isDisc ? 'rm-bar--disc' : 'rm-bar--skill'}" style="width:${beforePct}%"></div>
-                    </div>`;
-                skillList.appendChild(row);
-                await sleep(40);
-
-                const bar = row.querySelector('.rm-bar');
-                await animateBar(bar, beforePct, afterPct, isDisc ? 800 : 500, () => {
-                    bar.classList.add('rm-bar--flash');
-                    spawnParticles(inner, leveled ? 20 : 8,
-                        isDisc ? '#d4af37' : '#5ab4ff',
-                        { x: 50, y: 80, spread: leveled ? 60 : 25, life: 600 }
-                    );
-                    setTimeout(() => bar.classList.remove('rm-bar--flash'), 450);
-                });
-                await sleep(leveled ? 200 : 55);
-            }
-        }
-
-        // ── Footer ────────────────────────────────────────────────────────────
-        const footer = inner.querySelector('.rm-footer');
-        if (footer) {
-            await sleep(200);
-            footer.classList.add('rm-section--in');
-        }
-    };
-
-    // ── Shell HTML ────────────────────────────────────────────────────────────
-
-    function _buildShell(result) {
-        const isVictory = result === 'victory';
-        const isDefeat  = result === 'defeat' || result === 'loss';
         const titleText  = isVictory ? 'VICTORY' : isDefeat ? 'DEFEATED' : 'RETREATED';
         const titleColor = isVictory ? 'var(--green)' : isDefeat ? 'var(--red)' : 'var(--text-muted)';
 
-        return `
-        <div class="rm-title" style="color:${titleColor};">${titleText}</div>
+        // Unlocks section
+        const unlocksHTML = payload.newUnlocks?.length ? `
+            <div class="rm-section rm-unlocks" style="--rm-delay:0.1s">
+                <div class="rm-section-label rm-section-label--unlock">✨ Skill Unlocked</div>
+                ${payload.newUnlocks.map(u => `
+                    <div class="rm-unlock-entry">
+                        <div class="rm-unlock-name">${u.skillDef?.name || u.skillID}</div>
+                        ${u.skillDef?.description ? `<div class="rm-unlock-desc">${u.skillDef.description}</div>` : ''}
+                        <div class="rm-unlock-cat">${u.skillDef?.category || ''} — now equippable</div>
+                    </div>`).join('')}
+            </div>` : '';
 
-        <div class="rm-unlocks" style="display:none;">
-            <div class="rm-section-label rm-section-label--unlock">✨ Skill Unlocked</div>
-            <div class="rm-unlock-list"></div>
-        </div>
+        // Loot section — each item CSS staggered
+        const lootCount = payload.loot?.length || 0;
+        const lootHTML  = lootCount ? `
+            <div class="rm-section rm-loot-section" style="--rm-delay:0.18s">
+                <div class="rm-section-label">⚔ Loot</div>
+                <div class="rm-loot-list">
+                    ${payload.loot.map((item, i) => {
+                        const color      = rarityColor(item.rarity);
+                        const shakeClass = item.isConsumable ? '' : rarityShakeClass(item.rarity);
+                        const delay      = (0.25 + i * 0.1).toFixed(2);
+                        const rarityTag  = (item.rarity && item.rarity !== 'common')
+                            ? `<span class="rm-rarity rm-rarity--${item.rarity}">${item.rarity}</span>` : '';
+                        return `<div class="rm-loot-row ${shakeClass}" style="color:${color}; animation-delay:${delay}s; --rm-shake-delay:${delay}s;">
+                                    <span class="rm-loot-bullet">▸</span>${item.name}${rarityTag}
+                                </div>`;
+                    }).join('')}
+                </div>
+            </div>` : '';
 
-        <div class="rm-loot-section" style="display:none;">
-            <div class="rm-section-label">⚔ Loot</div>
-            <div class="rm-loot-list"></div>
-        </div>
+        // Char XP section
+        const xpDelay  = (0.22 + lootCount * 0.1).toFixed(2);
+        const charXPHTML = payload.charXP?.length ? `
+            <div class="rm-section rm-xp-section" style="--rm-delay:${xpDelay}s">
+                <div class="rm-section-label">✦ Experience</div>
+                <div class="rm-xp-list">
+                    ${payload.charXP.map(entry => {
+                        const leveled   = entry.levelAfter > entry.levelBefore;
+                        const beforePct = Math.min(100, (entry.xpBefore / entry.xpToNext) * 100);
+                        const afterPct  = (entry.xpAfter  / entry.xpToNext) * 100;
+                        return `<div class="rm-xp-row" data-from="${beforePct}" data-to="${afterPct}" data-leveled="${leveled}">
+                            <div class="rm-xp-header">
+                                <span class="rm-xp-name">${entry.name}</span>
+                                <span class="rm-xp-gain">+${entry.xpGained} XP${leveled ? ' <span class="rm-levelup">LEVEL UP!</span>' : ''}</span>
+                            </div>
+                            <div class="rm-bar-track"><div class="rm-bar rm-bar--char" style="width:${beforePct}%"></div></div>
+                        </div>`;
+                    }).join('')}
+                </div>
+            </div>` : '';
 
-        <div class="rm-xp-section" style="display:none;">
-            <div class="rm-section-label">✦ Experience</div>
-            <div class="rm-xp-list"></div>
-        </div>
+        // Skill XP section
+        const skillEntries = Object.entries(payload.skillXP || {});
+        skillEntries.sort(([,a],[,b]) => {
+            const score = x => (x.leveledUp ? 100 : 0) + (x.discovered ? 10 : 0);
+            return score(b) - score(a);
+        });
+        const skillDelay = (0.28 + lootCount * 0.1).toFixed(2);
+        const skillXPHTML = skillEntries.length ? `
+            <div class="rm-section rm-skill-section" style="--rm-delay:${skillDelay}s">
+                <div class="rm-section-label">◈ Skill Progress</div>
+                <div class="rm-skill-list">
+                    ${skillEntries.map(([, data]) => {
+                        const isDisc    = data.discovered && data.level < 1;
+                        const threshold = isDisc ? UNLOCK_XP : Math.round(100 * (data.level || 1) * 1.2);
+                        const beforePct = Math.min(100, (data.before / threshold) * 100);
+                        const afterPct  = (data.after / threshold) * 100;
+                        return `<div class="rm-skill-row" data-from="${beforePct}" data-to="${afterPct}" data-leveled="${!!data.leveledUp}" data-disc="${isDisc}">
+                            <div class="rm-skill-header">
+                                <span class="rm-skill-name ${isDisc ? 'rm-skill-name--disc' : ''}">${isDisc ? '🔮 ' : ''}${data.name}${!isDisc ? ` <span class="rm-skill-level">Lv.${data.level}</span>` : ''}</span>
+                                <span class="rm-skill-xp">+${data.xpAwarded.toFixed(0)} XP${data.leveledUp ? ` <span class="rm-levelup">${isDisc ? 'UNLOCKED!' : 'LEVEL UP!'}</span>` : ''}</span>
+                            </div>
+                            <div class="rm-bar-track"><div class="rm-bar ${isDisc ? 'rm-bar--disc' : 'rm-bar--skill'}" style="width:${beforePct}%"></div></div>
+                        </div>`;
+                    }).join('')}
+                </div>
+            </div>` : '';
 
-        <div class="rm-skill-section" style="display:none;">
-            <div class="rm-section-label">◈ Skill Progress</div>
-            <div class="rm-skill-list"></div>
-        </div>
+        const footerDelay = (0.35 + lootCount * 0.1).toFixed(2);
 
-        <div class="rm-footer">
-            <p id="autoRestartText" class="rm-countdown"></p>
-            <div class="rm-footer-btns">
-                <button class="secondary" onclick="cancelAutoRestart()">Stop Loop</button>
-                <button onclick="dismissResultModal()">Dismiss ✕</button>
-            </div>
-        </div>`;
-    }
-
-    // ── Populate unlock list (called separately, data arrives async) ──────────
-
-    window.populateUnlockFanfare = function (newUnlocks) {
-        const list = document.querySelector('.rm-unlock-list');
-        if (!list) return;
-        list.innerHTML = newUnlocks.map(u => {
-            const name = u.skillDef?.name || u.skillID;
-            const desc = u.skillDef?.description || '';
-            const cat  = u.skillDef?.category || '';
-            return `<div class="rm-unlock-entry">
-                <div class="rm-unlock-name">${name}</div>
-                ${desc ? `<div class="rm-unlock-desc">${desc}</div>` : ''}
-                <div class="rm-unlock-cat">${cat} — now equippable</div>
+        // Inject all at once — no flicker
+        inner.innerHTML = `
+            <div class="rm-title" style="color:${titleColor};">${titleText}</div>
+            ${unlocksHTML}
+            ${lootHTML}
+            ${charXPHTML}
+            ${skillXPHTML}
+            <div class="rm-footer rm-section" style="--rm-delay:${footerDelay}s">
+                <p id="autoRestartText" class="rm-countdown"></p>
+                <div class="rm-footer-btns">
+                    <button class="secondary" onclick="cancelAutoRestart()">Stop Loop</button>
+                    <button onclick="dismissResultModal()">Dismiss ✕</button>
+                </div>
             </div>`;
-        }).join('');
+
+        // Show modal only after content is ready
+        modal.style.display = 'flex';
+
+        // Kick off title animation next frame
+        requestAnimationFrame(() => {
+            const titleEl = inner.querySelector('.rm-title');
+            if (titleEl) titleEl.classList.add('rm-title--in');
+
+            if (isVictory) {
+                spawnParticles(inner, 28, 'var(--gold)',       { spread: 85, life: 1100 });
+                spawnParticles(inner, 14, 'var(--gold-bright)',{ spread: 45, life: 850  });
+            }
+            if (payload.newUnlocks?.length) {
+                setTimeout(() => spawnParticles(inner, 18, 'var(--green)', { spread: 60, life: 900 }), 250);
+            }
+        });
+
+        // Animate bars after loot has cascaded in
+        const barStartDelay = (parseFloat(xpDelay) + 0.35) * 1000;
+        setTimeout(async () => {
+            for (const row of inner.querySelectorAll('.rm-xp-row')) {
+                const bar     = row.querySelector('.rm-bar--char');
+                const from    = parseFloat(row.dataset.from);
+                const to      = parseFloat(row.dataset.to);
+                const leveled = row.dataset.leveled === 'true';
+                if (bar) {
+                    animateBar(bar, from, to, 680, () => {
+                        bar.classList.add('rm-bar--flash');
+                        if (leveled) spawnParticles(inner, 18, 'var(--green)', { spread: 55, life: 700 });
+                        setTimeout(() => bar.classList.remove('rm-bar--flash'), 480);
+                    });
+                }
+                await new Promise(r => setTimeout(r, 75));
+            }
+
+            await new Promise(r => setTimeout(r, 120));
+
+            for (const row of inner.querySelectorAll('.rm-skill-row')) {
+                const bar     = row.querySelector('.rm-bar');
+                const from    = parseFloat(row.dataset.from);
+                const to      = parseFloat(row.dataset.to);
+                const leveled = row.dataset.leveled === 'true';
+                const isDisc  = row.dataset.disc === 'true';
+                if (bar) {
+                    animateBar(bar, from, to, isDisc ? 720 : 460, () => {
+                        bar.classList.add('rm-bar--flash');
+                        if (leveled) spawnParticles(inner, isDisc ? 20 : 10,
+                            isDisc ? 'var(--gold)' : 'var(--blue)', { spread: isDisc ? 60 : 28, life: 620 });
+                        setTimeout(() => bar.classList.remove('rm-bar--flash'), 420);
+                    });
+                }
+                await new Promise(r => setTimeout(r, isDisc ? 55 : 30));
+            }
+        }, barStartDelay);
     };
+
+    window.populateUnlockFanfare = function () {};
 
 })();

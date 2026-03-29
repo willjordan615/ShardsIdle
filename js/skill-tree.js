@@ -205,7 +205,7 @@
                     position:absolute; top:0; left:0; right:0;
                     display:flex; align-items:center; justify-content:space-between;
                     padding:0.75rem 1.25rem;
-                    background:linear-gradient(135deg, #1a2240 0%, #10162d 100%);
+                    background:linear-gradient(135deg, var(--window-base) 0%, var(--window-deep) 100%);
                     border-bottom:1px solid rgba(212,175,55,0.2);
                     z-index:2; height:52px; box-sizing:border-box;
                 ">
@@ -234,7 +234,7 @@
                     <svg id="skillTreeSVG" style="display:block; width:100%; height:100%;"></svg>
                     <div id="skillTreeTooltip" style="
                         display:none; position:absolute;
-                        background:linear-gradient(135deg,#1a2240,#10162d);
+                        background:linear-gradient(135deg,var(--window-base),var(--window-deep));
                         border:1px solid rgba(212,175,55,0.35);
                         border-radius:6px; padding:0.6rem 0.8rem;
                         font-family:var(--font-body); font-size:0.8rem;
@@ -283,7 +283,7 @@
             tip.id = 'skillTreeTooltip';
             tip.style.cssText = `
                 display:none; position:absolute;
-                background:linear-gradient(135deg,#1a2240,#10162d);
+                background:linear-gradient(135deg,var(--window-base),var(--window-deep));
                 border:1px solid rgba(212,175,55,0.35);
                 border-radius:6px; padding:0.6rem 0.8rem;
                 font-family:var(--font-body); font-size:0.8rem;
@@ -305,7 +305,7 @@
             <svg id="skillTreeSVG" style="display:block; width:100%; height:100%;"></svg>
             <div id="skillTreeTooltip" style="
                 display:none; position:absolute;
-                background:linear-gradient(135deg,#1a2240,#10162d);
+                background:linear-gradient(135deg,var(--window-base),var(--window-deep));
                 border:1px solid rgba(212,175,55,0.35);
                 border-radius:6px; padding:0.6rem 0.8rem;
                 font-family:var(--font-body); font-size:0.8rem;
@@ -396,17 +396,17 @@
         rect.setAttribute('rx', '5');
 
         if (state === 'owned') {
-            rect.setAttribute('fill', '#2a1f06');
+            rect.setAttribute('class', 'st-node-owned');
             rect.setAttribute('stroke', COLOR_OWNED);
             rect.setAttribute('stroke-width', '1.5');
             rect.setAttribute('filter', 'url(#stGlowGold)');
         } else if (state === 'discovering') {
-            rect.setAttribute('fill', '#1e1608');
+            rect.setAttribute('class', 'st-node-discovering');
             rect.setAttribute('stroke', COLOR_DISC);
             rect.setAttribute('stroke-width', '1');
             rect.setAttribute('stroke-dasharray', '3 2');
         } else {
-            rect.setAttribute('fill', '#0d1628');
+            rect.setAttribute('class', 'st-node-reachable');
             rect.setAttribute('stroke', '#2a3a5a');
             rect.setAttribute('stroke-width', '1');
             rect.setAttribute('stroke-dasharray', '4 3');
@@ -437,7 +437,7 @@
             const barBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
             barBg.setAttribute('x', '8'); barBg.setAttribute('y', barY);
             barBg.setAttribute('width', barW); barBg.setAttribute('height', '4');
-            barBg.setAttribute('rx', '2'); barBg.setAttribute('fill', '#2a1f06');
+            barBg.setAttribute('rx', '2'); barBg.setAttribute('class', 'st-bar-bg');
             group.appendChild(barBg);
 
             const barFill = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
