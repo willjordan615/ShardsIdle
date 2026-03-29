@@ -745,7 +745,16 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
     padding: 0.65rem 0.75rem;
     border: 1px solid rgba(139,115,85,0.22);
     border-radius: 6px;
-    background: var(--window-subtle);
+    background: rgba(7,10,24,0.35);
+    position: relative;
+    overflow: hidden;
+}
+.combatant .avatar-card-bg {
+    opacity: 0.22;
+    width: 64px;
+    height: 86px;
+    bottom: -4px;
+    right: -4px;
 }
 .combatant:last-child { margin-bottom: 0; }
 .combatant-inner { display: block; }
