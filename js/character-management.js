@@ -984,7 +984,6 @@ async function showCharacterDetail(characterId, opts = {}) {
                     bgEl.style.backgroundImage  = `url('${img.src}')`;
                     bgEl.style.backgroundSize   = 'auto 160%';
                     bgEl.style.backgroundRepeat = 'no-repeat';
-                    bgEl.style.backgroundPosition = 'right 20%';
                     bgEl.style.animation = 'detail-portrait-pan 8s ease-in-out infinite alternate';
                 }
             }
