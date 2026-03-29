@@ -701,7 +701,6 @@ async function sellInventoryItem(characterId, inventoryIndex) {
         });
     }
 }
-}
 
 async function sellConsumableFromStash(characterId, itemId) {
     const character = await getCharacter(characterId);
