@@ -105,8 +105,12 @@
                 const state = (rec && rec.skillLevel >= 1) ? 'owned' : 'discovering';
                 visible.set(skill.id, { skill, state, rec, knownParents });
             } else if (knownParents.length >= 1) {
-                // One or both parents known but child not yet in their skills
-                visible.set(skill.id, { skill, state: 'reachable', knownParents });
+                // Name revealed if any known parent is level 3+
+                const nameRevealed = knownParents.some(pid => {
+                    const rec = _skillRecord(pid);
+                    return rec && rec.skillLevel >= 3;
+                });
+                visible.set(skill.id, { skill, state: 'reachable', knownParents, nameRevealed });
             }
         });
 
@@ -357,9 +361,7 @@
         text.setAttribute('font-size', '9.5');
         text.setAttribute('fill', state === 'owned' ? COLOR_OWNED : state === 'discovering' ? COLOR_DISC_TEXT : COLOR_REACH_TEXT);
 
-        const displayName = state === 'reachable' && node.knownParents.length < (skill.parentSkills || []).length
-            ? skill.name  // show name — they know at least one parent
-            : skill.name;
+        const displayName = (state === 'reachable' && !node.nameRevealed) ? '???' : skill.name;
 
         text.textContent = _truncate(displayName, 14);
         group.appendChild(text);
@@ -385,8 +387,8 @@
             group.appendChild(barFill);
         }
 
-        // Missing parent indicator for reachable
-        if (state === 'reachable') {
+        // Missing parent indicator for reachable — only when name revealed
+        if (state === 'reachable' && node.nameRevealed) {
             const missing = (skill.parentSkills || []).filter(p => !_ownedIds().has(p));
             if (missing.length > 0) {
                 const sub = document.createElementNS('http://www.w3.org/2000/svg', 'text');
@@ -461,18 +463,23 @@
             html += `<div style="color:#6a6a8a; font-size:0.72rem;">${Math.floor(xp)} / ${UNLOCK_XP} XP to unlock</div>`;
         } else {
             // Reachable
-            const missingIds = parents.filter(p => !owned.has(p));
-            const missingNames = missingIds.map(id => {
-                const s = _skillsData.find(sk => sk.id === id);
-                return s ? s.name : id;
-            });
-            html += `<div style="color:#3a6a9a; font-size:0.75rem; margin-bottom:4px;">Within reach</div>`;
-            if (missingNames.length) {
-                html += `<div style="color:#6a6a8a; font-size:0.72rem;">Also needs: <span style="color:#7a9acc;">${missingNames.join(', ')}</span></div>`;
+            if (!node.nameRevealed) {
+                // Name not yet revealed — say nothing useful
+                html += `<div style="color:#3a4a6a; font-size:0.75rem; margin-bottom:4px;">Something stirs in the dark.</div>`;
+                html += `<div style="color:#4a4a6a; font-size:0.72rem; font-style:italic;">Develop your skills further to reveal this path.</div>`;
+            } else {
+                const missingCount = parents.filter(p => !owned.has(p)).length;
+                html += `<div style="color:#3a6a9a; font-size:0.75rem; margin-bottom:4px;">Within reach</div>`;
+                if (missingCount > 0) {
+                    html += `<div style="color:#6a6a8a; font-size:0.72rem;">Also needs: <span style="color:#7a9acc;">${'???'.repeat(missingCount)}</span></div>`;
+                }
+                if (skill.description) {
+                    html += `<div style="color:#6a6070; font-size:0.72rem; margin-top:6px; font-style:italic;">${skill.description}</div>`;
+                }
             }
         }
 
-        if (skill.description) {
+        if (state !== 'reachable' && skill.description) {
             html += `<div style="color:#6a6070; font-size:0.72rem; margin-top:6px; font-style:italic;">${skill.description}</div>`;
         }
 
