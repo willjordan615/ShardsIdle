@@ -3302,3 +3302,198 @@ body:has(#combatlog.active) #headerTopBar {
     font-size: 0.68rem;
     font-weight: 400;
 }
+
+/* ============================================================
+   COMBAT REWARDS MODAL — Animated
+   ============================================================ */
+
+/* Modal inner resets for animation layout */
+#combatResultModal .result-modal-inner {
+    position: relative;
+    overflow: hidden;
+    padding: 1.5rem 1.75rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-height: 88vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--gold-dim) transparent;
+}
+
+/* Title */
+.rm-title {
+    font-family: var(--font-display);
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-align: center;
+    opacity: 0;
+    transform: scale(0.85) translateY(-8px);
+    transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.16,1,0.3,1);
+    text-shadow: 0 0 40px currentColor;
+    margin-bottom: 0.25rem;
+}
+.rm-title--in {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+}
+
+/* Section label */
+.rm-section-label {
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 0.4rem;
+}
+.rm-section-label--unlock { color: var(--green); }
+
+/* Section fade-in */
+.rm-loot-section,
+.rm-xp-section,
+.rm-skill-section,
+.rm-unlocks,
+.rm-footer {
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.28s ease, transform 0.28s ease;
+    background: rgba(10,14,39,0.55);
+    border-radius: var(--radius-md);
+    padding: 0.7rem 0.9rem;
+    border: 1px solid rgba(212,175,55,0.1);
+}
+.rm-section--in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Loot rows */
+.rm-loot-row {
+    font-family: var(--font-body);
+    font-size: 0.88rem;
+    padding: 0.18rem 0;
+    opacity: 0;
+    transform: translateX(-10px);
+    animation: rmLootIn 0.22s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+@keyframes rmLootIn {
+    to { opacity: 1; transform: translateX(0); }
+}
+.rm-loot-bullet { color: var(--gold-dim); margin-right: 0.3rem; }
+.rm-rarity {
+    font-size: 0.72rem;
+    font-style: italic;
+    opacity: 0.75;
+    margin-left: 0.3rem;
+    text-transform: capitalize;
+}
+
+/* XP / skill rows */
+.rm-xp-row, .rm-skill-row {
+    margin-bottom: 0.55rem;
+}
+.rm-xp-header, .rm-skill-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.25rem;
+}
+.rm-xp-name, .rm-skill-name {
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    color: var(--text-primary);
+}
+.rm-skill-name--disc { color: var(--gold); }
+.rm-skill-level {
+    font-size: 0.72rem;
+    color: var(--gold-dim);
+    margin-left: 0.3rem;
+}
+.rm-xp-gain, .rm-skill-xp {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    color: var(--green);
+}
+.rm-levelup {
+    color: var(--gold-bright);
+    font-weight: 700;
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    animation: rmLevelUpPulse 0.6s ease infinite alternate;
+}
+@keyframes rmLevelUpPulse {
+    from { opacity: 0.7; }
+    to   { opacity: 1; text-shadow: 0 0 8px var(--gold); }
+}
+
+/* Progress bars */
+.rm-bar-track {
+    height: 6px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+}
+.rm-bar {
+    height: 100%;
+    border-radius: 3px;
+    transition: none; /* JS-driven */
+    position: relative;
+}
+.rm-bar--char  { background: linear-gradient(90deg, #2a8a3a, var(--green)); }
+.rm-bar--skill { background: linear-gradient(90deg, #1a4a7a, var(--blue)); }
+.rm-bar--disc  { background: linear-gradient(90deg, var(--gold-dim), var(--gold-bright)); }
+
+/* Bar level-up flash */
+.rm-bar--flash {
+    animation: rmBarFlash 0.45s ease forwards;
+}
+@keyframes rmBarFlash {
+    0%   { filter: brightness(1); }
+    30%  { filter: brightness(2.5) saturate(0.3); }
+    60%  { filter: brightness(1.8); }
+    100% { filter: brightness(1); }
+}
+
+/* Skill unlock entry */
+.rm-unlock-entry {
+    margin-bottom: 0.5rem;
+}
+.rm-unlock-name {
+    color: var(--green);
+    font-weight: 700;
+    font-size: 0.95rem;
+    font-family: var(--font-display);
+}
+.rm-unlock-desc {
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+    font-style: italic;
+    margin-top: 2px;
+}
+.rm-unlock-cat {
+    color: var(--gold-dim);
+    font-size: 0.72rem;
+    margin-top: 2px;
+}
+
+/* Footer */
+.rm-footer {
+    text-align: center;
+    border: none;
+    background: none;
+    padding: 0.5rem 0 0;
+}
+.rm-countdown {
+    color: var(--gold);
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+}
+.rm-footer-btns {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}

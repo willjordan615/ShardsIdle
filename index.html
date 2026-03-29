@@ -664,45 +664,16 @@
     <script src="js/inventory-system.js?v=4"></script>
     <script src="js/combat-log.js?v=4"></script>
     <script src="js/skill-tree.js?v=1"></script>
+    <script src="js/combat-rewards.js?v=1"></script>
     <script src="js/admin-panel.js?v=5"></script>
     <!-- ADDED: Browse System for Share/Import functionality -->
     <script src="js/combat-system.js?v=4"></script>
     <script src="js/browse-system.js?v=5"></script>
 
     <!-- COMBAT RESULT MODAL -->
-    <div id="combatResultModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; align-items:center; justify-content:center;">
-        <div class="result-modal-inner" style="background: linear-gradient(135deg, #0a0e27 0%, #1a1a2e 100%); border: 2px solid #d4af37; border-radius: 12px; padding: 2rem; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; box-shadow: 0 0 40px rgba(212,175,55,0.3);">
-            
-            <!-- Title -->
-            <h2 id="resultModalTitle" style="text-align:center; font-size: 2rem; margin-bottom: 1.5rem; letter-spacing: 3px;">VICTORY!</h2>
-
-            <!-- Loot -->
-            <div class="result-modal-section" style="margin-bottom: 1rem; background: rgba(10,14,39,0.6); border-radius: 8px; padding: 1rem;">
-                <div class="result-modal-label" style="color: #d4af37; font-weight: bold; margin-bottom: 0.5rem;">⚔️ Loot Dropped:</div>
-                <div id="lootList" style="font-size: 0.9rem; color: #ccc;"></div>
-            </div>
-
-            <!-- Character XP -->
-            <div class="result-modal-section" style="margin-bottom: 1rem; background: rgba(10,14,39,0.6); border-radius: 8px; padding: 1rem;">
-                <div class="result-modal-label" style="color: #4cd964; font-weight: bold; margin-bottom: 0.5rem;">✨ Experience Gained:</div>
-                <div id="charXPList" style="font-size: 0.9rem; color: #ccc;"></div>
-            </div>
-
-            <!-- Skill XP -->
-            <div class="result-modal-section" style="margin-bottom: 1.5rem; background: rgba(10,14,39,0.6); border-radius: 8px; padding: 1rem;">
-                <div class="result-modal-label" style="color: #00d4ff; font-weight: bold; margin-bottom: 0.5rem;">📚 Skill Progress:</div>
-                <div id="skillXPList" style="font-size: 0.85rem; color: #aaa;"></div>
-            </div>
-
-            <!-- Countdown & Actions -->
-            <div class="result-modal-footer" style="text-align:center; border-top: 1px solid #444; padding-top: 1rem;">
-                <p id="autoRestartText" style="color: #ffd700; font-size: 0.9rem; margin-bottom: 1rem;">Next run in <span id="countdownTimer" style="font-weight:bold; font-size:1.1rem;">7</span>s...</p>
-                <div style="display:flex; gap:10px; justify-content:center;">
-                    <button class="secondary" onclick="cancelAutoRestart()">Stop Loop</button>
-                    <button onclick="dismissResultModal()">Dismiss ✕</button>
-                </div>
-            </div>
-
+    <div id="combatResultModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.88); z-index:9999; align-items:center; justify-content:center;">
+        <div class="result-modal-inner" style="background: linear-gradient(135deg, #0a0e27 0%, #1a1a2e 100%); border: 2px solid var(--gold-border); border-radius: 12px; max-width: 520px; width: 92%; box-shadow: 0 0 60px rgba(212,175,55,0.2), 0 0 120px rgba(0,0,0,0.8);">
+            <!-- Content injected by animateCombatRewards -->
         </div>
     </div>
 
