@@ -265,10 +265,17 @@ router.post('/start', requireAuth, async (req, res) => {
                                 ...(dbSkill.intrinsic ? { intrinsic: true } : {})
                             });
                         } else {
-                            // Level 1+ skills: engine result is authoritative, but preserve intrinsic flag
+                            // Level 1+ skills: engine result is authoritative for most fields,
+                            // but the DB may have a higher skillLevel than the engine snapshot
+                            // if the frontend awarded discovery XP that crossed 0→1 last combat.
+                            // Always take the max to prevent regressing a leveled skill back to 0.
                             finalSkills.push({
                                 ...dbSkill,
                                 ...incoming,
+                                skillLevel: Math.max(dbSkill.skillLevel || 0, incoming.skillLevel || 0),
+                                skillXP:    (dbSkill.skillLevel || 0) > (incoming.skillLevel || 0)
+                                                ? dbSkill.skillXP  // DB is ahead — preserve its XP too
+                                                : incoming.skillXP,
                                 ...(dbSkill.intrinsic ? { intrinsic: true } : {})
                             });
                         }
