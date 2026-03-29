@@ -981,12 +981,13 @@ async function showCharacterDetail(characterId, opts = {}) {
                 const bgEl = detailHeader.querySelector('.avatar-card-bg');
                 const img  = bgEl?.querySelector('img');
                 if (bgEl && img) {
-                    img.style.height = '160%';
-                    img.style.width  = 'auto';
+                    img.style.width     = '100%';
+                    img.style.height    = 'auto';
                     img.style.objectFit = 'unset';
                     img.style.objectPosition = 'unset';
-                    img.style.position = 'absolute';
-                    img.style.right = '0';
+                    img.style.position  = 'absolute';
+                    img.style.left      = '0';
+                    img.style.right     = '0';
                     img.style.animation = 'detail-portrait-pan 8s ease-in-out infinite alternate';
                 }
             }
