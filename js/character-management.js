@@ -971,6 +971,14 @@ async function showCharacterDetail(characterId, opts = {}) {
         document.getElementById('detailName').textContent = character.name;
         document.getElementById('detailRace').textContent = race ? race.name : 'Unknown';
 
+        const detailHeader = document.getElementById('detailCharHeader');
+        if (detailHeader) {
+            const existingBg = detailHeader.querySelector('.avatar-card-bg');
+            if (existingBg) existingBg.remove();
+            const avatarBg = window.AVATARS?.renderCardBg(character.avatarId, character.avatarColor) ?? '';
+            if (avatarBg) detailHeader.insertAdjacentHTML('afterbegin', avatarBg);
+        }
+
         // Currency display
         const goldEl = document.getElementById('detailGold');
         const dustEl = document.getElementById('detailDust');

@@ -175,15 +175,17 @@
                 <button id="selectChallengeBtn" onclick="selectCharacterForChallenge(currentState.detailCharacterId)">Select Challenge</button>
             </div>
 
-            <div style="display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:0.25rem;">
-                <h2 id="detailName" style="margin:0;">Character Name</h2>
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <span id="detailGold" style="color:#d4af37; font-size:0.85rem;">💰 0g</span>
-                    <span id="detailDust" style="color:#8888ff; font-size:0.85rem;">✨ 0 dust</span>
-                    <button onclick="openCombatHistoryModal()" class="secondary btn-compact">📜 Combat History</button>
+            <div id="detailCharHeader" class="detail-char-header">
+                <div style="display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:0.25rem; position:relative; z-index:1;">
+                    <h2 id="detailName" style="margin:0;">Character Name</h2>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span id="detailGold" style="color:#d4af37; font-size:0.85rem;">💰 0g</span>
+                        <span id="detailDust" style="color:#8888ff; font-size:0.85rem;">✨ 0 dust</span>
+                        <button onclick="openCombatHistoryModal()" class="secondary btn-compact">📜 Combat History</button>
+                    </div>
                 </div>
+                <p id="detailRace" style="color: #8b7355; margin-bottom: 0; position:relative; z-index:1;">Race</p>
             </div>
-            <p id="detailRace" style="color: #8b7355; margin-bottom: 1rem;">Race</p>
 
             <div class="detail-layout">
                 <!-- Column 1: Stats + Progression -->

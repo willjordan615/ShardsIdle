@@ -3668,7 +3668,22 @@ body:has(#combatlog.active) #headerTopBar {
     z-index: 1;
 }
 
-/* Avatar picker in character creation */
+.detail-char-header {
+    position: relative;
+    overflow: hidden;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+}
+.detail-char-header .avatar-card-bg {
+    inset: 0;
+    width: auto;
+    opacity: 0.18;
+    filter: saturate(0.4);
+}
+.detail-char-header .avatar-card-bg img {
+    object-position: right center;
+}
 .avatar-picker {
     display: flex;
     gap: 0.75rem;
