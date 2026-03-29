@@ -253,6 +253,7 @@ async function initializeGame() {
         gameData.challenges = dataFromServer.challenges || [];
         gameData.bots       = dataFromServer.bots       || [];
         gameData.statuses   = dataFromServer.statuses   || [];
+        gameData.tuning     = dataFromServer.tuning     || {};
 
         // Attach to window ONLY after data is fully populated
         window.gameData = gameData;
