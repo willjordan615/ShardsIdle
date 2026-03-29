@@ -976,7 +976,14 @@ async function showCharacterDetail(characterId, opts = {}) {
             const existingBg = detailHeader.querySelector('.avatar-card-bg');
             if (existingBg) existingBg.remove();
             const avatarBg = window.AVATARS?.renderCardBg(character.avatarId, character.avatarColor) ?? '';
-            if (avatarBg) detailHeader.insertAdjacentHTML('afterbegin', avatarBg);
+            if (avatarBg) {
+                detailHeader.insertAdjacentHTML('afterbegin', avatarBg);
+                const bgEl = detailHeader.querySelector('.avatar-card-bg');
+                const img  = bgEl?.querySelector('img');
+                if (bgEl && img) {
+                    bgEl.style.setProperty('--avatar-url', `url('${img.src}')`);
+                }
+            }
         }
 
         // Currency display

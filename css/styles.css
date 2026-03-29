@@ -3682,7 +3682,18 @@ body:has(#combatlog.active) #headerTopBar {
     filter: saturate(0.4);
 }
 .detail-char-header .avatar-card-bg img {
-    object-position: right 30%;
+    display: none;
+}
+.detail-char-header .avatar-card-bg[style*="--avatar-url"] {
+    background-image: var(--avatar-url);
+    background-size: auto 160%;
+    background-repeat: no-repeat;
+    background-position-x: right;
+    animation: detail-portrait-pan 8s ease-in-out infinite alternate;
+}
+@keyframes detail-portrait-pan {
+    from { background-position-y: 20%; }
+    to   { background-position-y: 45%; }
 }
 .avatar-picker {
     display: flex;
