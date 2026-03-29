@@ -257,7 +257,10 @@
 
                 <!-- Column 3: Skills + Combat Style -->
                 <div class="detail-col-skills">
-                    <div class="section-title">Skills</div>
+                    <div class="section-title" style="display:flex; align-items:center; justify-content:space-between;">
+                        <span>Skills</span>
+                        <button onclick="openSkillTree()" class="secondary btn-compact" style="font-size:0.72rem; padding:0.2rem 0.6rem; letter-spacing:0.04em;">⬡ Skill Web</button>
+                    </div>
                     <div id="skillDisplay" style="display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;"></div>
                     <div id="skillActionContainer" style="margin-bottom: 1rem; min-height: 40px;"></div>
 
@@ -660,6 +663,7 @@
     <script src="js/gear-tooltip.js?v=6"></script>
     <script src="js/inventory-system.js?v=4"></script>
     <script src="js/combat-log.js?v=4"></script>
+    <script src="js/skill-tree.js?v=1"></script>
     <script src="js/admin-panel.js?v=5"></script>
     <!-- ADDED: Browse System for Share/Import functionality -->
     <script src="js/combat-system.js?v=4"></script>
