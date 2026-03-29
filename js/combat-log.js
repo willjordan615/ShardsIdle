@@ -1026,17 +1026,33 @@ function renderTurn(turn, logDisplay, hpMaxes, hpCurrent) {
     // Child skill discovery proc
     if (turn.isChildSkillProc) {
         turnEl.classList.add('narrative-turn');
-        turnEl.style.border = '1px solid #d4af37';
-        turnEl.style.background = 'rgba(212,175,55,0.08)';
-        const skillDef = window.gameData?.skills?.find(s => s.id === turn.action?.skillID);
-        const skillName = skillDef?.name || turn.action?.skillID || 'Unknown Skill';
-        const discoveryHeader = turn.isFirstDiscovery
-            ? `✨ An unknown technique fires — <strong>${skillName}</strong> discovered!`
-            : `⚡ <strong>${skillName}</strong> (Lv.0 — gaining XP)`;
-        turnEl.innerHTML = `
-            <div class="turn-header" style="color:#d4af37;">${discoveryHeader}</div>
-            <div class="turn-message">${turn.result?.message || skillName + ' fires!'}</div>
-        `;
+        const skillDef   = window.gameData?.skills?.find(s => s.id === turn.action?.skillID);
+        const skillName  = skillDef?.name || turn.action?.skillID || 'Unknown Skill';
+        const isPlayer   = turn.actor === window.currentState?.detailCharacterId;
+
+        if (turn.isFirstDiscovery) {
+            if (isPlayer) {
+                turnEl.classList.add('discovery-turn--player');
+                turnEl.innerHTML = `
+                    <div class="turn-header discovery-player-header">✦ New Technique Discovered</div>
+                    <div class="discovery-player-name">${skillName}</div>
+                    <div class="turn-message">${turn.result?.message || skillName + ' fires!'}</div>
+                `;
+            } else {
+                turnEl.classList.add('discovery-turn--ally');
+                turnEl.innerHTML = `
+                    <div class="turn-header" style="color:#a08828;">✨ ${turn.actorName} — <strong>${skillName}</strong> discovered</div>
+                    <div class="turn-message">${turn.result?.message || skillName + ' fires!'}</div>
+                `;
+            }
+        } else {
+            // Subsequent procs while still at level 0 — same for everyone, no fanfare
+            turnEl.innerHTML = `
+                <div class="turn-header" style="color:#8a7520;">⚡ <strong>${skillName}</strong> (Lv.0 — gaining XP)</div>
+                <div class="turn-message">${turn.result?.message || skillName + ' fires!'}</div>
+            `;
+        }
+
         logDisplay.appendChild(turnEl);
         _scrollLogToBottom(logDisplay);
         return;

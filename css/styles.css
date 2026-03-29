@@ -918,6 +918,44 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
 }
 .combat-turn.narrative-turn .turn-header { color:var(--color-narrative); font-style:normal; }
 
+/* ── Discovery turns ── */
+@keyframes discoveryPlayerIn {
+    0%   { opacity:0; transform:translateY(-6px) scale(0.97); }
+    60%  { opacity:1; transform:translateY(1px) scale(1.01); }
+    100% { opacity:1; transform:translateY(0) scale(1); }
+}
+.combat-turn.discovery-turn--player {
+    background: linear-gradient(135deg, rgba(212,175,55,0.13) 0%, rgba(212,175,55,0.05) 100%);
+    border-left: 3px solid var(--gold);
+    border-top: 1px solid rgba(212,175,55,0.3);
+    border-bottom: 1px solid rgba(212,175,55,0.15);
+    margin-bottom: var(--space-lg);
+    font-style: normal;
+    animation: discoveryPlayerIn 0.45s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+.discovery-player-header {
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    margin-bottom: 0.2rem;
+}
+.discovery-player-name {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 0.04em;
+    margin-bottom: 0.25rem;
+    text-shadow: 0 0 18px rgba(212,175,55,0.35);
+}
+.combat-turn.discovery-turn--ally {
+    background: rgba(212,175,55,0.05);
+    border-left: 3px solid rgba(212,175,55,0.35);
+    margin-bottom: var(--space-lg);
+    font-style: normal;
+}
+
 .combat-turn.summary-turn {
     background: rgba(0,0,0,0.22);
     border-top:1px solid rgba(80,80,80,0.35);
