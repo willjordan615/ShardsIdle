@@ -17,8 +17,8 @@
 
     // ── Constants ────────────────────────────────────────────────────────────
 
-    const NODE_W        = 148;
-    const NODE_H        = 52;
+    const NODE_W        = 155;
+    const NODE_H        = 58;
     const COL_GAP       = 210;  // horizontal spacing between depth columns
     const ROW_GAP       = 72;   // vertical spacing between nodes in a column
     const DEPTH_COLS    = 7;    // depths 1–7
@@ -210,7 +210,7 @@
                     z-index:2; height:52px; box-sizing:border-box;
                 ">
                     <div>
-                        <span style="font-family:'Cinzel',serif; color:#d4af37; font-size:1rem; font-weight:600; letter-spacing:0.05em;">
+                        <span style="font-family:var(--font-display); color:var(--gold); font-size:1rem; font-weight:600; letter-spacing:0.05em;">
                             Skill Web
                         </span>
                         <span id="skillTreeCharName" style="color:#8b7355; font-size:0.82rem; margin-left:0.75rem;"></span>
@@ -237,8 +237,8 @@
                         background:linear-gradient(135deg,#1a2240,#10162d);
                         border:1px solid rgba(212,175,55,0.35);
                         border-radius:6px; padding:0.6rem 0.8rem;
-                        font-family:'Lato',sans-serif; font-size:0.8rem;
-                        color:#e8e0d0; pointer-events:none;
+                        font-family:var(--font-body); font-size:0.8rem;
+                        color:var(--text-primary); pointer-events:none;
                         max-width:220px; z-index:10;
                         box-shadow:0 4px 20px rgba(0,0,0,0.6);
                     "></div>
@@ -247,7 +247,7 @@
                     position:absolute; bottom:0; left:0; right:0; height:28px;
                     text-align:center; font-size:0.72rem; color:#3a3a5a;
                     line-height:28px;
-                    font-family:'Lato',sans-serif;
+                    font-family:var(--font-body);
                 ">Drag to pan · Scroll to zoom</div>
             `;
             document.body.appendChild(modal);
@@ -269,7 +269,7 @@
                 <div style="
                     display:flex; align-items:center; justify-content:center;
                     height:100%; color:#8b7355;
-                    font-family:'Lato',sans-serif; font-size:0.9rem;
+                    font-family:var(--font-body); font-size:0.9rem;
                     letter-spacing:0.05em;
                 ">
                     <span style="opacity:0.6;">Reading the paths…</span>
@@ -286,8 +286,8 @@
                 background:linear-gradient(135deg,#1a2240,#10162d);
                 border:1px solid rgba(212,175,55,0.35);
                 border-radius:6px; padding:0.6rem 0.8rem;
-                font-family:'Lato',sans-serif; font-size:0.8rem;
-                color:#e8e0d0; pointer-events:none;
+                font-family:var(--font-body); font-size:0.8rem;
+                color:var(--text-primary); pointer-events:none;
                 max-width:220px; z-index:10;
                 box-shadow:0 4px 20px rgba(0,0,0,0.6);
             `;
@@ -308,8 +308,8 @@
                 background:linear-gradient(135deg,#1a2240,#10162d);
                 border:1px solid rgba(212,175,55,0.35);
                 border-radius:6px; padding:0.6rem 0.8rem;
-                font-family:'Lato',sans-serif; font-size:0.8rem;
-                color:#e8e0d0; pointer-events:none;
+                font-family:var(--font-body); font-size:0.8rem;
+                color:var(--text-primary); pointer-events:none;
                 max-width:220px; z-index:10;
                 box-shadow:0 4px 20px rgba(0,0,0,0.6);
             "></div>`;
@@ -419,8 +419,7 @@
         text.setAttribute('y', NODE_H / 2 + (state === 'discovering' ? -4 : 5));
         text.setAttribute('text-anchor', 'middle');
         text.setAttribute('dominant-baseline', 'middle');
-        text.setAttribute('font-family', "'Cinzel', serif");
-        text.setAttribute('font-size', '11');
+
         text.setAttribute('fill', state === 'owned' ? COLOR_OWNED : state === 'discovering' ? COLOR_DISC_TEXT : COLOR_REACH_TEXT);
 
         const displayName = (state === 'reachable' && !node.nameRevealed) ? '???' : skill.name;
@@ -457,8 +456,7 @@
                 sub.setAttribute('x', NODE_W / 2);
                 sub.setAttribute('y', NODE_H - 7);
                 sub.setAttribute('text-anchor', 'middle');
-                sub.setAttribute('font-family', "'Lato', sans-serif");
-                sub.setAttribute('font-size', '9');
+                sub.setAttribute('class', 'st-sub');
                 sub.setAttribute('fill', '#3a5a7a');
                 sub.textContent = '+ needs ???';
                 group.appendChild(sub);
@@ -471,8 +469,7 @@
             badge.setAttribute('x', NODE_W - 5);
             badge.setAttribute('y', 9);
             badge.setAttribute('text-anchor', 'end');
-            badge.setAttribute('font-family', "'Lato', sans-serif");
-            badge.setAttribute('font-size', '9');
+            badge.setAttribute('class', 'st-badge');
             badge.setAttribute('fill', '#8b7355');
             badge.textContent = `Lv${rec.skillLevel}`;
             group.appendChild(badge);
@@ -483,8 +480,7 @@
             const badge = document.createElementNS('http://www.w3.org/2000/svg', 'text');
             badge.setAttribute('x', '5');
             badge.setAttribute('y', '9');
-            badge.setAttribute('font-family', "'Lato', sans-serif");
-            badge.setAttribute('font-size', '7');
+            badge.setAttribute('class', 'st-badge');
             badge.setAttribute('fill', '#c9a0ff');
             badge.textContent = '★';
             group.appendChild(badge);
@@ -563,7 +559,7 @@
         const owned = _ownedIds();
         const parents = skill.parentSkills || [];
 
-        let html = `<div style="color:#d4af37; font-family:'Cinzel',serif; font-size:0.85rem; margin-bottom:4px;">${skill.name}</div>`;
+        let html = `<div style="color:var(--gold); font-family:var(--font-display); font-size:0.85rem; margin-bottom:4px;">${skill.name}</div>`;
 
         if (state === 'owned') {
             const level = rec?.skillLevel ?? '?';
