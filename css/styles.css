@@ -3682,7 +3682,7 @@ body:has(#combatlog.active) #headerTopBar {
     filter: saturate(0.4);
 }
 .detail-char-header .avatar-card-bg img {
-    object-position: right center;
+    object-position: right 30%;
 }
 .avatar-picker {
     display: flex;
