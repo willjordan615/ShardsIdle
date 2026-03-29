@@ -981,7 +981,11 @@ async function showCharacterDetail(characterId, opts = {}) {
                 const bgEl = detailHeader.querySelector('.avatar-card-bg');
                 const img  = bgEl?.querySelector('img');
                 if (bgEl && img) {
-                    bgEl.style.setProperty('--avatar-url', `url('${img.src}')`);
+                    bgEl.style.backgroundImage  = `url('${img.src}')`;
+                    bgEl.style.backgroundSize   = 'auto 160%';
+                    bgEl.style.backgroundRepeat = 'no-repeat';
+                    bgEl.style.backgroundPositionX = 'right';
+                    bgEl.style.animation = 'detail-portrait-pan 8s ease-in-out infinite alternate';
                 }
             }
         }
