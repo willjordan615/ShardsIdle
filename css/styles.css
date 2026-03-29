@@ -3685,8 +3685,8 @@ body:has(#combatlog.active) #headerTopBar {
     display: none;
 }
 @keyframes detail-portrait-pan {
-    from { background-position-y: 20%; }
-    to   { background-position-y: 45%; }
+    from { background-position: right 20%; }
+    to   { background-position: right 45%; }
 }
 .avatar-picker {
     display: flex;
