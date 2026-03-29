@@ -46,6 +46,7 @@
     let _pan          = { x: 0, y: 0 };
     let _zoom         = 1;
     let _dragging     = false;
+    let _selectedNode = null;   // currently clicked node id
     let _lastMouse    = { x: 0, y: 0 };
     let _canvasW      = 0;
     let _canvasH      = 0;
@@ -252,9 +253,10 @@
             document.body.appendChild(modal);
         }
 
-        // Reset pan/zoom each open
+        // Reset pan/zoom/selection each open
         _pan  = { x: 40, y: 40 };
         _zoom = 1;
+        _selectedNode = null;
 
         document.getElementById('skillTreeCharName').textContent = _character?.name || '';
 
@@ -364,6 +366,9 @@
             path.setAttribute('stroke', edge.color);
             path.setAttribute('stroke-width', '1.5');
             path.setAttribute('fill', 'none');
+            path.dataset.edge = '1';
+            path.dataset.from = edge.from.id;
+            path.dataset.to   = edge.to.id;
             if (edge.color === COLOR_EDGE_REACH) {
                 path.setAttribute('stroke-dasharray', '4 4');
             }
@@ -381,6 +386,7 @@
 
         const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         group.setAttribute('transform', `translate(${nx},${ny})`);
+        group.dataset.skillId = node.id;
         group.style.cursor = 'pointer';
 
         // Background rect
@@ -484,12 +490,70 @@
             group.appendChild(badge);
         }
 
-        // Hover events
+        // Hover + click events
         group.addEventListener('mouseenter', (e) => _showTooltip(e, node));
         group.addEventListener('mouseleave', () => { _tooltip.style.display = 'none'; });
         group.addEventListener('mousemove', (e) => _moveTooltip(e));
+        group.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (_selectedNode === node.id) {
+                _selectedNode = null;
+            } else {
+                _selectedNode = node.id;
+            }
+            _applySelection();
+        });
 
         _g.appendChild(group);
+    }
+
+    // ── Selection highlight ───────────────────────────────────────────────────
+
+    function _applySelection() {
+        if (!_g) return;
+        const groups = _g.querySelectorAll('g[data-skill-id]');
+
+        if (!_selectedNode) {
+            // Clear — restore all to full opacity
+            groups.forEach(g => g.style.opacity = '1');
+            // Restore edge opacity
+            _g.querySelectorAll('path[data-edge]').forEach(p => p.style.opacity = '1');
+            return;
+        }
+
+        // Find the selected node
+        const selNode = _nodes.find(n => n.id === _selectedNode);
+        if (!selNode) return;
+
+        // Children of selected node that are reachable
+        const childIds = new Set(
+            _nodes
+                .filter(n => (n.skill.parentSkills || []).includes(_selectedNode) && n.state === 'reachable')
+                .map(n => n.id)
+        );
+        // Also highlight owned/discovering children
+        const ownedChildIds = new Set(
+            _nodes
+                .filter(n => (n.skill.parentSkills || []).includes(_selectedNode) && n.state !== 'reachable')
+                .map(n => n.id)
+        );
+
+        groups.forEach(g => {
+            const id = g.dataset.skillId;
+            if (id === _selectedNode || childIds.has(id) || ownedChildIds.has(id)) {
+                g.style.opacity = '1';
+            } else {
+                g.style.opacity = '0.2';
+            }
+        });
+
+        // Dim edges — only keep edges connected to selected or its children
+        _g.querySelectorAll('path[data-edge]').forEach(p => {
+            const from = p.dataset.from;
+            const to   = p.dataset.to;
+            const relevant = (from === _selectedNode && (childIds.has(to) || ownedChildIds.has(to)));
+            p.style.opacity = relevant ? '1' : '0.08';
+        });
     }
 
     // ── Tooltip ───────────────────────────────────────────────────────────────
@@ -560,6 +624,14 @@
     // ── Pan / zoom ────────────────────────────────────────────────────────────
 
     function _bindEvents(wrap) {
+        // Click background to deselect
+        _svg.addEventListener('click', (e) => {
+            if (e.target === _svg || e.target === _g) {
+                _selectedNode = null;
+                _applySelection();
+            }
+        });
+
         wrap.addEventListener('mousedown', (e) => {
             if (e.button !== 0) return;
             _dragging = true;
