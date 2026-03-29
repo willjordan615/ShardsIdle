@@ -2,98 +2,160 @@ Session Handoff
 
 Delivered This Session
 
-skills.json
+challenges.json
 
-deploy_caltrops — damage effect replaced with slow + bleed (both AOE, duration 2, basePower 0)
-deploy_trap_stun — stun chance dropped 0.6 → 0.25
-restore_mana_major, restore_stam_minor, restore_stam_small — targets fixed from single_ally to self
-use_health_potion, use_health_potion_minor — now scalesBy harmony; major bumped to 0.65
-mend — parents changed from [first_aid, use_health_potion_minor] to [first_aid, heal_major]; magnitude 0.35 → 0.52
-15 use_* wrapper skills removed entirely (use_health_potion, use_mana_potion, use_stamina_potion, etc.)
-New skills added:
-  heal_minor — flat 15hp, scalesBy flat, CONSUMABLE_HEALING, no parents
-  heal_standard — flat 60hp, same pattern
-  heal_major2 — flat 150hp, same pattern
-  restore_stam — magnitude 0.45, CONSUMABLE_RESTORATION
-  restore_stam_major — magnitude 0.9, CONSUMABLE_RESTORATION
-  restore_mana_major2 — magnitude 0.9, CONSUMABLE_RESTORATION
-  purge — cleanse_debuffs self, CONSUMABLE_HEALING, no parents (antidote skill)
-  elixir_of_vitality — heal 1.5 harmony + cleanse_debuffs, CONSUMABLE_HEALING
-20 consumable-linked skills recategorised to CONSUMABLE_* categories:
-  proc_burn_aoe, proc_chill_aoe, skill_fireball, skill_lightning → CONSUMABLE_DAMAGE
-  proc_stun_aoe, deploy_caltrops, deploy_trap_stun → CONSUMABLE_CONTROL
-  proc_stealth, skill_teleport → CONSUMABLE_ESCAPE
-  buff_all_stats, buff_strength, buff_defense, buff_speed → CONSUMABLE_BUFF
-  restore_stam_small, restore_mana_minor, restore_mana_major, restore_stam,
-    restore_mana_major2, restore_stam_major → CONSUMABLE_RESTORATION
-  skill_resurrect → CONSUMABLE_HEALING
-NOT recategorised (combo tree parents — do not change):
-  rest, bloodlust, restore_stam_minor
+Four two-handed weapons added to challenge loot tables (0.12 drop chance each):
+  challenge_ancestral_forge → greatsword_flame_tier3
+  challenge_stonetusk_forward_camp → greataxe_rage_tier5 (intentional tier exception)
+  challenge_gallery_fractured_light → staff_void_tier3
+  challenge_watchtower_northern_lights → polearm_storm_tier4
+
+Five named unique items created and wired to challenge loot tables (0.12 drop chance each):
+  polearm_ferryman_tier1 — The Ferryman's Pole → challenge_moonlit_ferry
+  staff_hearth_tier2 — The Mage's Hearth → challenge_burnt_outpost
+  staff_scribe_tier3 — Ink of the Bound Scribes → challenge_whispering_athenaeum
+  greatsword_verdict_tier5 — Verdict of the Ancestors → challenge_hall_ancestral_echoes (intentional tier exception)
+  polearm_aethelgard_tier4 — Spear of the Sunken City → challenge_sunken_sanctum
+  All unique: true — display as gold in tooltips
+
+Lockpick and rope opportunities added — 12 challenges now have rope or lockpick slots:
+  Rope (7 total): Vulture's Perch s1, Burnt Outpost s2, Watchtower s1, Stone Tooth Pass s1,
+    Broken Axle Crossing s2, Kennels of Wolf's Head s2, Stone-Tusk Forward Camp s1
+  Lockpick (5 total): Guildhall s1, Sealed Excavation s3, Whispering Athenaeum s2,
+    Bastion of the Fractured Ward s1, Spire of Silent Conviction s2
+  Effect types used: remove_enemy, apply_buff (haste/fortitude), narrative_only (lore payoff)
+  Spire archive and Athenaeum sealed section are sub-secret lore paths — narrative_only with
+    meaningful text, no combat advantage
 
 items.json
 
-consumable_bomb_smoke removed (duplicate of smoke_bomb)
-consumable_potion_health_minor/major, mana_minor/major, stamina_minor removed (duplicates with no challenge refs)
-Legacy items fixed in place — tiers, goldValues, descriptions corrected
-  health_potion_minor t1 $8, health_potion t3 $30, mana/stamina equivalents
-New items added: stamina_potion (t3), health_potion_major (t5), mana_potion_major (t5),
-  stamina_potion_major (t5), antidote (t2), elixir_vitality (t6), food_hearty_meal (t2)
-All consumable skillID refs now point to real skills — no use_* wrappers remain
-  health_potion_minor → heal_minor
-  health_potion → heal_standard
-  health_potion_major → heal_major2
-  mana_potion_minor → restore_mana_minor
-  mana_potion → restore_mana_major
-  mana_potion_major → restore_mana_major2
-  stamina_potion_minor → restore_stam_minor (second_wind parent — do not change)
-  stamina_potion → restore_stam
-  stamina_potion_major → restore_stam_major
-  antidote → purge
-  elixir_vitality → elixir_of_vitality
-  food items → restore_stam_small / rest / buff_all_stats
-  scrolls → skill_fireball / skill_lightning / skill_teleport / skill_resurrect
-  bombs → proc_burn_aoe / proc_chill_aoe / proc_stun_aoe / proc_stealth
-  traps → deploy_caltrops / deploy_trap_stun
-Gold values added to all bombs, scrolls, buff potions, traps
+consumable_tool_lockpick and consumable_tool_rope:
+  consumable: false, stackable: false — reusable, never decrement
+  goldValue: 120 (lockpick), 90 (rope)
+  Description updated to note reusability
+consumable_scroll_resurrection and consumable_crystal_resurrection — deleted entirely
+
+skills.json
+
+cleanse_debuffs → cleanse fix: purge, elixir_of_vitality, and the cleanse skill itself
+  were using effect type 'cleanse_debuffs' which the engine doesn't handle — renamed to 'cleanse'
+skill_resurrect and skill_resurrect_party — deleted entirely
+resurrection_rite (proc tree combat skill, unrelated) — renamed to display name 'Bless',
+  description updated. ID unchanged, reference chain intact.
+
+inventory-system.js
+
+_dmgDelay() helper added — builds "14 Slashing + 4 Dark · Delay 3" strings across all
+  four dmg columns, armor, and delay
+Gear modal equipped and inventory rows now show:
+  - Damage types + delay on one line
+  - Stat bonuses on next line
+  - Description below in italic
+Old single-stat stats string replaced in both equipped and inventory row paths
+
+character-management.js
+
+renderEquippedGear updated with same treatment:
+  - Damage/delay line
+  - Stat bonuses line
+  - Description line (italic)
+
+styles.css
+
+slot-bonus, slot-desc, inv-item__desc CSS classes added
+
+combat-log.js
+
+Escape consumable state vars: _escapeRequested, _escapeStageIndex, _escapeItemUsed, _escapeStageReady
+_escapeItemInBelt() — checks belt for consumable_scroll_teleport or smoke_bomb (teleport priority)
+window.triggerEscape() — sets escape flag; smoke bomb blocked until _escapeStageReady
+_updateMediaControls extended: stop button visible when escape item in belt,
+  dimmed (0.4 opacity) for smoke bomb until stage completes, full opacity for teleport
+Stage loop: resets escape state at start, activates smoke bomb after each stage victory,
+  checks escape flag before inter-stage sleep gap
+
+combat-system.js
+
+After combatResult arrives: if _escapeRequested, POSTs to /api/combat/escape,
+  calls returnToHub(), returns early — combat log never displays
+
+backend/routes/combat.js
+
+POST /escape endpoint added:
+  Loads combat log, marks result: 'escaped', strips rewards if no stages completed,
+  decrements belt item on character, saves character and log
+  Uses same character lock pattern as /start
+
+index.html
+
+mediaBtn_stop onclick changed from toggleLoopStop() to triggerEscape()
 
 merchant.js
 
-Herbalist stock updated to clean tier ladder (minor/standard/major for all three lines)
-Antidote and elixir added
-Duplicate smoke bomb entries removed
-Alchemist pool cleaned up
-
-combatEngine.js
-
-scalesBy: flat support added to heal/restore resolver — uses effect.flatAmount directly,
-  bypasses maxPool * magnitude * scaleMultiplier path. Sudden death penalty still applies.
-Both isConsumable checks expanded to include CONSUMABLE_BUFF and CONSUMABLE_CONTROL
-CONSUMABLE_BUFF scoring: cautious/support favour early fight use; aggressive/berserker
-  save for boss fights; others only on hard difficulty
-CONSUMABLE_CONTROL scoring: tactical/disruptor favour when outnumbered; aggressive
-  mostly ignores traps; others use sparingly
-NON_OFFENSIVE set expanded: CONSUMABLE_BUFF, CONSUMABLE_CONTROL, CONSUMABLE_ESCAPE
-  added so they bypass damage calculation entirely
+consumable_scroll_resurrection and consumable_crystal_resurrection removed from Scribe pool
+Fence priceMultiplier restored to 0.9 (lockpick/rope expensive via goldValue, not multiplier)
 
 Outstanding / Notes
 
-Consumable system design established: items fire real skills directly — no wrapper skills.
-  The skill lands in the character's pool; children can discover off it via normal proc tree.
-  Consumable charges decrement when a child procs. This is the intended mechanic.
+Belt display for reusable items — lockpick, rope, and quest items show a quantity
+  that never decrements. Needs a dedicated UI pass to either suppress quantity display
+  or show a different indicator (carried/equipped vs count) for non-consumable belt items.
+  Quest items have the same problem throughout.
 
-use_* skills are gone. Do not re-introduce them.
+Child proc consumable decrement — confirmed working. Decrements by matching
+  parentSkillId against item skillID/effect_skillid. Edge case: child with two consumable
+  parents could double-decrement on a single proc. Acceptable for now.
 
-stamina_potion_minor → restore_stam_minor is intentional. second_wind parents off
-  restore_stam_minor + first_aid at 8% procChance. Do not change that item's skillID.
+Teleport escape timing — the escape flag is set on button press but the full combat result
+  must arrive before the escape POST fires. Combat runs to completion server-side regardless.
+  This is by design — the result is needed to know the combatID.
 
-skill_teleport (utility: teleport_random) is non-functional — engine has no utility effect handler.
-  Teleport scroll should trigger guaranteed retreat via the existing retreat clause.
-  Wiring deferred — combat engine change needed, not data.
+Tier intentional exceptions — greatsword_verdict_tier5 (Hall of Ancestral Echoes, diff 7)
+  and greataxe_rage_tier5 (Stonetusk, diff 7) are above the normal drop tier for their
+  difficulty. This is intentional — hardwired named loot is exempt from the global tier range.
 
-heal_major (the original combat skill, scalesBy harmony) is still used by mend's effect.
-  health_potion and health_potion_major use their own flat heal skills (heal_standard, heal_major2)
-  to avoid harmony dependency on consumables. heal_major the combat skill is untouched.
+Smoketest recommended — escape consumable flow end to end, cleanse fix on purge/elixir,
+  flat heals still firing correctly after all the skills.json edits this session.
 
-Smoketest recommended — verify flat heal amounts on health potions fire correctly,
-  CONSUMABLE_BUFF/CONTROL scoring behaves as expected in combat log,
-  proc_stealth on smoke_bomb, purge on antidote.
+───────────────────────────────────────────────────────────────────────────────
+DEVELOPMENT STATUS: Early Alpha
+───────────────────────────────────────────────────────────────────────────────
+
+TASK LIST
+
+Bugs / Gaps
+  [ ] Belt display — reusable items (lockpick, rope) and quest items show a
+        quantity that never moves. Needs UI pass to suppress count or show
+        carried/equipped indicator for non-consumable belt items.
+  [ ] Challenge opportunity balance — new rope/lockpick ops untested in play.
+        Spawn chances and effect magnitudes may need tuning.
+
+Systems Incomplete
+  [ ] Sound effects — none implemented
+  [ ] Music — none implemented
+  [ ] Graphics / icons — none implemented
+
+Smoketests Needed
+  [ ] Escape consumable flow end to end (smoke bomb at stage boundary,
+        teleport mid-combat, item decrement, returnToHub)
+  [ ] cleanse fix — purge and elixir_of_vitality actually cleansing debuffs
+  [ ] Flat heals — health potions firing correct fixed amounts in combat log
+  [ ] CONSUMABLE_BUFF / CONSUMABLE_CONTROL AI scoring visible in combat log
+  [ ] Two-handed weapons appearing in loot and feeling correct in play
+  [ ] Named unique items dropping from correct challenges
+
+Hardening (pre-Beta)
+  [ ] Dual wield echo edge cases — spiked shields, offhand procs
+  [ ] Child proc double-decrement — child with two consumable parents
+  [ ] AI consumable scoring audit against actual combat logs
+  [ ] Loot table coverage review — gaps in challenge reward pools
+  [ ] Balance pass on consumable usage frequency in practice
+
+Art / Audio Workstream (blocking Beta, not Alpha)
+  [ ] Visual direction decision — tone is low fantasy, institutional decay,
+        moral grey. Manuscript/woodcut aesthetic fits better than bright fantasy.
+  [ ] Character portraits
+  [ ] Item icons
+  [ ] UI accent illustrations
+  [ ] Sound effects pack (single source for coherence)
+  [ ] Music — understated folk/medieval, not heroic fantasy

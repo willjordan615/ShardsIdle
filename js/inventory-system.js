@@ -674,14 +674,17 @@ async function sellInventoryItem(characterId, inventoryIndex) {
     const def = _itemDef(inv.itemID);
     const g = _goldValue(def);
     const d = _dustYield(g);
+    const rarity = inv.rarity || def?.rarity || 'common';
     character.gold       = parseFloat((_safeGold(character) + g).toFixed(2));
     character.arcaneDust = parseFloat((_safeDust(character) + d).toFixed(4));
     character.inventory.splice(inventoryIndex, 1);
     character.lastModified = Date.now();
     await saveCharacterToServer(character);
-    await showCharacterDetail(character.id);
+    await showCharacterDetail(character.id, { goldFlash: g, goldFlashRarity: rarity });
     _renderGearModal(character, _activeGearSlot);
-    if (typeof showSuccess === 'function') showSuccess(`Sold ${def?.name || inv.itemID} for ${g}g.`);
+    const rarityPrefix = (rarity && rarity !== 'common') ? `[${rarity}] ` : '';
+    if (typeof showSellToast === 'function') showSellToast(`${rarityPrefix}${def?.name || inv.itemID}`, g, rarity);
+    else if (typeof showSuccess === 'function') showSuccess(`Sold ${def?.name || inv.itemID} for ${g}g.`);
 }
 
 async function sellConsumableFromStash(characterId, itemId) {

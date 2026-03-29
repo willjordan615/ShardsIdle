@@ -1494,6 +1494,7 @@ try {
 
         await saveCharacterToServer(character);
         savedCharacters[charId] = character; // keep in-memory for loot section
+        savedCharacters[charId]._oldLevel = oldLevel; // carry pre-reward level for hub return flash
 
         // --- PATCH: SYNC STATE FOR NEXT COMBAT ---
         if (window.currentState && window.currentState.currentParty) {
@@ -1642,11 +1643,13 @@ try {
         // Only navigate to detail screen if the player isn't reviewing the combat log
         const activeScreen = document.querySelector('.screen.active')?.id || '';
         const onCombatLog  = activeScreen === 'combatlog' || activeScreen === 'combat';
+        const _hubCharId  = window.currentState.detailCharacterId;
+        const _prevLevel  = savedCharacters[_hubCharId]?._oldLevel ?? null;
         if (!onCombatLog) {
-            await showCharacterDetail(window.currentState.detailCharacterId);
+            await showCharacterDetail(_hubCharId, { prevLevel: _prevLevel });
         } else {
             // Silently refresh character data without changing the screen
-            await showCharacterDetail(window.currentState.detailCharacterId, { silent: true });
+            await showCharacterDetail(_hubCharId, { silent: true });
         }
 
         // Roll for traveling merchant on victory runs

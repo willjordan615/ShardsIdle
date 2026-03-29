@@ -312,3 +312,60 @@ function positionTooltip(tooltip, event, targetEl) {
         _touchLongPressTimer = null;
     }, { passive: true });
 })();
+
+/**
+ * Rarity-aware sell toast. Replaces plain showSuccess for item sells.
+ * Common → standard green. Uncommon/rare/legendary → colored with gold amount prominent.
+ */
+function showSellToast(itemName, goldAmount, rarity) {
+    const rarityColors = {
+        legendary: { bg: '#3a2800', border: '#ffaa00', text: '#ffaa00', label: 'LEGENDARY' },
+        rare:      { bg: '#001a26', border: '#00d4ff', text: '#00d4ff', label: 'RARE' },
+        uncommon:  { bg: '#1a0d2e', border: '#b060ff', text: '#b060ff', label: 'UNCOMMON' },
+    };
+    const scheme = rarityColors[rarity];
+
+    const div = document.createElement('div');
+    div.className = 'sell-toast';
+
+    if (scheme) {
+        div.style.cssText = `
+            position:fixed; right:20px; z-index:9999; min-width:280px;
+            padding:10px 16px; border-radius:8px;
+            background:${scheme.bg}; border:1px solid ${scheme.border};
+            box-shadow:0 4px 18px rgba(0,0,0,0.45), 0 0 12px ${scheme.border}44;
+            opacity:0; transition:opacity 0.35s ease, transform 0.35s ease;
+            font-family:var(--font-body,monospace);
+        `;
+        div.innerHTML = `
+            <div style="font-size:0.68rem;color:${scheme.text};font-weight:700;letter-spacing:0.08em;margin-bottom:3px;">${scheme.label} · SOLD</div>
+            <div style="color:#e8e8e8;font-size:0.9rem;">${itemName}</div>
+            <div style="color:var(--gold,#d4af37);font-size:1.05rem;font-weight:700;margin-top:3px;">+${goldAmount}g</div>
+        `;
+    } else {
+        div.style.cssText = `
+            position:fixed; right:20px; z-index:9999; min-width:260px;
+            padding:10px 16px; border-radius:8px;
+            background:#1e2e1e; border:1px solid #3a5a3a;
+            box-shadow:0 4px 12px rgba(0,0,0,0.3);
+            opacity:0; transition:opacity 0.35s ease, transform 0.35s ease;
+            font-family:var(--font-body,monospace); color:#e8e8e8; font-size:0.9rem;
+        `;
+        div.innerHTML = `Sold <strong>${itemName}</strong> &nbsp;<span style="color:var(--gold,#d4af37);font-weight:700;">+${goldAmount}g</span>`;
+    }
+
+    const existing = document.querySelectorAll('.sell-toast, .success, .error-toast');
+    const offset = 20 + (existing.length * 70);
+    div.style.top = `${offset}px`;
+    document.body.appendChild(div);
+
+    requestAnimationFrame(() => {
+        div.style.opacity = '1';
+        div.style.transform = 'translateY(0)';
+    });
+    setTimeout(() => {
+        div.style.opacity = '0';
+        div.style.transform = 'translateY(-16px)';
+        setTimeout(() => div.remove(), 380);
+    }, rarity === 'legendary' ? 4000 : rarity === 'rare' ? 3500 : 3000);
+}

@@ -956,6 +956,17 @@ async function showCharacterDetail(characterId, opts = {}) {
         const dustEl = document.getElementById('detailDust');
         if (goldEl) goldEl.textContent = `💰 ${(character.gold || 0).toFixed(0)}g`;
         if (dustEl) dustEl.textContent = `✨ ${(character.arcaneDust || 0).toFixed(2)} dust`;
+
+        // Gold flash — fires when a sell passes opts.goldFlash with the amount gained
+        if (opts.goldFlash && goldEl) {
+            const rarityClass = opts.goldFlashRarity
+                ? `hub-goldbump--${opts.goldFlashRarity}`
+                : 'hub-goldbump--common';
+            goldEl.classList.remove('hub-goldbump--common','hub-goldbump--uncommon','hub-goldbump--rare','hub-goldbump--legendary');
+            void goldEl.offsetWidth;
+            goldEl.classList.add('hub-goldbump', rarityClass);
+            setTimeout(() => goldEl.classList.remove('hub-goldbump', rarityClass), 1400);
+        }
         const detailLevelEl = document.getElementById('detailLevel');
         if (detailLevelEl) {
             detailLevelEl.innerHTML = `<span style="color:#d4af37;">${character.level}</span><span style="color:#555; font-size:0.85em;"> → ${character.level + 1}</span>`;
@@ -1020,6 +1031,20 @@ renderImportBadge(character);
             showScreen('detail');
             // Refresh idle loop status banner whenever character detail is shown
             if (typeof updateChallengeStatusBanner === 'function') updateChallengeStatusBanner();
+
+            // Level-up flash — fires when returning from combat with a new level
+            if (opts.prevLevel != null && character.level > opts.prevLevel) {
+                requestAnimationFrame(() => {
+                    const levelEl = document.getElementById('detailLevel');
+                    const barEl   = document.getElementById('xpBar');
+                    if (levelEl) levelEl.classList.add('hub-levelup-flash');
+                    if (barEl)   barEl.classList.add('hub-levelup-bar');
+                    setTimeout(() => {
+                        levelEl?.classList.remove('hub-levelup-flash');
+                        barEl?.classList.remove('hub-levelup-bar');
+                    }, 2200);
+                });
+            }
         }
     } catch (error) {
         console.error('Error showing character detail:', error);
