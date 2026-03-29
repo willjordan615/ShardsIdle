@@ -417,7 +417,10 @@ async function startCombat(forcedChallengeId) {
             consumables: member.consumables || {},
             equipment: member.equipment,
             isImported: member.isImported || false,
-            aiProfile: member.aiProfile || 'balanced'
+            aiProfile: member.aiProfile || 'balanced',
+            race: member.race || null,
+            avatarId: member.avatarId || null,
+            avatarColor: member.avatarColor || null
         }));
 
         const requestBody = {
