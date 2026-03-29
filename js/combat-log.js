@@ -413,14 +413,14 @@ async function displayCombatLog(combatData) {
                             <div class="bar-row">
                                 <div class="bar-label">MP</div>
                                 <div class="mana-bar" style="flex:1; background:#1a1a2e; border:1px solid #0f3460; height:12px; border-radius:2px; position:relative; overflow:hidden;">
-                                    <div class="mana-bar-fill" style="background:linear-gradient(90deg,#00d4ff,#0084d1); width:100%; height:100%; opacity:0.7;"></div>
+                                    <div class="mana-bar-fill"></div>
                                     <div class="bar-overlay-text"><span class="mana-value">${pc.maxMana || 0}</span>/${pc.maxMana || 0}</div>
                                 </div>
                             </div>
                             <div class="bar-row">
                                 <div class="bar-label">ST</div>
                                 <div class="stamina-bar" style="flex:1; background:#1a1a2e; border:1px solid #0f3460; height:12px; border-radius:2px; position:relative; overflow:hidden;">
-                                    <div class="stamina-bar-fill" style="background:linear-gradient(90deg,#ffd700,#ff8c00); width:100%; height:100%; opacity:0.7;"></div>
+                                    <div class="stamina-bar-fill"></div>
                                     <div class="bar-overlay-text"><span class="stamina-value">${pc.maxStamina || 0}</span>/${pc.maxStamina || 0}</div>
                                 </div>
                             </div>
@@ -1404,8 +1404,6 @@ try {
         // awarded once per skill (not per use) — tracked by skillID below.
         const skillBonusPaid  = {};
 
-        const isDefeat = combatData.result === 'defeat' || combatData.result === 'loss';
-
         // Apply skill XP
         allTurns.forEach(turn => {
             // Match by ID first, then Name
@@ -1478,7 +1476,6 @@ try {
             }
 
             if (xpToAward > 0) {
-                if (isDefeat) xpToAward *= 0.5;
                 skillRef.skillXP = (skillRef.skillXP || 0) + xpToAward;
                 skillRef.usageCount = (skillRef.usageCount || 0) + 1;
                 // Track for modal display
