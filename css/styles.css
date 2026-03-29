@@ -3333,6 +3333,21 @@ body:has(#combatlog.active) #headerTopBar {
 #skillTreeModal .st-node-reachable  { fill: var(--window-deep); }
 #skillTreeModal .st-bar-bg          { fill: var(--window-muted); }
 
+/* ── Loading pulse ── */
+.rm-loading-pulse {
+    height: 2px;
+    border-radius: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+    background-size: 200% 100%;
+    animation: rmLoadingPulse 1.2s ease infinite;
+    margin: 0.5rem 1rem;
+    opacity: 0.5;
+}
+@keyframes rmLoadingPulse {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
 /* ── Title ── */
 .rm-title {
     font-family: var(--font-display);

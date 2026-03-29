@@ -696,10 +696,16 @@ async function displayCombatLog(combatData) {
         const currentScreen = document.querySelector('.screen.active')?.id || '';
         const onCombatLog   = currentScreen === 'combatlog' || currentScreen === 'combat';
 
-        // Clear inner content immediately so old state never flickers through
+        // Show modal immediately with a loading state — rewards compute async
         if (modal) {
             const inner = modal.querySelector('.result-modal-inner');
-            if (inner) inner.innerHTML = '';
+            const isVic = finalResult === 'victory';
+            const isDef = finalResult === 'defeat' || finalResult === 'loss';
+            const titleColor = isVic ? 'var(--green)' : isDef ? 'var(--red)' : 'var(--text-muted)';
+            const titleText  = isVic ? 'VICTORY' : isDef ? 'DEFEATED' : 'RETREATED';
+            if (inner) inner.innerHTML = `
+                <div class="rm-title rm-title--in" style="color:${titleColor};">${titleText}</div>
+                <div class="rm-loading-pulse"></div>`;
             modal.style.display = onCombatLog ? 'flex' : 'none';
         }
 

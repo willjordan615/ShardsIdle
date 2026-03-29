@@ -191,10 +191,10 @@
         // Show modal only after content is ready
         modal.style.display = 'flex';
 
-        // Kick off title animation next frame
+        // Title already visible from loading state — just fire particles
         requestAnimationFrame(() => {
             const titleEl = inner.querySelector('.rm-title');
-            if (titleEl) titleEl.classList.add('rm-title--in');
+            if (titleEl) titleEl.classList.add('rm-title--in'); // no-op if already in
 
             if (isVictory) {
                 spawnParticles(inner, 28, 'var(--gold)',       { spread: 85, life: 1100 });
