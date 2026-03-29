@@ -53,13 +53,16 @@
     };
 
     function _resolve(avatarId, fallbackRace) {
-        const id = avatarId || (fallbackRace ? `${fallbackRace}:0` : null);
-        if (!id) return null;
-        const [race, idxStr] = id.split(':');
-        const idx   = parseInt(idxStr) || 0;
-        const set   = IMAGES[race] || [];
-        const entry = set[idx] || set[0] || null;
-        return { race, idx, entry };
+        if (avatarId) {
+            for (const [race, set] of Object.entries(IMAGES)) {
+                const entry = set.find(e => e.file === avatarId);
+                if (entry) return { race, entry };
+            }
+        }
+        if (fallbackRace && IMAGES[fallbackRace]?.[0]) {
+            return { race: fallbackRace, entry: IMAGES[fallbackRace][0] };
+        }
+        return null;
     }
 
     function _imgTag(file, label) {
@@ -72,7 +75,7 @@
         return (SVG_FALLBACKS[race] || '').replace(/<svg[^>]*>/, '').replace('</svg>', '');
     }
 
-    function defaultForRace(raceId) { return `${raceId}:0`; }
+    function defaultForRace(raceId) { return IMAGES[raceId]?.[0]?.file || null; }
     function defaultColor(raceId)   { return RACE_COLORS[raceId] || '#8a7a5a'; }
 
     function renderPicker(raceId, currentAvatarId, onChange) {
@@ -84,8 +87,8 @@
         container.className = 'avatar-picker';
 
         for (let idx = 0; idx < count; idx++) {
-            const avatarId   = `${raceId}:${idx}`;
             const entry      = set[idx];
+            const avatarId   = entry?.file || `${raceId}:${idx}`;
             const isSelected = currentAvatarId === avatarId;
 
             const btn = document.createElement('div');
