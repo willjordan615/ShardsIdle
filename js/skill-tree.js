@@ -253,7 +253,7 @@
         _pan  = { x: 40, y: 40 };
         _zoom = 1;
 
-        document.getElementById('skillTreeCharName').textContent = _character.name || '';
+        document.getElementById('skillTreeCharName').textContent = _character?.name || '';
 
         modal.style.display = 'flex';
 
