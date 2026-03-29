@@ -750,7 +750,7 @@
   {
     "id": "misdirect",
     "name": "Misdirect",
-    "category": "DEFENSE",
+    "category": "CONTROL",
     "description": "Confuse your enemies with feints and misdirection. Briefly lowers Harmony and Ambition.",
     "basePower": 0.9,
     "costType": "stamina",
