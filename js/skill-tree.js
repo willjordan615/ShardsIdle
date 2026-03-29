@@ -17,10 +17,10 @@
 
     // ── Constants ────────────────────────────────────────────────────────────
 
-    const NODE_W        = 120;
-    const NODE_H        = 44;
-    const COL_GAP       = 180;  // horizontal spacing between depth columns
-    const ROW_GAP       = 64;   // vertical spacing between nodes in a column
+    const NODE_W        = 148;
+    const NODE_H        = 52;
+    const COL_GAP       = 210;  // horizontal spacing between depth columns
+    const ROW_GAP       = 72;   // vertical spacing between nodes in a column
     const DEPTH_COLS    = 7;    // depths 1–7
 
     const COLOR_OWNED       = '#d4af37';
@@ -197,6 +197,9 @@
                 animation: modalBackdropIn 0.2s ease;
                 flex-direction:column;
                 align-items:stretch;
+                width:100vw;
+                height:100vh;
+                box-sizing:border-box;
             `;
             modal.innerHTML = `
                 <div style="
@@ -411,7 +414,7 @@
         text.setAttribute('text-anchor', 'middle');
         text.setAttribute('dominant-baseline', 'middle');
         text.setAttribute('font-family', "'Cinzel', serif");
-        text.setAttribute('font-size', '9.5');
+        text.setAttribute('font-size', '11');
         text.setAttribute('fill', state === 'owned' ? COLOR_OWNED : state === 'discovering' ? COLOR_DISC_TEXT : COLOR_REACH_TEXT);
 
         const displayName = (state === 'reachable' && !node.nameRevealed) ? '???' : skill.name;
@@ -449,7 +452,7 @@
                 sub.setAttribute('y', NODE_H - 7);
                 sub.setAttribute('text-anchor', 'middle');
                 sub.setAttribute('font-family', "'Lato', sans-serif");
-                sub.setAttribute('font-size', '7.5');
+                sub.setAttribute('font-size', '9');
                 sub.setAttribute('fill', '#3a5a7a');
                 sub.textContent = '+ needs ???';
                 group.appendChild(sub);
@@ -463,7 +466,7 @@
             badge.setAttribute('y', 9);
             badge.setAttribute('text-anchor', 'end');
             badge.setAttribute('font-family', "'Lato', sans-serif");
-            badge.setAttribute('font-size', '7.5');
+            badge.setAttribute('font-size', '9');
             badge.setAttribute('fill', '#8b7355');
             badge.textContent = `Lv${rec.skillLevel}`;
             group.appendChild(badge);
