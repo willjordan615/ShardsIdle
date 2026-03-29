@@ -957,16 +957,7 @@ async function showCharacterDetail(characterId, opts = {}) {
         if (goldEl) goldEl.textContent = `💰 ${(character.gold || 0).toFixed(0)}g`;
         if (dustEl) dustEl.textContent = `✨ ${(character.arcaneDust || 0).toFixed(2)} dust`;
 
-        // Gold flash — fires when a sell passes opts.goldFlash with the amount gained
-        if (opts.goldFlash && goldEl) {
-            const rarityClass = opts.goldFlashRarity
-                ? `hub-goldbump--${opts.goldFlashRarity}`
-                : 'hub-goldbump--common';
-            goldEl.classList.remove('hub-goldbump--common','hub-goldbump--uncommon','hub-goldbump--rare','hub-goldbump--legendary');
-            void goldEl.offsetWidth;
-            goldEl.classList.add('hub-goldbump', rarityClass);
-            setTimeout(() => goldEl.classList.remove('hub-goldbump', rarityClass), 1400);
-        }
+
         const detailLevelEl = document.getElementById('detailLevel');
         if (detailLevelEl) {
             detailLevelEl.innerHTML = `<span style="color:#d4af37;">${character.level}</span><span style="color:#555; font-size:0.85em;"> → ${character.level + 1}</span>`;
@@ -981,19 +972,25 @@ async function showCharacterDetail(characterId, opts = {}) {
         addStatTooltip(document.getElementById('detailAmbition'), 'ambition');
         document.getElementById('detailHarmony').textContent = totalStats.harmony;
         addStatTooltip(document.getElementById('detailHarmony'), 'harmony');
-        
         const derived = calculateDerivedStatsWithEquipment(character);
         document.getElementById('detailHP').textContent = derived.hp;
         document.getElementById('detailMana').textContent = derived.mana;
         document.getElementById('detailStamina').textContent = derived.stamina;
-        
-        document.getElementById('xpBar').style.width = xpPercent + '%';
-        document.getElementById('xpText').textContent = `${formatNumber(character.experience)}/${formatNumber(xpToNextLevel)}`;
-        
+
+        const xpBarEl  = document.getElementById('xpBar');
+        const xpTextEl = document.getElementById('xpText');
+        if (xpTextEl) xpTextEl.textContent = `${formatNumber(character.experience)}/${formatNumber(xpToNextLevel)}`;
+
+        // Determine whether to animate the XP bar or just snap it
+        const hasXPHistory = opts.prevXP != null && opts.prevLevel != null;
+        const leveledUp    = hasXPHistory && character.level > opts.prevLevel;
+
+        if (xpBarEl) xpBarEl.style.width = xpPercent + '%'; // snap to final first (fallback / no-anim path)
+
         if (typeof renderLoadoutSummary === 'function') renderLoadoutSummary(character);
         renderCharacterSkills(character);
-        renderExportButton(character); 
-renderImportBadge(character);
+        renderExportButton(character);
+        renderImportBadge(character);
         renderCombatHistory(characterId);
         renderGearUpgradeBadge(character);
         if (typeof renderMerchant === 'function') renderMerchant(character);
@@ -1029,21 +1026,48 @@ renderImportBadge(character);
 
         if (!silent) {
             showScreen('detail');
-            // Refresh idle loop status banner whenever character detail is shown
             if (typeof updateChallengeStatusBanner === 'function') updateChallengeStatusBanner();
 
-            // Level-up flash — fires when returning from combat with a new level
-            if (opts.prevLevel != null && character.level > opts.prevLevel) {
-                requestAnimationFrame(() => {
+            if (hasXPHistory && xpBarEl) {
+                // Snap bar to pre-combat position, then animate forward after paint
+                const prevXPToNext   = getXPToNextLevel(opts.prevLevel);
+                const fromPct        = Math.min(100, (opts.prevXP / prevXPToNext) * 100);
+
+                xpBarEl.style.transition = 'none';
+                xpBarEl.style.width      = fromPct + '%';
+
+                requestAnimationFrame(() => requestAnimationFrame(() => {
                     const levelEl = document.getElementById('detailLevel');
-                    const barEl   = document.getElementById('xpBar');
-                    if (levelEl) levelEl.classList.add('hub-levelup-flash');
-                    if (barEl)   barEl.classList.add('hub-levelup-bar');
-                    setTimeout(() => {
-                        levelEl?.classList.remove('hub-levelup-flash');
-                        barEl?.classList.remove('hub-levelup-bar');
-                    }, 2200);
-                });
+
+                    if (leveledUp) {
+                        // Sweep to 100%, flash, reset, sweep to final
+                        xpBarEl.style.transition = 'width 0.7s ease-in-out';
+                        xpBarEl.style.width      = '100%';
+                        setTimeout(() => {
+                            xpBarEl.classList.add('hub-xpbar-levelflash');
+                            if (levelEl) levelEl.classList.add('hub-levelup-flash');
+                            setTimeout(() => {
+                                xpBarEl.style.transition = 'none';
+                                xpBarEl.style.width      = '0%';
+                                xpBarEl.classList.remove('hub-xpbar-levelflash');
+                                requestAnimationFrame(() => requestAnimationFrame(() => {
+                                    xpBarEl.style.transition = 'width 0.8s ease-out';
+                                    xpBarEl.style.width      = xpPercent + '%';
+                                }));
+                            }, 420);
+                            setTimeout(() => levelEl?.classList.remove('hub-levelup-flash'), 2200);
+                        }, 720);
+                    } else {
+                        // Simple sweep to final
+                        xpBarEl.style.transition = 'width 1.1s cubic-bezier(0.16, 1, 0.3, 1)';
+                        xpBarEl.style.width      = xpPercent + '%';
+                        // Pulse the bar a couple times once it arrives
+                        setTimeout(() => {
+                            xpBarEl.classList.add('hub-xpbar-pulse');
+                            setTimeout(() => xpBarEl.classList.remove('hub-xpbar-pulse'), 900);
+                        }, 1200);
+                    }
+                }));
             }
         }
     } catch (error) {

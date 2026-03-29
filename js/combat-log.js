@@ -1316,6 +1316,7 @@ try {
         }
 
         const oldLevel = character.level || 1;
+        const oldXP    = character.experience || 0;
 
         // Apply character XP and level-ups
         const xpGained = rewards.experienceGained?.[charId] || 0;
@@ -1493,8 +1494,14 @@ try {
         });
 
         await saveCharacterToServer(character);
-        savedCharacters[charId] = character; // keep in-memory for loot section
-        savedCharacters[charId]._oldLevel = oldLevel; // carry pre-reward level for hub return flash
+        savedCharacters[charId] = character;
+        savedCharacters[charId]._oldLevel = oldLevel;
+        savedCharacters[charId]._oldXP    = oldXP;
+        // Also stash on currentState so returnToHub (ui-helpers) can animate the XP bar
+        if (window.currentState && charId === window.currentState.detailCharacterId) {
+            window.currentState._prevLevel = oldLevel;
+            window.currentState._prevXP    = oldXP;
+        }
 
         // --- PATCH: SYNC STATE FOR NEXT COMBAT ---
         if (window.currentState && window.currentState.currentParty) {
@@ -1645,8 +1652,9 @@ try {
         const onCombatLog  = activeScreen === 'combatlog' || activeScreen === 'combat';
         const _hubCharId  = window.currentState.detailCharacterId;
         const _prevLevel  = savedCharacters[_hubCharId]?._oldLevel ?? null;
+        const _prevXP     = savedCharacters[_hubCharId]?._oldXP    ?? null;
         if (!onCombatLog) {
-            await showCharacterDetail(_hubCharId, { prevLevel: _prevLevel });
+            await showCharacterDetail(_hubCharId, { prevLevel: _prevLevel, prevXP: _prevXP });
         } else {
             // Silently refresh character data without changing the screen
             await showCharacterDetail(_hubCharId, { silent: true });

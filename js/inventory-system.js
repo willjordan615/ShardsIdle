@@ -240,8 +240,8 @@ function _renderGearModal(character, activeSlot) {
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--space-sm); flex-shrink:0;">
             <div style="display:flex; align-items:center; gap:var(--space-md);">
                 <h3 style="margin:0; font-size:0.88rem; letter-spacing:0.08em;">GEAR MANAGEMENT</h3>
-                <span style="color:var(--gold); font-size:0.78rem;">&#128176; ${character.gold.toFixed(0)}g</span>
-                <span style="color:#8888ff; font-size:0.78rem;">&#10022; ${character.arcaneDust.toFixed(2)} dust</span>
+                <span class="inv-header-gold" style="color:var(--gold); font-size:0.78rem;">&#128176; ${character.gold.toFixed(0)}g</span>
+                <span class="inv-header-dust" style="color:#8888ff; font-size:0.78rem;">&#10022; ${character.arcaneDust.toFixed(2)} dust</span>
             </div>
             <button class="secondary" onclick="closeInventory()" style="padding:3px 10px; font-size:0.72rem;">&#10005; Close</button>
         </div>`;
@@ -311,7 +311,7 @@ function _renderGearModal(character, activeSlot) {
             const desc     = inv.itemDescription || def?.description || '';
             const nameColor = _rollQualityColor(inv) || _rarityColor(inv.rarity);
             rows += `
-                <div class="inv-item">
+                <div class="inv-item" data-inv-idx="${idx}">
                     <div class="inv-item__info">
                         <div class="inv-item__name" style="color:${nameColor};">${(inv.itemName && inv.itemName.includes(' ')) ? inv.itemName : (def?.name || inv.itemID)}</div>
                         ${dmgDelay ? `<div class="inv-item__stats">${dmgDelay}</div>` : ''}
@@ -667,6 +667,13 @@ async function unequipItem(character, slot)       { await unequipItemNew(charact
 // ── Sell / Delete ─────────────────────────────────────────────────────────────
 
 async function sellInventoryItem(characterId, inventoryIndex) {
+    // Flash the row out immediately before the async round-trip
+    const rowEl = document.querySelector(`.inv-item[data-inv-idx="${inventoryIndex}"]`);
+    if (rowEl) {
+        rowEl.classList.add('inv-item--selling');
+        await new Promise(r => setTimeout(r, 280));
+    }
+
     const character = await getCharacter(characterId);
     if (!character) return;
     const inv = _safeInventory(character)[inventoryIndex];
@@ -674,17 +681,26 @@ async function sellInventoryItem(characterId, inventoryIndex) {
     const def = _itemDef(inv.itemID);
     const g = _goldValue(def);
     const d = _dustYield(g);
-    const rarity = inv.rarity || def?.rarity || 'common';
     character.gold       = parseFloat((_safeGold(character) + g).toFixed(2));
     character.arcaneDust = parseFloat((_safeDust(character) + d).toFixed(4));
     character.inventory.splice(inventoryIndex, 1);
     character.lastModified = Date.now();
     await saveCharacterToServer(character);
-    await showCharacterDetail(character.id, { goldFlash: g, goldFlashRarity: rarity });
+    await showCharacterDetail(character.id);
     _renderGearModal(character, _activeGearSlot);
-    const rarityPrefix = (rarity && rarity !== 'common') ? `[${rarity}] ` : '';
-    if (typeof showSellToast === 'function') showSellToast(`${rarityPrefix}${def?.name || inv.itemID}`, g, rarity);
-    else if (typeof showSuccess === 'function') showSuccess(`Sold ${def?.name || inv.itemID} for ${g}g.`);
+
+    // Flash gold and dust in the modal header after re-render
+    const inner = document.getElementById('inventoryModalInner');
+    if (inner) {
+        const spans = inner.querySelectorAll('.inv-header-gold, .inv-header-dust');
+        spans.forEach(s => {
+            s.classList.remove('inv-header-bump');
+            void s.offsetWidth;
+            s.classList.add('inv-header-bump');
+            setTimeout(() => s.classList.remove('inv-header-bump'), 1000);
+        });
+    }
+}
 }
 
 async function sellConsumableFromStash(characterId, itemId) {
