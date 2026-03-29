@@ -985,7 +985,11 @@ async function showCharacterDetail(characterId, opts = {}) {
         const hasXPHistory = opts.prevXP != null && opts.prevLevel != null;
         const leveledUp    = hasXPHistory && character.level > opts.prevLevel;
 
-        if (xpBarEl) xpBarEl.style.width = xpPercent + '%'; // snap to final first (fallback / no-anim path)
+        // Only snap immediately if we're NOT going to animate — animation handles its own positioning
+        if (xpBarEl && !hasXPHistory) {
+            xpBarEl.style.transition = 'none';
+            xpBarEl.style.width = xpPercent + '%';
+        }
 
         if (typeof renderLoadoutSummary === 'function') renderLoadoutSummary(character);
         renderCharacterSkills(character);
@@ -1029,45 +1033,46 @@ async function showCharacterDetail(characterId, opts = {}) {
             if (typeof updateChallengeStatusBanner === 'function') updateChallengeStatusBanner();
 
             if (hasXPHistory && xpBarEl) {
-                // Snap bar to pre-combat position, then animate forward after paint
-                const prevXPToNext   = getXPToNextLevel(opts.prevLevel);
-                const fromPct        = Math.min(100, (opts.prevXP / prevXPToNext) * 100);
+                const prevXPToNext = getXPToNextLevel(opts.prevLevel);
+                const fromPct      = Math.min(100, (opts.prevXP / prevXPToNext) * 100);
 
+                // Kill CSS transition, snap to pre-combat position, let the browser paint it
                 xpBarEl.style.transition = 'none';
                 xpBarEl.style.width      = fromPct + '%';
 
-                requestAnimationFrame(() => requestAnimationFrame(() => {
+                // Wait for the screen to actually render before starting the sweep
+                setTimeout(() => {
                     const levelEl = document.getElementById('detailLevel');
 
                     if (leveledUp) {
-                        // Sweep to 100%, flash, reset, sweep to final
-                        xpBarEl.style.transition = 'width 0.7s ease-in-out';
+                        // Sweep to 100%
+                        xpBarEl.style.transition = 'width 0.9s ease-in-out';
                         xpBarEl.style.width      = '100%';
                         setTimeout(() => {
                             xpBarEl.classList.add('hub-xpbar-levelflash');
                             if (levelEl) levelEl.classList.add('hub-levelup-flash');
+                            // Reset to 0, sweep to final
                             setTimeout(() => {
                                 xpBarEl.style.transition = 'none';
                                 xpBarEl.style.width      = '0%';
                                 xpBarEl.classList.remove('hub-xpbar-levelflash');
-                                requestAnimationFrame(() => requestAnimationFrame(() => {
-                                    xpBarEl.style.transition = 'width 0.8s ease-out';
+                                setTimeout(() => {
+                                    xpBarEl.style.transition = 'width 1.0s ease-out';
                                     xpBarEl.style.width      = xpPercent + '%';
-                                }));
-                            }, 420);
-                            setTimeout(() => levelEl?.classList.remove('hub-levelup-flash'), 2200);
-                        }, 720);
+                                }, 50);
+                            }, 480);
+                            setTimeout(() => levelEl?.classList.remove('hub-levelup-flash'), 2400);
+                        }, 950);
                     } else {
-                        // Simple sweep to final
-                        xpBarEl.style.transition = 'width 1.1s cubic-bezier(0.16, 1, 0.3, 1)';
+                        // Sweep to final, then pulse twice on arrival
+                        xpBarEl.style.transition = 'width 1.4s cubic-bezier(0.16, 1, 0.3, 1)';
                         xpBarEl.style.width      = xpPercent + '%';
-                        // Pulse the bar a couple times once it arrives
                         setTimeout(() => {
                             xpBarEl.classList.add('hub-xpbar-pulse');
-                            setTimeout(() => xpBarEl.classList.remove('hub-xpbar-pulse'), 900);
-                        }, 1200);
+                            setTimeout(() => xpBarEl.classList.remove('hub-xpbar-pulse'), 1000);
+                        }, 1500);
                     }
-                }));
+                }, 120);
             }
         }
     } catch (error) {

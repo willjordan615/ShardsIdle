@@ -83,9 +83,6 @@ function rollMerchantAppearance() {
   currentMerchant = merchant;
   currentMerchantStock = stock;
 
-  const notifier = document.getElementById('merchantNotifier');
-  if (notifier) notifier.style.display = '';
-
   return true;
 }
 
@@ -129,10 +126,12 @@ function renderMerchant(character) {
 
   const gold = character?.gold || 0;
   const m = currentMerchant;
+  const isNew = slot.style.display === 'none' || slot.dataset.merchantId !== m.name;
 
   slot.style.display = 'block';
+  slot.dataset.merchantId = m.name;
   slot.innerHTML = `
-    <div>
+    <div class="merchant-panel${isNew ? ' merchant-panel--arriving' : ''}">
       <div class="merchant-header">
         <span class="merchant-name">${m.icon} ${m.name}</span>
         <button onclick="dismissMerchant()" class="btn-dismiss-hint">✕ Send away</button>
@@ -207,7 +206,5 @@ function dismissMerchant() {
   currentMerchant = null;
   currentMerchantStock = [];
   const slot = document.getElementById('merchantSlot');
-  if (slot) { slot.innerHTML = ''; slot.style.display = 'none'; }
-  const notifier = document.getElementById('merchantNotifier');
-  if (notifier) notifier.style.display = 'none';
+  if (slot) { slot.innerHTML = ''; slot.style.display = 'none'; delete slot.dataset.merchantId; }
 }
