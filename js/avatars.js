@@ -8,7 +8,7 @@
  *   window.AVATARS.defaultForRace(raceId)               → avatarId string
  *   window.AVATARS.defaultColor(raceId)                 → hex string
  *   window.AVATARS.renderPicker(raceId, currentId, cb)  → HTMLElement
- *   window.AVATARS.renderCardBg(avatarId, fallbackRace) → HTML string
+ *   window.AVATARS.renderCardBg(avatarId, color)          → HTML string
  */
 
 (function () {
@@ -110,8 +110,8 @@
         return container;
     }
 
-    function renderCardBg(avatarId, color, fallbackRace) {
-        const resolved = _resolve(avatarId, fallbackRace);
+    function renderCardBg(avatarId, color) {
+        const resolved = _resolve(avatarId);
         if (!resolved) return '';
         const { race, entry } = resolved;
         const tint = color || RACE_COLORS[race] || '#8a7a5a';
