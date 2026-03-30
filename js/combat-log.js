@@ -1314,8 +1314,8 @@ try {
     // without a second getCharacter() call that would return a stale DB snapshot
     // and overwrite XP we just saved.
     const savedCharacters = {};
-    const newUnlocks = [];     // skills that crossed level 0→1 this combat
-    const skillXPGains = {};   // skillID → { name, before, after, level, discovered }
+    const newUnlocks = [];        // skills that crossed level 0→1 this combat
+    const skillXPGains = {};      // skillID → { name, before, after, level, discovered } — party-wide for modal
 
     for (const participant of combatData.participants.playerCharacters) {
         const charId = participant.characterID;
@@ -1400,8 +1400,10 @@ try {
         const skillXPTuning   = window.gameData?.tuning?.skillXP || {};
         const xpRates         = skillXPTuning.rates || {};
         const combatBonusPct  = skillXPTuning.combatBonusPercent ?? 0.005;
-        // Skills that used this combat get a one-time bonus of combatBonusPct * charXP,
-        // awarded once per skill (not per use) — tracked by skillID below.
+        // Combat bonus only applies to the two equipped skill slots
+        const equippedSkillIDs = new Set(
+            character.skills.slice(0, 2).map(s => s?.skillID).filter(Boolean)
+        );
         const skillBonusPaid  = {};
 
         // Apply skill XP
@@ -1452,6 +1454,31 @@ try {
             }
             // --- LOGIC BRANCH B: MASTERY PHASE (Level >= 1) ---
             else {
+                // Learned child procs grant no XP to the child — credit goes to the parent below
+                if (turn.isChildSkillProc) {
+                    const parentID  = turn.action?.replacedSkillID;
+                    const parentRef = parentID ? character.skills.find(s => s.skillID === parentID) : null;
+                    if (parentRef && (parentRef.skillLevel || 0) >= 1) {
+                        const parentDef      = allSkills.find(s => s.id === parentID);
+                        const parentCategory = parentDef?.category || '';
+                        if (!parentCategory.startsWith('CONSUMABLE_')) {
+                            const baseSkillXP = xpRates[parentCategory] ?? 50.0;
+                            let parentXP = baseSkillXP / Math.log(parentRef.skillLevel + 2);
+                            if (parentRef.skillLevel > 20) parentXP *= 0.1;
+                            if (isDefeat) parentXP *= 0.5;
+                            parentRef.skillXP = (parentRef.skillXP || 0) + parentXP;
+                            parentRef.usageCount = (parentRef.usageCount || 0) + 1;
+                            if (!skillXPGains[parentID]) {
+                                skillXPGains[parentID] = { name: parentDef?.name || parentID, before: parentRef.skillXP - parentXP, after: parentRef.skillXP, level: parentRef.skillLevel, discovered: !!parentRef.discovered, xpAwarded: parentXP };
+                            } else {
+                                skillXPGains[parentID].after = parentRef.skillXP;
+                                skillXPGains[parentID].xpAwarded += parentXP;
+                            }
+                        }
+                    }
+                    return; // No XP to the child
+                }
+
                 const category = skillDef?.category || '';
 
                 // Skip consumable skills entirely
@@ -1467,8 +1494,8 @@ try {
                     xpToAward = (baseSkillXP * multiplier) / Math.log(skillRef.skillLevel + 2);
                     if (skillRef.skillLevel > 20) xpToAward *= 0.1;
 
-                    // One-time combat bonus per skill: combatBonusPercent * charXP
-                    if (!skillBonusPaid[skillID]) {
+                    // One-time combat bonus per skill: combatBonusPercent * charXP — equipped skills only
+                    if (!skillBonusPaid[skillID] && equippedSkillIDs.has(skillID)) {
                         xpToAward += xpGained * combatBonusPct;
                         skillBonusPaid[skillID] = true;
                     }
