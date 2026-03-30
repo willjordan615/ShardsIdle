@@ -130,11 +130,12 @@ window.renderGearSlots = function(character) {
         const def    = itemId ? _itemDef(itemId) : null;
         const displayName = (entry.itemName && entry.itemName !== itemId) ? entry.itemName : (def?.name || null);
         const filled = !!(itemId && (def || displayName));
+        const twoHandedPrefix = (filled && def?.two_handed) ? '<span class="inv-two-handed-tag">(2H)</span> ' : '';
 
         return `<div class="loadout-slot ${filled ? 'loadout-slot--filled' : 'loadout-slot--empty'}"
                      onclick="openGearModal('${slot}')" title="${filled ? 'Click to change' : 'Click to equip'}">
             <span class="loadout-slot__label">${SLOT_LABELS[slot]}</span>
-            <span class="loadout-slot__item">${filled ? (displayName || def?.name || itemId) : '—'}</span>
+            <span class="loadout-slot__item">${filled ? (twoHandedPrefix + (displayName || def?.name || itemId)) : '—'}</span>
         </div>`;
     }).join('');
 };

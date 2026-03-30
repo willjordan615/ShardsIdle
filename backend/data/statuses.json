@@ -705,9 +705,9 @@
     "id": "taunt",
     "name": "Taunt",
     "type": "debuff",
-    "description": "Drawing enemy attention. Enemies are forced to target you.",
+    "description": "Taunted. More likely to attack the actor who placed this debuff.",
     "emoji": "\ud83d\ude24",
-    "tooltip": "Taunting \u2014 enemies are compelled to attack you",
+    "tooltip": "Taunted \u2014 More likely to attack the actor who placed this debuff",
     "defaultDuration": 2,
     "defaultMagnitude": 1,
     "effects": {
