@@ -253,12 +253,18 @@ function _scrollLogToBottom(logDisplay) {
 }
 
 function sleep(ms) {
+    if (window.combatSkipPlayback) return Promise.resolve();
     const multiplier = window.combatSpeedMultiplier || 1.0;
     const duration = ms * multiplier;
     // Poll pause state in 100ms increments
     return new Promise(resolve => {
         let elapsed = 0;
         const interval = setInterval(() => {
+            if (window.combatSkipPlayback) {
+                clearInterval(interval);
+                resolve();
+                return;
+            }
             if (!window.combatPaused) {
                 elapsed += 100;
                 if (elapsed >= duration) {
@@ -293,6 +299,13 @@ function showSafeSuccess(msg) {
 async function displayCombatLog(combatData) {
     try {
         console.log('[COMBAT] displayCombatLog called');
+
+        // Skip playback animations if tab is hidden
+        window.combatSkipPlayback = document.hidden;
+        const _onVisibilityChange = () => {
+            if (document.hidden) window.combatSkipPlayback = true;
+        };
+        document.addEventListener('visibilitychange', _onVisibilityChange);
 
         // --- SAFETY CHECKS ---
         if (!combatData) throw new Error('Combat data is null/undefined!');
@@ -712,6 +725,8 @@ async function displayCombatLog(combatData) {
         }
 
         // Trigger rewards (computes XP, builds skillXPGains, calls animateCombatRewards)
+        window.combatSkipPlayback = false;
+        document.removeEventListener('visibilitychange', _onVisibilityChange);
         await applyCombatRewards(combatData);
 
         // After animation shell is injected, set countdown text on the footer element
