@@ -9,7 +9,7 @@
   },
   "procDepth": [0.18, 0.10, 0.06, 0.03, 0.015, 0.007],
   "skillXP": {
-    "combatBonusPercent": 0.005,
+    "combatBonusPercent": 0.01,
     "rates": {
       "DAMAGE_SINGLE": 8,
       "DAMAGE_AOE":    8,
