@@ -7,20 +7,24 @@
 // _watchedCombatMs: duration of the last fully-watched combat cycle (playback + countdown).
 //   Updated every time the player watches a combat all the way through without tabbing away.
 //   Used to estimate how many combats elapsed while the tab was hidden.
-window._watchedCombatMs   = 240000; // initial estimate: 4 minutes
+window._watchedCombatMs   = null; // null until first fully-watched combat
 window._missedCombats     = 0;
-let _combatCycleStart     = null;  // set when a combat begins, cleared if tab hides mid-combat
+let _combatCycleStart     = null;
 let _combatHiddenMidCycle = false;
+
+const _TAB_PROTECTION_MS = 5 * 60 * 1000; // 5 minutes — short tabs don't count as missed
 
 document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
         window._combatHideTime   = Date.now();
-        _combatHiddenMidCycle    = true;  // tab hid during this cycle — don't update timer
+        _combatHiddenMidCycle    = true;
     } else {
-        if (window._combatHideTime && window.currentState?.idleActive) {
+        if (window._combatHideTime && window.currentState?.idleActive && window._watchedCombatMs) {
             const elapsed = Date.now() - window._combatHideTime;
-            const missed  = Math.floor(elapsed / window._watchedCombatMs);
-            if (missed > 0) window._missedCombats += missed;
+            if (elapsed >= _TAB_PROTECTION_MS) {
+                const missed = Math.floor(elapsed / window._watchedCombatMs);
+                if (missed > 0) window._missedCombats += missed;
+            }
         }
         window._combatHideTime = null;
     }
@@ -327,8 +331,8 @@ async function displayCombatLog(combatData) {
         console.log('[COMBAT] displayCombatLog called');
         _combatCycleStart     = Date.now();
         _combatHiddenMidCycle = document.hidden;
-        // Fast-forward playback if we have missed combats to catch up
-        window.combatSkipPlayback = window._missedCombats > 0;
+        // Fast-forward playback if we have missed combats to catch up (only if calibrated)
+        window.combatSkipPlayback = window._watchedCombatMs !== null && window._missedCombats > 0;
 
         // --- SAFETY CHECKS ---
         if (!combatData) throw new Error('Combat data is null/undefined!');
