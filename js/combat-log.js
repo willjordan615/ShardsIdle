@@ -1406,6 +1406,8 @@ try {
         );
         const skillBonusPaid  = {};
 
+        const isDefeat = combatData.result === 'defeat' || combatData.result === 'loss';
+
         // Apply skill XP
         allTurns.forEach(turn => {
             // Match by ID first, then Name
@@ -1503,6 +1505,7 @@ try {
             }
 
             if (xpToAward > 0) {
+                if (isDefeat) xpToAward *= 0.5;
                 skillRef.skillXP = (skillRef.skillXP || 0) + xpToAward;
                 skillRef.usageCount = (skillRef.usageCount || 0) + 1;
                 // Track for modal display
