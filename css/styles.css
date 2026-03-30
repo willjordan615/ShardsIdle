@@ -3688,6 +3688,17 @@ body:has(#combatlog.active) #headerTopBar {
     from { transform: translateY(-20%); }
     to   { transform: translateY(-45%); }
 }
+.inv-two-handed-tag {
+    display: inline-block;
+    margin-left: 0.5em;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: #a0c4ff;
+    opacity: 0.8;
+    vertical-align: middle;
+}
+
 .avatar-picker {
     display: flex;
     gap: 0.75rem;

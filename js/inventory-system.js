@@ -285,10 +285,11 @@ function _renderGearModal(character, activeSlot) {
             const dmgDelay = _dmgDelay(equippedDef);
             const bonuses  = _statBonuses(equippedDef);
             const desc     = equippedDef.description || '';
+            const twoHanded = equippedDef.two_handed ? `<span class="inv-two-handed-tag">Two-Handed</span>` : '';
             rows += `
                 <div class="inv-item inv-item--equipped">
                     <div class="inv-item__info">
-                        <div class="inv-item__name">${equippedDef.name}</div>
+                        <div class="inv-item__name">${equippedDef.name}${twoHanded}</div>
                         ${dmgDelay ? `<div class="inv-item__stats">${dmgDelay}</div>` : ''}
                         ${bonuses  ? `<div class="inv-item__stats">${bonuses}</div>`  : ''}
                         ${desc     ? `<div class="inv-item__desc">${desc}</div>`      : ''}
@@ -310,10 +311,11 @@ function _renderGearModal(character, activeSlot) {
             const bonuses  = _statBonuses(def);
             const desc     = inv.itemDescription || def?.description || '';
             const nameColor = _rollQualityColor(inv) || _rarityColor(inv.rarity);
+            const twoHanded = def?.two_handed ? `<span class="inv-two-handed-tag">Two-Handed</span>` : '';
             rows += `
                 <div class="inv-item" data-inv-idx="${idx}">
                     <div class="inv-item__info">
-                        <div class="inv-item__name" style="color:${nameColor};">${(inv.itemName && inv.itemName.includes(' ')) ? inv.itemName : (def?.name || inv.itemID)}</div>
+                        <div class="inv-item__name" style="color:${nameColor};">${(inv.itemName && inv.itemName.includes(' ')) ? inv.itemName : (def?.name || inv.itemID)}${twoHanded}</div>
                         ${dmgDelay ? `<div class="inv-item__stats">${dmgDelay}</div>` : ''}
                         ${bonuses  ? `<div class="inv-item__stats">${bonuses}</div>`  : ''}
                         ${desc     ? `<div class="inv-item__desc">${desc}</div>`      : ''}

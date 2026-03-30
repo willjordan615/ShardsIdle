@@ -17458,7 +17458,7 @@
   {
     "id": "greataxe_wood_tier0",
     "name": "Woodcutter's Greataxe",
-    "type": "axe",
+    "type": "greateaxe",
     "slot_id1": "mainHand",
     "slot_id2": null,
     "dmg_type_1": "Slashing",
@@ -17499,7 +17499,7 @@
   {
     "id": "greataxe_iron_tier0",
     "name": "Iron Bardiche",
-    "type": "axe",
+    "type": "greataxe",
     "slot_id1": "mainHand",
     "slot_id2": null,
     "dmg_type_1": "Slashing",
@@ -17540,7 +17540,7 @@
   {
     "id": "greataxe_bronze_tier1",
     "name": "Bronze Ono",
-    "type": "axe",
+    "type": "greataxe",
     "slot_id1": "mainHand",
     "slot_id2": null,
     "dmg_type_1": "Slashing",
@@ -17581,7 +17581,7 @@
   {
     "id": "greataxe_steel_tier1",
     "name": "Steel Executioner",
-    "type": "axe",
+    "type": "greataxe",
     "slot_id1": "mainHand",
     "slot_id2": null,
     "dmg_type_1": "Slashing",
@@ -17622,7 +17622,7 @@
   {
     "id": "greataxe_mithril_tier2",
     "name": "Mithril Splitter",
-    "type": "axe",
+    "type": "greataxe",
     "slot_id1": "mainHand",
     "slot_id2": null,
     "dmg_type_1": "Slashing",
@@ -17663,7 +17663,7 @@
   {
     "id": "greataxe_storm_tier2",
     "name": "Storm Cleaver",
-    "type": "axe",
+    "type": "greataxe",
     "slot_id1": "mainHand",
     "slot_id2": null,
     "dmg_type_1": "Slashing",
@@ -17704,7 +17704,7 @@
   {
     "id": "greataxe_adamant_tier3",
     "name": "Adamant Reaver",
-    "type": "axe",
+    "type": "greataxe",
     "slot_id1": "mainHand",
     "slot_id2": null,
     "dmg_type_1": "Slashing",
@@ -17745,7 +17745,7 @@
   {
     "id": "greataxe_venom_tier3",
     "name": "Venom Chopper",
-    "type": "axe",
+    "type": "greataxe",
     "slot_id1": "mainHand",
     "slot_id2": null,
     "dmg_type_1": "Slashing",
@@ -17786,7 +17786,7 @@
   {
     "id": "greataxe_frost_tier4",
     "name": "Frostbite Bardiche",
-    "type": "axe",
+    "type": "greataxe",
     "slot_id1": "mainHand",
     "slot_id2": null,
     "dmg_type_1": "Slashing",
@@ -17827,7 +17827,7 @@
   {
     "id": "greataxe_earth_tier4",
     "name": "Tectonic Splitter",
-    "type": "axe",
+    "type": "greataxe",
     "slot_id1": "mainHand",
     "slot_id2": null,
     "dmg_type_1": "Slashing",
@@ -17868,7 +17868,7 @@
   {
     "id": "greataxe_radiant_tier5",
     "name": "Radiant Executioner",
-    "type": "axe",
+    "type": "greataxe",
     "slot_id1": "mainHand",
     "slot_id2": null,
     "dmg_type_1": "Slashing",
@@ -17909,7 +17909,7 @@
   {
     "id": "greataxe_rage_tier5",
     "name": "Berserker's Ono",
-    "type": "axe",
+    "type": "greataxe",
     "slot_id1": "mainHand",
     "slot_id2": null,
     "dmg_type_1": "Slashing",
@@ -17950,7 +17950,7 @@
   {
     "id": "greataxe_void_tier6",
     "name": "Void Reaver",
-    "type": "axe",
+    "type": "greataxe",
     "slot_id1": "mainHand",
     "slot_id2": null,
     "dmg_type_1": "Slashing",
@@ -17991,7 +17991,7 @@
   {
     "id": "greataxe_shadow_tier7",
     "name": "Nightfall Greataxe",
-    "type": "axe",
+    "type": "greataxe",
     "slot_id1": "mainHand",
     "slot_id2": null,
     "dmg_type_1": "Slashing",
@@ -18032,7 +18032,7 @@
   {
     "id": "greataxe_inferno_tier8",
     "name": "Inferno Splitter",
-    "type": "axe",
+    "type": "greataxe",
     "slot_id1": "mainHand",
     "slot_id2": null,
     "dmg_type_1": "Slashing",
