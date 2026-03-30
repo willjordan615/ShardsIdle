@@ -2322,8 +2322,11 @@ _applyLootTagFlavour(item, tagDef) {
    * Explicit procChance on the skill data always wins.
    * Otherwise, depth-based rates from PROC_DEPTH_RATES tuning apply.
    */
-  _childProcChance(childSkill) {
+  _childProcChance(childSkill, character) {
       if (childSkill.procChance != null) return childSkill.procChance;
+      // If the character has already learned this skill (level >= 1), use flat 5% proc rate
+      const charSkillRecord = character?.skills?.find(s => s.skillID === childSkill.id);
+      if (charSkillRecord && (charSkillRecord.skillLevel || 0) >= 1) return 0.05;
       const rates = CombatEngine.TUNING.PROC_DEPTH_RATES;
       const depth = this._skillDepthCache.get(childSkill.id) || 2;
       // rates is indexed from depth 2 upward; clamp to last entry for depth 7+
@@ -2357,7 +2360,7 @@ _applyLootTagFlavour(item, tagDef) {
     const shuffled = eligibleChildSkills.sort(() => Math.random() - 0.5);
 
     for (const childSkill of shuffled) {
-        const procChance = this._childProcChance(childSkill);
+        const procChance = this._childProcChance(childSkill, character);
         if (Math.random() >= procChance) continue;
 
         // --- CRITICAL FIX: Prevent "Lunge replacing Lunge" ---
