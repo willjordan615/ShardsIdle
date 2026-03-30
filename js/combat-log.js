@@ -773,18 +773,17 @@ async function displayCombatLog(combatData) {
 
         // Countdown — runs in modal timer span; fires combat when done
         function startCountdown(seconds, targetChallengeId, result, data) {
-            let counter = seconds;
+            const deadline = Date.now() + seconds * 1000;
             _setupChallenge(targetChallengeId);
 
             const interval = setInterval(() => {
-                counter--;
+                const remaining = Math.ceil((deadline - Date.now()) / 1000);
                 const timerSpan = document.getElementById('countdownTimer');
-                if (timerSpan) timerSpan.textContent = counter;
-                // Keep toast in sync if visible
+                if (timerSpan) timerSpan.textContent = Math.max(0, remaining);
                 const toastTimer = document.getElementById('combatToastTimer');
-                if (toastTimer) toastTimer.textContent = counter;
+                if (toastTimer) toastTimer.textContent = Math.max(0, remaining);
 
-                if (counter <= 0) {
+                if (Date.now() >= deadline) {
                     clearInterval(interval);
                     _fireNextCombat(targetChallengeId);
                 }
