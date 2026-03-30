@@ -4,20 +4,22 @@
 // ---------------------------------------------------------------------------
 // BACKGROUND TAB CATCH-UP
 // ---------------------------------------------------------------------------
-// Track how long the tab was hidden and estimate missed combats.
-// _avgCombatMs: rolling average of recent playback durations (ms).
-// _missedCombats: combats to fast-forward on return.
-window._avgCombatMs   = 60000; // initial estimate: 60s per combat
-window._missedCombats = 0;
-let _combatPlaybackStart = null;
+// _watchedCombatMs: duration of the last fully-watched combat cycle (playback + countdown).
+//   Updated every time the player watches a combat all the way through without tabbing away.
+//   Used to estimate how many combats elapsed while the tab was hidden.
+window._watchedCombatMs   = 240000; // initial estimate: 4 minutes
+window._missedCombats     = 0;
+let _combatCycleStart     = null;  // set when a combat begins, cleared if tab hides mid-combat
+let _combatHiddenMidCycle = false;
 
 document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
-        window._combatHideTime = Date.now();
+        window._combatHideTime   = Date.now();
+        _combatHiddenMidCycle    = true;  // tab hid during this cycle — don't update timer
     } else {
         if (window._combatHideTime && window.currentState?.idleActive) {
             const elapsed = Date.now() - window._combatHideTime;
-            const missed  = Math.floor(elapsed / window._avgCombatMs);
+            const missed  = Math.floor(elapsed / window._watchedCombatMs);
             if (missed > 0) window._missedCombats += missed;
         }
         window._combatHideTime = null;
@@ -323,7 +325,8 @@ function showSafeSuccess(msg) {
 async function displayCombatLog(combatData) {
     try {
         console.log('[COMBAT] displayCombatLog called');
-        _combatPlaybackStart = Date.now();
+        _combatCycleStart     = Date.now();
+        _combatHiddenMidCycle = document.hidden;
         // Fast-forward playback if we have missed combats to catch up
         window.combatSkipPlayback = window._missedCombats > 0;
 
@@ -744,10 +747,12 @@ async function displayCombatLog(combatData) {
             modal.style.display = onCombatLog ? 'flex' : 'none';
         }
 
-        // Update rolling average playback duration
-        if (_combatPlaybackStart) {
-            const duration = Date.now() - _combatPlaybackStart;
-            window._avgCombatMs = Math.round(window._avgCombatMs * 0.8 + duration * 0.2);
+        // If the player watched this combat all the way through, record the cycle duration
+        if (!_combatHiddenMidCycle && _combatCycleStart) {
+            window._watchedCombatMs = Date.now() - _combatCycleStart;
+            const mins = Math.round(window._watchedCombatMs / 60000);
+            const el = document.getElementById('combatCycleSpeed');
+            if (el) el.textContent = `Avg Challenge: ~${mins} Min`;
         }
 
         // If combats were missed while hidden, skip this one's rewards display
