@@ -2,6 +2,29 @@
 // Handles combat log display with metered playback and rewards
 
 // ---------------------------------------------------------------------------
+// BACKGROUND TAB CATCH-UP
+// ---------------------------------------------------------------------------
+// Track how long the tab was hidden and estimate missed combats.
+// _avgCombatMs: rolling average of recent playback durations (ms).
+// _missedCombats: combats to fast-forward on return.
+window._avgCombatMs   = 60000; // initial estimate: 60s per combat
+window._missedCombats = 0;
+let _combatPlaybackStart = null;
+
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+        window._combatHideTime = Date.now();
+    } else {
+        if (window._combatHideTime && window.currentState?.idleActive) {
+            const elapsed = Date.now() - window._combatHideTime;
+            const missed  = Math.floor(elapsed / window._avgCombatMs);
+            if (missed > 0) window._missedCombats += missed;
+        }
+        window._combatHideTime = null;
+    }
+});
+
+// ---------------------------------------------------------------------------
 // PANEL COLLAPSE TOGGLES
 // ---------------------------------------------------------------------------
 // ── Session loot log ─────────────────────────────────────────────────────────
@@ -256,8 +279,8 @@ function sleep(ms) {
     if (window.combatSkipPlayback) return Promise.resolve();
     const multiplier = window.combatSpeedMultiplier || 1.0;
     const duration = ms * multiplier;
-    // Poll pause state in 100ms increments
     return new Promise(resolve => {
+        const start = Date.now();
         let elapsed = 0;
         const interval = setInterval(() => {
             if (window.combatSkipPlayback) {
@@ -266,7 +289,8 @@ function sleep(ms) {
                 return;
             }
             if (!window.combatPaused) {
-                elapsed += 100;
+                // Use real wall-clock time so background throttling doesn't stall playback
+                elapsed = Date.now() - start;
                 if (elapsed >= duration) {
                     clearInterval(interval);
                     resolve();
@@ -299,13 +323,9 @@ function showSafeSuccess(msg) {
 async function displayCombatLog(combatData) {
     try {
         console.log('[COMBAT] displayCombatLog called');
-
-        // Skip playback animations if tab is hidden
-        window.combatSkipPlayback = document.hidden;
-        const _onVisibilityChange = () => {
-            if (document.hidden) window.combatSkipPlayback = true;
-        };
-        document.addEventListener('visibilitychange', _onVisibilityChange);
+        _combatPlaybackStart = Date.now();
+        // Fast-forward playback if we have missed combats to catch up
+        window.combatSkipPlayback = window._missedCombats > 0;
 
         // --- SAFETY CHECKS ---
         if (!combatData) throw new Error('Combat data is null/undefined!');
@@ -724,9 +744,21 @@ async function displayCombatLog(combatData) {
             modal.style.display = onCombatLog ? 'flex' : 'none';
         }
 
+        // Update rolling average playback duration
+        if (_combatPlaybackStart) {
+            const duration = Date.now() - _combatPlaybackStart;
+            window._avgCombatMs = Math.round(window._avgCombatMs * 0.8 + duration * 0.2);
+        }
+
+        // If combats were missed while hidden, skip this one's rewards display
+        if (window._missedCombats > 0) {
+            window._missedCombats = Math.max(0, window._missedCombats - 1);
+            window.combatSkipPlayback = true;
+        } else {
+            window.combatSkipPlayback = false;
+        }
+
         // Trigger rewards (computes XP, builds skillXPGains, calls animateCombatRewards)
-        window.combatSkipPlayback = false;
-        document.removeEventListener('visibilitychange', _onVisibilityChange);
         await applyCombatRewards(combatData);
 
         // After animation shell is injected, set countdown text on the footer element
