@@ -487,7 +487,7 @@ async function startCombat(forcedChallengeId) {
         if (!silent) {
             showScreen('combatlog');
         }
-        displayCombatLog(combatResult);
+        await displayCombatLog(combatResult);
 
     } catch (error) {
         console.error('Combat error:', error);
