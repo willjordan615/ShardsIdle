@@ -436,6 +436,8 @@ async function startCombat(forcedChallengeId) {
         currentState.idleActive = true;
         updateChallengeStatusBanner();
         if (typeof _updateMediaControls === 'function') _updateMediaControls();
+        // Stamp idle session on server so offline collect works if tab is closed
+        _notifyIdleStart();
 
         console.log('[COMBAT] Starting combat:', requestBody.challengeID);
 
@@ -566,6 +568,8 @@ function requestLoopExit() {
     updateChallengeStatusBanner();
     if (typeof _updateMediaControls === 'function') _updateMediaControls();
     console.log('[IDLE] Loop exit requested — will stop after current combat.');
+    // Notify server so offline collect doesn't fire on next load
+    _notifyIdleStop();
 }
 
 /**
@@ -578,4 +582,31 @@ function cancelLoopExit() {
     updateChallengeStatusBanner();
     if (typeof _updateMediaControls === 'function') _updateMediaControls();
     console.log('[IDLE] Loop exit cancelled — continuing idle loop.');
+    // Re-stamp idle session since player is back in the loop
+    _notifyIdleStart();
+}
+
+// ── Offline idle session notifications ───────────────────────────────────────
+
+function _notifyIdleStart() {
+    const challengeId = currentState.selectedChallenge?.id;
+    const partyIds    = (currentState.currentParty || []).map(m => m.characterID || m.id).filter(Boolean);
+    const primaryId   = partyIds.find(id => !id.startsWith('bot_') && !id.startsWith('import_'));
+    if (!primaryId || !challengeId) return;
+    authFetch(`${BACKEND_URL}/api/combat/idle/start`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ characterId: primaryId, challengeId, partyIds }),
+    }).catch(e => console.warn('[IDLE] Failed to stamp idle session:', e.message));
+}
+
+function _notifyIdleStop() {
+    const partyIds  = (currentState.currentParty || []).map(m => m.characterID || m.id).filter(Boolean);
+    const primaryId = partyIds.find(id => !id.startsWith('bot_') && !id.startsWith('import_'));
+    if (!primaryId) return;
+    authFetch(`${BACKEND_URL}/api/combat/idle/stop`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ characterId: primaryId }),
+    }).catch(e => console.warn('[IDLE] Failed to clear idle session:', e.message));
 }

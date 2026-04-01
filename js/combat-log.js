@@ -285,8 +285,17 @@ function _scrollLogToBottom(logDisplay) {
 }
 
 function sleep(ms) {
-    if (window.combatSkipPlayback) return Promise.resolve();
     const multiplier = window.combatSpeedMultiplier || 1.0;
+    if (window.combatSkipPlayback) {
+        // Compress playback so the cycle takes at least 60 seconds.
+        // Scale factor = 60s / watchedCombatMs — if the watched cycle was already
+        // under 60s, scale is >= 1.0 so we clamp at 1.0 (no compression needed).
+        const watchedMs = window._watchedCombatMs || 60000;
+        const scale = Math.min(1.0, 60000 / watchedMs);
+        const compressed = ms * scale * multiplier;
+        if (compressed < 50) return Promise.resolve(); // too small to bother timing
+        return new Promise(resolve => setTimeout(resolve, compressed));
+    }
     const duration = ms * multiplier;
     return new Promise(resolve => {
         const start = Date.now();
@@ -298,7 +307,6 @@ function sleep(ms) {
                 return;
             }
             if (!window.combatPaused) {
-                // Use real wall-clock time so background throttling doesn't stall playback
                 elapsed = Date.now() - start;
                 if (elapsed >= duration) {
                     clearInterval(interval);
@@ -943,6 +951,7 @@ window.cancelAutoRestart = function() {
         window.currentState.idleActive     = false;
         window.currentState.pendingLoopExit = false;
     }
+    if (typeof _notifyIdleStop === 'function') _notifyIdleStop();
     if (typeof updateChallengeStatusBanner === 'function') updateChallengeStatusBanner();
     _updateMediaControls();
     // Clear session loot when loop stops

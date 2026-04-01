@@ -519,6 +519,272 @@ router.post('/admin/prune-logs', async (req, res) => {
     }
 });
 
+// ── Offline idle endpoints ────────────────────────────────────────────────────
+
+// POST /idle/start — persist idle session when the loop activates
+router.post('/idle/start', requireAuth, async (req, res) => {
+    const { characterId, challengeId, partyIds } = req.body;
+    if (!characterId || !challengeId || !Array.isArray(partyIds)) {
+        return res.status(400).json({ error: 'characterId, challengeId, and partyIds are required' });
+    }
+    try {
+        await db.setIdleSession(characterId, challengeId, partyIds);
+        res.json({ ok: true });
+    } catch (err) {
+        console.error('[IDLE] Failed to set idle session:', err);
+        res.status(500).json({ error: 'Failed to save idle session' });
+    }
+});
+
+// POST /idle/stop — clear idle session when the loop is cancelled
+router.post('/idle/stop', requireAuth, async (req, res) => {
+    const { characterId } = req.body;
+    if (!characterId) return res.status(400).json({ error: 'characterId is required' });
+    try {
+        await db.clearIdleSession(characterId);
+        res.json({ ok: true });
+    } catch (err) {
+        console.error('[IDLE] Failed to clear idle session:', err);
+        res.status(500).json({ error: 'Failed to clear idle session' });
+    }
+});
+
+// POST /idle/collect — run all missed combats server-side, apply rewards, return summary
+router.post('/idle/collect', requireAuth, async (req, res) => {
+    const { characterId } = req.body;
+    if (!characterId) return res.status(400).json({ error: 'characterId is required' });
+
+    let releaseLocks;
+    try {
+        const session = await db.getIdleSession(characterId);
+        if (!session) return res.json({ hadSession: false });
+
+        // Always clear the session first — so a crash doesn't trap the player
+        await db.clearIdleSession(characterId);
+
+        const { challengeId, partyIds, startedAt } = session;
+        const elapsedMs  = Date.now() - startedAt;
+        const cappedMs   = Math.min(elapsedMs, 24 * 60 * 60 * 1000); // 24hr cap
+        const MIN_CYCLE  = 60 * 1000; // 1 minute minimum cycle
+        const combatCount = Math.max(1, Math.floor(cappedMs / MIN_CYCLE));
+
+        const engine = await getCombatEngine();
+        const challenges = JSON.parse(
+            require('fs').readFileSync(require('path').join(__dirname, '../data/challenges.json'), 'utf8')
+        );
+        const challenge = challenges.find(c => c.id === challengeId);
+        if (!challenge) return res.status(404).json({ error: `Challenge not found: ${challengeId}` });
+
+        // Load all party members fresh from DB
+        const ownedIds = partyIds.filter(id => id && !id.startsWith('import_') && !id.startsWith('bot_'));
+        releaseLocks = await acquireCharacterLocks(ownedIds);
+
+        // Build party snapshots from live DB state
+        const partySnapshots = await Promise.all(partyIds.map(async (id) => {
+            if (id.startsWith('bot_')) {
+                const bots = JSON.parse(
+                    require('fs').readFileSync(require('path').join(__dirname, '../data/bots.json'), 'utf8')
+                );
+                const bot = bots.find(b => b.characterID === id);
+                return bot ? { ...bot, characterID: bot.characterID, characterName: bot.name, isBot: true } : null;
+            }
+            const char = await db.getCharacter(id);
+            if (!char) return null;
+            return {
+                characterID:   char.id,
+                characterName: char.name,
+                race:          char.race,
+                level:         char.level,
+                stats:         char.stats,
+                skills:        char.skills,
+                equipment:     char.equipment,
+                consumables:   char.consumables || {},
+                aiProfile:     char.aiProfile || 'balanced',
+            };
+        }));
+
+        const validParty = partySnapshots.filter(Boolean);
+        if (!validParty.length) return res.status(400).json({ error: 'No valid party members found' });
+
+        // Seed drop chance from the primary character
+        const primaryChar = await db.getCharacter(characterId);
+        const lastId      = primaryChar?.lastSuccessfulChallengeId || null;
+        const switched    = lastId && challengeId && lastId !== challengeId;
+        challenge._globalDropChance = switched ? 0.01 : (primaryChar?.combatStats?.globalDropChance ?? 0.01);
+        challenge._lastSuccessfulChallengeId = lastId;
+
+        // ── Run combats ───────────────────────────────────────────────────────
+        const summary = {
+            hadSession:   true,
+            challengeId,
+            elapsedMs:    cappedMs,
+            combatCount,
+            wins:         0,
+            losses:       0,
+            xpGained:     {},   // characterId → total XP
+            lootGained:   [],   // aggregated loot entries
+            goldGained:   0,
+            dustGained:   0,
+        };
+
+        // Track live character state across runs so each combat sees updated skills/stats
+        const liveChars = {};
+        for (const snap of validParty) {
+            if (!snap.characterID.startsWith('bot_') && !snap.characterID.startsWith('import_')) {
+                const char = await db.getCharacter(snap.characterID);
+                if (char) liveChars[snap.characterID] = char;
+            }
+        }
+
+        for (let i = 0; i < combatCount; i++) {
+            // Refresh party snapshots from live char state for owned members
+            const currentParty = validParty.map(snap => {
+                const live = liveChars[snap.characterID];
+                if (!live) return snap;
+                return {
+                    ...snap,
+                    level:    live.level,
+                    skills:   live.skills,
+                    equipment: live.equipment,
+                    stats:    live.stats,
+                };
+            });
+
+            const result = engine.runCombat(currentParty, challenge);
+            const isVictory = result.result === 'victory';
+            const isDefeat  = result.result === 'defeat' || result.result === 'loss';
+
+            if (isVictory) summary.wins++;
+            else summary.losses++;
+
+            // Apply rewards to each owned character
+            if (result.participants?.playerCharacters) {
+                for (const participant of result.participants.playerCharacters) {
+                    const pid = participant.characterID;
+                    if (pid.startsWith('bot_') || pid.startsWith('import_')) continue;
+
+                    const character = liveChars[pid];
+                    if (!character) continue;
+
+                    // XP
+                    const xpGained = result.rewards?.experienceGained?.[pid] || 0;
+                    if (xpGained > 0) {
+                        character.experience = (character.experience || 0) + xpGained;
+                        let xpThreshold = getXPToNextLevel(character.level);
+                        while (character.experience >= xpThreshold) {
+                            character.experience -= xpThreshold;
+                            character.level++;
+                            xpThreshold = getXPToNextLevel(character.level);
+                        }
+                        summary.xpGained[pid] = (summary.xpGained[pid] || 0) + xpGained;
+                    }
+
+                    // Skill merge (same logic as live combat route)
+                    const incomingMap = new Map(
+                        (participant.skills || []).map(s => [s.skillID, s])
+                    );
+                    const finalSkills = [];
+                    const seen = new Set();
+                    for (const dbSkill of (character.skills || [])) {
+                        const incoming = incomingMap.get(dbSkill.skillID);
+                        if (incoming) {
+                            const isDiscovery = (dbSkill.skillLevel || 0) < 1;
+                            finalSkills.push(isDiscovery
+                                ? { ...incoming, skillXP: dbSkill.skillXP, skillLevel: dbSkill.skillLevel, ...(dbSkill.intrinsic ? { intrinsic: true } : {}) }
+                                : { ...dbSkill, ...incoming, skillLevel: Math.max(dbSkill.skillLevel || 0, incoming.skillLevel || 0), ...(dbSkill.intrinsic ? { intrinsic: true } : {}) }
+                            );
+                        } else {
+                            finalSkills.push(dbSkill);
+                        }
+                        seen.add(dbSkill.skillID);
+                    }
+                    for (const s of (participant.skills || [])) {
+                        if (!seen.has(s.skillID)) finalSkills.push(s);
+                    }
+                    character.skills = finalSkills;
+
+                    // Combat stats
+                    engine.updateCombatStats(character, result, challenge);
+
+                    // Drop chance ramp
+                    if (result.rewards?.nextGlobalDropChance !== undefined) {
+                        if (!character.combatStats) character.combatStats = {};
+                        character.combatStats.globalDropChance = result.rewards.nextGlobalDropChance;
+                        challenge._globalDropChance = result.rewards.nextGlobalDropChance;
+                    }
+
+                    // lastSuccessfulChallengeId
+                    if (isVictory) character.lastSuccessfulChallengeId = challengeId;
+                }
+            }
+
+            // Loot — stack consumables, add gear to primary char inventory
+            if (result.rewards?.lootDropped?.length > 0) {
+                const primary = liveChars[characterId];
+                if (primary) {
+                    if (!primary.consumableStash) primary.consumableStash = {};
+                    if (!primary.inventory)       primary.inventory = [];
+
+                    result.rewards.lootDropped.forEach(loot => {
+                        if (!loot?.itemID) return;
+                        const itemDef = engine.gear.find(g => g.id === loot.itemID);
+                        const isConsumable = itemDef?.slot_id1 === 'consumable'
+                            || itemDef?.slot === 'consumable'
+                            || itemDef?.consumable === true;
+
+                        if (isConsumable) {
+                            primary.consumableStash[loot.itemID] = (primary.consumableStash[loot.itemID] || 0) + 1;
+                        } else if (itemDef?.slot_id1 && ['mainHand','offHand','head','chest','accessory1','accessory2'].includes(itemDef.slot_id1)) {
+                            // Check for duplicate before adding gear
+                            const equippedIds = Object.values(primary.equipment || {}).filter(Boolean).map(v => typeof v === 'object' ? v.itemID : v);
+                            const inInv = (primary.inventory || []).some(i => i?.itemID === loot.itemID);
+                            if (equippedIds.includes(loot.itemID) || inInv) {
+                                // Auto-sell duplicate
+                                const goldVal = loot.itemID ? (itemDef?.goldValue || ((itemDef?.tier || 0) * 8 + 5)) : 5;
+                                primary.gold = parseFloat(((primary.gold || 0) + goldVal).toFixed(2));
+                                primary.arcaneDust = parseFloat(((primary.arcaneDust || 0) + goldVal * 0.01).toFixed(4));
+                                summary.goldGained += goldVal;
+                                summary.dustGained += goldVal * 0.01;
+                                loot._autosold = true;
+                            } else {
+                                primary.inventory.push({ itemID: loot.itemID, rarity: loot.rarity || 'common', acquiredAt: Date.now() });
+                            }
+                        } else {
+                            // Quest/misc items
+                            primary.inventory.push({ itemID: loot.itemID, rarity: loot.rarity || 'common', acquiredAt: Date.now() });
+                        }
+
+                        // Add to summary loot list (aggregate by itemID)
+                        const existing = summary.lootGained.find(l => l.itemID === loot.itemID && l.rarity === loot.rarity);
+                        if (existing) existing.count++;
+                        else summary.lootGained.push({ itemID: loot.itemID, name: itemDef?.name || loot.itemID, rarity: loot.rarity || 'common', count: 1, autosold: !!loot._autosold });
+                    });
+                }
+            }
+        } // end combat loop
+
+        // Persist all character state
+        for (const char of Object.values(liveChars)) {
+            await db.saveCharacter(char);
+            console.log(`[IDLE] Saved ${char.name} after ${combatCount} offline combats`);
+        }
+
+        console.log(`[IDLE] Collect complete: ${combatCount} combats, ${summary.wins}W/${summary.losses}L for ${characterId}`);
+        res.json(summary);
+
+    } catch (err) {
+        console.error('[IDLE] Collect failed:', err);
+        res.status(500).json({ error: 'Offline collect failed: ' + err.message });
+    } finally {
+        if (releaseLocks) releaseLocks();
+    }
+});
+
+// ── XP helper (mirrors client-side formula) ───────────────────────────────────
+function getXPToNextLevel(level) {
+    return Math.max(1, Math.floor(7300 * Math.pow(1.15, (level || 1) - 1)));
+}
+
 // Allow admin saves to invalidate the singleton so next combat re-reads fresh JSON data.
 function resetCombatEngine() {
     combatEngine = null;

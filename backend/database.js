@@ -253,6 +253,62 @@ async function initializeCharacterSnapshotsTable() {
             });
         });
     }
+
+    // Migration: add offline idle session tracking columns
+    for (const [col, def] of [
+        ['idleChallengeId', 'TEXT DEFAULT NULL'],
+        ['idlePartyIds',    'TEXT DEFAULT NULL'],
+        ['idleStartedAt',   'INTEGER DEFAULT NULL'],
+    ]) {
+        await new Promise((resolve) => {
+            db.run(`ALTER TABLE characters ADD COLUMN ${col} ${def}`, (err) => {
+                if (err && !err.message.includes('duplicate column')) {
+                    console.warn(`[DATABASE] Migration note (${col}):`, err.message);
+                }
+                resolve();
+            });
+        });
+    }
+}
+
+// ── Idle session helpers ──────────────────────────────────────────────────────
+
+function setIdleSession(characterId, challengeId, partyIds) {
+    return new Promise((resolve, reject) => {
+        db.run(
+            `UPDATE characters SET idleChallengeId = ?, idlePartyIds = ?, idleStartedAt = ? WHERE id = ?`,
+            [challengeId, JSON.stringify(partyIds), Date.now(), characterId],
+            (err) => { if (err) reject(err); else resolve(); }
+        );
+    });
+}
+
+function getIdleSession(characterId) {
+    return new Promise((resolve, reject) => {
+        db.get(
+            `SELECT idleChallengeId, idlePartyIds, idleStartedAt FROM characters WHERE id = ?`,
+            [characterId],
+            (err, row) => {
+                if (err) return reject(err);
+                if (!row || !row.idleStartedAt) return resolve(null);
+                resolve({
+                    challengeId:  row.idleChallengeId,
+                    partyIds:     JSON.parse(row.idlePartyIds || '[]'),
+                    startedAt:    row.idleStartedAt,
+                });
+            }
+        );
+    });
+}
+
+function clearIdleSession(characterId) {
+    return new Promise((resolve, reject) => {
+        db.run(
+            `UPDATE characters SET idleChallengeId = NULL, idlePartyIds = NULL, idleStartedAt = NULL WHERE id = ?`,
+            [characterId],
+            (err) => { if (err) reject(err); else resolve(); }
+        );
+    });
 }
 
 function saveCombatLog(logData) {
@@ -908,4 +964,8 @@ module.exports = {
     reassignSnapshots,
     pruneExpiredSessions,
     scheduleSessionPruning,
+    // Idle session
+    setIdleSession,
+    getIdleSession,
+    clearIdleSession,
 };
