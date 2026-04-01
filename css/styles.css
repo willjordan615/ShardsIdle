@@ -3914,24 +3914,23 @@ body:has(#combatlog.active) #headerTopBar {
 
 /* Avatar panel */
 
-css.os-hero__avatar {
+.os-hero__avatar {
     position: absolute;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    width: 260px;
+    right: 1.5rem;
+    top: 0.75rem;
+    bottom: 0.75rem;
+    width: 120px;
+    border-radius: 4px;
     overflow: hidden;
     z-index: 1;
+    border: 1px solid var(--gold-border);
 }
 
 .os-hero__avatar::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: 
-        linear-gradient(to right, var(--window-deep) 0%, transparent 60%),
-        linear-gradient(to bottom, var(--window-deep) 0%, transparent 20%),
-        linear-gradient(to top, var(--window-deep) 0%, transparent 20%);
+    background: linear-gradient(to bottom, transparent 60%, rgba(0,0,0,0.4) 100%);
     z-index: 2;
     pointer-events: none;
 }
@@ -3940,23 +3939,21 @@ css.os-hero__avatar {
     position: absolute;
     inset: 0;
     width: 100%;
-    opacity: 0.85;
-    filter: saturate(0.9);
+    opacity: 1;
+    filter: saturate(0.85);
 }
 
 .os-hero__avatar .avatar-card-bg img {
     width: 100%;
-    height: 100%;
+    height: 160%;
     object-fit: cover;
     object-position: top center;
-    transform: scale(1.4);
-    transform-origin: top center;
-    animation: os-portrait-pan 12s ease-in-out infinite alternate;
+    animation: os-portrait-pan 10s ease-in-out infinite alternate;
 }
 
 @keyframes os-portrait-pan {
-    from { transform: scale(1.4) translateY(0%); }
-    to   { transform: scale(1.4) translateY(-8%); }
+    from { transform: translateY(0%); }
+    to   { transform: translateY(-30%); }
 }
 
 /* Color glow behind the portrait */
@@ -4078,7 +4075,7 @@ css.os-hero__avatar {
 
 @media (max-width: 540px) {
     .os-hero {
-        padding: 2.5rem 280px 2.5rem 2rem;
+        padding: 2.5rem 160px 2.5rem 2rem;
         min-height: 130px;
     }
     .os-hero__avatar { width: 130px; }
