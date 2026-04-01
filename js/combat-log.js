@@ -751,12 +751,17 @@ async function displayCombatLog(combatData) {
             modal.style.display = onCombatLog ? 'flex' : 'none';
         }
 
-        // If the player watched this combat all the way through, record the cycle duration
-        if (!_combatHiddenMidCycle && _combatCycleStart) {
+        // If the player watched this combat all the way through (no tab-away, no skip),
+        // record the cycle duration. Skip-playback cycles are invalid measurements —
+        // they complete in ~0ms and would corrupt the catch-up estimator.
+        if (!_combatHiddenMidCycle && _combatCycleStart && !window.combatSkipPlayback) {
             window._watchedCombatMs = Date.now() - _combatCycleStart;
-            const mins = Math.round(window._watchedCombatMs / 60000);
+            const totalSecs = window._watchedCombatMs / 1000;
+            const display = totalSecs < 90
+                ? `Avg Challenge: ~${Math.max(1, Math.round(totalSecs))}s`
+                : `Avg Challenge: ~${Math.max(1, Math.round(totalSecs / 60))} Min`;
             const el = document.getElementById('combatCycleSpeed');
-            if (el) el.textContent = `Avg Challenge: ~${mins} Min`;
+            if (el) el.textContent = display;
         }
 
         // If combats were missed while hidden, skip this one's rewards display
