@@ -9,18 +9,12 @@
  * Returns false if nothing was pending — caller should proceed normally.
  */
 async function checkOfflineProgress() {
-    // Need a primary character to check against.
-    // We discover it by looking at all characters owned by this user.
-    // Use the most recently active one that has an idle session.
     try {
         const res = await authFetch(`${BACKEND_URL}/api/characters`);
         if (!res.ok) return false;
-        const characters = await res.json();
+        const data = await res.json();
+        const characters = data.characters || [];
 
-        // Find the first character that has an idle session pending
-        // by calling /idle/collect — it reads idleStartedAt server-side.
-        // We try each owned character; the first one with a session wins.
-        // (In practice, only one character runs a loop at a time.)
         for (const char of characters) {
             const id = char.id || char.characterID;
             if (!id || id.startsWith('import_') || id.startsWith('bot_')) continue;
@@ -31,12 +25,15 @@ async function checkOfflineProgress() {
                 body:    JSON.stringify({ characterId: id }),
             });
 
-            if (!collectRes.ok) continue;
+            if (!collectRes.ok) {
+                console.warn(`[OFFLINE] collect failed for ${id}: ${collectRes.status}`);
+                continue;
+            }
             const summary = await collectRes.json();
+            console.log(`[OFFLINE] collect response for ${id}:`, summary.hadSession, summary.combatCount);
 
             if (!summary.hadSession) continue;
 
-            // Found a session — render the summary screen
             _renderOfflineSummary(summary, char);
             if (typeof showScreen === 'function') showScreen('offlineSummary');
             return true;

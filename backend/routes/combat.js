@@ -568,10 +568,9 @@ router.post('/idle/collect', requireAuth, async (req, res) => {
         const MIN_CYCLE  = 60 * 1000; // 1 minute minimum cycle
         const combatCount = Math.max(1, Math.floor(cappedMs / MIN_CYCLE));
 
-        const engine = await getCombatEngine();
-        const challenges = JSON.parse(
-            require('fs').readFileSync(require('path').join(__dirname, '../data/challenges.json'), 'utf8')
-        );
+        const engine = initializeCombatEngine();
+        const dataDir    = path.join(__dirname, '../data');
+        const challenges = JSON.parse(fs.readFileSync(path.join(dataDir, 'challenges.json'), 'utf8'));
         const challenge = challenges.find(c => c.id === challengeId);
         if (!challenge) return res.status(404).json({ error: `Challenge not found: ${challengeId}` });
 
@@ -582,9 +581,7 @@ router.post('/idle/collect', requireAuth, async (req, res) => {
         // Build party snapshots from live DB state
         const partySnapshots = await Promise.all(partyIds.map(async (id) => {
             if (id.startsWith('bot_')) {
-                const bots = JSON.parse(
-                    require('fs').readFileSync(require('path').join(__dirname, '../data/bots.json'), 'utf8')
-                );
+                const bots = JSON.parse(fs.readFileSync(path.join(dataDir, 'bots.json'), 'utf8'));
                 const bot = bots.find(b => b.characterID === id);
                 return bot ? { ...bot, characterID: bot.characterID, characterName: bot.name, isBot: true } : null;
             }
