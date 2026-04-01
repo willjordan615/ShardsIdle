@@ -1845,7 +1845,7 @@ try {
     if (window.currentState?.detailCharacterId && typeof showCharacterDetail === 'function') {
         // Only navigate to detail screen if the player isn't reviewing the combat log
         const activeScreen = document.querySelector('.screen.active')?.id || '';
-        const onCombatLog  = activeScreen === 'combatlog' || activeScreen === 'combat';
+        const onCombatLog  = activeScreen === 'combatlog' || activeScreen === 'combat' || activeScreen === 'offlineSummary';
         const _hubCharId  = window.currentState.detailCharacterId;
         const _prevLevel  = savedCharacters[_hubCharId]?._oldLevel ?? null;
         const _prevXP     = savedCharacters[_hubCharId]?._oldXP    ?? null;
