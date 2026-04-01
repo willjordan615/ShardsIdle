@@ -3923,16 +3923,6 @@ body:has(#combatlog.active) #headerTopBar {
     border-radius: 4px;
     overflow: hidden;
     z-index: 1;
-    border: 1px solid var(--gold-border);
-}
-
-.os-hero__avatar::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to bottom, transparent 60%, rgba(0,0,0,0.4) 100%);
-    z-index: 2;
-    pointer-events: none;
 }
 
 .os-hero__avatar .avatar-card-bg {
@@ -3944,16 +3934,16 @@ body:has(#combatlog.active) #headerTopBar {
 }
 
 .os-hero__avatar .avatar-card-bg img {
-    width: 100%;
-    height: 160%;
+    width: 200%;
+    height: 100%;
     object-fit: cover;
-    object-position: top center;
-    animation: os-portrait-pan 10s ease-in-out infinite alternate;
+    object-position: top left;
+    animation: os-portrait-pan 14s ease-in-out infinite alternate;
 }
 
 @keyframes os-portrait-pan {
-    from { transform: translateY(0%); }
-    to   { transform: translateY(-30%); }
+    from { transform: translateX(0%); }
+    to   { transform: translateX(-50%); }
 }
 
 /* Color glow behind the portrait */
