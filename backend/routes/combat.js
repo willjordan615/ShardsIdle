@@ -563,10 +563,12 @@ router.post('/idle/collect', requireAuth, async (req, res) => {
         await db.clearIdleSession(characterId);
 
         const { challengeId, partyIds, startedAt } = session;
-        const elapsedMs  = Date.now() - startedAt;
-        const cappedMs   = Math.min(elapsedMs, 24 * 60 * 60 * 1000); // 24hr cap
-        const MIN_CYCLE  = 60 * 1000; // 1 minute minimum cycle
-        const combatCount = Math.max(1, Math.floor(cappedMs / MIN_CYCLE));
+        const elapsedMs   = Date.now() - startedAt;
+        const cappedMs    = Math.min(elapsedMs, 24 * 60 * 60 * 1000); // 24hr cap
+        const AVG_CYCLE   = 120 * 1000; // 2 minute default cycle
+        const MIN_CYCLE   = 60  * 1000; // 1 minute floor
+        const cycleMs     = Math.max(MIN_CYCLE, AVG_CYCLE);
+        const combatCount = Math.max(1, Math.floor(cappedMs / cycleMs));
 
         const engine = initializeCombatEngine();
         const dataDir    = path.join(__dirname, '../data');
