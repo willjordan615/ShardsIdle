@@ -15,26 +15,32 @@
 
     const AVATAR_PATH = 'assets/avatars/';
 
-    const IMAGES = {
-        human:    [
-            { file: 'human1.png',    label: 'Warrior'     },
-            { file: 'human2.png',    label: 'Veteran'     },
-            { file: 'human3.png',    label: 'Scout'       },
-        ],
-        dwarf:    [
-            { file: 'dwarf1.png',    label: 'Ironhand'    },
-        ],
-        elf:      [
-            { file: 'elf1.png',      label: 'Wanderer'    },
-        ],
-        halfling: [
-            { file: 'halfling1.png', label: 'Burglar'     },
-            { file: 'halfling2.png', label: 'Trickster'   },
-        ],
-        orc:      [
-            { file: 'orc1.png',      label: 'Bonecrusher' },
-        ],
-    };
+const IMAGES = {
+    human:    [
+        { file: 'human1.png',    label: 'Heroine'     },
+        { file: 'human2.png',    label: 'Veteran'     },
+        { file: 'human3.png',    label: 'Scout'       },
+        { file: 'human4.png',    label: 'Knight'      },
+    ],
+    dwarf:    [
+        { file: 'dwarf1.png',    label: 'Paladin'    },
+        { file: 'dwarf2.png',    label: 'Cleric'   },
+        { file: 'dwarf3.png',    label: 'Slayer'  },
+    ],
+    elf:      [
+        { file: 'elf1.png',      label: 'Wanderer'    },
+        { file: 'elf2.png',      label: 'Weaver'      },
+        { file: 'elf3.png',      label: 'Warden'      },
+    ],
+    halfling: [
+        { file: 'halfling1.png', label: 'Burglar'     },
+        { file: 'halfling2.png', label: 'Trickster'   },
+        { file: 'halfling3.png', label: 'Strongheart'    },
+    ],
+    orc:      [
+        { file: 'orc1.png',      label: 'Bonecrusher' },
+    ],
+};
 
     const RACE_COLORS = {
         human:    '#8a7a5a',
