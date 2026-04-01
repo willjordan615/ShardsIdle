@@ -1686,7 +1686,74 @@ try {
                     }
 
                     // Helper: is item a duplicate (equipped or already in inventory)?
-                    function _isDuplicate(itemId) {
+                    // Auto-equip a newly looted gear item if conditions are met:
+                    // - Empty slot: always fill it.
+                    // - Occupied slot (non-accessory): only if new item type matches equipped type.
+                    // - Accessories: fill first empty slot; skip if both occupied.
+                    // Never auto-equips if the item is still in a locked/favorited state (none at loot time).
+                    function _autoEquip(invEntry, def) {
+                        const eq   = character.equipment || {};
+                        const slot1 = def?.slot_id1 || def?.slot || '';
+                        const slot2 = def?.slot_id2 || null;
+
+                        if (!slot1 || !['mainHand','offHand','head','chest','accessory1','accessory2'].includes(slot1)) return false;
+
+                        // Accessories: fill first empty slot, skip if both full
+                        if (slot2 && ['accessory1','accessory2'].includes(slot1)) {
+                            const emptySlot = !eq[slot1] ? slot1 : (!eq[slot2] ? slot2 : null);
+                            if (!emptySlot) return false;
+                            character.inventory.splice(character.inventory.indexOf(invEntry), 1);
+                            eq[emptySlot] = { itemID: invEntry.itemID,
+                                ...(invEntry.itemName        ? { itemName:        invEntry.itemName        } : {}),
+                                ...(invEntry.itemDescription ? { itemDescription: invEntry.itemDescription } : {}),
+                                ...(invEntry._rolls          ? { _rolls:          invEntry._rolls          } : {}),
+                            };
+                            character.equipment = eq;
+                            return true;
+                        }
+
+                        // offHand: skip if mainHand is two-handed
+                        if (slot1 === 'offHand') {
+                            const mhDef = eq.mainHand ? (window.gameData?.gear?.find(g => g.id === (eq.mainHand?.itemID || eq.mainHand))) : null;
+                            if (mhDef?.two_handed) return false;
+                        }
+
+                        const currentVal = eq[slot1];
+                        if (!currentVal) {
+                            // Empty slot — always fill
+                            character.inventory.splice(character.inventory.indexOf(invEntry), 1);
+                            eq[slot1] = { itemID: invEntry.itemID,
+                                ...(invEntry.itemName        ? { itemName:        invEntry.itemName        } : {}),
+                                ...(invEntry.itemDescription ? { itemDescription: invEntry.itemDescription } : {}),
+                                ...(invEntry._rolls          ? { _rolls:          invEntry._rolls          } : {}),
+                            };
+                            character.equipment = eq;
+                            return true;
+                        }
+
+                        // Slot occupied — auto-equip only if weapon types match
+                        const currentId  = currentVal?.itemID || currentVal;
+                        const currentDef = window.gameData?.gear?.find(g => g.id === currentId);
+                        if (!currentDef || currentDef.type !== def.type) return false;
+
+                        // Displace current item to inventory, equip new one
+                        const cur = currentVal && typeof currentVal === 'object' ? currentVal : { itemID: currentVal };
+                        character.inventory.push({ itemID: cur.itemID, rarity: 'common', acquiredAt: Date.now(),
+                            ...(cur.itemName        ? { itemName:        cur.itemName        } : {}),
+                            ...(cur.itemDescription ? { itemDescription: cur.itemDescription } : {}),
+                            ...(cur._rolls          ? { _rolls:          cur._rolls          } : {}),
+                        });
+                        character.inventory.splice(character.inventory.indexOf(invEntry), 1);
+                        eq[slot1] = { itemID: invEntry.itemID,
+                            ...(invEntry.itemName        ? { itemName:        invEntry.itemName        } : {}),
+                            ...(invEntry.itemDescription ? { itemDescription: invEntry.itemDescription } : {}),
+                            ...(invEntry._rolls          ? { _rolls:          invEntry._rolls          } : {}),
+                        };
+                        character.equipment = eq;
+                        return true;
+                    }
+
+                                        function _isDuplicate(itemId) {
                         const equippedIds = Object.values(character.equipment || {})
                             .filter(Boolean).map(v => v && typeof v === 'object' ? v.itemID : v);
                         if (equippedIds.includes(itemId)) return true;
@@ -1726,7 +1793,12 @@ try {
                                 if (loot.itemDescription && loot.itemDescription !== itemDef?.description) inventoryEntry.itemDescription = loot.itemDescription;
                                 if (loot._rolls) inventoryEntry._rolls = loot._rolls;
                                 character.inventory.push(inventoryEntry);
-                                lootLines.push(loot.itemName || itemName);
+                                const autoEquipped = _autoEquip(inventoryEntry, itemDef);
+                                if (autoEquipped) {
+                                    lootLines.push(`${loot.itemName || itemName} (auto-equipped)`);
+                                } else {
+                                    lootLines.push(loot.itemName || itemName);
+                                }
                             }
 
                         } else {

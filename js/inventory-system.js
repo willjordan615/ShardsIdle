@@ -730,19 +730,13 @@ async function equipItemNew(characterId, itemId, inventoryIndex) {
     let targetSlot = _itemSlot(def);
     const slotId2 = def?.slot_id2;
 
-    // 2. If item supports a secondary slot (e.g. accessories), check occupancy
+    // 2. If item supports a secondary slot (e.g. accessories), prefer the empty one
     if (slotId2 && GEAR_SLOTS.includes(slotId2)) {
-        // If primary slot is occupied...
-        if (character.equipment?.[targetSlot]) {
-            // ...check if secondary slot is free
-            if (!character.equipment?.[slotId2]) {
-                targetSlot = slotId2; // Equip to secondary
-            } else {
-                // Both slots occupied
-                if (typeof showError === 'function') showError('Both accessory slots are occupied.');
-                return; // Stop execution
-            }
+        if (character.equipment?.[targetSlot] && !character.equipment?.[slotId2]) {
+            targetSlot = slotId2;
         }
+        // If both slots occupied, fall through and overwrite targetSlot (primary).
+        // Step 4 will displace the current item to inventory as normal.
     } 
     // 3. Fallback for items with invalid slot definitions (legacy support)
     else if (!GEAR_SLOTS.includes(targetSlot)) {
