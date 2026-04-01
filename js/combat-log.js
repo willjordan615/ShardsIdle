@@ -27,6 +27,9 @@ document.addEventListener('visibilitychange', () => {
             }
         }
         window._combatHideTime = null;
+        // Clear the mid-cycle flag now that we're back — the missed-combat count has been
+        // recorded and the next combat cycle should start with a clean slate.
+        _combatHiddenMidCycle = false;
     }
 });
 
