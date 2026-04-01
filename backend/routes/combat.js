@@ -619,6 +619,8 @@ router.post('/idle/collect', requireAuth, async (req, res) => {
             wins:         0,
             losses:       0,
             xpGained:     {},   // characterId → total XP
+            skillXP:      {},   // skillID → { name, before, after, level, xpAwarded, leveledUp, discovered }
+            newDiscoveries: [], // { skillID, name, description, category } — skills that hit level 1 this session
             lootGained:   [],   // aggregated loot entries
             goldGained:   0,
             dustGained:   0,
@@ -626,10 +628,21 @@ router.post('/idle/collect', requireAuth, async (req, res) => {
 
         // Track live character state across runs so each combat sees updated skills/stats
         const liveChars = {};
+        // Also snapshot starting skill state so we can compute before/after for the summary
+        const skillSnapshots = {}; // characterId → { skillID → { xp, level } }
         for (const snap of validParty) {
             if (!snap.characterID.startsWith('bot_') && !snap.characterID.startsWith('import_')) {
                 const char = await db.getCharacter(snap.characterID);
-                if (char) liveChars[snap.characterID] = char;
+                if (char) {
+                    liveChars[snap.characterID] = char;
+                    skillSnapshots[snap.characterID] = {};
+                    (char.skills || []).forEach(s => {
+                        skillSnapshots[snap.characterID][s.skillID] = {
+                            xp:    s.skillXP    || 0,
+                            level: s.skillLevel || 0,
+                        };
+                    });
+                }
             }
         }
 
@@ -760,6 +773,52 @@ router.post('/idle/collect', requireAuth, async (req, res) => {
             }
         } // end combat loop
 
+        // ── Compute skill XP gains for summary display ────────────────────────
+        const allSkillDefs = JSON.parse(fs.readFileSync(path.join(dataDir, 'skills.json'), 'utf8'));
+
+        for (const [pid, char] of Object.entries(liveChars)) {
+            const startSnap = skillSnapshots[pid] || {};
+            for (const skill of (char.skills || [])) {
+                const sid   = skill.skillID;
+                const snap  = startSnap[sid] || { xp: 0, level: 0 };
+                const def   = allSkillDefs.find(s => s.id === sid);
+                const name  = def?.name || sid;
+
+                // Only include skills that actually moved
+                const xpMoved    = (skill.skillXP || 0) !== snap.xp;
+                const levelMoved = (skill.skillLevel || 0) !== snap.level;
+                if (!xpMoved && !levelMoved) continue;
+
+                const isDisc     = skill.discovered && snap.level < 1;
+                const leveledUp  = (skill.skillLevel || 0) > snap.level;
+                const xpAwarded  = Math.max(0,
+                    ((skill.skillXP || 0) - snap.xp) +
+                    (leveledUp ? _xpThresholdForLevel(snap.level) : 0)
+                );
+
+                // Was this skill newly discovered this session?
+                const wasKnown = snap.level >= 1 || snap.xp > 0;
+                if (leveledUp && snap.level === 0 && !wasKnown) {
+                    summary.newDiscoveries.push({
+                        skillID:     sid,
+                        name,
+                        description: def?.description || '',
+                        category:    def?.category    || '',
+                    });
+                }
+
+                summary.skillXP[sid] = {
+                    name,
+                    before:    snap.xp,
+                    after:     skill.skillXP || 0,
+                    level:     snap.level,
+                    xpAwarded,
+                    leveledUp,
+                    discovered: !!skill.discovered,
+                };
+            }
+        }
+
         // Persist all character state
         for (const char of Object.values(liveChars)) {
             await db.saveCharacter(char);
@@ -777,9 +836,13 @@ router.post('/idle/collect', requireAuth, async (req, res) => {
     }
 });
 
-// ── XP helper (mirrors client-side formula) ───────────────────────────────────
+// ── XP helpers (mirror client-side formulas) ──────────────────────────────────
 function getXPToNextLevel(level) {
     return Math.max(1, Math.floor(7300 * Math.pow(1.15, (level || 1) - 1)));
+}
+function _xpThresholdForLevel(level) {
+    // Skill level-up threshold: level 0→1 costs 120 XP, level N→N+1 costs 100*N*1.2
+    return level < 1 ? 120 : Math.round(100 * level * 1.2);
 }
 
 // Allow admin saves to invalidate the singleton so next combat re-reads fresh JSON data.

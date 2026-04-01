@@ -57,117 +57,212 @@ function _renderOfflineSummary(summary, primaryChar) {
     window._offlineSummaryChallengeId = summary.challengeId;
     window._offlineSummaryPrimaryChar = primaryChar;
 
-    const charName = primaryChar?.name || 'Your character';
+    const charName     = primaryChar?.name || 'Your character';
     const challengeName = _formatChallengeName(summary.challengeId);
+    const avatarId     = primaryChar?.avatarId   || null;
+    const avatarColor  = primaryChar?.avatarColor || '#8a7a5a';
+
+    // Avatar HTML — full portrait treatment
+    const avatarHtml = (window.AVATARS && avatarId)
+        ? window.AVATARS.renderCardBg(avatarId, avatarColor)
+        : '';
 
     // Time away
-    const totalMins  = Math.round(summary.elapsedMs / 60000);
-    const hrs        = Math.floor(totalMins / 60);
-    const mins       = totalMins % 60;
-    const timeAway   = hrs > 0
-        ? `${hrs}h ${mins}m`
-        : `${mins}m`;
+    const totalMins = Math.round(summary.elapsedMs / 60000);
+    const hrs       = Math.floor(totalMins / 60);
+    const mins      = totalMins % 60;
+    const timeAway  = hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`;
 
-    // Win/loss line
-    const total    = summary.combatCount;
-    const winRate  = total > 0 ? Math.round((summary.wins / total) * 100) : 0;
-    const wlColor  = winRate >= 60 ? 'var(--green)' : winRate >= 40 ? 'var(--gold)' : 'var(--red)';
+    // Win/loss
+    const total   = summary.combatCount;
+    const winRate = total > 0 ? Math.round((summary.wins / total) * 100) : 0;
+    const wlColor = winRate >= 60 ? 'var(--green)' : winRate >= 40 ? 'var(--gold)' : 'var(--red)';
 
-    // XP summary
+    // XP
     const xpEntries = Object.entries(summary.xpGained || {});
     const xpLines   = xpEntries.map(([charId, xp]) => {
         const name = charId === (primaryChar?.id || primaryChar?.characterID)
-            ? charName
-            : charId;
-        return `<div style="color:var(--text-primary); font-size:0.85rem;">${name} — <span style="color:var(--gold);">+${xp.toLocaleString()} XP</span></div>`;
+            ? charName : charId;
+        return `<div style="color:var(--text-primary); font-size:0.85rem; margin-bottom:3px;">
+            ${name} — <span style="color:var(--gold);">+${xp.toLocaleString()} XP</span>
+        </div>`;
     }).join('');
 
-    // Loot summary — group by rarity order
+    // Char XP bars — need level data from the primary character
+    // We'll pull current state from the char object for end state;
+    // the server tells us total xpGained so we back-calculate before state.
+    const charXPRows = xpEntries.map(([charId, totalXP]) => {
+        const name      = charId === (primaryChar?.id || primaryChar?.characterID) ? charName : charId;
+        const afterLevel = primaryChar?.level || 1;
+        const afterXP    = primaryChar?.experience || 0;
+        const xpToNext   = _xpToNextLevel(afterLevel);
+        // Approximate before: current XP minus gained (may have leveled, so clamp)
+        const beforeXP   = Math.max(0, afterXP - (totalXP % xpToNext));
+        const beforePct  = Math.min(100, (beforeXP / xpToNext) * 100);
+        const afterPct   = Math.min(200, (afterXP  / xpToNext) * 100); // allow overshoot for level-cross
+        return `<div class="os-xp-row rm-xp-row" data-from="${beforePct}" data-to="${afterPct}" data-leveled="false">
+            <div class="rm-xp-header">
+                <span class="rm-xp-name">${name}</span>
+                <span class="rm-xp-gain">+${totalXP.toLocaleString()} XP</span>
+            </div>
+            <div class="rm-bar-track"><div class="rm-bar rm-bar--char" style="width:${beforePct}%"></div></div>
+        </div>`;
+    }).join('');
+
+    // Skill XP rows — reuse rm-skill-row markup exactly
+    const UNLOCK_XP = 120;
+    const skillEntries = Object.entries(summary.skillXP || {});
+    skillEntries.sort(([, a], [, b]) => {
+        const score = x => (x.leveledUp ? 100 : 0) + (x.discovered && x.level < 1 ? 10 : 0);
+        return score(b) - score(a);
+    });
+    const skillRows = skillEntries.map(([, data]) => {
+        const isDisc    = data.discovered && data.level < 1;
+        const threshold = isDisc ? UNLOCK_XP : Math.round(100 * (data.level || 1) * 1.2);
+        const beforePct = Math.min(100, (data.before / threshold) * 100);
+        const afterPct  = (data.after  / threshold) * 100;
+        const discIcon  = isDisc ? '◆ ' : '';
+        const levelTag  = !isDisc ? ` <span class="rm-skill-level">Lv.${data.level}</span>` : '';
+        const levelUpTag = data.leveledUp
+            ? ` <span class="rm-levelup">${isDisc ? 'UNLOCKED!' : 'LEVEL UP!'}</span>` : '';
+        return `<div class="rm-skill-row" data-from="${beforePct}" data-to="${afterPct}"
+                     data-leveled="${!!data.leveledUp}" data-disc="${isDisc}">
+            <div class="rm-skill-header">
+                <span class="rm-skill-name ${isDisc ? 'rm-skill-name--disc' : ''}">${discIcon}${data.name}${levelTag}</span>
+                <span class="rm-skill-xp">+${(data.xpAwarded || 0).toFixed(0)} XP${levelUpTag}</span>
+            </div>
+            <div class="rm-bar-track"><div class="rm-bar ${isDisc ? 'rm-bar--disc' : 'rm-bar--skill'}" style="width:${beforePct}%"></div></div>
+        </div>`;
+    }).join('');
+
+    // Discoveries
+    const discoveries = summary.newDiscoveries || [];
+    const discoveryHTML = discoveries.length ? `
+        <div class="section os-discoveries">
+            <div class="os-section-label" style="color:var(--gold);">◆ Skills Discovered</div>
+            ${discoveries.map(d => `
+                <div class="os-discovery-entry">
+                    <div class="os-discovery-name">${d.name}</div>
+                    ${d.description ? `<div class="os-discovery-desc">${d.description}</div>` : ''}
+                    ${d.category ? `<div class="os-discovery-cat">${d.category} — now equippable</div>` : ''}
+                </div>`).join('')}
+        </div>` : '';
+
+    // Loot
     const rarityOrder = { legendary: 0, rare: 1, uncommon: 2, common: 3 };
+    const rarityColor = { legendary: '#ffaa00', rare: '#00d4ff', uncommon: '#4eff7f', common: '#aaa' };
     const sortedLoot  = [...(summary.lootGained || [])].sort((a, b) =>
         (rarityOrder[a.rarity] ?? 4) - (rarityOrder[b.rarity] ?? 4)
     );
-    const rarityColor = { legendary: '#ffaa00', rare: '#00d4ff', uncommon: '#4eff7f', common: '#aaa' };
-
     const lootRows = sortedLoot.length > 0
         ? sortedLoot.map(l => {
             const color    = rarityColor[l.rarity] || '#aaa';
             const soldNote = l.autosold ? ` <span style="color:var(--text-muted); font-size:0.78rem;">(auto-sold)</span>` : '';
             const qty      = l.count > 1 ? ` <span style="color:var(--text-muted);">×${l.count}</span>` : '';
-            return `<div style="padding:4px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+            return `<div class="os-loot-row">
                 <span style="color:${color};">${l.name}</span>${qty}${soldNote}
             </div>`;
         }).join('')
         : `<div style="color:var(--text-muted); font-size:0.85rem;">No gear dropped.</div>`;
 
-    // Gold/dust
     const goldLine = (summary.goldGained > 0 || summary.dustGained > 0)
-        ? `<div style="margin-top:6px; font-size:0.82rem; color:var(--text-muted);">
-               Auto-sold duplicates: <span style="color:var(--gold);">+${summary.goldGained.toFixed(0)}g</span>
+        ? `<div style="margin-top:8px; font-size:0.82rem; color:var(--text-muted);">
+               Auto-sold duplicates:
+               <span style="color:var(--gold);">+${summary.goldGained.toFixed(0)}g</span>
                · <span style="color:#8888ff;">+${summary.dustGained.toFixed(2)} dust</span>
            </div>`
         : '';
 
+    // Particle dots — pure CSS animation, injected as spans
+    const particles = Array.from({ length: 12 }, (_, i) =>
+        `<span class="os-particle" style="--i:${i};"></span>`
+    ).join('');
+
     inner.innerHTML = `
-        <div style="text-align:center; margin-bottom:2rem;">
-            <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;
-                        letter-spacing:0.1em; margin-bottom:0.5rem;">While You Were Away</div>
-            <h2 style="margin:0 0 0.25rem; font-size:1.6rem; color:var(--text-primary);">${charName}</h2>
-            <div style="color:var(--text-muted); font-size:0.88rem;">${challengeName}</div>
-        </div>
+        <!-- Hero header -->
+        <div class="os-hero">
+            ${particles}
+            <div class="os-hero__shimmer"></div>
 
-        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-bottom:2rem;">
-            ${_statCard('Time Away', timeAway, 'var(--text-primary)')}
-            ${_statCard('Combats', total.toLocaleString(), 'var(--text-primary)')}
-            ${_statCard('Win Rate', `${winRate}%`, wlColor)}
-        </div>
-
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:2rem;">
-            <div class="section">
-                <h3 style="margin:0 0 0.75rem; font-size:0.78rem; text-transform:uppercase;
-                           letter-spacing:0.08em; color:var(--text-muted);">Experience Gained</h3>
-                ${xpLines || '<div style="color:var(--text-muted); font-size:0.85rem;">None.</div>'}
+            <div class="os-hero__content">
+                <div class="os-hero__eyebrow">While You Were Away</div>
+                <div class="os-hero__name">${charName}</div>
+                <div class="os-hero__challenge">${challengeName}</div>
             </div>
+
+            <div class="os-hero__avatar">
+                ${avatarHtml}
+                <div class="os-hero__avatar-glow" style="--avatar-color:${avatarColor};"></div>
+            </div>
+        </div>
+
+        <!-- Stat row -->
+        <div class="os-stats">
+            ${_statCard('Time Away',  timeAway,              'var(--text-primary)')}
+            ${_statCard('Combats',    total.toLocaleString(), 'var(--text-primary)')}
+            ${_statCard('Win Rate',   `${winRate}%`,          wlColor)}
+        </div>
+
+        <!-- XP + W/L -->
+        <div class="os-grid-2">
             <div class="section">
-                <h3 style="margin:0 0 0.75rem; font-size:0.78rem; text-transform:uppercase;
-                           letter-spacing:0.08em; color:var(--text-muted);">
-                    Wins / Losses
-                </h3>
-                <div style="font-size:1.1rem;">
+                <div class="os-section-label">Wins / Losses</div>
+                <div style="font-size:1.15rem; margin-top:4px;">
                     <span style="color:var(--green);">${summary.wins}W</span>
-                    <span style="color:var(--text-muted); margin:0 6px;">/</span>
+                    <span style="color:var(--text-muted); margin:0 8px;">/</span>
                     <span style="color:var(--red);">${summary.losses}L</span>
                 </div>
             </div>
+            <div class="section">
+                <div class="os-section-label">Experience Gained</div>
+                ${xpLines || '<div style="color:var(--text-muted); font-size:0.85rem;">None.</div>'}
+            </div>
         </div>
 
-        <div class="section" style="margin-bottom:2rem;">
-            <h3 style="margin:0 0 0.75rem; font-size:0.78rem; text-transform:uppercase;
-                       letter-spacing:0.08em; color:var(--text-muted);">Loot Collected</h3>
-            <div style="max-height:280px; overflow-y:auto; font-size:0.85rem;">
-                ${lootRows}
-            </div>
+        ${discoveryHTML}
+
+        ${charXPRows ? `
+        <div class="section" style="margin-bottom:0.75rem;">
+            <div class="os-section-label">Character XP</div>
+            <div class="rm-xp-list">${charXPRows}</div>
+        </div>` : ''}
+
+        ${skillRows ? `
+        <div class="section" style="margin-bottom:0.75rem;">
+            <div class="os-section-label">Skill Progress</div>
+            <div class="rm-skill-list os-skill-list">${skillRows}</div>
+        </div>` : ''}
+
+        <!-- Loot -->
+        <div class="section os-loot">
+            <div class="os-section-label">Loot Collected</div>
+            <div class="os-loot__list">${lootRows}</div>
             ${goldLine}
         </div>
 
-        <div style="text-align:center; display:flex; gap:1rem; justify-content:center;">
-            <button onclick="_dismissOfflineSummary(false)"
-                    class="secondary" style="padding:10px 28px;">
+        <!-- Actions -->
+        <div class="os-actions">
+            <button onclick="_dismissOfflineSummary(false)" class="secondary os-btn">
                 Return to Roster
             </button>
-            <button onclick="_dismissOfflineSummary(true)"
-                    style="padding:10px 28px;">
+            <button onclick="_viewCharacterFromSummary()" class="secondary os-btn">
+                See Character
+            </button>
+            <button onclick="_dismissOfflineSummary(true)" class="os-btn os-btn--primary">
                 Resume Loop
             </button>
         </div>
     `;
+
+    // Animate bars after the DOM settles
+    requestAnimationFrame(() => _animateOfflineBars(inner, summary));
 }
 
 function _statCard(label, value, valueColor) {
     return `
-        <div class="section" style="text-align:center; padding:1rem;">
-            <div style="font-size:1.4rem; font-weight:700; color:${valueColor}; margin-bottom:4px;">${value}</div>
-            <div style="font-size:0.72rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.07em;">${label}</div>
+        <div class="os-stat-card">
+            <div class="os-stat-card__value" style="color:${valueColor};">${value}</div>
+            <div class="os-stat-card__label">${label}</div>
         </div>`;
 }
 
@@ -216,5 +311,124 @@ async function _dismissOfflineSummary(resumeLoop) {
         if (typeof startCombat === 'function') startCombat();
     } catch (e) {
         console.warn('[OFFLINE] Resume loop failed:', e.message);
+    }
+}
+
+async function _viewCharacterFromSummary() {
+    const charId = (window._offlineSummaryPrimaryChar?.id)
+        || (window._offlineSummaryPrimaryChar?.characterID);
+    await renderRoster();
+    if (charId && typeof showCharacterDetail === 'function') {
+        await showCharacterDetail(charId);
+    } else {
+        if (typeof showScreen === 'function') showScreen('roster');
+    }
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function _xpToNextLevel(level) {
+    return Math.max(1, Math.floor(7300 * Math.pow(1.15, (level || 1) - 1)));
+}
+
+function _osAnimateBar(barEl, fromPct, toPct, duration, onCross) {
+    return new Promise(resolve => {
+        const start   = performance.now();
+        let crossed   = false;
+        const crosses = toPct > 100 && fromPct < 100;
+        function frame(now) {
+            const t    = Math.min(1, (now - start) / duration);
+            const ease = t < 0.5 ? 2*t*t : -1 + (4 - 2*t)*t;
+            const cur  = fromPct + (toPct - fromPct) * ease;
+            if (crosses && !crossed && cur >= 100) {
+                crossed = true;
+                barEl.style.width = '100%';
+                barEl.classList.add('rm-bar--flash');
+                onCross && onCross();
+                setTimeout(() => { barEl.classList.remove('rm-bar--flash'); barEl.style.width = '0%'; }, 180);
+            } else if (!crosses || cur < 100) {
+                barEl.style.width = Math.min(cur, 100) + '%';
+            }
+            if (t < 1) {
+                requestAnimationFrame(frame);
+            } else {
+                const finalPct = toPct >= 100 ? (toPct % 100 || 100) : toPct;
+                barEl.style.width = Math.min(finalPct, 100) + '%';
+                resolve();
+            }
+        }
+        requestAnimationFrame(frame);
+    });
+}
+
+function _osSpawnParticles(container, count, color, spread = 55, life = 800) {
+    for (let i = 0; i < count; i++) {
+        const p     = document.createElement('div');
+        const angle = Math.random() * 360;
+        const dist  = 15 + Math.random() * spread;
+        const dx    = Math.cos(angle * Math.PI / 180) * dist;
+        const dy    = Math.sin(angle * Math.PI / 180) * dist;
+        const size  = 2.5 + Math.random() * 4;
+        p.style.cssText = `
+            position:absolute; border-radius:50%;
+            width:${size}px; height:${size}px;
+            background:${color};
+            left:50%; top:30%;
+            transform:translate(-50%,-50%);
+            pointer-events:none; z-index:20;
+            transition: transform ${life}ms cubic-bezier(0,.9,.2,1), opacity ${life}ms ease-in;
+            opacity:1;
+        `;
+        container.appendChild(p);
+        requestAnimationFrame(() => {
+            p.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+            p.style.opacity   = '0';
+        });
+        setTimeout(() => p.remove(), life + 60);
+    }
+}
+
+async function _animateOfflineBars(container) {
+    // Slight delay so CSS fade-in finishes first
+    await new Promise(r => setTimeout(r, 400));
+
+    // Char XP bars
+    for (const row of container.querySelectorAll('.rm-xp-row')) {
+        const bar     = row.querySelector('.rm-bar--char');
+        const from    = parseFloat(row.dataset.from);
+        const to      = parseFloat(row.dataset.to);
+        if (!bar) continue;
+        await _osAnimateBar(bar, from, to, 700, () => {
+            _osSpawnParticles(container, 14, 'var(--gold)', 60, 900);
+        });
+        await new Promise(r => setTimeout(r, 80));
+    }
+
+    await new Promise(r => setTimeout(r, 120));
+
+    // Skill XP bars
+    for (const row of container.querySelectorAll('.rm-skill-row')) {
+        const bar     = row.querySelector('.rm-bar');
+        const from    = parseFloat(row.dataset.from);
+        const to      = parseFloat(row.dataset.to);
+        const leveled = row.dataset.leveled === 'true';
+        const isDisc  = row.dataset.disc === 'true';
+        if (!bar) continue;
+        await _osAnimateBar(bar, from, to, isDisc ? 720 : 460, () => {
+            bar.classList.add('rm-bar--flash');
+            if (leveled) _osSpawnParticles(container,
+                isDisc ? 20 : 10,
+                isDisc ? 'var(--gold)' : '#5ab4ff',
+                isDisc ? 60 : 28, 620
+            );
+            setTimeout(() => bar.classList.remove('rm-bar--flash'), 420);
+        });
+        await new Promise(r => setTimeout(r, isDisc ? 55 : 30));
+    }
+
+    // Discovery fanfare — pulse the discovery section if present
+    const discSection = container.querySelector('.os-discoveries');
+    if (discSection) {
+        _osSpawnParticles(container, 22, 'var(--gold)', 80, 1000);
     }
 }
