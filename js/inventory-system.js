@@ -103,6 +103,75 @@ function _procLine(def) {
     });
     return parts.join(' · ');
 }
+// ── Lock / Favorite cycle ─────────────────────────────────────────────────────
+// State cycle: unlocked → locked → favorited → unlocked
+// Both block selling. Favorited also floats to top when sort=type.
+
+window._cycleItemLock = async function(characterId, inventoryIndex) {
+    const character = await getCharacter(characterId);
+    if (!character) return;
+    const inv = _safeInventory(character)[inventoryIndex];
+    if (!inv) return;
+
+    if (!inv.locked && !inv.favorited) {
+        inv.locked = true; inv.favorited = false;
+    } else if (inv.locked) {
+        inv.locked = false; inv.favorited = true;
+    } else {
+        inv.locked = false; inv.favorited = false;
+    }
+
+    character.lastModified = Date.now();
+    await saveCharacterToServer(character);
+    _renderGearModal(character, _activeGearSlot);
+};
+
+// ── Sell All ──────────────────────────────────────────────────────────────────
+// Sells all unprotected items visible in the current slot tab.
+// Skips: equipped, locked, favorited.
+
+window._sellAllVisible = async function(characterId, activeSlot) {
+    const character = await getCharacter(characterId);
+    if (!character) return;
+    _safeInventory(character); _safeGold(character); _safeDust(character);
+
+    const eq = character.equipment || {};
+    const equippedIds = new Set(GEAR_SLOTS.map(s => _eqId(eq[s])).filter(Boolean));
+    const visibleSlots = activeSlot ? [activeSlot] : GEAR_SLOTS;
+    const visibleSlotSet = new Set(visibleSlots);
+
+    let goldGained = 0, dustGained = 0, soldCount = 0;
+
+    for (let i = character.inventory.length - 1; i >= 0; i--) {
+        const inv = character.inventory[i];
+        if (!inv || inv.locked || inv.favorited) continue;
+        const def = _itemDef(inv.itemID);
+        if (!_isGear(def)) continue;
+        if (equippedIds.has(inv.itemID)) continue;
+        const inView = visibleSlotSet.has(_itemSlot(def)) || (def?.slot_id2 && visibleSlotSet.has(def.slot_id2));
+        if (!inView) continue;
+
+        const g = _goldValue(def);
+        goldGained += g;
+        dustGained += _dustYield(g);
+        soldCount++;
+        character.inventory.splice(i, 1);
+    }
+
+    if (soldCount === 0) {
+        if (typeof showError === 'function') showError('Nothing to sell.');
+        return;
+    }
+
+    character.gold       = parseFloat((_safeGold(character) + goldGained).toFixed(2));
+    character.arcaneDust = parseFloat((_safeDust(character) + dustGained).toFixed(4));
+    character.lastModified = Date.now();
+    await saveCharacterToServer(character);
+    await showCharacterDetail(character.id);
+    _renderGearModal(character, _activeGearSlot);
+    if (typeof showSuccess === 'function') showSuccess(`Sold ${soldCount} item${soldCount !== 1 ? 's' : ''} for ${goldGained.toFixed(0)}g.`);
+};
+
 // 'type' groups by def.type alphabetically, then damage desc within type.
 // All other keys sort the full list directly, with newest as tiebreaker.
 function _sortInventoryItems(items, sortKey = 'type') {
@@ -123,7 +192,11 @@ function _sortInventoryItems(items, sortKey = 'type') {
     function _hasProc(def) { return (def?.onhit_skillid_1 || def?.effect_skillid) ? 1 : 0; }
 
     return [...items].sort((a, b) => {
+        // Favorited items float to top under default sort only
         if (sortKey === 'type') {
+            const favA = a.inv.favorited ? 0 : 1;
+            const favB = b.inv.favorited ? 0 : 1;
+            if (favA !== favB) return favA - favB;
             const typeDiff = (a.def?.type || '').localeCompare(b.def?.type || '');
             if (typeDiff !== 0) return typeDiff;
             return _totalDmg(b.def, b.inv) - _totalDmg(a.def, a.inv);
@@ -333,6 +406,9 @@ function _renderGearModal(character, activeSlot, sortKey) {
                         style="padding:2px 8px; font-size:0.72rem;"
                         onclick="_renderGearModal(window._currentModalChar, ${activeSlot ? `'${activeSlot}'` : 'null'}, '${o.key}')">${o.label}</button>
             `).join('')}
+            <button class="inv-btn inv-btn--sell-all"
+                    style="margin-left:auto;"
+                    onclick="_sellAllVisible('${character.id}', ${activeSlot ? `'${activeSlot}'` : 'null'})">Sell All</button>
         </div>`;
 
     // ── Item list ─────────────────────────────────────────────────────────────
@@ -393,6 +469,9 @@ function _renderGearModal(character, activeSlot, sortKey) {
             const desc     = inv.itemDescription || def?.description || '';
             const nameColor = _rollQualityColor(inv) || _rarityColor(inv.rarity);
             const twoHanded = def?.two_handed ? `<span class="inv-two-handed-tag">Two-Handed</span>` : '';
+            const isProtected = inv.locked || inv.favorited;
+            const lockLabel   = inv.favorited ? '★ Fav' : inv.locked ? '🔒 Locked' : 'Unlocked';
+            const lockClass   = inv.favorited ? 'inv-btn--fav' : inv.locked ? 'inv-btn--locked' : 'inv-btn--unlocked';
             rows += `
                 <div class="inv-item" data-inv-idx="${idx}">
                     <div class="inv-item__info">
@@ -405,8 +484,10 @@ function _renderGearModal(character, activeSlot, sortKey) {
                     <div class="inv-item__actions">
                         <button class="inv-btn inv-btn--equip"
                                 onclick="equipItemNew('${character.id}','${inv.itemID}',${idx})">Equip</button>
-                        <button class="inv-btn inv-btn--sell"
-                                onclick="sellInventoryItem('${character.id}',${idx})">${g}g</button>
+                        <button class="inv-btn inv-btn--sell${isProtected ? ' inv-btn--sell-blocked' : ''}"
+                                ${isProtected ? 'disabled title="Remove lock or favorite to sell"' : `onclick="sellInventoryItem('${character.id}',${idx})"`}>${g}g</button>
+                        <button class="inv-btn ${lockClass}"
+                                onclick="_cycleItemLock('${character.id}',${idx})">${lockLabel}</button>
                     </div>
                 </div>`;
         });

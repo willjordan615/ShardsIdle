@@ -716,6 +716,63 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
 .rarity-epic      { color:#c060f0; }
 .rarity-legendary { color:#ff8c40; }
 
+/* ── Lock / Favorite toggle tag ── */
+.inv-btn--unlocked {
+    background: transparent;
+    border-color: rgba(255,255,255,0.12);
+    color: var(--text-muted);
+}
+.inv-btn--unlocked:hover {
+    border-color: rgba(255,255,255,0.3);
+    color: var(--text-secondary);
+}
+.inv-btn--locked {
+    background: rgba(255,180,50,0.1);
+    border-color: rgba(255,180,50,0.4);
+    color: #ffb432;
+}
+.inv-btn--locked:hover {
+    background: rgba(255,180,50,0.2);
+    border-color: #ffb432;
+}
+.inv-btn--fav {
+    background: rgba(255,215,0,0.12);
+    border-color: rgba(255,215,0,0.5);
+    color: #ffd700;
+}
+.inv-btn--fav:hover {
+    background: rgba(255,215,0,0.22);
+    border-color: #ffd700;
+}
+ 
+/* ── Sell blocked state ── */
+.inv-btn--sell-blocked {
+    opacity: 0.35;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+ 
+/* ── Sell All button ── */
+.inv-btn--sell-all {
+    background: rgba(255,100,100,0.08);
+    border-color: rgba(255,100,100,0.3);
+    color: #ff7070;
+    font-family: var(--font-body);
+    font-size: 0.65rem;
+    padding: 3px 10px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    border: 1px solid;
+    transition: all 0.15s;
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+}
+.inv-btn--sell-all:hover {
+    background: rgba(255,100,100,0.18);
+    border-color: #ff7070;
+}
+ 
+
 /* ============================================================
    CHALLENGE DIFFICULTY
    ============================================================ */
