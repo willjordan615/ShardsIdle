@@ -89,6 +89,62 @@ function _dmgDelay(def, rolls) {
     return parts.join(' · ');
 }
 
+// Returns on-hit proc lines, e.g. "⚡ Burn (15%)" for each proc slot.
+function _procLine(def) {
+    if (!def) return '';
+    const parts = [];
+    [1, 2, 3].forEach(n => {
+        const skillId = def[`onhit_skillid_${n}`];
+        const chance  = def[`onhit_skillchance_${n}`];
+        if (!skillId) return;
+        const skillDef = window.gameData?.skills?.find(s => s.id === skillId);
+        const name = skillDef?.name || skillId;
+        parts.push(`↯ ${name}${chance != null ? ` (${chance}%)` : ''}`);
+    });
+    return parts.join(' · ');
+}
+// 'type' groups by def.type alphabetically, then damage desc within type.
+// All other keys sort the full list directly, with newest as tiebreaker.
+function _sortInventoryItems(items, sortKey = 'type') {
+    function _totalDmg(def, inv) {
+        const r = inv._rolls || def?._rolls || {};
+        let total = 0;
+        [1,2,3,4].forEach(n => { total += (r[`dmg${n}`] ?? def?.[`dmg${n}`]) || 0; });
+        return total;
+    }
+    function _totalStats(def, inv) {
+        const r = inv._rolls || def?._rolls || {};
+        let total = 0;
+        ['hp','mana','stam','con','end','amb','har','armor','phys_ev','mag_ev'].forEach(k => {
+            total += (r[k] ?? def?.[k]) || 0;
+        });
+        return total;
+    }
+    function _hasProc(def) { return (def?.onhit_skillid_1 || def?.effect_skillid) ? 1 : 0; }
+
+    return [...items].sort((a, b) => {
+        if (sortKey === 'type') {
+            const typeDiff = (a.def?.type || '').localeCompare(b.def?.type || '');
+            if (typeDiff !== 0) return typeDiff;
+            return _totalDmg(b.def, b.inv) - _totalDmg(a.def, a.inv);
+        }
+        if (sortKey === 'damage') {
+            const d = _totalDmg(b.def, b.inv) - _totalDmg(a.def, a.inv);
+            if (d !== 0) return d;
+        }
+        if (sortKey === 'stats') {
+            const d = _totalStats(b.def, b.inv) - _totalStats(a.def, a.inv);
+            if (d !== 0) return d;
+        }
+        if (sortKey === 'proc') {
+            const d = _hasProc(b.def) - _hasProc(a.def);
+            if (d !== 0) return d;
+        }
+        // 'newest' or tiebreaker for all other keys
+        return (b.inv.acquiredAt || 0) - (a.inv.acquiredAt || 0);
+    });
+}
+
 // ── One-time belt migration ───────────────────────────────────────────────────
 function _migrateBelt(character) {
     const belt  = _safeBelt(character);
@@ -204,7 +260,10 @@ window.closeConsumableManagement = window.closeInventory;
 
 // ── Gear modal renderer ───────────────────────────────────────────────────────
 
-function _renderGearModal(character, activeSlot) {
+let _invSortKey = 'type'; // persists across re-renders: 'type' | 'damage' | 'stats' | 'proc' | 'newest'
+
+function _renderGearModal(character, activeSlot, sortKey) {
+    if (sortKey !== undefined) _invSortKey = sortKey;
     const inner = document.getElementById('inventoryModalInner');
     if (!inner) return;
     window._currentModalChar = character;
@@ -258,6 +317,24 @@ function _renderGearModal(character, activeSlot) {
             `).join('')}
         </div>`;
 
+    // ── Sort bar ──────────────────────────────────────────────────────────────
+    const SORT_OPTIONS = [
+        { key: 'type',   label: 'Type'   },
+        { key: 'damage', label: 'Damage' },
+        { key: 'stats',  label: 'Stats'  },
+        { key: 'proc',   label: 'Procs'  },
+        { key: 'newest', label: 'Newest' },
+    ];
+    const sortBar = `
+        <div style="display:flex; align-items:center; gap:6px; padding:4px 0 6px; flex-shrink:0; flex-wrap:wrap;">
+            <span style="font-size:0.72rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em;">Sort:</span>
+            ${SORT_OPTIONS.map(o => `
+                <button class="inv-tab ${_invSortKey === o.key ? 'inv-tab--active' : ''}"
+                        style="padding:2px 8px; font-size:0.72rem;"
+                        onclick="_renderGearModal(window._currentModalChar, ${activeSlot ? `'${activeSlot}'` : 'null'}, '${o.key}')">${o.label}</button>
+            `).join('')}
+        </div>`;
+
     // ── Item list ─────────────────────────────────────────────────────────────
     let rows = '';
     let anyItem = false;
@@ -273,7 +350,7 @@ function _renderGearModal(character, activeSlot) {
                 ...(_eqSlotEntry._rolls          ? { _rolls: _eqSlotEntry._rolls, ..._eqSlotEntry._rolls } : {}),
               }
             : _eqBaseDef;
-        const invItems    = bySlot[slot] || [];
+        const invItems    = _sortInventoryItems(bySlot[slot] || [], _invSortKey);
         const hasContent  = equippedDef || invItems.length > 0;
 
         if (visibleSlots.length > 1 && !hasContent) return;
@@ -285,6 +362,7 @@ function _renderGearModal(character, activeSlot) {
             anyItem = true;
             const dmgDelay = _dmgDelay(equippedDef);
             const bonuses  = _statBonuses(equippedDef);
+            const procs    = _procLine(equippedDef);
             const desc     = equippedDef.description || '';
             const twoHanded = equippedDef.two_handed ? `<span class="inv-two-handed-tag">Two-Handed</span>` : '';
             rows += `
@@ -293,6 +371,7 @@ function _renderGearModal(character, activeSlot) {
                         <div class="inv-item__name">${equippedDef.name}${twoHanded}</div>
                         ${dmgDelay ? `<div class="inv-item__stats">${dmgDelay}</div>` : ''}
                         ${bonuses  ? `<div class="inv-item__stats">${bonuses}</div>`  : ''}
+                        ${procs    ? `<div class="inv-item__stats" style="color:#a0d4ff;">${procs}</div>` : ''}
                         ${desc     ? `<div class="inv-item__desc">${desc}</div>`      : ''}
                     </div>
                     <div class="inv-item__actions">
@@ -310,6 +389,7 @@ function _renderGearModal(character, activeSlot) {
             const g        = _goldValue(def);
             const dmgDelay = _dmgDelay(def, inv._rolls);
             const bonuses  = _statBonuses(def);
+            const procs    = _procLine(def);
             const desc     = inv.itemDescription || def?.description || '';
             const nameColor = _rollQualityColor(inv) || _rarityColor(inv.rarity);
             const twoHanded = def?.two_handed ? `<span class="inv-two-handed-tag">Two-Handed</span>` : '';
@@ -319,6 +399,7 @@ function _renderGearModal(character, activeSlot) {
                         <div class="inv-item__name" style="color:${nameColor};">${(inv.itemName && inv.itemName.includes(' ')) ? inv.itemName : (def?.name || inv.itemID)}${twoHanded}</div>
                         ${dmgDelay ? `<div class="inv-item__stats">${dmgDelay}</div>` : ''}
                         ${bonuses  ? `<div class="inv-item__stats">${bonuses}</div>`  : ''}
+                        ${procs    ? `<div class="inv-item__stats" style="color:#a0d4ff;">${procs}</div>` : ''}
                         ${desc     ? `<div class="inv-item__desc">${desc}</div>`      : ''}
                     </div>
                     <div class="inv-item__actions">
@@ -335,7 +416,7 @@ function _renderGearModal(character, activeSlot) {
         rows = '<div class="inv-empty-msg">Nothing here.</div>';
     }
 
-    inner.innerHTML = header + tabs + `<div class="inv-list">${rows}</div>`;
+    inner.innerHTML = header + tabs + sortBar + `<div class="inv-list">${rows}</div>`;
 }
 
 
