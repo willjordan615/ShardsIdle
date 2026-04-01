@@ -319,6 +319,7 @@ async function _viewCharacterFromSummary() {
         || (window._offlineSummaryPrimaryChar?.characterID);
     await renderRoster();
     if (charId && typeof showCharacterDetail === 'function') {
+        if (typeof showScreen === 'function') showScreen('characterDetail');
         await showCharacterDetail(charId);
     } else {
         if (typeof showScreen === 'function') showScreen('roster');
