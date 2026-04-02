@@ -948,7 +948,7 @@
             "requiredSkillID": "misdirect",
             "checkStat": "ambition",
             "secondaryStat": "endurance",
-            "difficultyThreshold": 55,
+            "difficultyThreshold": 105,
             "successEffect": {
               "type": "remove_enemy",
               "magnitude": 1,
@@ -994,7 +994,7 @@
       {
         "stageId": 3,
         "title": "The Altar of the Spirit",
-        "description": "At the heart of the Sanctum stands the altar where Aethelgard's founders attempted their ritual \u2014 and where Archbishop Valerius has spent three centuries completing it.",
+        "description": "At the heart of the Sanctum stands the altar where Aethelgard's founders attempted their ritual \u2014 and where Archbishop Malacor has spent three centuries completing it.",
         "enemies": [
           {
             "enemyTypeID": "tide_lasher",
