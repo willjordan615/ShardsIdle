@@ -97,7 +97,7 @@
       "footwork",
       "misdirect"
     ],
-    "basePower": 3,
+    "basePower": 2,
     "baseHitChance": 1.0,
     "critChance": 0.0,
     "critMultiplier": 1.0,

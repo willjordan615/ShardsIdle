@@ -1471,6 +1471,14 @@ _applyLootTagFlavour(item, tagDef) {
       }
     }
 
+    // Build intrinsic ID set for this actor — used to apply a score penalty below.
+    // Intrinsics should fire, but not crowd out skills the player deliberately equipped.
+    const intrinsicIds = new Set(
+      !isEnemy && actor.skills
+        ? actor.skills.filter(s => s.intrinsic).map(s => s.skillID)
+        : []
+    );
+
     if (usableSkills.length > 0) {
       const candidates = usableSkills.map(skill => {
         const cat = skill.category;
@@ -2137,6 +2145,10 @@ _applyLootTagFlavour(item, tagDef) {
       // Normal difficulty — additional reluctance multiplier
       if (difficulty === 'normal') score *= 0.4;
     }
+
+    // Intrinsics are always available but should yield to deliberately equipped skills.
+    // Apply a moderate penalty so equipped skills win when scores are otherwise close.
+    if (intrinsicIds.has(skill.id)) score *= 0.6;
 
     return score;
   }
