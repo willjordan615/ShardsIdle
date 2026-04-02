@@ -1691,8 +1691,18 @@ try {
                     // - Occupied slot (non-accessory): only if new item type matches equipped type.
                     // - Accessories: fill first empty slot; skip if both occupied.
                     // Never auto-equips if the item is still in a locked/favorited state (none at loot time).
+                    function _itemScore(d) {
+                        if (!d) return 0;
+                        const dmg = (d.dmg1 || 0) + (d.dmg2 || 0) + (d.dmg3 || 0) + (d.dmg4 || 0);
+                        const stats = (d.armor || 0) + (d.hp || 0) + (d.mana || 0) + (d.stam || 0)
+                                    + (d.con || 0) + (d.end || 0) + (d.amb || 0) + (d.har || 0)
+                                    + (d.phys_ev || 0) + (d.mag_ev || 0);
+                        return dmg * 2 + stats;
+                    }
+
+                    // Returns false (no swap), or { slot, oldName, newName } on swap.
                     function _autoEquip(invEntry, def) {
-                        const eq   = character.equipment || {};
+                        const eq    = character.equipment || {};
                         const slot1 = def?.slot_id1 || def?.slot || '';
                         const slot2 = def?.slot_id2 || null;
 
@@ -1709,7 +1719,7 @@ try {
                                 ...(invEntry._rolls          ? { _rolls:          invEntry._rolls          } : {}),
                             };
                             character.equipment = eq;
-                            return true;
+                            return { slot: emptySlot, oldName: null, newName: invEntry.itemName || def.name };
                         }
 
                         // offHand: skip if mainHand is two-handed
@@ -1728,16 +1738,18 @@ try {
                                 ...(invEntry._rolls          ? { _rolls:          invEntry._rolls          } : {}),
                             };
                             character.equipment = eq;
-                            return true;
+                            return { slot: slot1, oldName: null, newName: invEntry.itemName || def.name };
                         }
 
-                        // Slot occupied — auto-equip only if weapon types match
+                        // Slot occupied — type must match, new item must score higher
                         const currentId  = currentVal?.itemID || currentVal;
                         const currentDef = window.gameData?.gear?.find(g => g.id === currentId);
                         if (!currentDef || currentDef.type !== def.type) return false;
+                        if (_itemScore(def) <= _itemScore(currentDef)) return false;
 
                         // Displace current item to inventory, equip new one
-                        const cur = currentVal && typeof currentVal === 'object' ? currentVal : { itemID: currentVal };
+                        const cur     = currentVal && typeof currentVal === 'object' ? currentVal : { itemID: currentVal };
+                        const oldName = cur.itemName || currentDef.name || cur.itemID;
                         character.inventory.push({ itemID: cur.itemID, rarity: 'common', acquiredAt: Date.now(),
                             ...(cur.itemName        ? { itemName:        cur.itemName        } : {}),
                             ...(cur.itemDescription ? { itemDescription: cur.itemDescription } : {}),
@@ -1750,7 +1762,7 @@ try {
                             ...(invEntry._rolls          ? { _rolls:          invEntry._rolls          } : {}),
                         };
                         character.equipment = eq;
-                        return true;
+                        return { slot: slot1, oldName, newName: invEntry.itemName || def.name };
                     }
 
                                         function _isDuplicate(itemId) {
@@ -1762,6 +1774,7 @@ try {
 
                     const lootLines   = [];
                     const soldLines   = [];
+                    const autoEquips  = [];
                     let goldGained    = 0;
                     let dustGained    = 0;
 
@@ -1795,6 +1808,7 @@ try {
                                 character.inventory.push(inventoryEntry);
                                 const autoEquipped = _autoEquip(inventoryEntry, itemDef);
                                 if (autoEquipped) {
+                                    autoEquips.push(autoEquipped);
                                     lootLines.push(`${loot.itemName || itemName} (auto-equipped)`);
                                 } else {
                                     lootLines.push(loot.itemName || itemName);
@@ -1921,6 +1935,7 @@ try {
             charXP:     charXPPayload,
             skillXP:    skillXPGains,
             newUnlocks,
+            autoEquips: typeof autoEquips !== 'undefined' ? autoEquips : [],
         });
     }
 

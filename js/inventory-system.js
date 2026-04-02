@@ -54,6 +54,7 @@ const SLOT_LABELS = { mainHand:'Main Hand', offHand:'Off Hand', head:'Head', che
 function _itemSlot(def)    { return def?.slot_id1 || def?.slot || ''; }
 function _isGear(def)      { return def && GEAR_SLOTS.includes(_itemSlot(def)); }
 function _isConsumable(def){ return def && (_itemSlot(def) === 'consumable' || def.consumable === true); }
+function _isQuestItem(def) { return def && def.slot_id1 === 'consumable' && !def.type; }
 function _itemDef(id)      {
     return window.gameData?.gear?.find(g => g.id === id)
         || window.gameData?.gear?.find(g => g.id === id && g.type === 'consumable');
@@ -282,15 +283,18 @@ window.renderBeltSlots = function(character) {
     el.innerHTML = [0, 1, 2, 3].map(i => {
         const itemId = order[i] || null;
         const def    = itemId ? _itemDef(itemId) : null;
-        const qty    = itemId ? (character.consumables[itemId] || 0) : 0;
-        const filled = !!itemId;
+        const qty     = itemId ? (character.consumables[itemId] || 0) : 0;
+        const filled  = !!itemId;
+        const isQuest = filled && _isQuestItem(def);
 
-        const sub = filled ? `×${qty}` : null;
+        const sub = filled
+            ? (isQuest ? `<span style="color:var(--gold); font-size:0.7em;">Quest Item</span>` : `×${qty}`)
+            : null;
 
         return `<div class="loadout-slot ${filled ? 'loadout-slot--filled' : 'loadout-slot--empty'} loadout-slot--belt"
                      onclick="openBeltModal('${character.id}', ${i})" title="Click to manage belt slot">
             <span class="loadout-slot__label">Slot ${i + 1}</span>
-            <span class="loadout-slot__item">${filled ? (def?.name || itemId) : '—'}</span>
+            <span class="loadout-slot__item" ${isQuest ? 'style="color:var(--gold);"' : ''}>${filled ? (def?.name || itemId) : '—'}</span>
             ${sub ? `<span class="loadout-slot__sub" style="white-space:normal; line-height:1.3;">${sub}</span>` : ''}
         </div>`;
     }).join('');
@@ -598,17 +602,21 @@ function _renderBeltModal(character, activeSlot) {
     const slotItemId  = order[activeSlot] ?? null;
     const slotDef     = slotItemId ? _itemDef(slotItemId) : null;
     const slotQty     = slotItemId ? (character.consumables[slotItemId] || 0) : 0;
+    const slotIsQuest = _isQuestItem(slotDef);
 
     let rows = '';
 
     // Equipped row
     if (slotDef) {
         const slotEffect = _consumableEffectLine(slotDef);
+        const nameLabel  = slotIsQuest
+            ? `<span style="color:var(--gold);">${slotDef.name}</span> <span style="color:var(--gold); font-size:0.75em; opacity:0.8;">Quest Item</span>`
+            : `×${slotQty} ${slotDef.name}`;
         rows += `
             <div class="inv-slot-header">Equipped</div>
             <div class="inv-item inv-item--equipped">
                 <div class="inv-item__info">
-                    <div class="inv-item__name">×${slotQty} ${slotDef.name}</div>
+                    <div class="inv-item__name">${nameLabel}</div>
                     ${slotDef.description ? `<div class="inv-item__stats">${slotDef.description}</div>` : ''}
                     ${slotEffect ? `<div class="inv-item__stats" style="color:#a0d4ff; margin-top:2px;">${slotEffect}</div>` : ''}
                 </div>
@@ -627,18 +635,22 @@ function _renderBeltModal(character, activeSlot) {
             const def = _itemDef(itemId);
             if (!def) return;
             const isEquippedHere = slotItemId === itemId;
-            const effectLine = _consumableEffectLine(def);
+            const isQuest        = _isQuestItem(def);
+            const effectLine     = _consumableEffectLine(def);
+            const nameLabel      = isQuest
+                ? `<span style="color:var(--gold);">${def.name}</span> <span style="color:var(--gold); font-size:0.75em; opacity:0.8;">Quest Item</span>`
+                : `×${qty} ${def.name}`;
             rows += `
                 <div class="inv-item ${isEquippedHere ? 'inv-item--equipped' : ''}">
                     <div class="inv-item__info">
-                        <div class="inv-item__name">×${qty} ${def.name}</div>
+                        <div class="inv-item__name">${nameLabel}</div>
                         ${def.description ? `<div class="inv-item__stats">${def.description}</div>` : ''}
                         ${effectLine ? `<div class="inv-item__stats" style="color:#a0d4ff; margin-top:2px;">${effectLine}</div>` : ''}
                     </div>
                     <div class="inv-item__actions">
                         ${!isEquippedHere
                             ? `<button class="inv-btn inv-btn--equip"
-                                       onclick="setBeltSlot('${character.id}', ${activeSlot}, '${itemId}')">Equip ×${qty}</button>`
+                                       onclick="setBeltSlot('${character.id}', ${activeSlot}, '${itemId}')">${isQuest ? 'Equip' : `Equip ×${qty}`}</button>`
                             : ''}
                     </div>
                 </div>`;

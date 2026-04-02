@@ -171,6 +171,25 @@
                 </div>
             </div>` : '';
 
+        // Auto-equip section
+        const autoEquips   = payload.autoEquips || [];
+        const autoEquipHTML = autoEquips.length ? `
+            <div class="rm-section rm-autoequip-section" style="--rm-delay:${(0.30 + lootCount * 0.1).toFixed(2)}s">
+                <div class="rm-section-label">⚔ Auto-Equipped</div>
+                <div class="rm-autoequip-list">
+                    ${autoEquips.map(e => e.oldName
+                        ? `<div class="rm-autoequip-row">
+                               <span class="rm-autoequip-new">${e.newName}</span>
+                               <span class="rm-autoequip-replaced">replaces ${e.oldName}</span>
+                           </div>`
+                        : `<div class="rm-autoequip-row">
+                               <span class="rm-autoequip-new">${e.newName}</span>
+                               <span class="rm-autoequip-replaced">equipped (empty slot)</span>
+                           </div>`
+                    ).join('')}
+                </div>
+            </div>` : '';
+
         const footerDelay = (0.35 + lootCount * 0.1).toFixed(2);
 
         // Inject all at once — no flicker
@@ -178,6 +197,7 @@
             <div class="rm-title" style="color:${titleColor};">${titleText}</div>
             ${unlocksHTML}
             ${lootHTML}
+            ${autoEquipHTML}
             ${charXPHTML}
             ${skillXPHTML}
             <div class="rm-footer rm-section" style="--rm-delay:${footerDelay}s">

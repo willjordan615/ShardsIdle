@@ -345,8 +345,12 @@ class CombatEngine {
           )
         );
         if (owner) {
-          if (owner.consumables?.[itemID] > 0) owner.consumables[itemID]--;
-          else if (owner.consumableStash?.[itemID] > 0) owner.consumableStash[itemID]--;
+          const _itemDef1 = this.gear.find(g => g.id === itemID);
+          const _isQuest1 = _itemDef1 && _itemDef1.slot_id1 === 'consumable' && !_itemDef1.type;
+          if (!_isQuest1) {
+            if (owner.consumables?.[itemID] > 0) owner.consumables[itemID]--;
+            else if (owner.consumableStash?.[itemID] > 0) owner.consumableStash[itemID]--;
+          }
           //DEBUG
           //console.log(`[PRE-COMBAT] ${owner.name} used ${itemID} as offering`);
         }
@@ -2410,7 +2414,8 @@ _applyLootTagFlavour(item, tagDef) {
                 const itemDef = this.gear.find(g => g.id === consumableId);
                 const itemSkillId = itemDef?.skillID || itemDef?.effect_skillid;
                 if (itemSkillId === parentSkillId) {
-                    consumables[consumableId]--;
+                    const _isQuest2 = itemDef.slot_id1 === 'consumable' && !itemDef.type;
+                    if (!_isQuest2) consumables[consumableId]--;
                     //console.log(`[CHILD PROC] Consumed ${consumableId} (${consumables[consumableId]} remaining)`);
                 }
             });
@@ -2631,7 +2636,8 @@ _applyLootTagFlavour(item, tagDef) {
             if (!itemDef) continue;
             const itemSkillId = itemDef.skillID || itemDef.effect_skillid;
             if (itemSkillId === skill.id) {
-                consumables[consumableId]--;
+                const _isQuest3 = itemDef.slot_id1 === 'consumable' && !itemDef.type;
+                if (!_isQuest3) consumables[consumableId]--;
                 //console.log(`[CONSUMABLE] ${actor.name} used ${itemDef.name} (${consumables[consumableId]} remaining)`);
                 break;
             }

@@ -331,9 +331,18 @@ router.post('/start', requireAuth, async (req, res) => {
                     const isConsumable = itemDef?.slot_id1 === 'consumable'
                         || itemDef?.slot === 'consumable'
                         || itemDef?.consumable === true;
+                    const isQuestItem  = itemDef?.slot_id1 === 'consumable' && !itemDef?.type;
                     if (isConsumable) {
-                        character.consumableStash[loot.itemID] = (character.consumableStash[loot.itemID] || 0) + 1;
-                        console.log(`[LOOT] Stacked ${loot.itemID} → stash[${character.consumableStash[loot.itemID]}] for ${character.name}`);
+                        if (isQuestItem) {
+                            // Quest items: player may only hold one; silently skip duplicates
+                            if (!character.consumableStash[loot.itemID]) {
+                                character.consumableStash[loot.itemID] = 1;
+                                console.log(`[LOOT] Quest item ${loot.itemID} added to stash for ${character.name}`);
+                            }
+                        } else {
+                            character.consumableStash[loot.itemID] = (character.consumableStash[loot.itemID] || 0) + 1;
+                            console.log(`[LOOT] Stacked ${loot.itemID} → stash[${character.consumableStash[loot.itemID]}] for ${character.name}`);
+                        }
                     }
                 });
             }
@@ -688,7 +697,7 @@ router.post('/idle/collect', requireAuth, async (req, res) => {
                             character.level++;
                             xpThreshold = getXPToNextLevel(character.level);
                         }
-                        summary.xpGained[pid] = (summary.xpGained[pid] || 0) + xpGained;
+                        if (pid === characterId) summary.xpGained[pid] = (summary.xpGained[pid] || 0) + xpGained;
                     }
 
                     // Skill merge (same logic as live combat route)
@@ -744,8 +753,15 @@ router.post('/idle/collect', requireAuth, async (req, res) => {
                             || itemDef?.slot === 'consumable'
                             || itemDef?.consumable === true;
 
+                        const isQuestItem = itemDef?.slot_id1 === 'consumable' && !itemDef?.type;
                         if (isConsumable) {
-                            primary.consumableStash[loot.itemID] = (primary.consumableStash[loot.itemID] || 0) + 1;
+                            if (isQuestItem) {
+                                if (!primary.consumableStash[loot.itemID]) {
+                                    primary.consumableStash[loot.itemID] = 1;
+                                }
+                            } else {
+                                primary.consumableStash[loot.itemID] = (primary.consumableStash[loot.itemID] || 0) + 1;
+                            }
                         } else if (itemDef?.slot_id1 && ['mainHand','offHand','head','chest','accessory1','accessory2'].includes(itemDef.slot_id1)) {
                             // Check for duplicate before adding gear
                             const equippedIds = Object.values(primary.equipment || {}).filter(Boolean).map(v => typeof v === 'object' ? v.itemID : v);
@@ -779,6 +795,7 @@ router.post('/idle/collect', requireAuth, async (req, res) => {
         const allSkillDefs = JSON.parse(fs.readFileSync(path.join(dataDir, 'skills.json'), 'utf8'));
 
         for (const [pid, char] of Object.entries(liveChars)) {
+            if (pid !== characterId) continue;
             const startSnap = skillSnapshots[pid] || {};
             for (const skill of (char.skills || [])) {
                 const sid   = skill.skillID;
