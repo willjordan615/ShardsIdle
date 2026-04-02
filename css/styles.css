@@ -3929,8 +3929,10 @@ body:has(#combatlog.active) #headerTopBar {
     position: absolute;
     inset: 0;
     width: 100%;
-    opacity: 0.55;
+    opacity: 0.75;
     filter: saturate(0.7);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 40%);
+    mask-image: linear-gradient(to right, transparent 0%, black 40%);
 }
 
 .os-hero__avatar .avatar-card-bg img {
