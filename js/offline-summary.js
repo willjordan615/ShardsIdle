@@ -254,8 +254,24 @@ function _renderOfflineSummary(summary, primaryChar) {
         </div>
     `;
 
-    // Animate bars after the DOM settles
-    requestAnimationFrame(() => _animateOfflineBars(inner, summary));
+    // Apply portrait styles after DOM settles — override _imgTag inline styles
+    // the same way character detail does.
+    requestAnimationFrame(() => {
+        const avatarPanel = inner.querySelector('.os-hero__avatar');
+        const img = avatarPanel?.querySelector('img');
+        if (img) {
+            img.style.width          = '100%';
+            img.style.height         = 'auto';
+            img.style.objectFit      = 'unset';
+            img.style.objectPosition = 'unset';
+            img.style.position       = 'absolute';
+            img.style.left           = '0';
+            img.style.right          = '0';
+            img.style.top            = '0';
+            img.style.animation      = 'os-portrait-pan 14s ease-in-out infinite alternate';
+        }
+        _animateOfflineBars(inner, summary);
+    });
 }
 
 function _statCard(label, value, valueColor) {
