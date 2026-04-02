@@ -3947,8 +3947,8 @@ body:has(#combatlog.active) #headerTopBar {
 }
 
 @keyframes os-portrait-pan {
-    from { transform: translateY(-15%); }
-    to   { transform: translateY(-40%); }
+    from { transform: translateY(-20%); }
+    to   { transform: translateY(20%); }
 }
 
 /* Color glow behind the portrait */
