@@ -3833,7 +3833,7 @@ body:has(#combatlog.active) #headerTopBar {
     border-radius: 8px;
     border: 1px solid var(--gold-border);
     background: linear-gradient(135deg, var(--window-deep) 0%, var(--ink-surface) 100%);
-    padding: 2.5rem 200px 2.5rem 2rem;
+    padding: 2.5rem 320px 2.5rem 2rem;
     margin-bottom: 1.5rem;
     min-height: 160px;
     display: flex;
@@ -3919,9 +3919,21 @@ body:has(#combatlog.active) #headerTopBar {
     right: 0;
     top: 0;
     bottom: 0;
-    width: 160px;
+    width: 280px;
     overflow: hidden;
     z-index: 1;
+    pointer-events: none;
+}
+
+/* Gradient dissolve — left edge fades into hero bg, bottom softens */
+.os-hero__avatar::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background:
+        linear-gradient(to right, var(--window-deep) 0%, transparent 45%),
+        linear-gradient(to top,   var(--window-deep) 0%, transparent 30%);
     pointer-events: none;
 }
 
@@ -3929,21 +3941,28 @@ body:has(#combatlog.active) #headerTopBar {
     position: absolute;
     inset: 0;
     width: 100%;
-    opacity: 0.55;
-    filter: saturate(0.7);
+    height: 100%;
+    opacity: 0.75;
+    filter: saturate(0.75);
 }
 
 .os-hero__avatar .avatar-card-bg img {
-    width: 180%;
-    height: 180%;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: auto;
+    height: 160%;
+    max-width: none;
+    transform-origin: top center;
+    transform: translateX(-50%) translateY(-15%);
+    animation: os-portrait-pan 14s ease-in-out infinite alternate;
     object-fit: cover;
     object-position: top center;
-    animation: os-portrait-pan 14s ease-in-out infinite alternate;
 }
 
 @keyframes os-portrait-pan {
-    from { transform: translateY(-15%); }
-    to   { transform: translateY(-40%); }
+    from { transform: translateX(-50%) translateY(-15%); }
+    to   { transform: translateX(-50%) translateY(-35%); }
 }
 
 /* Color glow behind the portrait */
@@ -4065,10 +4084,10 @@ body:has(#combatlog.active) #headerTopBar {
 
 @media (max-width: 540px) {
     .os-hero {
-        padding: 2.5rem 160px 2.5rem 2rem;
+        padding: 2.5rem 220px 2.5rem 2rem;
         min-height: 130px;
     }
-    .os-hero__avatar { width: 130px; }
+    .os-hero__avatar { width: 200px; }
     .os-hero__name   { font-size: 1.4rem; }
     .os-stats        { grid-template-columns: repeat(3,1fr); gap: 0.4rem; }
     .os-stat-card__value { font-size: 1.1rem; }
