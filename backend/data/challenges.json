@@ -9538,5 +9538,1761 @@
       "nature",
       "sacred"
     ]
+  },
+  {
+    "id": "challenge_ironvein_relay",
+    "name": "The Ironvein Relay",
+    "description": "A dwarven supply convoy moving through the foothills of Stone Tooth Pass, protected by Ironvein Loyalist veterans who have kept the route open through four years of succession war. The cargo is sealed. The veterans are not corrupt \u2014 they are disciplined, oath-bound, and prepared to kill anyone who threatens the shipment.",
+    "difficulty": 8,
+    "recommendedLevel": 28,
+    "minPartySize": 1,
+    "maxPartySize": 4,
+    "lore": [
+      {
+        "unlocksAfter": 1,
+        "text": "The Ironvein Relay has moved continuously for four years. The veterans never stop in the same place twice. The cargo manifests are sealed and countersigned by Supply Captain Vedra personally. No one below her rank has ever seen what is actually being shipped."
+      },
+      {
+        "unlocksAfter": 5,
+        "text": "The Frostbite Conscripts were not always undead. They were living soldiers who took an oath of preservation \u2014 to keep the route open until the war ended. The war did not end. The oath did not expire. The soldiers did not survive long enough to be released from it."
+      },
+      {
+        "unlocksAfter": 15,
+        "text": "The Goldcrown faction has intercepted two Ironvein shipments in the past year. Neither interception found weapons or supplies. The crates contained records \u2014 documentation of agreements between the Ironvein Loyalists and a third party whose name does not appear in any official ledger. The Goldcrown commanders who read those records were reassigned to the front lines within a week."
+      },
+      {
+        "unlocksAfter": 1,
+        "requiresSecret": true,
+        "text": "Vedra's field orders are not military orders. They are reporting instructions \u2014 schedules for when the convoy will pass specific waypoints, formatted for someone who needs to know where the shipment is without being seen near it. The Ironvein succession war is not a distraction from the Architect's work. It is the work. The cargo has never mattered. The route has."
+      }
+    ],
+    "stages": [
+      {
+        "stageId": 1,
+        "title": "The Frozen Approach",
+        "description": "The convoy's perimeter is held by Frostbite Conscripts \u2014 oath-bound dwarven dead who patrol the ice-covered foothills with the same discipline they had in life. Ironvein Outriders sweep the ridgeline on mounted patrol, cutting off flanking approaches.",
+        "enemies": [
+          {
+            "enemyTypeID": "ironvein_frostbite_conscript",
+            "countRange": [
+              2,
+              4
+            ],
+            "level": 27
+          },
+          {
+            "enemyTypeID": "ironvein_outrider",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 29
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "ironvein_relay_insignia",
+            "name": "Ironvein Military Colours",
+            "spawnChance": 0.7,
+            "checkType": "item",
+            "requiredItemID": "loyalist_seal",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "ironvein_frostbite_conscript",
+              "count": 2,
+              "narrative": "The Loyalist Seal carries the correct counter-signature. Two Conscripts halt their patrol and hold position. They are not standing down \u2014 they are deferring, briefly, to an authority they still recognize. The Outriders have not seen the seal. They have not slowed."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You have no credential the perimeter recognizes."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The foothills offer no cover. The Conscripts have already marked you."
+            }
+          },
+          {
+            "id": "ironvein_relay_scout",
+            "name": "Read the Patrol Timing",
+            "spawnChance": 0.6,
+            "checkType": "stat",
+            "checkStat": "ambition",
+            "difficultyThreshold": 75,
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "ironvein_outrider",
+              "count": 1,
+              "narrative": "The Outriders run a predictable circuit. One passes the far ridge on a schedule and won't return for several minutes. You move before the window closes."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "The patrol pattern is irregular enough that you can't find a clean gap. They've trained against ambush."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "You see soldiers moving but can't read the pattern in time."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "stamina_potion_minor",
+            "dropChance": 0.5,
+            "rarity": "common"
+          },
+          {
+            "itemID": "hammer_iron_tier0",
+            "dropChance": 0.35,
+            "rarity": "common"
+          },
+          {
+            "itemID": "loyalist_seal",
+            "dropChance": 0.25,
+            "rarity": "uncommon"
+          }
+        ]
+      },
+      {
+        "stageId": 2,
+        "title": "The Convoy Interior",
+        "description": "The convoy's core is protected by Tide Wardens who use channelled cold magic to slow and disorient intruders, and Siege Callers who coordinate suppressing fire from elevated positions on the supply wagons. The Wardens and Callers work in concert \u2014 Chilled targets are easier to pin, and Electrified targets burn through resources before the fight is half done.",
+        "enemies": [
+          {
+            "enemyTypeID": "ironvein_tide_warden",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 30
+          },
+          {
+            "enemyTypeID": "ironvein_siege_caller",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 28
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "ironvein_relay_cold_skill",
+            "name": "Counter the Channelling",
+            "spawnChance": 0.65,
+            "checkType": "skill",
+            "requiredSkillTag": "fire",
+            "successEffect": {
+              "type": "apply_buff",
+              "narrative": "A fire-aspected skill disrupts the Wardens' channelling before combat begins. The cold in the air thins noticeably. The Wardens will need time to re-establish their link \u2014 your first round is clean."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You have no fire-aspected skill to disrupt the channelling."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Wardens are already linked. The cold hits the moment you breach the perimeter."
+            }
+          },
+          {
+            "id": "ironvein_relay_elevation",
+            "name": "Deny the High Ground",
+            "spawnChance": 0.55,
+            "checkType": "item_and_stat",
+            "requiredItemID": "vulture_company_ledger",
+            "checkStat": "conviction",
+            "difficultyThreshold": 85,
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "ironvein_siege_caller",
+              "count": 1,
+              "narrative": "The Vulture Company ledger contains the Relay's secondary contract \u2014 the Siege Callers are mercenaries, not veterans. Confronting one with proof of the ledger's contents is enough. He steps down from the wagon and leaves without a word. The remaining Caller watches him go and does not move to stop him."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You have the ledger but not the reach to leverage it under pressure."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Siege Callers hold their positions. They were paid in advance."
+            }
+          }
+        ],
+        "stageBranches": [
+          {
+            "condition": {
+              "type": "has_item",
+              "value": "loyalist_seal"
+            },
+            "nextStageId": 99,
+            "overrideDescription": "The Loyalist Seal opens more than the outer checkpoint. A sealed compartment in the lead wagon, marked with Vedra's counter-signature, requires exactly this credential to access. Someone wanted this to be findable by the right person.",
+            "chance": 0.4
+          },
+          {
+            "nextStageId": null
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion",
+            "dropChance": 0.4,
+            "rarity": "common"
+          },
+          {
+            "itemID": "chest_chain_tier0",
+            "dropChance": 0.3,
+            "rarity": "common"
+          },
+          {
+            "itemID": "hammer_steel_tier1",
+            "dropChance": 0.2,
+            "rarity": "uncommon"
+          }
+        ]
+      },
+      {
+        "stageId": 3,
+        "title": "The Observation Deck",
+        "description": "Supply Captain Vedra commands from the lead wagon's upper platform, flanked by the convoy's last Tide Wardens. She fights with the deliberate economy of a soldier who has kept this route open for four years through attrition \u2014 draining what she cannot break, buffing her remaining soldiers before engaging directly.",
+        "enemies": [
+          {
+            "enemyTypeID": "ironvein_supply_captain",
+            "countRange": [
+              1,
+              1
+            ],
+            "level": 33
+          },
+          {
+            "enemyTypeID": "ironvein_tide_warden",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 30
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "ironvein_relay_vedra_challenge",
+            "name": "Challenge Vedra's Orders",
+            "spawnChance": 0.8,
+            "checkType": "item_and_stat",
+            "requiredItemID": "loyalist_seal",
+            "checkStat": "harmony",
+            "difficultyThreshold": 90,
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "ironvein_tide_warden",
+              "count": 2,
+              "narrative": "You present the Loyalist Seal and name the counter-signature. Vedra goes still. She dismisses the Wardens with a word \u2014 not because you've convinced her, but because she understands you know enough to make this personal. Whatever happens next, she wants no witnesses."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You have the seal but Vedra reads the challenge in your face before you can frame it. She signals the Wardens to hold their positions."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "Vedra does not negotiate with people who announce themselves by breaking through her perimeter."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion",
+            "dropChance": 0.5,
+            "rarity": "common"
+          },
+          {
+            "itemID": "hammer_mithril_tier2",
+            "dropChance": 0.25,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "chest_warrior_plate_tier1",
+            "dropChance": 0.3,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "stamina_potion",
+            "dropChance": 0.4,
+            "rarity": "common"
+          }
+        ]
+      },
+      {
+        "stageId": 99,
+        "title": "The Sealed Compartment",
+        "secretPath": true,
+        "description": "The compartment is not a weapons cache. It is a document archive \u2014 sealed orders, countersigned route maps, and correspondence addressed to no named recipient. Reading it takes time. Vedra finds you before you finish.",
+        "enemies": [
+          {
+            "enemyTypeID": "ironvein_supply_captain",
+            "countRange": [
+              1,
+              1
+            ],
+            "level": 35
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "ironvein_relay_read_orders",
+            "name": "Read Vedra's Field Orders",
+            "spawnChance": 1.0,
+            "checkType": "random",
+            "successEffect": {
+              "type": "narrative_only",
+              "narrative": "The orders are not combat instructions. They are waypoint schedules \u2014 precise timings for when the convoy will pass specific locations, formatted as reporting intervals. The recipient is identified only by a sigil you have seen before, pressed into the corner of every document. Someone has been tracking this convoy's position. Vedra arrives before you can read further."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "The orders are not combat instructions. They are waypoint schedules \u2014 precise timings for when the convoy will pass specific locations, formatted as reporting intervals. The recipient is identified only by a sigil you have seen before, pressed into the corner of every document. Someone has been tracking this convoy's position. Vedra arrives before you can read further."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The orders are not combat instructions. They are waypoint schedules \u2014 precise timings for when the convoy will pass specific locations, formatted as reporting intervals. The recipient is identified only by a sigil you have seen before, pressed into the corner of every document. Someone has been tracking this convoy's position. Vedra arrives before you can read further."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "ironvein_field_orders",
+            "dropChance": 1.0,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "hammer_frost_tier2",
+            "dropChance": 0.5,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "chest_mithril_chain_tier2",
+            "dropChance": 0.35,
+            "rarity": "rare"
+          }
+        ]
+      }
+    ],
+    "rewards": {
+      "baseXP": 22000,
+      "baseGold": 230,
+      "lootTable": [
+        {
+          "itemID": "hammer_steel_tier1",
+          "dropChance": 0.55,
+          "rarity": "uncommon"
+        },
+        {
+          "itemID": "chest_warrior_plate_tier1",
+          "dropChance": 0.4,
+          "rarity": "uncommon"
+        },
+        {
+          "itemID": "loyalist_seal",
+          "dropChance": 0.3,
+          "rarity": "uncommon"
+        },
+        {
+          "itemID": "stamina_potion",
+          "dropChance": 0.5,
+          "rarity": "common"
+        }
+      ],
+      "secretLootTable": [
+        {
+          "itemID": "ironvein_field_orders",
+          "dropChance": 1.0,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "hammer_frost_tier2",
+          "dropChance": 0.6,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "chest_mithril_chain_tier2",
+          "dropChance": 0.4,
+          "rarity": "rare"
+        }
+      ]
+    },
+    "tags": [
+      "dwarven",
+      "martial",
+      "undead"
+    ]
+  },
+  {
+    "id": "challenge_vultures_roost",
+    "name": "The Vulture's Roost",
+    "description": "The Vulture Company's primary command post, carved into the cliffs above the Silver Vale trade routes. Captain Vane runs his raiding operation from here \u2014 the contracts, the ledgers, the chain of command that has kept the Vale's roads impassable for four years. The Company isn't hiding anymore. They're managing.",
+    "difficulty": 8,
+    "recommendedLevel": 30,
+    "minPartySize": 1,
+    "maxPartySize": 4,
+    "lore": [
+      {
+        "unlocksAfter": 1,
+        "text": "The Roost was a minor waystation before the Royal Guard withdrew. Vane didn't build it \u2014 he inherited it when the garrison left and the previous occupants didn't survive the transition. The garrison's records were still here when he arrived. He has not shared what they contained."
+      },
+      {
+        "unlocksAfter": 5,
+        "text": "The Vulture Company's contracts are not random. The shipments they intercept are specifically selected \u2014 grain convoys pass unmolested while Verdant Word supply lines are hit every time. Someone is telling them which wagons to take and which to leave. The Company calls this good intelligence. The merchants who've noticed the pattern call it something else."
+      },
+      {
+        "unlocksAfter": 15,
+        "text": "Vane keeps two sets of ledgers. The one his Strike Captains have seen shows standard raiding income. The second, locked in his personal quarters, shows payments from a source he refers to only as the Contractor. The amounts dwarf the raiding revenue. The Vulture Company is not a mercenary band that raids for profit. It is a funded operation with a specific mandate, and raiding is the cover."
+      },
+      {
+        "unlocksAfter": 1,
+        "requiresSecret": true,
+        "text": "The blood-oath ceremony is not a Vulture Company tradition. It is a Stonetusk one \u2014 a contract ritual that makes debt binding across both parties in perpetuity. Vane performed it with Chieftain Krog's envoy three years ago in exchange for safe passage through Orc territory. He has not honored the debt. The Stonetusk Clan knows. They have been waiting to see if he will. The Contractor's payments are the reason he hasn't \u2014 the Contractor needs the Orcish alliance broken, not mended."
+      }
+    ],
+    "stages": [
+      {
+        "stageId": 1,
+        "title": "The Outer Perimeter",
+        "description": "Wing Scouts hold the cliffside approaches in rotating pairs, and Strike Captains anchor the main gate. The Company runs a tight perimeter \u2014 the Scouts bleed targets before the Captains close in to finish.",
+        "enemies": [
+          {
+            "enemyTypeID": "vulture_wing_scout",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 28
+          },
+          {
+            "enemyTypeID": "vulture_strike_captain",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 30
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "vultures_roost_ledger_passage",
+            "name": "Company Credentials",
+            "spawnChance": 0.7,
+            "checkType": "item",
+            "requiredItemID": "vulture_company_ledger",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "vulture_wing_scout",
+              "count": 2,
+              "narrative": "The ledger carries Vane's counter-signature on the inside cover. The Wing Scouts recognize it and wave you through without a word \u2014 the Company doesn't question people who know the captain's mark. The Strike Captains at the gate have not seen you yet."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You have no credential the perimeter recognizes."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The cliffside offers no approach the Scouts haven't already mapped."
+            }
+          },
+          {
+            "id": "vultures_roost_scout_ambition",
+            "name": "Use the Wind",
+            "spawnChance": 0.55,
+            "checkType": "stat",
+            "checkStat": "ambition",
+            "difficultyThreshold": 80,
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "vulture_strike_captain",
+              "count": 1,
+              "narrative": "The wind off the cliff face is constant and loud enough to cover movement. One Strike Captain has his back to the approach. You're inside his perimeter before he knows you're there."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "The wind is in your favour but the Captains are watching the right angles. They've done this longer than you."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "You can't find an opening before the Scouts mark your position."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "dagger_iron_tier0",
+            "dropChance": 0.4,
+            "rarity": "common"
+          },
+          {
+            "itemID": "health_potion_minor",
+            "dropChance": 0.45,
+            "rarity": "common"
+          },
+          {
+            "itemID": "vulture_company_ledger",
+            "dropChance": 0.2,
+            "rarity": "uncommon"
+          }
+        ]
+      },
+      {
+        "stageId": 2,
+        "title": "The Command Compound",
+        "description": "The Roost's interior is anchored by Ironbound veterans at the chokepoints and a Quartermaster who keeps their stamina topped and their damage up. The Ironbound are the wall \u2014 the Quartermaster is why the wall holds.",
+        "enemies": [
+          {
+            "enemyTypeID": "vulture_ironbound",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 31
+          },
+          {
+            "enemyTypeID": "vulture_quartermaster",
+            "countRange": [
+              1,
+              1
+            ],
+            "level": 29
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "vultures_roost_disrupt_supply",
+            "name": "Hit the Supply Cache",
+            "spawnChance": 0.6,
+            "checkType": "stat",
+            "checkStat": "ambition",
+            "difficultyThreshold": 85,
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "vulture_quartermaster",
+              "count": 1,
+              "narrative": "The supply cache is separate from the command tent, and it's where the Quartermaster spends most of his time. You reach it before he does. Without his stores he has nothing to offer the Ironbound \u2014 he retreats rather than fight empty-handed."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "The Quartermaster is already at his post. You can't reach the cache without going through him."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "You don't find the cache in time."
+            }
+          },
+          {
+            "id": "vultures_roost_guild_pressure",
+            "name": "Invoke the Guild Contract",
+            "spawnChance": 0.5,
+            "checkType": "item_and_stat",
+            "requiredItemID": "guild_seal",
+            "checkStat": "harmony",
+            "difficultyThreshold": 85,
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "vulture_ironbound",
+              "count": 1,
+              "narrative": "The Guild Seal is proof of something the Ironbound have suspected: the Contractor is the Guild, and the Guild's contracts don't cover dying in a compound fight. One Ironbound steps aside. He doesn't look ashamed. He looks like he's been waiting for a reason."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "The seal means something but not enough \u2014 the Ironbound aren't paid to reason through implications under pressure."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "You have nothing the Ironbound recognize as authority."
+            }
+          }
+        ],
+        "stageBranches": [
+          {
+            "condition": {
+              "type": "has_item",
+              "value": "vulture_company_ledger"
+            },
+            "nextStageId": 99,
+            "overrideDescription": "The ledger gets you past the outer gate, but it also gets you into Vane's personal quarters \u2014 a room the Strike Captains know exists but have never entered. The lock uses the same counter-signature as the ledger's cover. He built himself a way out and left the key in his most dangerous document.",
+            "chance": 0.4
+          },
+          {
+            "nextStageId": null
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "stamina_potion",
+            "dropChance": 0.45,
+            "rarity": "common"
+          },
+          {
+            "itemID": "chest_chain_hauberk_tier1",
+            "dropChance": 0.25,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "axe_steel_tier1",
+            "dropChance": 0.2,
+            "rarity": "uncommon"
+          }
+        ]
+      },
+      {
+        "stageId": 3,
+        "title": "The Chief's Throne",
+        "description": "Vane commands from the cliff's highest platform \u2014 a chair, a table covered in contracts, and a view of every road he's made impassable. He fights like the officer he used to be: pressure first, then attrition, then the killing blow when you're already spent.",
+        "enemies": [
+          {
+            "enemyTypeID": "captain_vane",
+            "countRange": [
+              1,
+              1
+            ],
+            "level": 34
+          },
+          {
+            "enemyTypeID": "vulture_strike_captain",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 30
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "vultures_roost_vane_confront",
+            "name": "Present the Evidence",
+            "spawnChance": 0.8,
+            "checkType": "item_and_stat",
+            "requiredItemID": "guild_seal",
+            "checkStat": "conviction",
+            "difficultyThreshold": 90,
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "vulture_strike_captain",
+              "count": 2,
+              "narrative": "You lay the Guild Seal on his table and name the Contractor. Vane is quiet for a moment. Then he dismisses the Strike Captains \u2014 not because you've beaten him, but because what comes next is between him and whoever sent you. He doesn't want witnesses to what he's about to say before the fight starts."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You have the seal but Vane doesn't let you finish the sentence. He's heard enough accusations to know how to shut them down."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "Vane doesn't negotiate with people who break into his compound."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "vulture_company_ledger",
+            "dropChance": 0.6,
+            "rarity": "common"
+          },
+          {
+            "itemID": "guild_seal",
+            "dropChance": 0.4,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "axe_mithril_tier2",
+            "dropChance": 0.2,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "health_potion",
+            "dropChance": 0.5,
+            "rarity": "common"
+          }
+        ]
+      },
+      {
+        "stageId": 99,
+        "title": "The Blood-Oath Chamber",
+        "secretPath": true,
+        "description": "Vane's private quarters contain two things: a second set of ledgers and a Stonetusk contract marker on the wall \u2014 a blood-oath token, half-completed, the Orcish side of the seal pressed but the human side left blank. He signed the ritual and never finished it. Vane arrives before you can read everything.",
+        "enemies": [
+          {
+            "enemyTypeID": "captain_vane",
+            "countRange": [
+              1,
+              1
+            ],
+            "level": 36
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "vultures_roost_read_oath",
+            "name": "Read the Blood-Oath",
+            "spawnChance": 1.0,
+            "checkType": "random",
+            "successEffect": {
+              "type": "narrative_only",
+              "narrative": "The contract is written in both Trade Common and Stonetusk script. Vane agreed to honor an Orcish debt \u2014 safe passage, a share of the raiding income, acknowledgment of the clan's territorial claim \u2014 in exchange for access to the northern passes. He signed it. The Stonetusk envoy pressed his mark. The debt is real and it is unpaid. The Contractor's ledger entries start two weeks after the oath was made. Vane arrives before you finish reading."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "The contract is written in both Trade Common and Stonetusk script. Vane agreed to honor an Orcish debt \u2014 safe passage, a share of the raiding income, acknowledgment of the clan's territorial claim \u2014 in exchange for access to the northern passes. He signed it. The Stonetusk envoy pressed his mark. The debt is real and it is unpaid. The Contractor's ledger entries start two weeks after the oath was made. Vane arrives before you finish reading."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The contract is written in both Trade Common and Stonetusk script. Vane agreed to honor an Orcish debt \u2014 safe passage, a share of the raiding income, acknowledgment of the clan's territorial claim \u2014 in exchange for access to the northern passes. He signed it. The Stonetusk envoy pressed his mark. The debt is real and it is unpaid. The Contractor's ledger entries start two weeks after the oath was made. Vane arrives before you finish reading."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "blood_oath_token",
+            "dropChance": 1.0,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "axe_mithril_tier2",
+            "dropChance": 0.5,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "acc_cloak_hunter_tier1",
+            "dropChance": 0.4,
+            "rarity": "uncommon"
+          }
+        ]
+      }
+    ],
+    "rewards": {
+      "baseXP": 22000,
+      "baseGold": 230,
+      "lootTable": [
+        {
+          "itemID": "axe_steel_tier1",
+          "dropChance": 0.5,
+          "rarity": "uncommon"
+        },
+        {
+          "itemID": "chest_chain_hauberk_tier1",
+          "dropChance": 0.35,
+          "rarity": "uncommon"
+        },
+        {
+          "itemID": "vulture_company_ledger",
+          "dropChance": 0.3,
+          "rarity": "uncommon"
+        },
+        {
+          "itemID": "health_potion",
+          "dropChance": 0.5,
+          "rarity": "common"
+        }
+      ],
+      "secretLootTable": [
+        {
+          "itemID": "blood_oath_token",
+          "dropChance": 1.0,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "axe_mithril_tier2",
+          "dropChance": 0.55,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "acc_cloak_hunter_tier1",
+          "dropChance": 0.45,
+          "rarity": "uncommon"
+        }
+      ]
+    },
+    "tags": [
+      "mercenary",
+      "martial",
+      "scavenge"
+    ]
+  },
+  {
+    "id": "challenge_blood_oath_tribunal",
+    "name": "The Blood-Oath Tribunal",
+    "description": "A neutral field between the Dwarven Holds and the Silver Vale where the Stonetusk Clan has called the factions of the succession crisis to settle their debts. Chieftain Krog is not here to negotiate \u2014 he is here to collect. The arbitration has been armed since the first delegation arrived.",
+    "difficulty": 9,
+    "recommendedLevel": 38,
+    "minPartySize": 1,
+    "maxPartySize": 4,
+    "lore": [
+      {
+        "unlocksAfter": 1,
+        "text": "The Tribunal field has hosted three prior arbitrations. The first two ended in settlement. The third ended when one delegation's escorts decided the outcome before the judges finished deliberating. The bones from that session were never cleared. Krog chose this site deliberately. He wants everyone to remember what happens when the process fails."
+      },
+      {
+        "unlocksAfter": 5,
+        "text": "The Stonetusk Clan is owed three things: safe passage through the northern passes, a share of the Ironvein trade revenue, and acknowledgment of their territorial claim on the lowland hunting grounds. The Goldcrown faction has contested all three for five years. The Ironvein faction agreed to the second two and has been using Goldcrown's objection as cover to avoid paying the first. Krog knows this. He has been watching both factions lie to his face for five years. He is done watching."
+      },
+      {
+        "unlocksAfter": 15,
+        "text": "The Unpaid Ledger the Stonetusk Clan carries is not a record of what they are owed. It is a record of what they have already collected \u2014 raids on Goldcrown supply lines, tolls on unauthorized pass traffic, the slow attrition of a creditor who has given up asking politely. By the Tribunal's accounting, the debt is nearly settled. What Krog actually wants is the acknowledgment. The Orcs do not need the gold. They need the dwarves to say out loud that the contract was real."
+      },
+      {
+        "unlocksAfter": 1,
+        "requiresSecret": true,
+        "text": "The Third Heir's claim was in the Stonetusk records before it appeared in any dwarven document. Krog's envoy identified the legitimate bloodline four years ago during a routine contract review \u2014 the Heir's grandmother had signed a territorial agreement with the Clan in exchange for safe passage during the succession crisis of her generation. The Stonetusk Clan has known who the rightful heir is longer than anyone. They have been waiting to use it. Presenting the signet at the Tribunal is not a surprise to Krog. It is the move he has been waiting for someone to make."
+      }
+    ],
+    "stages": [
+      {
+        "stageId": 1,
+        "title": "The Outer Arbitration Ground",
+        "description": "The Tribunal's perimeter is held by Stonetusk Plain-Runners who enforce the boundary between delegations, and Tusk-Brothers who guarantee no one leaves before the debt is acknowledged. The party registers as an unknown party \u2014 neither delegation nor witness.",
+        "enemies": [
+          {
+            "enemyTypeID": "stonetusk_plain_runner",
+            "countRange": [
+              3,
+              4
+            ],
+            "level": 37
+          },
+          {
+            "enemyTypeID": "stonetusk_tusk_brother",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 39
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "tribunal_ledger_passage",
+            "name": "Present the Unpaid Ledger",
+            "spawnChance": 0.7,
+            "checkType": "item",
+            "requiredItemID": "unpaid_ledger",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "stonetusk_plain_runner",
+              "count": 2,
+              "narrative": "The Unpaid Ledger carries the Stonetusk seal on the cover. The Plain-Runners recognize it immediately and step back \u2014 anyone carrying this document has either stolen it from a corpse or is here on legitimate business, and the Clan's protocol is to let the Chieftain decide which. Two runners peel off to report. The Tusk-Brothers have not moved."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You have nothing the perimeter recognizes as authorization."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Plain-Runners have already marked your position. Unknown parties do not pass the boundary unchallenged."
+            }
+          },
+          {
+            "id": "tribunal_conviction_push",
+            "name": "Hold Your Ground",
+            "spawnChance": 0.6,
+            "checkType": "stat",
+            "checkStat": "conviction",
+            "difficultyThreshold": 85,
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "stonetusk_tusk_brother",
+              "count": 1,
+              "narrative": "The Tusk-Brothers respect one thing above credentials: someone who doesn't flinch when challenged. You hold your position without breaking eye contact until one of them steps aside. It is not a concession. It is an acknowledgment that this fight will cost something."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "The Tusk-Brothers read the hesitation. They close the distance."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The boundary is absolute. Everyone who doesn't belong here gets removed."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "axe_steel_tier1",
+            "dropChance": 0.4,
+            "rarity": "common"
+          },
+          {
+            "itemID": "stamina_potion",
+            "dropChance": 0.45,
+            "rarity": "common"
+          },
+          {
+            "itemID": "unpaid_ledger",
+            "dropChance": 0.2,
+            "rarity": "uncommon"
+          }
+        ]
+      },
+      {
+        "stageId": 2,
+        "title": "The Inner Council Ring",
+        "description": "The arbitration's core is guarded by Bone-Guards anchoring the council perimeter and a Blood-Shaman who maintains the oath-binding ritual that keeps the session legitimate. The Shaman is the reason the dwarven delegations haven't fled \u2014 while the ritual holds, no faction can leave without forfeiting their claim. Disrupt it and the council dissolves into a free fight.",
+        "enemies": [
+          {
+            "enemyTypeID": "stonetusk_bone_guard",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 40
+          },
+          {
+            "enemyTypeID": "stonetusk_blood_shaman",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 38
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "tribunal_oath_stone",
+            "name": "Invoke the Shrine Oath",
+            "spawnChance": 0.65,
+            "checkType": "item",
+            "requiredItemID": "oath_stone",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "stonetusk_blood_shaman",
+              "count": 1,
+              "narrative": "The Oath Stone from the Shrine of the First Oath resonates with the Shaman's ritual \u2014 it is older than the Stonetusk binding and the Shaman recognizes it. He steps back from the circle without a word. The oath-binding holds on its own for now, but the Bone-Guards are watching you with new attention."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You have nothing the ritual recognizes."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Shaman does not acknowledge outsiders during the binding. The Bone-Guards enforce this."
+            }
+          },
+          {
+            "id": "tribunal_harmony_negotiate",
+            "name": "Address the Council",
+            "spawnChance": 0.55,
+            "checkType": "stat",
+            "checkStat": "harmony",
+            "difficultyThreshold": 90,
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "stonetusk_bone_guard",
+              "count": 1,
+              "narrative": "You speak directly to the council before the Bone-Guards can move. One guard pauses \u2014 not because the argument was persuasive, but because interrupting a formal address during an active binding is a protocol violation and he knows it. He holds position while the rest close in."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "The council does not recognize your standing to address it. The Bone-Guards do not wait for a second attempt."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "You have no standing here. The guards enforce that immediately."
+            }
+          }
+        ],
+        "stageBranches": [
+          {
+            "condition": {
+              "type": "has_item",
+              "value": "heir_signet"
+            },
+            "nextStageId": 99,
+            "overrideDescription": "The Third Heir's Signet stops everything. The Shaman recognizes the seal before you've finished drawing it \u2014 the Stonetusk records have carried this bloodline for four years. The Bone-Guards step back. Krog has been summoned. This is the move he was waiting for.",
+            "chance": 0.45
+          },
+          {
+            "nextStageId": null
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion",
+            "dropChance": 0.45,
+            "rarity": "common"
+          },
+          {
+            "itemID": "axe_mithril_tier2",
+            "dropChance": 0.2,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "stamina_potion",
+            "dropChance": 0.4,
+            "rarity": "common"
+          }
+        ]
+      },
+      {
+        "stageId": 3,
+        "title": "The Chieftain's Judgment",
+        "description": "Krog does not fight from a throne. He fights from the center of the field, in front of both delegations, because he wants everyone to see what happens to people who waste his time. The Bone-Guards flank him. This is not an ambush \u2014 it is an execution of process.",
+        "enemies": [
+          {
+            "enemyTypeID": "chieftain_krog",
+            "countRange": [
+              1,
+              1
+            ],
+            "level": 43
+          },
+          {
+            "enemyTypeID": "stonetusk_bone_guard",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 40
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "tribunal_krog_ledger_present",
+            "name": "Present the Vulture's Debt",
+            "spawnChance": 0.75,
+            "checkType": "item_and_stat",
+            "requiredItemID": "blood_oath_token",
+            "checkStat": "conviction",
+            "difficultyThreshold": 90,
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "stonetusk_bone_guard",
+              "count": 2,
+              "narrative": "The Blood-Oath Token from the Roost is proof that the Vulture Company's debt to the Stonetusk Clan has been acknowledged. Krog takes it, reads the seal, and sets it on the arbitration table. He dismisses the Bone-Guards with a gesture \u2014 the formal part of the proceeding is over. What remains is between him and you, and he intends to conduct it honestly."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You have the token but Krog's patience for presentations ran out before you arrived. He has been waiting five years. He is not waiting any longer."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "Krog does not negotiate with people who haven't done their homework."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "axe_mithril_tier2",
+            "dropChance": 0.35,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "unpaid_ledger",
+            "dropChance": 0.5,
+            "rarity": "common"
+          },
+          {
+            "itemID": "health_potion",
+            "dropChance": 0.5,
+            "rarity": "common"
+          },
+          {
+            "itemID": "axe_adamant_tier3",
+            "dropChance": 0.15,
+            "rarity": "rare"
+          }
+        ]
+      },
+      {
+        "stageId": 99,
+        "title": "The Legitimate Claim",
+        "secretPath": true,
+        "description": "The Stonetusk records are produced. The Heir's bloodline is verified against the grandmother's territorial agreement. Krog reads the signet against his records and finds them matching. He then looks at you, and the session becomes something else entirely \u2014 a test of whether you understand what you're holding.",
+        "enemies": [
+          {
+            "enemyTypeID": "chieftain_krog",
+            "countRange": [
+              1,
+              1
+            ],
+            "level": 45
+          },
+          {
+            "enemyTypeID": "stonetusk_tusk_brother",
+            "countRange": [
+              2,
+              2
+            ],
+            "level": 41
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "tribunal_signet_verification",
+            "name": "The Verification",
+            "spawnChance": 1.0,
+            "checkType": "random",
+            "successEffect": {
+              "type": "narrative_only",
+              "narrative": "Krog verifies the signet against the Stonetusk territorial record \u2014 the match is exact. He sets both documents on the table and looks at you for a long moment. Then he says: the Clan will honor the coronation if the party can prove they understand what they're asking for. The Tusk-Brothers move to flank. This is the proof."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "Krog verifies the signet against the Stonetusk territorial record \u2014 the match is exact. He sets both documents on the table and looks at you for a long moment. Then he says: the Clan will honor the coronation if the party can prove they understand what they're asking for. The Tusk-Brothers move to flank. This is the proof."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "Krog verifies the signet against the Stonetusk territorial record \u2014 the match is exact. He sets both documents on the table and looks at you for a long moment. Then he says: the Clan will honor the coronation if the party can prove they understand what they're asking for. The Tusk-Brothers move to flank. This is the proof."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "heir_signet",
+            "dropChance": 1.0,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "axe_adamant_tier3",
+            "dropChance": 0.55,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "unpaid_ledger",
+            "dropChance": 0.8,
+            "rarity": "uncommon"
+          }
+        ]
+      }
+    ],
+    "rewards": {
+      "baseXP": 26000,
+      "baseGold": 260,
+      "lootTable": [
+        {
+          "itemID": "axe_mithril_tier2",
+          "dropChance": 0.5,
+          "rarity": "uncommon"
+        },
+        {
+          "itemID": "stamina_potion",
+          "dropChance": 0.55,
+          "rarity": "common"
+        },
+        {
+          "itemID": "health_potion",
+          "dropChance": 0.5,
+          "rarity": "common"
+        },
+        {
+          "itemID": "unpaid_ledger",
+          "dropChance": 0.35,
+          "rarity": "uncommon"
+        }
+      ],
+      "secretLootTable": [
+        {
+          "itemID": "heir_signet",
+          "dropChance": 1.0,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "axe_adamant_tier3",
+          "dropChance": 0.6,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "unpaid_ledger",
+          "dropChance": 0.9,
+          "rarity": "uncommon"
+        }
+      ]
+    },
+    "tags": [
+      "orc",
+      "oath",
+      "martial"
+    ]
+  },
+  {
+    "id": "challenge_frayed_outpost",
+    "name": "The Frayed Outpost",
+    "description": "A sealed sub-basement beneath the Royal Palace where the High Council of the Verdant Word held its final session fifty years ago. The vote was never completed. The councillors who died in the coup are still here, still deliberating, still preventing anyone from reaching the record of what was actually decided.",
+    "difficulty": 9,
+    "recommendedLevel": 38,
+    "minPartySize": 1,
+    "maxPartySize": 4,
+    "lore": [
+      {
+        "unlocksAfter": 1,
+        "text": "The sub-basement was sealed from the outside the same night the coup occurred. The Royal Guard posted at the entrance were reassigned within the week. No official record acknowledges the chamber exists. The iron-bound transaction ledgers lining the walls contain every contract the Verdant Word signed in the last three hundred years. Someone wanted those records inaccessible more than they wanted the councillors dead."
+      },
+      {
+        "unlocksAfter": 5,
+        "text": "The Echo Councillors are not haunting the chamber. They are completing the session. The vote on the Entropy threat was four votes in favour, three opposed, and one abstention when the coup began. The abstention belonged to a councillor who left the room to retrieve a document. She never returned. The remaining seven have been waiting for a quorum that will never arrive. They cannot close the session without it. They cannot leave without closing the session."
+      },
+      {
+        "unlocksAfter": 15,
+        "text": "High Speaker Valerius is not the same entity encountered in the Spire. The Spire holds the version of Valerius that survived and was corrupted. This chamber holds the version that died in the coup \u2014 the one who called the vote, who believed the threat was real, who never knew the outcome. He has been presiding over an unfinished deliberation for fifty years. He does not know the Architect won. He is still trying to stop it."
+      }
+    ],
+    "stages": [
+      {
+        "stageId": 1,
+        "title": "The Outer Stacks",
+        "description": "The chamber's outer hall is still staffed \u2014 Silent Scribes move between the iron-bound shelves marking anything that approaches, and Echo Judges maintain the session's procedural integrity with force. The quills have not stopped scratching.",
+        "enemies": [
+          {
+            "enemyTypeID": "council_silent_scribe",
+            "countRange": [
+              3,
+              4
+            ],
+            "level": 36
+          },
+          {
+            "enemyTypeID": "council_echo_judge",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 38
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "frayed_outpost_verdant_seal",
+            "name": "Present Order Credentials",
+            "spawnChance": 0.7,
+            "checkType": "item",
+            "requiredItemID": "verdant_word_seal",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "council_silent_scribe",
+              "count": 2,
+              "narrative": "The Verdant Word Seal carries the correct session authorization. Two Scribes pause mid-transcription and defer \u2014 the seal predates the coup and the Judges recognize it as valid entry credentials. They do not stand down, but they stop marking you. The Judges have taken positions at the inner door."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You have no credential the session recognizes."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "Unauthorized access to an active council session is an executable offence. The Scribes begin marking immediately."
+            }
+          },
+          {
+            "id": "frayed_outpost_harmony_address",
+            "name": "Request the Floor",
+            "spawnChance": 0.55,
+            "checkType": "stat",
+            "checkStat": "harmony",
+            "difficultyThreshold": 88,
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "council_echo_judge",
+              "count": 1,
+              "narrative": "You invoke procedural right of address \u2014 the formal request that any witness may present evidence to an active session. One Echo Judge hesitates. The protocol is fifty years old but the session never closed, which means the protocol still applies. He steps back to allow presentation. The others do not."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "The floor is not yours to request. The Judges enforce this without ceremony."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The session is not accepting new testimony. The Scribes have already logged your presence as a disruption."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "mana_potion_minor",
+            "dropChance": 0.5,
+            "rarity": "common"
+          },
+          {
+            "itemID": "verdant_word_seal",
+            "dropChance": 0.2,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "scepter_iron_tier0",
+            "dropChance": 0.25,
+            "rarity": "common"
+          }
+        ]
+      },
+      {
+        "stageId": 2,
+        "title": "The Deliberation Chamber",
+        "description": "The inner chamber is where the vote stalled. Whisper Mages enforce the silence protocols that kept deliberations secret in life, and Vault Wardens seal the exits the same way they did the night of the coup. The ambient Fraying makes every mana expenditure here cost more than it should.",
+        "enemies": [
+          {
+            "enemyTypeID": "council_whisper_mage",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 39
+          },
+          {
+            "enemyTypeID": "council_vault_warden",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 40
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "frayed_outpost_athenaeum_scroll",
+            "name": "Present the Athenaeum Record",
+            "spawnChance": 0.6,
+            "checkType": "item",
+            "requiredItemID": "athenaeum_scroll",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "council_whisper_mage",
+              "count": 1,
+              "narrative": "The Athenaeum Scroll is an external record of the session \u2014 a backup copy filed by a Scrivener who didn't survive the coup. One Whisper Mage recognizes the filing seal and goes still. An external record means the session's secrecy was already broken decades ago. She has been enforcing a confidentiality that no longer exists. She does not fight. She simply stops."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You have nothing the confidentiality protocol recognizes as authorization."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The silence protocols are absolute. Mana expenditure in this chamber is logged as a procedural violation."
+            }
+          },
+          {
+            "id": "frayed_outpost_conviction_breach",
+            "name": "Force the Door",
+            "spawnChance": 0.6,
+            "checkType": "stat",
+            "checkStat": "conviction",
+            "difficultyThreshold": 90,
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "council_vault_warden",
+              "count": 1,
+              "narrative": "The Vault Wardens sealed these exits fifty years ago on direct order. You make clear that order is no longer operative. One Warden holds your gaze for a long moment \u2014 then steps aside. He does not concede the point. He concedes that the argument requires more force to settle than he has been allocated."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "The exits are sealed. The order has not been rescinded. The Wardens will not discuss it further."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The doors do not open. The Wardens do not explain why."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "mana_potion",
+            "dropChance": 0.4,
+            "rarity": "common"
+          },
+          {
+            "itemID": "tome_steel_tier1",
+            "dropChance": 0.2,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "health_potion",
+            "dropChance": 0.4,
+            "rarity": "common"
+          }
+        ]
+      },
+      {
+        "stageId": 3,
+        "title": "The Speaker's Podium",
+        "description": "High Speaker Valerius presides from the head of the council table, still waiting for quorum, still calling the vote that cannot close. He treats the party as a disruption to be silenced and a mana drain as the appropriate response to unauthorized presence during active deliberation.",
+        "enemies": [
+          {
+            "enemyTypeID": "high_speaker_valerius",
+            "countRange": [
+              1,
+              1
+            ],
+            "level": 44
+          },
+          {
+            "enemyTypeID": "council_echo_judge",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 39
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "frayed_outpost_valerius_address",
+            "name": "Deliver the Absent Vote",
+            "spawnChance": 0.75,
+            "checkType": "item_and_stat",
+            "requiredItemID": "verdant_word_seal",
+            "checkStat": "harmony",
+            "difficultyThreshold": 92,
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "council_echo_judge",
+              "count": 3,
+              "narrative": "You present the Verdant Word Seal and declare the absent councillor's vote \u2014 in favour, as her later writings in the Athenaeum confirm. Valerius goes silent. For a moment the scratching of quills stops entirely. Five votes in favour is a majority. The session can close. He dismisses the Judges. Then he looks at you, and his expression is not relief. He has just realized what a closed vote means: the decision was made. The Architect's pact was rejected. And it happened anyway."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You have the seal but not the standing to deliver testimony on another councillor's behalf. Valerius calls the chamber to order."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "Valerius does not recognize you as a party to these proceedings. The session resumes."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "seed_of_first_tree",
+            "dropChance": 0.4,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "verdant_word_seal",
+            "dropChance": 0.5,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "tome_mithril_tier2",
+            "dropChance": 0.2,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "mana_potion",
+            "dropChance": 0.5,
+            "rarity": "common"
+          }
+        ]
+      }
+    ],
+    "rewards": {
+      "baseXP": 26000,
+      "baseGold": 260,
+      "lootTable": [
+        {
+          "itemID": "verdant_word_seal",
+          "dropChance": 0.45,
+          "rarity": "uncommon"
+        },
+        {
+          "itemID": "seed_of_first_tree",
+          "dropChance": 0.35,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "tome_mithril_tier2",
+          "dropChance": 0.25,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "mana_potion",
+          "dropChance": 0.5,
+          "rarity": "common"
+        }
+      ]
+    },
+    "tags": [
+      "arcane",
+      "undead",
+      "sacred"
+    ]
+  },
+  {
+    "id": "challenge_merchants_ledger_vault",
+    "name": "The Merchant's Ledger Vault",
+    "description": "A sealed subterranean archive beneath the Guildhall of Silent Trade, where Guildmaster Vane has kept the records of the Third Heir buried in the merchant lineage files for five years. The Coin-Keepers don't know what they're guarding. Vane has made sure of that.",
+    "difficulty": 9,
+    "recommendedLevel": 38,
+    "minPartySize": 1,
+    "maxPartySize": 4,
+    "lore": [
+      {
+        "unlocksAfter": 1,
+        "text": "The vault was sealed the same week the Verdant Word dissolved. Vane's official account is that the closure was a precaution against political instability. The actual content of the sealed section \u2014 three crates of merchant lineage files cross-referenced against dwarven territorial agreements \u2014 suggests the precaution was specifically targeted."
+      },
+      {
+        "unlocksAfter": 5,
+        "text": "The Third Heir's claim runs through the merchant side of the family \u2014 a grandmother who traded across the dwarven passes and signed a territorial compact with the Stonetusk Clan three generations ago. That compact is in this vault. Vane found it five years ago and understood immediately what it meant: whoever holds that document controls the succession. He has been holding it ever since."
+      },
+      {
+        "unlocksAfter": 15,
+        "text": "The Coin-Keepers are paid by contract, not loyalty. Their clearance levels are structured so that no single guard knows what the others have seen. Vane designed the security around the assumption that someone would eventually try to bribe their way in. He did not design it around the assumption that someone would arrive already knowing what was inside."
+      }
+    ],
+    "stages": [
+      {
+        "stageId": 1,
+        "title": "The Outer Stacks",
+        "description": "Ledger Clerks patrol the outer stacks in overlapping patterns, and Audit Mages hold the inner entrance behind arcane locks. The Clerks bleed anything that moves without authorization. The Mages silence anything that tries to bypass the locks with magic.",
+        "enemies": [
+          {
+            "enemyTypeID": "coinkeeper_ledger_clerk",
+            "countRange": [
+              3,
+              4
+            ],
+            "level": 37
+          },
+          {
+            "enemyTypeID": "coinkeeper_audit_mage",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 38
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "vault_guild_seal",
+            "name": "Present Guild Credentials",
+            "spawnChance": 0.7,
+            "checkType": "item",
+            "requiredItemID": "guild_seal",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "coinkeeper_ledger_clerk",
+              "count": 2,
+              "narrative": "The Guild Seal carries the standard access authorization. Two Clerks step aside \u2014 their contract specifies deference to sealed credentials, and the seal is genuine. They don't know it was obtained elsewhere. The Audit Mages have not seen it yet and are not bound by the same clause."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You have no credential the outer stacks recognize."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "Unauthorized entry into an active Guild archive is a contract violation. The Clerks treat it as one."
+            }
+          },
+          {
+            "id": "vault_ambition_slip",
+            "name": "Move Through the Stacks",
+            "spawnChance": 0.6,
+            "checkType": "stat",
+            "checkStat": "ambition",
+            "difficultyThreshold": 85,
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "coinkeeper_audit_mage",
+              "count": 1,
+              "narrative": "The Audit Mages monitor the primary approach but the stacks themselves are deep enough to move through unseen. You reach the inner entrance before one of them completes their circuit. They'll find the gap on the next pass."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "The Mages cover the approaches thoroughly. You don't find a clean line."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The stacks are too well-lit for undetected movement."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "stamina_potion_minor",
+            "dropChance": 0.45,
+            "rarity": "common"
+          },
+          {
+            "itemID": "mana_potion_minor",
+            "dropChance": 0.4,
+            "rarity": "common"
+          },
+          {
+            "itemID": "guild_seal",
+            "dropChance": 0.2,
+            "rarity": "uncommon"
+          }
+        ]
+      },
+      {
+        "stageId": 2,
+        "title": "The Record Room",
+        "description": "The inner archive is held by Coin-Keepers anchoring the chokepoints and Audit Mages who silence anything that tries to work around them. The Keepers are immovable. The Mages make sure the Keepers stay that way by stripping the party's options down to whatever they brought that doesn't cost mana.",
+        "enemies": [
+          {
+            "enemyTypeID": "coinkeeper_guard",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 40
+          },
+          {
+            "enemyTypeID": "coinkeeper_audit_mage",
+            "countRange": [
+              2,
+              2
+            ],
+            "level": 39
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "vault_ledger_leverage",
+            "name": "Invoke the Vulture Contract",
+            "spawnChance": 0.6,
+            "checkType": "item",
+            "requiredItemID": "vulture_company_ledger",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "coinkeeper_guard",
+              "count": 1,
+              "narrative": "The Vulture Company Ledger contains the Guild's secondary contract \u2014 the one that hired the Company to intercept Verdant Word supply lines. One Coin-Keeper reads the page you open to and sets down his weapon. His contract with the Guild is employment, not complicity. There's a difference, and the ledger makes clear which side of it he's been standing on."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You have the ledger but the Keepers aren't paid to reason through implications mid-shift."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Coin-Keepers hold their positions. They were retained specifically to avoid being reasoned with."
+            }
+          },
+          {
+            "id": "vault_conviction_pressure",
+            "name": "Hold the Line",
+            "spawnChance": 0.55,
+            "checkType": "stat",
+            "checkStat": "conviction",
+            "difficultyThreshold": 90,
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "coinkeeper_audit_mage",
+              "count": 1,
+              "narrative": "One Audit Mage breaks position to reinforce the Keepers before you've fully engaged. You step into her path and don't move. She recalculates. A Mage with no line of sight to her target is a Mage wasting a contract hour. She repositions rather than commit."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "The Mages hold their coverage angles. You can't force a gap."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Record Room has no angles that aren't covered."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion",
+            "dropChance": 0.45,
+            "rarity": "common"
+          },
+          {
+            "itemID": "mana_potion",
+            "dropChance": 0.35,
+            "rarity": "common"
+          },
+          {
+            "itemID": "sword_mithril_tier2",
+            "dropChance": 0.15,
+            "rarity": "uncommon"
+          }
+        ]
+      },
+      {
+        "stageId": 3,
+        "title": "The Vault Door",
+        "description": "Guildmaster Vane waits at the sealed section with the last of his Coin-Keepers. He does not fight because he enjoys it. He fights because someone reaching this room means his leverage is gone, and a man with nothing to lose is considerably more dangerous than one protecting an asset.",
+        "enemies": [
+          {
+            "enemyTypeID": "guildmaster_vane",
+            "countRange": [
+              1,
+              1
+            ],
+            "level": 45
+          },
+          {
+            "enemyTypeID": "coinkeeper_guard",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 41
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "vault_vane_confront",
+            "name": "Name the Heir",
+            "spawnChance": 0.75,
+            "checkType": "item_and_stat",
+            "requiredItemID": "heir_signet",
+            "checkStat": "harmony",
+            "difficultyThreshold": 92,
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "coinkeeper_guard",
+              "count": 3,
+              "narrative": "You present the heir_signet and name the lineage. Vane looks at the signet for a long time. Then he dismisses the Coin-Keepers \u2014 all of them, including the ones in the outer stacks. His leverage was the secret. The secret is standing in front of him with a signet ring and a complete argument. There is nothing left to guard. He tells them their contracts are fulfilled. Then he turns back to you, and his expression is the specific look of a man who has just realized his five-year plan ended thirty seconds ago."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You have the signet but Vane doesn't let you finish. He's spent five years anticipating this conversation and he knows which words to cut off."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "Vane does not discuss the vault's contents with unauthorized parties. The Coin-Keepers enforce this policy."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "heir_signet",
+            "dropChance": 0.7,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "guild_seal",
+            "dropChance": 0.5,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "vulture_company_ledger",
+            "dropChance": 0.4,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "sword_mithril_tier2",
+            "dropChance": 0.2,
+            "rarity": "rare"
+          }
+        ]
+      }
+    ],
+    "rewards": {
+      "baseXP": 26000,
+      "baseGold": 260,
+      "lootTable": [
+        {
+          "itemID": "guild_seal",
+          "dropChance": 0.5,
+          "rarity": "uncommon"
+        },
+        {
+          "itemID": "heir_signet",
+          "dropChance": 0.4,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "sword_mithril_tier2",
+          "dropChance": 0.25,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "mana_potion",
+          "dropChance": 0.5,
+          "rarity": "common"
+        }
+      ]
+    },
+    "tags": [
+      "mercenary",
+      "arcane",
+      "oath"
+    ]
   }
 ]

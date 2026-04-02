@@ -2735,14 +2735,12 @@
     "availableSkills": [
       "basic_attack",
       "pierce",
-      "weak_point",
+      "pummel",
       "shout",
-      "warcry",
-      "counter_strike",
-      "block",
-      "pummel"
+      "drain_reserves",
+      "warcry"
     ],
-    "skillSelectionCount": 5,
+    "skillSelectionCount": 2,
     "tags": [
       "human",
       "boss",
@@ -4162,16 +4160,13 @@
     },
     "availableSkills": [
       "shock",
-      "sleet",
-      "shout",
-      "warcry",
-      "mental_fog",
-      "misdirect",
-      "block",
       "sacred_roots",
-      "channel"
+      "mental_fog",
+      "shout",
+      "channel",
+      "sleet"
     ],
-    "skillSelectionCount": 6,
+    "skillSelectionCount": 2,
     "tags": [
       "spirit",
       "echo_council",
@@ -4653,19 +4648,13 @@
     },
     "availableSkills": [
       "slash",
-      "blood_letting",
       "pummel",
       "warcry",
-      "shout",
       "berserker_rage",
-      "frenzy",
-      "terror_cry",
-      "block",
-      "shove",
-      "bloodlust",
-      "blood_fury"
+      "shout",
+      "blood_letting"
     ],
-    "skillSelectionCount": 6,
+    "skillSelectionCount": 2,
     "tags": [
       "orc",
       "boss",
@@ -5048,6 +5037,709 @@
     "weaponTypes": [
       "scepter",
       "tome"
+    ]
+  },
+  {
+    "id": "ironvein_frostbite_conscript",
+    "name": "Frostbite Conscript",
+    "description": "An oath-bound dwarven soldier who did not survive long enough to be released from their vow of preservation \u2014 they patrol the convoy perimeter with the same discipline they had in life.",
+    "stats": {
+      "conviction": 75,
+      "endurance": 90,
+      "ambition": 45,
+      "harmony": 15
+    },
+    "armorValue": 8,
+    "aiProfile": "aggressive",
+    "equipment": {
+      "mainHand": "hammer_iron_tier0",
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "basic_attack",
+      "heavy_blow",
+      "shove"
+    ],
+    "lootTable": [
+      {
+        "itemID": "hammer_iron_tier0",
+        "dropChance": 0.3,
+        "rarity": "common"
+      },
+      {
+        "itemID": "stamina_potion_minor",
+        "dropChance": 0.2,
+        "rarity": "common"
+      }
+    ],
+    "tags": [
+      "dwarven",
+      "undead"
+    ],
+    "weaponTypes": [
+      "hammer"
+    ]
+  },
+  {
+    "id": "ironvein_outrider",
+    "name": "Ironvein Outrider",
+    "description": "A living dwarven cavalry scout who sweeps the convoy's flanks, using speed and a light crossbow to harry approaching threats before they reach the perimeter.",
+    "stats": {
+      "conviction": 65,
+      "endurance": 70,
+      "ambition": 85,
+      "harmony": 20
+    },
+    "armorValue": 5,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "crossbow_light_tier0",
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "basic_attack",
+      "aim",
+      "stun_strike",
+      "evasive_maneuver"
+    ],
+    "lootTable": [
+      {
+        "itemID": "crossbow_light_tier0",
+        "dropChance": 0.25,
+        "rarity": "common"
+      },
+      {
+        "itemID": "health_potion_minor",
+        "dropChance": 0.3,
+        "rarity": "common"
+      }
+    ],
+    "tags": [
+      "dwarven",
+      "martial"
+    ],
+    "weaponTypes": [
+      "crossbow"
+    ]
+  },
+  {
+    "id": "ironvein_tide_warden",
+    "name": "Tide Warden",
+    "description": "A senior Ironvein veteran who channels cold magic drawn from the mountain runoff to slow and disorient intruders \u2014 their Chill applications stack quickly in coordinated groups.",
+    "stats": {
+      "conviction": 60,
+      "endurance": 80,
+      "ambition": 70,
+      "harmony": 95
+    },
+    "armorValue": 6,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "scepter_silver_tier1",
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "basic_attack",
+      "chill",
+      "cone_of_cold",
+      "freeze_strike"
+    ],
+    "lootTable": [
+      {
+        "itemID": "scepter_iron_tier0",
+        "dropChance": 0.25,
+        "rarity": "common"
+      },
+      {
+        "itemID": "mana_potion_minor",
+        "dropChance": 0.3,
+        "rarity": "common"
+      }
+    ],
+    "tags": [
+      "dwarven",
+      "martial"
+    ],
+    "weaponTypes": [
+      "scepter"
+    ]
+  },
+  {
+    "id": "ironvein_siege_caller",
+    "name": "Siege Caller",
+    "description": "A mercenary crossbowman contracted to hold elevated positions on the supply wagons, coordinating suppressing fire and applying Electrified to disrupt enemy rotations.",
+    "stats": {
+      "conviction": 70,
+      "endurance": 65,
+      "ambition": 90,
+      "harmony": 35
+    },
+    "armorValue": 4,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "crossbow_heavy_tier1",
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "basic_attack",
+      "aim",
+      "shock",
+      "shout"
+    ],
+    "lootTable": [
+      {
+        "itemID": "crossbow_light_tier0",
+        "dropChance": 0.3,
+        "rarity": "common"
+      },
+      {
+        "itemID": "stamina_potion_minor",
+        "dropChance": 0.25,
+        "rarity": "common"
+      }
+    ],
+    "tags": [
+      "mercenary",
+      "martial"
+    ],
+    "weaponTypes": [
+      "crossbow"
+    ]
+  },
+  {
+    "id": "ironvein_supply_captain",
+    "name": "Supply Captain Vedra",
+    "description": "The Ironvein officer who has kept this convoy moving through four years of succession war \u2014 she fights with the deliberate economy of someone who has survived on resource management, draining what she cannot break.",
+    "stats": {
+      "conviction": 150,
+      "endurance": 175,
+      "ambition": 90,
+      "harmony": 110
+    },
+    "armorValue": 12,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "hammer_mithril_tier2",
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "basic_attack",
+      "heavy_blow",
+      "drain_reserves",
+      "shout"
+    ],
+    "lootTable": [
+      {
+        "itemID": "hammer_mithril_tier2",
+        "dropChance": 0.3,
+        "rarity": "rare"
+      },
+      {
+        "itemID": "chest_warrior_plate_tier1",
+        "dropChance": 0.25,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "ironvein_field_orders",
+        "dropChance": 0.5,
+        "rarity": "rare"
+      }
+    ],
+    "tags": [
+      "dwarven",
+      "martial",
+      "boss"
+    ],
+    "weaponTypes": [
+      "hammer"
+    ]
+  },
+  {
+    "id": "vulture_wing_scout",
+    "name": "Wing Scout",
+    "description": "Young recruits who earned their place in the Roost by surviving the cliffside approach \u2014 they fight light, fast, and without hesitation.",
+    "stats": {
+      "conviction": 60,
+      "endurance": 55,
+      "ambition": 90,
+      "harmony": 20
+    },
+    "armorValue": 2,
+    "aiProfile": "aggressive",
+    "equipment": {
+      "mainHand": "dagger_steel_tier1",
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "basic_attack",
+      "slash",
+      "footwork",
+      "misdirect"
+    ],
+    "lootTable": [
+      {
+        "itemID": "dagger_iron_tier0",
+        "dropChance": 0.25,
+        "rarity": "common"
+      },
+      {
+        "itemID": "health_potion_minor",
+        "dropChance": 0.2,
+        "rarity": "common"
+      }
+    ],
+    "tags": [
+      "human",
+      "mercenary"
+    ],
+    "weaponTypes": [
+      "dagger",
+      "handaxe"
+    ]
+  },
+  {
+    "id": "vulture_strike_captain",
+    "name": "Strike Captain",
+    "description": "Veterans who've run enough ambushes to know that the first wound matters most \u2014 they open with Slash and press before it can be cleansed.",
+    "stats": {
+      "conviction": 95,
+      "endurance": 90,
+      "ambition": 70,
+      "harmony": 30
+    },
+    "armorValue": 5,
+    "aiProfile": "aggressive",
+    "equipment": {
+      "mainHand": "axe_steel_tier1",
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "basic_attack",
+      "slash",
+      "pummel",
+      "warcry"
+    ],
+    "lootTable": [
+      {
+        "itemID": "axe_iron_tier0",
+        "dropChance": 0.3,
+        "rarity": "common"
+      },
+      {
+        "itemID": "stamina_potion_minor",
+        "dropChance": 0.25,
+        "rarity": "common"
+      }
+    ],
+    "tags": [
+      "human",
+      "mercenary",
+      "soldier"
+    ],
+    "weaponTypes": [
+      "axe",
+      "sword"
+    ]
+  },
+  {
+    "id": "vulture_quartermaster",
+    "name": "Quartermaster",
+    "description": "The logistics officer who keeps the Roost supplied \u2014 in a fight he's the one making sure his side never runs dry, shouting buffs while the line holds.",
+    "stats": {
+      "conviction": 70,
+      "endurance": 85,
+      "ambition": 55,
+      "harmony": 75
+    },
+    "armorValue": 4,
+    "aiProfile": "support",
+    "equipment": {
+      "mainHand": "mace_steel_tier1",
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "basic_attack",
+      "shout",
+      "warcry",
+      "first_aid"
+    ],
+    "lootTable": [
+      {
+        "itemID": "stamina_potion",
+        "dropChance": 0.35,
+        "rarity": "common"
+      },
+      {
+        "itemID": "health_potion",
+        "dropChance": 0.25,
+        "rarity": "common"
+      }
+    ],
+    "tags": [
+      "human",
+      "mercenary"
+    ],
+    "weaponTypes": [
+      "mace"
+    ]
+  },
+  {
+    "id": "vulture_ironbound",
+    "name": "Ironbound",
+    "description": "The Roost's heavy line \u2014 ex-Royal Guard who traded their oath for a salary and haven't lost the discipline that made them dangerous.",
+    "stats": {
+      "conviction": 100,
+      "endurance": 120,
+      "ambition": 45,
+      "harmony": 35
+    },
+    "armorValue": 9,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "sword_steel_tier1",
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "basic_attack",
+      "block",
+      "shove",
+      "counter_strike"
+    ],
+    "lootTable": [
+      {
+        "itemID": "chest_chain_hauberk_tier1",
+        "dropChance": 0.2,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "sword_steel_tier1",
+        "dropChance": 0.15,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "human",
+      "mercenary",
+      "soldier"
+    ],
+    "weaponTypes": [
+      "sword",
+      "axe"
+    ]
+  },
+  {
+    "id": "council_silent_scribe",
+    "name": "Silent Scribe",
+    "description": "A spectral clerk still transcribing the final session \u2014 they mark targets with unerring precision, ensuring subsequent strikes land harder.",
+    "stats": {
+      "conviction": 55,
+      "endurance": 60,
+      "ambition": 85,
+      "harmony": 90
+    },
+    "armorValue": 2,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "wand_steel_tier1",
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "basic_attack",
+      "aim",
+      "mental_fog",
+      "misdirect"
+    ],
+    "lootTable": [
+      {
+        "itemID": "mana_potion_minor",
+        "dropChance": 0.3,
+        "rarity": "common"
+      }
+    ],
+    "tags": [
+      "undead",
+      "arcane"
+    ],
+    "weaponTypes": [
+      "wand",
+      "scepter"
+    ]
+  },
+  {
+    "id": "council_echo_judge",
+    "name": "Echo Judge",
+    "description": "A spectral councillor locked in the posture of deliberation, using entangle and silence to prevent the living from disrupting the vote that never finished.",
+    "stats": {
+      "conviction": 70,
+      "endurance": 80,
+      "ambition": 65,
+      "harmony": 110
+    },
+    "armorValue": 4,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "scepter_light_tier1",
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "basic_attack",
+      "entangle",
+      "silence",
+      "shout"
+    ],
+    "lootTable": [
+      {
+        "itemID": "mana_potion_minor",
+        "dropChance": 0.25,
+        "rarity": "common"
+      },
+      {
+        "itemID": "scepter_iron_tier0",
+        "dropChance": 0.2,
+        "rarity": "common"
+      }
+    ],
+    "tags": [
+      "undead",
+      "arcane"
+    ],
+    "weaponTypes": [
+      "scepter",
+      "wand"
+    ]
+  },
+  {
+    "id": "council_whisper_mage",
+    "name": "Whisper Mage",
+    "description": "A spectral advisor who enforced information control in life and enforces silence in death \u2014 they target the party's mana-users first.",
+    "stats": {
+      "conviction": 65,
+      "endurance": 70,
+      "ambition": 90,
+      "harmony": 130
+    },
+    "armorValue": 2,
+    "aiProfile": "support",
+    "equipment": {
+      "mainHand": "tome_shadow_tier1",
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "basic_attack",
+      "silence",
+      "mental_fog",
+      "shadow_bolt"
+    ],
+    "lootTable": [
+      {
+        "itemID": "tome_steel_tier1",
+        "dropChance": 0.2,
+        "rarity": "common"
+      },
+      {
+        "itemID": "mana_potion",
+        "dropChance": 0.2,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "undead",
+      "arcane",
+      "shadow"
+    ],
+    "weaponTypes": [
+      "tome",
+      "wand"
+    ]
+  },
+  {
+    "id": "council_vault_warden",
+    "name": "Vault Warden",
+    "description": "A spectral guardsman who sealed the court's exits during the coup and has not opened them since \u2014 they anchor defensive lines with block and break armor on anyone trying to push through.",
+    "stats": {
+      "conviction": 100,
+      "endurance": 125,
+      "ambition": 50,
+      "harmony": 60
+    },
+    "armorValue": 10,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "sword_steel_tier1",
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "basic_attack",
+      "block",
+      "shield_bash",
+      "pierce"
+    ],
+    "lootTable": [
+      {
+        "itemID": "health_potion_minor",
+        "dropChance": 0.3,
+        "rarity": "common"
+      },
+      {
+        "itemID": "chest_chain_hauberk_tier1",
+        "dropChance": 0.15,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "undead",
+      "martial"
+    ],
+    "weaponTypes": [
+      "sword",
+      "axe"
+    ]
+  },
+  {
+    "id": "coinkeeper_ledger_clerk",
+    "name": "Ledger Clerk",
+    "description": "Guild scribes who moonlight as muscle \u2014 they know where every record is and will bleed anyone who reaches for the wrong one.",
+    "stats": {
+      "conviction": 65,
+      "endurance": 70,
+      "ambition": 75,
+      "harmony": 40
+    },
+    "armorValue": 3,
+    "aiProfile": "aggressive",
+    "equipment": {
+      "mainHand": "mace_steel_tier1",
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "basic_attack",
+      "slash",
+      "shove",
+      "pummel"
+    ],
+    "lootTable": [
+      {
+        "itemID": "health_potion_minor",
+        "dropChance": 0.3,
+        "rarity": "common"
+      },
+      {
+        "itemID": "stamina_potion_minor",
+        "dropChance": 0.25,
+        "rarity": "common"
+      }
+    ],
+    "tags": [
+      "human",
+      "mercenary"
+    ],
+    "weaponTypes": [
+      "mace",
+      "handaxe"
+    ]
+  },
+  {
+    "id": "coinkeeper_audit_mage",
+    "name": "Audit Mage",
+    "description": "Arcane specialists retained to maintain the vault's lock system \u2014 they apply silence to stop intruders from using magic to bypass what they've spent years securing.",
+    "stats": {
+      "conviction": 70,
+      "endurance": 75,
+      "ambition": 80,
+      "harmony": 115
+    },
+    "armorValue": 3,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "wand_mithril_tier2",
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "basic_attack",
+      "silence",
+      "shock",
+      "shout"
+    ],
+    "lootTable": [
+      {
+        "itemID": "mana_potion_minor",
+        "dropChance": 0.35,
+        "rarity": "common"
+      },
+      {
+        "itemID": "wand_steel_tier1",
+        "dropChance": 0.2,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "human",
+      "mercenary",
+      "arcane"
+    ],
+    "weaponTypes": [
+      "wand",
+      "scepter"
+    ]
+  },
+  {
+    "id": "coinkeeper_guard",
+    "name": "Coin-Keeper",
+    "description": "Vane's personal guard \u2014 paid better than the standard Guild staff, held to a tighter contract, and considerably harder to remove from a doorway.",
+    "stats": {
+      "conviction": 105,
+      "endurance": 120,
+      "ambition": 55,
+      "harmony": 40
+    },
+    "armorValue": 9,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "sword_mithril_tier2",
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "basic_attack",
+      "block",
+      "pierce",
+      "counter_strike"
+    ],
+    "lootTable": [
+      {
+        "itemID": "health_potion",
+        "dropChance": 0.3,
+        "rarity": "common"
+      },
+      {
+        "itemID": "chest_chain_hauberk_tier1",
+        "dropChance": 0.2,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "human",
+      "mercenary",
+      "soldier"
+    ],
+    "weaponTypes": [
+      "sword",
+      "mace"
     ]
   }
 ]

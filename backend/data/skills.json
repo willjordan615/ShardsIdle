@@ -12059,5 +12059,50 @@
     "tags": [
       "healing"
     ]
+  },
+  {
+    "id": "drain_reserves",
+    "name": "Drain Reserves",
+    "category": "CONTROL",
+    "description": "Siphons stamina and mana from a target, forcing a choice between offence and sustain.",
+    "basePower": 0.6,
+    "costType": "stamina",
+    "costAmount": 10,
+    "requiredLevel": 1,
+    "scalingFactors": {
+      "harmony": 0.5,
+      "conviction": 0.3
+    },
+    "baseHitChance": 0.85,
+    "critChance": 0.03,
+    "isStarterSkill": false,
+    "delay": 1800,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_debuff",
+        "targets": "single_enemy",
+        "scalesBy": "harmony",
+        "magnitude": 1.0,
+        "debuff": "mana_burn",
+        "duration": 3,
+        "chance": 0.85
+      },
+      {
+        "type": "apply_debuff",
+        "targets": "single_enemy",
+        "scalesBy": "harmony",
+        "magnitude": 0.7,
+        "debuff": "exhaustion",
+        "duration": 2,
+        "chance": 0.6
+      }
+    ],
+    "tags": [
+      "physical",
+      "control"
+    ]
   }
 ]
