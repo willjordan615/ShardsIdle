@@ -1538,13 +1538,15 @@ _applyLootTagFlavour(item, tagDef) {
           if (primaryDebuff && this._targetHasDebuff(targetCombatant, primaryDebuff)) score *= 0.55;
         }
 
-        // Buff redundancy + active buff penalty — covers UTILITY (e.g. Shadow Step) too
+        // Buff redundancy + active buff penalty — covers UTILITY (e.g. Shadow Step) too.
+        // Penalise re-casting a buff already active heavily. Penalise stacking multiple
+        // different buffs moderately — a character should use buffs, not chain them endlessly.
         if (cat === 'BUFF' || cat === 'DEFENSE' || cat === 'UTILITY') {
           const primaryBuff = skill.effects?.find(e => e.type === 'apply_buff')?.buff;
           if (primaryBuff && this._targetHasDebuff(actor, primaryBuff)) score *= 0.15;
           const activeBuffCount = (actor.statusEffects || []).filter(e => e.duration > 0).length;
-          if (activeBuffCount >= 1) score *= 0.4;
-          if (activeBuffCount >= 2) score *= 0.3;
+          if (activeBuffCount >= 1) score *= 0.6;
+          if (activeBuffCount >= 2) score *= 0.5;
         }
 
         // HP pressure — when the actor is hurting, threat removal trumps buffs/utility
