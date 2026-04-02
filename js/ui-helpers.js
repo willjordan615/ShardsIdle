@@ -298,13 +298,16 @@ function positionTooltip(tooltip, event, targetEl) {
 
     let _touchLongPressTimer = null;
 
+    function _attachTouchDismiss() {
+        document.addEventListener('touchstart', hide, { once: true, passive: true });
+    }
+
     document.addEventListener('touchstart', function(e) {
         const el = e.target.closest('[data-tooltip]');
         if (!el) return;
         _touchLongPressTimer = setTimeout(() => {
-            e.preventDefault();
             show(el.dataset.tooltip, null, el);
-            _tipTimeout = setTimeout(hide, 2500);
+            _attachTouchDismiss();
         }, 400);
     }, { passive: true });
 
