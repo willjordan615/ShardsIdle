@@ -3934,8 +3934,8 @@ body:has(#combatlog.active) #headerTopBar {
     width: 100%;
     opacity: 0.75;
     filter: saturate(0.7);
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 30%);
-    mask-image: linear-gradient(to right, transparent 0%, black 30%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.5) 25%, black 55%);
+    mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.5) 25%, black 55%);
 }
 
 .os-hero__avatar .avatar-card-bg img {
