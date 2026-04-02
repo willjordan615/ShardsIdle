@@ -284,17 +284,10 @@ async function _dismissOfflineSummary(resumeLoop) {
 
     if (!resumeLoop) return;
 
-    // Re-enter the loop: need a character and challenge in currentState.
-    // The summary screen was shown before renderRoster, so currentState may
-    // not be set yet. renderRoster sets detailCharacterId — use that.
-    const charId = window.currentState?.detailCharacterId;
+    const primaryChar = window._offlineSummaryPrimaryChar;
+    const charId = primaryChar?.id || primaryChar?.characterID;
     if (!charId) return;
 
-    // Find the challenge from the summary screen's stored data
-    const summaryInner = document.getElementById('offlineSummaryInner');
-    if (!summaryInner) return;
-
-    // Re-read challenge from the rendered name element — fallback to last known
     const challengeId = window._offlineSummaryChallengeId || window.currentState?.selectedChallenge?.id;
     if (!challengeId) return;
 
@@ -319,7 +312,7 @@ async function _viewCharacterFromSummary() {
         || (window._offlineSummaryPrimaryChar?.characterID);
     await renderRoster();
     if (charId && typeof showCharacterDetail === 'function') {
-        if (typeof showScreen === 'function') showScreen('characterDetail');
+        if (typeof showScreen === 'function') showScreen('detail');
         await showCharacterDetail(charId);
     } else {
         if (typeof showScreen === 'function') showScreen('roster');
