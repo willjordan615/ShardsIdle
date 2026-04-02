@@ -73,8 +73,7 @@ const IMAGES = {
 
     function _imgTag(file, label) {
         return `<img src="${AVATAR_PATH}${file}" alt="${label || ''}" draggable="false"
-            onerror="this.style.display='none';var s=this.nextElementSibling;if(s)s.style.display=''"
-            style="width:100%;height:100%;object-fit:cover;object-position:top center;display:block;">`;
+            onerror="this.style.display='none';var s=this.nextElementSibling;if(s)s.style.display=''">`;
     }
 
     function _svgFallbackInner(race) {
