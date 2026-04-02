@@ -191,6 +191,7 @@ function _renderOfflineSummary(summary, primaryChar) {
             </div>
 
             <div class="os-hero__avatar">
+                ${avatarHtml}
                 <div class="os-hero__avatar-glow" style="--avatar-color:${avatarColor};"></div>
             </div>
         </div>
@@ -254,37 +255,7 @@ function _renderOfflineSummary(summary, primaryChar) {
     `;
 
     // Animate bars after the DOM settles
-    requestAnimationFrame(() => {
-        // Inject portrait the same way character detail does —
-        // insertAdjacentHTML afterbegin so it sits behind content,
-        // then override inline styles so the image fills and animates.
-        if (avatarHtml) {
-            const heroEl = inner.querySelector('.os-hero');
-            if (heroEl) {
-                heroEl.insertAdjacentHTML('afterbegin', avatarHtml);
-                const bgEl = heroEl.querySelector('.avatar-card-bg');
-                const img  = bgEl?.querySelector('img');
-                if (bgEl) {
-                    bgEl.style.position = 'absolute';
-                    bgEl.style.inset    = '0';
-                    bgEl.style.width    = 'auto';
-                    bgEl.style.opacity  = '0.5';
-                    bgEl.style.filter   = 'saturate(0.7)';
-                }
-                if (img) {
-                    img.style.width          = '100%';
-                    img.style.height         = 'auto';
-                    img.style.objectFit      = 'unset';
-                    img.style.objectPosition = 'unset';
-                    img.style.position       = 'absolute';
-                    img.style.left           = '0';
-                    img.style.right          = '0';
-                    img.style.animation      = 'os-portrait-pan 14s ease-in-out infinite alternate';
-                }
-            }
-        }
-        _animateOfflineBars(inner, summary);
-    });
+    requestAnimationFrame(() => _animateOfflineBars(inner, summary));
 }
 
 function _statCard(label, value, valueColor) {
@@ -308,6 +279,10 @@ function _formatChallengeName(id) {
  * resumeLoop: if true, re-activates the idle loop on the same challenge.
  */
 async function _dismissOfflineSummary(resumeLoop) {
+    // Clear the summary content immediately so it can't bleed through
+    const inner = document.getElementById('offlineSummaryInner');
+    if (inner) inner.innerHTML = '';
+
     await renderRoster();
     if (typeof showScreen === 'function') showScreen('roster');
 
@@ -337,6 +312,9 @@ async function _dismissOfflineSummary(resumeLoop) {
 }
 
 async function _viewCharacterFromSummary() {
+    const inner = document.getElementById('offlineSummaryInner');
+    if (inner) inner.innerHTML = '';
+
     const charId = (window._offlineSummaryPrimaryChar?.id)
         || (window._offlineSummaryPrimaryChar?.characterID);
     await renderRoster();
