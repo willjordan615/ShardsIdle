@@ -3739,15 +3739,7 @@ body:has(#combatlog.active) #headerTopBar {
     filter: saturate(0.4);
 }
 .detail-char-header .avatar-card-bg img {
-    width: 100%;
-    height: auto;
-    object-fit: unset;
-    object-position: unset;
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    display: block;
+    display: none;
 }
 @keyframes detail-portrait-pan {
     from { transform: translateY(-20%); }

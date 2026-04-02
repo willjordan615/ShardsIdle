@@ -191,7 +191,6 @@ function _renderOfflineSummary(summary, primaryChar) {
             </div>
 
             <div class="os-hero__avatar">
-                ${avatarHtml}
                 <div class="os-hero__avatar-glow" style="--avatar-color:${avatarColor};"></div>
             </div>
         </div>
@@ -254,21 +253,35 @@ function _renderOfflineSummary(summary, primaryChar) {
         </div>
     `;
 
-    // Apply portrait styles after DOM settles — override _imgTag inline styles
-    // the same way character detail does.
+    // Animate bars after the DOM settles
     requestAnimationFrame(() => {
-        const avatarPanel = inner.querySelector('.os-hero__avatar');
-        const img = avatarPanel?.querySelector('img');
-        if (img) {
-            img.style.width          = '100%';
-            img.style.height         = 'auto';
-            img.style.objectFit      = 'unset';
-            img.style.objectPosition = 'unset';
-            img.style.position       = 'absolute';
-            img.style.left           = '0';
-            img.style.right          = '0';
-            img.style.top            = '0';
-            img.style.animation      = 'os-portrait-pan 14s ease-in-out infinite alternate';
+        // Inject portrait the same way character detail does —
+        // insertAdjacentHTML afterbegin so it sits behind content,
+        // then override inline styles so the image fills and animates.
+        if (avatarHtml) {
+            const heroEl = inner.querySelector('.os-hero');
+            if (heroEl) {
+                heroEl.insertAdjacentHTML('afterbegin', avatarHtml);
+                const bgEl = heroEl.querySelector('.avatar-card-bg');
+                const img  = bgEl?.querySelector('img');
+                if (bgEl) {
+                    bgEl.style.position = 'absolute';
+                    bgEl.style.inset    = '0';
+                    bgEl.style.width    = 'auto';
+                    bgEl.style.opacity  = '0.5';
+                    bgEl.style.filter   = 'saturate(0.7)';
+                }
+                if (img) {
+                    img.style.width          = '100%';
+                    img.style.height         = 'auto';
+                    img.style.objectFit      = 'unset';
+                    img.style.objectPosition = 'unset';
+                    img.style.position       = 'absolute';
+                    img.style.left           = '0';
+                    img.style.right          = '0';
+                    img.style.animation      = 'os-portrait-pan 14s ease-in-out infinite alternate';
+                }
+            }
         }
         _animateOfflineBars(inner, summary);
     });
