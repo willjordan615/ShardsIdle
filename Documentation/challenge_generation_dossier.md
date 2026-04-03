@@ -611,6 +611,13 @@ The following is `challenge_bastion_fractured_ward`. Note: narrative depth in lo
   "tags": ["martial", "arcane", "undead"]
 }
 ```
+Add to the dossier:
+
+skillSelectionCount: 2 rule with the note that bosses need at least one damage skill guaranteed. We've been trimming existing bosses to this standard — it should be explicit so it's applied on creation rather than corrected after.
+Additional valid skill IDs not in the original list but confirmed present in the codebase: chill, sleet, shock, water_bolt, undertow, tidal_grasp, mental_fog, sacred_roots, channel, silence, blood_letting, pierce, weak_point, thunderclap, venomous_slash, frenzy, berserker_rage, terror_cry, bloodlust, blood_fury, stone_skin, call_target, frost_nova, frozen_cry, shadow_tendril, drain_reserves, ice_pierce, nature_pierce, ward_break, faith_armor, tidal_grasp, forest_embrace, regrowth, nature_wrap, poison_cloud, shadow_bolt.
+Additional valid item IDs confirmed in the codebase that aren't in the dossier list — at minimum the weapon tiers actually present: axe_bronze_tier1, axe_flame_tier3, axe_adamant_tier3, polearm_steel_tier1, polearm_mithril_tier2, crossbow_wood_tier0, sword_iron_great_tier1, sword_gold_tier2, wand_steel_tier1 through wand_mithril_tier2, tome_steel_tier1 through tome_arcane_tier2, scepter_steel_tier1 through scepter_void_tier2, chest_chain_hauberk_tier1, chest_knight_plate_tier2, chest_warrior_plate_tier3, acc_cloak_hunter_tier1.
+The cross-challenge item cheatsheet — paste it directly into the dossier so it's available without a separate upload.
+Secret path guidance updated — one per tier as a default, but justified exceptions allowed when the revelation changes the meaning of the encounter rather than just the difficulty.
 
 ---
 

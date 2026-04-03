@@ -11687,5 +11687,2971 @@
       "arcane",
       "undead"
     ]
+  },
+  {
+    "id": "challenge_barricades_of_sorrow",
+    "name": "The Barricades of Sorrow",
+    "description": "Outside the sealed gates of the Human Capital, a refugee camp five years in the making has collapsed into something worse than poverty. The Royal Guard holds a perimeter it was never meant to hold. The Fraying seeps through despair like water through cloth. Captain Hrolf commands the barricades \u2014 not to protect the people inside them, but to keep the gates shut.",
+    "difficulty": 10,
+    "recommendedLevel": 38,
+    "minPartySize": 1,
+    "maxPartySize": 4,
+    "lore": [
+      {
+        "unlocksAfter": 1,
+        "text": "The camp formed within a week of Vane locking the Guildhall gates. The Guard's original orders were to maintain order at the Capital's perimeter. Captain Hrolf interpreted 'perimeter' to include the refugees. He has been interpreting it that way for five years."
+      },
+      {
+        "unlocksAfter": 5,
+        "text": "The Fraying manifestations in the camp are not invaders. They grew from inside it. Sustained collective grief \u2014 the particular kind that comes from being abandoned within sight of shelter \u2014 generates the same residue as a broken oath. The camp has been generating it for five years."
+      },
+      {
+        "unlocksAfter": 15,
+        "text": "Hrolf's orders have not been updated since the dissolution. He receives no dispatches from inside the Capital. He has sent seventeen reports requesting updated orders. None were acknowledged. He continues because the last instruction he received was to hold the perimeter, and he has not been told to stop."
+      },
+      {
+        "unlocksAfter": 1,
+        "requiresSecret": true,
+        "text": "Hrolf knows the gates could open. He has the authority to request it. He has not, because he believes opening the gates will collapse the barricades entirely \u2014 not structurally, but socially. The camp's order depends on the gates being something to fight toward, not something that simply opens. He is keeping the hope functional by keeping it deferred. He has not examined whether this is mercy or control."
+      }
+    ],
+    "stages": [
+      {
+        "stageId": 1,
+        "title": "The Outer Tents",
+        "description": "The camp's perimeter is a tangle of scrap-metal fencing and mud-weighted canvas. Civilians patrol it with tools repurposed into weapons. The Gatekeepers move behind them, timing shouts to push the civilians into reckless charges.",
+        "enemies": [
+          {
+            "enemyTypeID": "barricade_starving_civilian",
+            "countRange": [
+              3,
+              5
+            ],
+            "level": 36
+          },
+          {
+            "enemyTypeID": "barricade_gatekeeper",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 38
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "barricades_verdant_word_passage",
+            "name": "Verdant Word Authority",
+            "spawnChance": 0.7,
+            "checkType": "item",
+            "requiredItemID": "verdant_word_seal",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "barricade_gatekeeper",
+              "count": 1,
+              "narrative": "The Verdant Word seal carries enough residual authority that the nearest Gatekeeper hesitates. They were civilians before the dissolution; they remember what the Order meant. One steps back and waves you through the outer line without looking at you. The others don't move, but the formation has a gap in it now."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You have no credential the camp recognizes."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The perimeter does not open for strangers."
+            }
+          },
+          {
+            "id": "barricades_harmony_appeal",
+            "name": "Appeal to the Desperate",
+            "spawnChance": 0.6,
+            "checkType": "stat",
+            "checkStat": "harmony",
+            "difficultyThreshold": 85,
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "barricade_starving_civilian",
+              "count": 2,
+              "narrative": "You don't argue or threaten. You sit down in the mud and wait. Two of the civilians come close enough to talk. By the time the Gatekeepers notice, the conversation has already happened \u2014 they lower their weapons and drift back into the camp. They are not your allies. They are simply no longer your enemies."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You try to speak with them, but your words land wrong. They've heard too many promises. They don't attack \u2014 they simply stop listening, and the Gatekeepers move forward to fill the gap."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "There's no reaching them from outside. The camp has been closed too long."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion",
+            "dropChance": 0.5,
+            "rarity": "common"
+          },
+          {
+            "itemID": "stamina_potion",
+            "dropChance": 0.4,
+            "rarity": "common"
+          },
+          {
+            "itemID": "styptic_powder",
+            "dropChance": 0.35,
+            "rarity": "common"
+          },
+          {
+            "itemID": "axe_adamant_tier3",
+            "dropChance": 0.2,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "chest_warrior_plate_tier3",
+            "dropChance": 0.15,
+            "rarity": "uncommon"
+          }
+        ]
+      },
+      {
+        "stageId": 2,
+        "title": "The Command Zone",
+        "description": "The inner camp is quieter than the outer perimeter \u2014 not peaceful, but exhausted. Rogue Guards move through it with the muscle memory of soldiers who have forgotten what they're guarding. The Fraying manifestations have taken root in the spaces between tents, and they do not fight alone \u2014 the Guards call targets and the manifestations drain them.",
+        "enemies": [
+          {
+            "enemyTypeID": "barricade_rogue_guard",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 40
+          },
+          {
+            "enemyTypeID": "barricade_fraying_manifestation",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 39
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "barricades_guild_seal_recognition",
+            "name": "Guild Seal \u2014 Chain of Blame",
+            "spawnChance": 0.65,
+            "checkType": "item",
+            "requiredItemID": "guild_seal",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "barricade_rogue_guard",
+              "count": 1,
+              "narrative": "You show the Guild Seal to the nearest Rogue Guard. He stares at it for a long moment, then at the camp around him. He was a soldier before he was a deserter, and deserters remember who gave the orders that made them one. He turns and walks away from the line. His absence creates a gap the others don't fill."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "Without proof of who is responsible, the Guards have no reason to stand down. They've been holding this line too long to question it now."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Guards don't respond to credentials. They respond to orders, and you don't have those either."
+            }
+          },
+          {
+            "id": "barricades_shadow_cleanse",
+            "name": "Purge the Manifestations",
+            "spawnChance": 0.75,
+            "checkType": "skill",
+            "requiredSkillTag": "holy",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "barricade_fraying_manifestation",
+              "count": 1,
+              "narrative": "Holy magic doesn't destroy manifestations \u2014 it gives the grief somewhere to go. One collapses into a brief sound like a long-held breath finally released, and the ambient pressure in the command zone drops noticeably. The remaining manifestations become wary. They are used to things that cannot touch them."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You have no skill that can reach them where they anchor."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The manifestations don't respond to force. They respond to resolution. You don't have any to offer yet."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion",
+            "dropChance": 0.45,
+            "rarity": "common"
+          },
+          {
+            "itemID": "styptic_powder",
+            "dropChance": 0.4,
+            "rarity": "common"
+          },
+          {
+            "itemID": "stamina_ration",
+            "dropChance": 0.3,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "verdant_word_seal",
+            "dropChance": 0.2,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "polearm_sentinel_tier4",
+            "dropChance": 0.2,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "chest_void_plate_tier4",
+            "dropChance": 0.15,
+            "rarity": "rare"
+          }
+        ]
+      },
+      {
+        "stageId": 3,
+        "title": "The Gatehouse",
+        "description": "Captain Hrolf stands at the sealed gate with two Guards flanking him. He opens with a warcry that pushes his Guards into motion, then turns drain_reserves on whoever looks most dangerous. He is not trying to kill you. He is trying to outlast you \u2014 the same strategy he has applied to this post for five years.",
+        "enemies": [
+          {
+            "enemyTypeID": "barricade_rogue_guard",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 41
+          },
+          {
+            "enemyTypeID": "captain_hrolf",
+            "countRange": [
+              1,
+              1
+            ],
+            "level": 45
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "barricades_hrolf_confrontation",
+            "name": "Present the Evidence",
+            "spawnChance": 0.85,
+            "checkType": "item_and_stat",
+            "requiredItemID": "vulture_company_ledger",
+            "checkStat": "conviction",
+            "difficultyThreshold": 90,
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "barricade_rogue_guard",
+              "count": 2,
+              "narrative": "You lay the Vulture Company Ledger on the ground between you and Hrolf. You don't explain it. You wait. He reads it standing, without moving. When he looks up, he doesn't look at you \u2014 he looks at the gate. He says something to the Guards that you don't catch. They leave without argument. He doesn't move from the gate. But the fight, when it comes, will be between the two of you."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You have the ledger, but Hrolf has been holding this post too long to be moved by evidence alone. He looks at it, closes it, and sets it aside. The Guards stay where they are."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "Hrolf does not negotiate with people who arrive empty-handed. He has been waiting for someone with the authority to relieve him. You are not that person."
+            }
+          },
+          {
+            "id": "barricades_hrolf_ambition_press",
+            "name": "Force the Question",
+            "spawnChance": 0.5,
+            "checkType": "stat",
+            "checkStat": "ambition",
+            "difficultyThreshold": 95,
+            "successEffect": {
+              "type": "apply_buff",
+              "narrative": "You ask Hrolf when he last received orders from inside the Capital. The silence that follows is its own answer. You don't press further \u2014 you don't need to. He's already lost the argument with himself. He fights you because he has to, not because he believes he should. It won't change the outcome, but it will change how hard he fights."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You try to push him on his orders but he shuts the line of questioning down before you finish. He's had this conversation with himself before and he knows how to end it."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "Hrolf doesn't invite the question."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion_major",
+            "dropChance": 0.5,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "stamina_ration",
+            "dropChance": 0.45,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "axe_celestial_tier4",
+            "dropChance": 0.25,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "chest_void_plate_tier4",
+            "dropChance": 0.2,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "acc_ring_power_tier4",
+            "dropChance": 0.2,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "hrolf_standing_orders",
+            "dropChance": 0.5,
+            "rarity": "rare"
+          }
+        ]
+      }
+    ],
+    "rewards": {
+      "baseXP": 22000,
+      "baseGold": 250,
+      "lootTable": [
+        {
+          "itemID": "chest_void_plate_tier4",
+          "dropChance": 0.45,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "axe_celestial_tier4",
+          "dropChance": 0.35,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "acc_amulet_bear_tier4",
+          "dropChance": 0.3,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "hrolf_standing_orders",
+          "dropChance": 0.4,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "polearm_wind_tier5",
+          "dropChance": 0.15,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "greatsword_void_tier4",
+          "dropChance": 0.2,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "health_potion_major",
+          "dropChance": 0.6,
+          "rarity": "uncommon"
+        }
+      ]
+    },
+    "tags": [
+      "martial",
+      "corrupted",
+      "mercenary"
+    ]
+  },
+  {
+    "id": "challenge_chamber_of_petitioners",
+    "name": "The Chamber of Petitioners",
+    "description": "Beneath the Deep Throne of Khaz-Morad, both Ironvein Loyalists and Goldcrown Usurpers have been petitioning the Ancestral Throne for four years. The Throne has not answered. Its automated defenses have, however, and they do not distinguish between factions. The constructs view all living petitioners as desecrators. The dwarves who survived long enough have started to agree with them.",
+    "difficulty": 10,
+    "recommendedLevel": 38,
+    "minPartySize": 1,
+    "maxPartySize": 4,
+    "lore": [
+      {
+        "unlocksAfter": 1,
+        "text": "The chamber was built to receive petitions from dwarven clans in times of succession dispute. The Throne would hear both claims and render a verdict through the Forge-Kings' rune network. It has not rendered a verdict in four years. The constructs interpret continued silence as a standing order to purge."
+      },
+      {
+        "unlocksAfter": 5,
+        "text": "The Rune-Smiths did not join the constructs out of loyalty. They joined because the constructs do not attack what they recognize as part of the chamber's function. A Rune-Smith at work looks, to the construct rune network, like maintenance personnel. They have been maintaining the same section of wall for four years."
+      },
+      {
+        "unlocksAfter": 15,
+        "text": "The Ironvein Breakers were not driven mad by the chamber's influence. They were driven mad by certainty. They know the ancestors rejected the Goldcrown claim. They believe this means the Ironvein claim is valid. The constructs attacking them have not shaken this belief. Nothing has."
+      },
+      {
+        "unlocksAfter": 1,
+        "requiresSecret": true,
+        "text": "The Throne has not been silent. It rendered its verdict on the first day of petitions. The verdict is carved into the dais the Awakened Foreman stands on. Both claims are rejected. The Foreman has been standing on the verdict for four years, preventing anyone from reading it. He is not malfunctioning. He is following his last instruction: do not allow the verdict to cause a war."
+      }
+    ],
+    "stages": [
+      {
+        "stageId": 1,
+        "title": "The Outer Corridors",
+        "description": "The rune-lit passages leading to the Petition Hall are swept clean by Scraper Drones that do not stop moving. Stone Wardens hold the intersections, rotating through block-and-advance cycles they have been running for four years without pause or variation.",
+        "enemies": [
+          {
+            "enemyTypeID": "chamber_scraper_drone",
+            "countRange": [
+              3,
+              5
+            ],
+            "level": 36
+          },
+          {
+            "enemyTypeID": "chamber_stone_warden",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 38
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "chamber_loyalist_passage",
+            "name": "Ironvein Authorization",
+            "spawnChance": 0.7,
+            "checkType": "item",
+            "requiredItemID": "loyalist_seal",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "chamber_stone_warden",
+              "count": 1,
+              "narrative": "The loyalist seal carries an Ironvein authorization frequency the rune network still recognizes as a valid petition credential. One Stone Warden steps aside and resumes its patrol route, reclassifying you as non-hostile. The Scraper Drones continue their sweeping. They do not have an authorization protocol \u2014 only a threat threshold."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You have no credential the rune network accepts."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The constructs do not recognize you as a petitioner. They recognize you as an obstruction."
+            }
+          },
+          {
+            "id": "chamber_arcane_attunement",
+            "name": "Rune Attunement",
+            "spawnChance": 0.6,
+            "checkType": "skill",
+            "requiredSkillTag": "arcane",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "chamber_scraper_drone",
+              "count": 2,
+              "narrative": "The rune network responds to arcane resonance. You match the frequency of the nearest drone cluster long enough to walk through their patrol sweep without triggering the threat threshold. Two drones continue past you as if you are part of the wall. The effect won't last \u2014 they will recalibrate \u2014 but it buys you the corridor."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "Your attunement is close but not precise enough. The drones register the attempt as a disruption and tighten their sweep pattern."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "Without arcane attunement, there is no frequency to match. The drones sweep you into the threat category without hesitation."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion",
+            "dropChance": 0.5,
+            "rarity": "common"
+          },
+          {
+            "itemID": "stamina_potion",
+            "dropChance": 0.4,
+            "rarity": "common"
+          },
+          {
+            "itemID": "hammer_adamant_tier3",
+            "dropChance": 0.25,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "shield_adamant_tier3",
+            "dropChance": 0.2,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "head_adamant_helm_tier3",
+            "dropChance": 0.15,
+            "rarity": "uncommon"
+          }
+        ]
+      },
+      {
+        "stageId": 2,
+        "title": "The Petition Hall",
+        "description": "The main hall smells of ozone and old stone. Rune-Smiths work the walls in careful, repetitive strokes that keep them inside the constructs' maintenance classification. Ironvein Breakers patrol the far end \u2014 soldiers who have been certain of their rightness for so long it has curdled into something the constructs can use.",
+        "enemies": [
+          {
+            "enemyTypeID": "chamber_rune_smith",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 39
+          },
+          {
+            "enemyTypeID": "chamber_ironvein_breaker",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 40
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "chamber_field_orders_pass",
+            "name": "Sealed Route Authority",
+            "spawnChance": 0.65,
+            "checkType": "item",
+            "requiredItemID": "ironvein_field_orders",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "chamber_ironvein_breaker",
+              "count": 1,
+              "narrative": "The field orders carry Thrain's countersignature \u2014 recognized authority for movement through Ironvein-controlled territory. One Breaker reads them, then reads them again. He doesn't lower his weapon, but he steps away from the formation. His certainty has developed a crack. The others haven't noticed yet."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "Without Ironvein authority, the Breakers treat you as another Goldcrown agent. Their certainty extends to cover every unknown."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Breakers do not negotiate. They have been right for four years and they are not stopping now."
+            }
+          },
+          {
+            "id": "chamber_conviction_challenge",
+            "name": "Hold the Line",
+            "spawnChance": 0.55,
+            "checkType": "stat",
+            "checkStat": "conviction",
+            "difficultyThreshold": 88,
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "chamber_rune_smith",
+              "count": 1,
+              "narrative": "You step into the path of the nearest Rune-Smith and hold your ground without striking. It takes considerable will to stand still while they recalibrate. But a moving target registers as hostile. A stationary one that doesn't flinch registers as structural. One Rune-Smith classifies you as non-threat and returns to the wall."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You manage to hold for a moment, but not long enough. The Rune-Smith registers your tension as a threat signature before it can reclassify you."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "You cannot hold still enough. The Rune-Smiths sweep you into the engagement queue."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion",
+            "dropChance": 0.45,
+            "rarity": "common"
+          },
+          {
+            "itemID": "mana_potion",
+            "dropChance": 0.35,
+            "rarity": "common"
+          },
+          {
+            "itemID": "hammer_flame_tier3",
+            "dropChance": 0.25,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "acc_ring_gold_tier3",
+            "dropChance": 0.2,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "maul_adamant_tier3",
+            "dropChance": 0.2,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "greataxe_frost_tier4",
+            "dropChance": 0.15,
+            "rarity": "rare"
+          }
+        ]
+      },
+      {
+        "stageId": 3,
+        "title": "The Deep Throne Chamber",
+        "description": "The Awakened Foreman stands on the central dais, facing the entrance. He has been in this position for four years. His rune-network is fully active: he opens with earthquake to stun the entire party, follows with stone_fist on anything still upright, and cycles stone_skin when his armor drops below threshold. Scraper Drones will enter from the corridors if the fight extends past his patience.",
+        "enemies": [
+          {
+            "enemyTypeID": "chamber_scraper_drone",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 40
+          },
+          {
+            "enemyTypeID": "forge_awakened_foreman",
+            "countRange": [
+              1,
+              1
+            ],
+            "level": 45
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "chamber_throne_address",
+            "name": "Address the Throne Directly",
+            "spawnChance": 0.8,
+            "checkType": "item_and_stat",
+            "requiredItemID": "oath_stone",
+            "checkStat": "harmony",
+            "difficultyThreshold": 90,
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "chamber_scraper_drone",
+              "count": 2,
+              "narrative": "The Oath Stone resonates with the chamber's pact-rune frequency \u2014 the same magic that originally bound the Forge-Kings' spirits to the constructs. When you raise it and speak directly to the Throne, the Scraper Drones halt mid-sweep. They do not leave. But they are no longer in attack posture. The Foreman does not move from the dais. He is listening."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You have the stone but your harmony with the chamber's frequency is insufficient. The Foreman registers the attempt as a manipulation rather than a petition. The Drones resume their sweep."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "Without the pact-rune anchor, the Throne cannot distinguish your address from any other intrusion. The Foreman does not acknowledge you."
+            }
+          },
+          {
+            "id": "chamber_foreman_conviction_demand",
+            "name": "Demand an Accounting",
+            "spawnChance": 0.5,
+            "checkType": "stat",
+            "checkStat": "conviction",
+            "difficultyThreshold": 95,
+            "successEffect": {
+              "type": "apply_buff",
+              "narrative": "You walk to the dais and demand the Foreman explain what verdict he is standing on. He does not answer, but he shifts his weight \u2014 the first time in four years. Something in his rune-matrix registers the question as legitimate. He will still fight you. But the earthquake opener is delayed. He needs to recheck his authorization before he uses it."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "The Foreman does not register the demand as legitimate. He begins his rotation."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Foreman does not respond to anything that is not a valid petition. You are not a valid petitioner."
+            }
+          }
+        ],
+        "stageBranches": [
+          {
+            "condition": {
+              "type": "has_item",
+              "value": "ironvein_field_orders"
+            },
+            "nextStageId": 99,
+            "overrideDescription": "The field orders contain a routing code that accesses the Throne's maintenance passage \u2014 a secondary corridor the Forge-Kings used to update the verdict stone without opening the main chamber. The Foreman's rune-matrix recognizes the code and holds his earthquake as you move toward the side passage.",
+            "chance": 0.25
+          },
+          {
+            "condition": null,
+            "nextStageId": null
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion_major",
+            "dropChance": 0.55,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "mana_potion_major",
+            "dropChance": 0.4,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "hammer_celestial_tier4",
+            "dropChance": 0.25,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "maul_earth_tier4",
+            "dropChance": 0.2,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "acc_belt_gold_tier4",
+            "dropChance": 0.2,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "head_void_helm_tier4",
+            "dropChance": 0.15,
+            "rarity": "rare"
+          }
+        ]
+      },
+      {
+        "stageId": 99,
+        "title": "The Verdict Stone",
+        "secretPath": true,
+        "description": "The maintenance passage leads to the underside of the dais. The verdict is carved in full Forge-King rune script. Both claims are rejected. A third claimant is named. The name has been worn smooth by the Foreman's weight over four years \u2014 only the sigil remains.",
+        "enemies": [
+          {
+            "enemyTypeID": "chamber_stone_warden",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 42
+          }
+        ],
+        "preCombatOpportunities": [],
+        "lootTable": [
+          {
+            "itemID": "petitioners_verdict",
+            "dropChance": 1.0,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "hammer_void_tier5",
+            "dropChance": 0.3,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "shield_celestial_tier4",
+            "dropChance": 0.45,
+            "rarity": "rare"
+          }
+        ]
+      }
+    ],
+    "rewards": {
+      "baseXP": 22000,
+      "baseGold": 250,
+      "lootTable": [
+        {
+          "itemID": "hammer_celestial_tier4",
+          "dropChance": 0.45,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "maul_earth_tier4",
+          "dropChance": 0.35,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "greataxe_frost_tier4",
+          "dropChance": 0.3,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "acc_amulet_bear_tier4",
+          "dropChance": 0.3,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "head_void_helm_tier4",
+          "dropChance": 0.25,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "hammer_void_tier5",
+          "dropChance": 0.15,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "health_potion_major",
+          "dropChance": 0.6,
+          "rarity": "uncommon"
+        }
+      ],
+      "secretLootTable": [
+        {
+          "itemID": "petitioners_verdict",
+          "dropChance": 1.0,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "hammer_void_tier5",
+          "dropChance": 0.5,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "shield_celestial_tier4",
+          "dropChance": 0.6,
+          "rarity": "rare"
+        }
+      ]
+    },
+    "tags": [
+      "dwarven",
+      "arcane",
+      "mountain"
+    ]
+  },
+  {
+    "id": "challenge_field_shattered_vows",
+    "name": "The Field of Shattered Vows",
+    "description": "Three hundred years of broken oaths have saturated this plain. Fifty years ago the High Council died here, and the Fraying has been feeding on the residue ever since. The Architect's acolytes tend the field now \u2014 not because they chose entropy, but because they are what the field made of them. The corruption runs deep enough that it has its own priesthood.",
+    "difficulty": 10,
+    "recommendedLevel": 38,
+    "minPartySize": 1,
+    "maxPartySize": 4,
+    "lore": [
+      {
+        "unlocksAfter": 1,
+        "text": "The first binding attempt was three hundred years ago on this plain. It failed because the Water Spirit was not asked \u2014 it was instructed. The Verdant Word did not consider this a meaningful distinction at the time. The field has been recording the disagreement ever since."
+      },
+      {
+        "unlocksAfter": 5,
+        "text": "The Oath Breakers are not the people who broke the oaths. They are the oaths themselves \u2014 what a promise becomes when it is abandoned without acknowledgment. They are not angry. They are simply incomplete, and incompleteness has made them dangerous."
+      },
+      {
+        "unlocksAfter": 15,
+        "text": "The High Acolyte was a Verdant Word junior priest who survived the coup by hiding. He spent fifty years trying to complete the original binding ritual alone, without authority or sanction. The Fraying took him somewhere between the forty-seventh and forty-eighth attempt. He is still trying. The ritual he is performing now would unmake the Spire."
+      },
+      {
+        "unlocksAfter": 1,
+        "requiresSecret": true,
+        "text": "The sigil the High Acolyte carries is not the Architect's. It is the Verdant Word's original binding glyph, inverted. The Architect did not corrupt him \u2014 the corruption was already present in the ritual's design. Every attempt to bind without consent carries the same flaw. The Architect simply found a priest still trying hard enough to be useful."
+      }
+    ],
+    "stages": [
+      {
+        "stageId": 1,
+        "title": "The Blackened Approach",
+        "description": "The field's edge is patrolled by Oath Breakers \u2014 slow, purposeless drifters that become dangerous when Shadow Weavers push them into coordinated sweeps. The Weavers use shadow_bolt to apply shadowed from range while the Oath Breakers close under cover of the debuff.",
+        "enemies": [
+          {
+            "enemyTypeID": "field_oath_breaker",
+            "countRange": [
+              3,
+              5
+            ],
+            "level": 36
+          },
+          {
+            "enemyTypeID": "field_shadow_weaver",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 38
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "field_verdant_seal_approach",
+            "name": "Verdant Word Authority",
+            "spawnChance": 0.7,
+            "checkType": "item",
+            "requiredItemID": "verdant_word_seal",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "field_oath_breaker",
+              "count": 2,
+              "narrative": "The Verdant Word seal resonates with the field's original binding frequency. Two Oath Breakers halt mid-drift, drawn toward the seal's signal. They are not pacified \u2014 they are distracted, pulled toward the echo of the promise that made them. They drift away from the approach and do not return."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You have no credential the field recognizes."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Oath Breakers do not respond to anything that isn't the promise that made them. You don't have it."
+            }
+          },
+          {
+            "id": "field_harmony_resistance",
+            "name": "Resist the Fraying",
+            "spawnChance": 0.6,
+            "checkType": "stat",
+            "checkStat": "harmony",
+            "difficultyThreshold": 85,
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "field_shadow_weaver",
+              "count": 1,
+              "narrative": "The Weavers probe for dissonance before they commit \u2014 a party in harmony registers as a harder target than one already fraying. One Weaver peels away from the approach, redirecting toward easier ground. The others hold position, but they have noted the resistance."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "The Weavers sense the dissonance in your party and advance. You are exactly what they are looking for."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The field's pressure is too concentrated here. Harmony alone cannot hold against it."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion",
+            "dropChance": 0.5,
+            "rarity": "common"
+          },
+          {
+            "itemID": "mana_potion",
+            "dropChance": 0.45,
+            "rarity": "common"
+          },
+          {
+            "itemID": "verdant_word_seal",
+            "dropChance": 0.3,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "staff_void_tier3",
+            "dropChance": 0.2,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "chest_shadow_shroud_tier3",
+            "dropChance": 0.15,
+            "rarity": "uncommon"
+          }
+        ]
+      },
+      {
+        "stageId": 2,
+        "title": "The Field Interior",
+        "description": "The field's core is where the Fraying pressure concentrates. Fraying Wraiths move in erratic arcs, using entropic_decay and void_rend to layer shadowed and weaken simultaneously. A second Shadow Weaver formation maintains the ambient pressure from range.",
+        "enemies": [
+          {
+            "enemyTypeID": "field_fraying_wraith",
+            "countRange": [
+              2,
+              4
+            ],
+            "level": 39
+          },
+          {
+            "enemyTypeID": "field_shadow_weaver",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 40
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "field_fire_skill_purge",
+            "name": "Burn the Shadow",
+            "spawnChance": 0.75,
+            "checkType": "skill",
+            "requiredSkillTag": "fire",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "field_fraying_wraith",
+              "count": 1,
+              "narrative": "Fire magic does not just damage the Wraiths \u2014 it severs their anchor to the field's residue. One Wraith unravels before it can engage, the entropy holding it together dispersed by the heat. The remaining Wraiths widen their arcs. They have registered the fire signature and are adjusting their approach."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You have no fire skill to cut through the shadow. The Wraiths' anchors hold."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Wraiths are fully anchored in the field's residue. Without fire, you cannot dislodge them before they close."
+            }
+          },
+          {
+            "id": "field_ambition_navigation",
+            "name": "Read the Field",
+            "spawnChance": 0.55,
+            "checkType": "stat",
+            "checkStat": "ambition",
+            "difficultyThreshold": 90,
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "field_shadow_weaver",
+              "count": 1,
+              "narrative": "The Weavers maintain their position relative to the Wraiths \u2014 always behind the front line. You identify the gap in their formation and move through it before they can reposition. One Weaver is cut off from the formation and retreats rather than engage alone."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "The formation closes before you find the gap. The Weavers have been working this field long enough to read movement intent."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Weavers hold their position with the patience of something that has nowhere else to be."
+            }
+          }
+        ],
+        "stageBranches": [
+          {
+            "condition": {
+              "type": "has_item",
+              "value": "verdant_word_seal"
+            },
+            "nextStageId": 99,
+            "overrideDescription": "The seal pulses as you reach the field's center \u2014 it is resonating with the original binding glyph the High Acolyte still carries. The field's pressure drops for a moment, long enough to see the ritual site beneath the surface shadow. A path opens toward the source.",
+            "chance": 0.3
+          },
+          {
+            "condition": null,
+            "nextStageId": null
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion",
+            "dropChance": 0.45,
+            "rarity": "common"
+          },
+          {
+            "itemID": "mana_potion",
+            "dropChance": 0.5,
+            "rarity": "common"
+          },
+          {
+            "itemID": "verdant_word_seal",
+            "dropChance": 0.25,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "staff_harmony_tier3",
+            "dropChance": 0.2,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "tome_adamant_tier3",
+            "dropChance": 0.2,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "staff_shadow_tier4",
+            "dropChance": 0.15,
+            "rarity": "rare"
+          }
+        ]
+      },
+      {
+        "stageId": 3,
+        "title": "The Ritual Core",
+        "description": "The High Acolyte stands at the field's anchor point, mid-ritual. His pool: entropic_decay and smothering_darkness deal damage while layering shadowed and silence; drain_reserves punishes mana-heavy parties; shout extends his Oath Breaker screen's damage window. Three damage skills in six \u2014 he will hit.",
+        "enemies": [
+          {
+            "enemyTypeID": "field_oath_breaker",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 41
+          },
+          {
+            "enemyTypeID": "field_high_acolyte",
+            "countRange": [
+              1,
+              1
+            ],
+            "level": 45
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "field_acolyte_seal_interrupt",
+            "name": "Interrupt the Ritual",
+            "spawnChance": 0.8,
+            "checkType": "item_and_stat",
+            "requiredItemID": "verdant_word_seal",
+            "checkStat": "conviction",
+            "difficultyThreshold": 90,
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "field_oath_breaker",
+              "count": 2,
+              "narrative": "The Verdant Word seal disrupts the ritual's binding frequency when you thrust it toward the anchor point. The Oath Breakers maintaining the ritual perimeter dissolve \u2014 without the High Acolyte's active concentration holding them, they unravel. He turns from the ritual to face you. The ritual resumes behind him on its own, but slower."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You have the seal but cannot force it into the ritual's frequency against the Acolyte's will. The Oath Breakers hold their positions."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "Without the seal, you cannot touch the ritual's binding layer. The Acolyte does not acknowledge your approach until you are already in range."
+            }
+          },
+          {
+            "id": "field_acolyte_harmony_address",
+            "name": "Name the Original Oath",
+            "spawnChance": 0.5,
+            "checkType": "stat",
+            "checkStat": "harmony",
+            "difficultyThreshold": 95,
+            "successEffect": {
+              "type": "apply_buff",
+              "narrative": "You name the original water spirit pact \u2014 the one the Verdant Word broke three hundred years ago on this plain. The Acolyte stops. He knows the name. For a moment his ritual loses coherence, the inverted glyph flickering. He recovers, but the disruption was real. His first action will be spent re-anchoring rather than attacking."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You do not know enough of the original oath to name it correctly. The Acolyte continues his ritual without acknowledging the attempt."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Acolyte is too far into the ritual to respond to anything short of the original oath's name."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion_major",
+            "dropChance": 0.55,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "mana_potion_major",
+            "dropChance": 0.5,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "staff_shadow_tier4",
+            "dropChance": 0.25,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "tome_celestial_tier4",
+            "dropChance": 0.2,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "acc_amulet_heart_tier3",
+            "dropChance": 0.25,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "acc_ring_power_tier4",
+            "dropChance": 0.2,
+            "rarity": "rare"
+          }
+        ]
+      },
+      {
+        "stageId": 99,
+        "title": "The Binding Site",
+        "secretPath": true,
+        "description": "The original ritual site from three hundred years ago lies beneath the surface shadow. The binding glyph is still carved into the stone \u2014 intact, inverted, and active. The High Acolyte meets you here rather than at the anchor point. He is not surprised. He has been waiting for someone who would follow the seal's resonance this far.",
+        "enemies": [
+          {
+            "enemyTypeID": "field_fraying_wraith",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 42
+          },
+          {
+            "enemyTypeID": "field_high_acolyte",
+            "countRange": [
+              1,
+              1
+            ],
+            "level": 45
+          }
+        ],
+        "preCombatOpportunities": [],
+        "lootTable": [
+          {
+            "itemID": "sigil_fragment",
+            "dropChance": 1.0,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "staff_barrier_tier4",
+            "dropChance": 0.4,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "chest_celestial_robe_tier4",
+            "dropChance": 0.35,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "scepter_void_tier5",
+            "dropChance": 0.2,
+            "rarity": "legendary"
+          }
+        ]
+      }
+    ],
+    "rewards": {
+      "baseXP": 22000,
+      "baseGold": 250,
+      "lootTable": [
+        {
+          "itemID": "staff_shadow_tier4",
+          "dropChance": 0.45,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "tome_celestial_tier4",
+          "dropChance": 0.35,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "scepter_celestial_tier4",
+          "dropChance": 0.3,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "chest_celestial_robe_tier4",
+          "dropChance": 0.3,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "acc_amulet_soul_tier5",
+          "dropChance": 0.15,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "scepter_void_tier5",
+          "dropChance": 0.15,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "mana_potion_major",
+          "dropChance": 0.6,
+          "rarity": "uncommon"
+        }
+      ],
+      "secretLootTable": [
+        {
+          "itemID": "sigil_fragment",
+          "dropChance": 1.0,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "scepter_void_tier5",
+          "dropChance": 0.5,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "staff_barrier_tier4",
+          "dropChance": 0.6,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "chest_celestial_robe_tier4",
+          "dropChance": 0.5,
+          "rarity": "rare"
+        }
+      ]
+    },
+    "tags": [
+      "shadow",
+      "corrupted",
+      "sacred"
+    ]
+  },
+  {
+    "id": "challenge_coronation_of_stone",
+    "name": "The Coronation of Stone",
+    "description": "The Third Heir is being crowned in the Deep Throne chamber while both dwarven factions fight to stop it. The Ancestral Constructs have awakened to protect the ritual, and they do not distinguish between Ironvein soldiers, Goldcrown interceptors, and whoever you are. The coronation will complete with or without survivors.",
+    "difficulty": 11,
+    "recommendedLevel": 43,
+    "minPartySize": 1,
+    "maxPartySize": 4,
+    "lore": [
+      {
+        "unlocksAfter": 1,
+        "text": "The Third Heir did not want the throne. The ancestors named them because no one had contested it \u2014 the Ironvein and Goldcrown claims cancelled each other, and in the silence the Forge-Kings found the one lineage neither faction had thought to eliminate. The Heir was informed three days ago. The coronation began two days ago."
+      },
+      {
+        "unlocksAfter": 5,
+        "text": "The Ironvein and Goldcrown forces entered the chamber separately and began fighting each other on sight. They stopped when the Constructs activated. They did not form an alliance \u2014 they simply found a more immediate problem. They are still trying to kill each other between engagements."
+      },
+      {
+        "unlocksAfter": 15,
+        "text": "The High Justicar is not the same construct as the Awakened Foreman. The Foreman oversaw the petition process. The Justicar oversees succession itself \u2014 a function the Forge-Kings built into the chamber's foundation and hoped would never be needed. It has been dormant for four hundred years. The coronation reactivated it."
+      },
+      {
+        "unlocksAfter": 1,
+        "requiresSecret": true,
+        "text": "The Third Heir's name is not recorded anywhere the factions could find it. The Petitioners' Verdict names only a sigil \u2014 one that matches a lineage that both claimants agreed, four years ago, had died out. It had not. The Heir has been a smith's apprentice in the lower districts for thirty years, unaware of their own claim. The Justicar recognized them on sight."
+      }
+    ],
+    "stages": [
+      {
+        "stageId": 1,
+        "title": "The Outer Corridors",
+        "description": "Ironvein conscripts and Goldcrown interceptors are fighting each other in the outer corridors when the party arrives. Both factions immediately redirect. The Constructs have driven them into the same passage and they have not yet realized they are more dangerous together than apart.",
+        "enemies": [
+          {
+            "enemyTypeID": "ironvein_conscript",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 42
+          },
+          {
+            "enemyTypeID": "goldcrown_interceptor_elite",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 43
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "coronation_loyalist_seal_divide",
+            "name": "Ironvein Authorization",
+            "spawnChance": 0.7,
+            "checkType": "item",
+            "requiredItemID": "loyalist_seal",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "ironvein_conscript",
+              "count": 2,
+              "narrative": "The Ironvein conscripts recognize the seal immediately. Two lower their weapons \u2014 they cannot attack a bearer of official Loyalist authorization, not with Goldcrown soldiers watching. They step aside, which briefly confuses the Goldcrown interceptors and creates a gap in the formation before either faction recovers."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You have no Ironvein credential. Both factions are simply hostile."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The outer corridors offer no leverage without faction credentials."
+            }
+          },
+          {
+            "id": "coronation_unpaid_ledger_goldcrown",
+            "name": "The Goldcrown Debt",
+            "spawnChance": 0.6,
+            "checkType": "item",
+            "requiredItemID": "unpaid_ledger",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "goldcrown_interceptor_elite",
+              "count": 1,
+              "narrative": "The Stone-Tusk ledger documents Goldcrown payments that were never honored \u2014 payments the interceptors in front of you were supposed to have received. One reads it and looks at the others. The argument that breaks out is brief and loud, and while it lasts, the formation has a hole in it that your party can use."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "Without proof of the unpaid debt, the interceptors have no reason to stop."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The interceptors are not interested in negotiation while a coronation is proceeding without their consent."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion",
+            "dropChance": 0.5,
+            "rarity": "common"
+          },
+          {
+            "itemID": "stamina_potion",
+            "dropChance": 0.4,
+            "rarity": "common"
+          },
+          {
+            "itemID": "hammer_celestial_tier4",
+            "dropChance": 0.25,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "greataxe_frost_tier4",
+            "dropChance": 0.2,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "head_void_helm_tier4",
+            "dropChance": 0.15,
+            "rarity": "uncommon"
+          }
+        ]
+      },
+      {
+        "stageId": 2,
+        "title": "The Petition Hall",
+        "description": "The two factions have converged on the hall and found that fighting separately means losing separately. Chamber Rune-Smiths support the Goldcrown flank with thunderclap while Ironvein Breakers run warcry for the combined pack \u2014 a coordination neither faction planned and both resent.",
+        "enemies": [
+          {
+            "enemyTypeID": "chamber_rune_smith",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 44
+          },
+          {
+            "enemyTypeID": "chamber_ironvein_breaker",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 45
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "coronation_petitioners_verdict_hall",
+            "name": "Present the Throne's Verdict",
+            "spawnChance": 0.7,
+            "checkType": "item",
+            "requiredItemID": "petitioners_verdict",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "chamber_ironvein_breaker",
+              "count": 1,
+              "narrative": "The Petitioners' Verdict is a rubbing of the Throne's own judgment. One Ironvein Breaker reads it, and the certainty he has carried for four years develops a crack wide enough to walk through. He does not stand down \u2014 but he hesitates, and his warcry does not come. The others notice, and the formation loses its rhythm before it begins."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "Without the Throne's verdict, the Breakers have only their own certainty to go on. It has sustained them this long."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Breakers do not respond to arguments. They respond to authority, and you don't have the Throne's."
+            }
+          },
+          {
+            "id": "coronation_conviction_break_formation",
+            "name": "Exploit the Alliance",
+            "spawnChance": 0.55,
+            "checkType": "stat",
+            "checkStat": "conviction",
+            "difficultyThreshold": 92,
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "chamber_rune_smith",
+              "count": 1,
+              "narrative": "The Ironvein-Goldcrown alliance is tactical, not ideological. You drive a wedge into it \u2014 a direct challenge to the Rune-Smith's position that the Breakers cannot help but register as Goldcrown arrogance. One Smith is cut off when the formation briefly realigns along factional lines. He retreats rather than hold a position the Breakers are no longer covering."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "The alliance holds under pressure. Their mutual resentment is not enough to break formation when the alternative is losing."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The formation is too consolidated to split from the outside."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion",
+            "dropChance": 0.45,
+            "rarity": "common"
+          },
+          {
+            "itemID": "stamina_potion",
+            "dropChance": 0.4,
+            "rarity": "common"
+          },
+          {
+            "itemID": "maul_earth_tier4",
+            "dropChance": 0.25,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "shield_celestial_tier4",
+            "dropChance": 0.2,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "acc_belt_gold_tier4",
+            "dropChance": 0.2,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "greataxe_radiant_tier5",
+            "dropChance": 0.15,
+            "rarity": "rare"
+          }
+        ]
+      },
+      {
+        "stageId": 3,
+        "title": "The Deep Throne Chamber",
+        "description": "The Third Heir kneels at the dais. The High Justicar stands between them and everything else. Stone Wardens hold the perimeter. The Justicar opens with earthquake to establish zone control, follows with stone_fist on priority targets, and uses stone_skin when its armor drops \u2014 the coronation ritual behind it is providing a slow but steady reinforcement to its rune-network.",
+        "enemies": [
+          {
+            "enemyTypeID": "chamber_stone_warden",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 46
+          },
+          {
+            "enemyTypeID": "throne_high_justicar",
+            "countRange": [
+              1,
+              1
+            ],
+            "level": 50
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "coronation_heir_signet_recognition",
+            "name": "Present the Heir's Signet",
+            "spawnChance": 0.85,
+            "checkType": "item",
+            "requiredItemID": "heir_signet",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "chamber_stone_warden",
+              "count": 2,
+              "narrative": "The Justicar's rune-network registers the Heir's Signet as a valid succession credential \u2014 the same frequency as the lineage it has been protecting. The Stone Wardens stand down immediately. They do not reclassify you as non-hostile, but they reclassify the perimeter as secured. The Justicar remains between you and the Heir. It is not finished evaluating your intentions."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "Without the Heir's credential, the Wardens hold the perimeter. The Justicar does not acknowledge you as a legitimate presence."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The chamber's defenses are fully active. You are an unclassified intrusion."
+            }
+          },
+          {
+            "id": "coronation_harmony_address_throne",
+            "name": "Address the Forge-Kings",
+            "spawnChance": 0.5,
+            "checkType": "stat",
+            "checkStat": "harmony",
+            "difficultyThreshold": 95,
+            "successEffect": {
+              "type": "apply_buff",
+              "narrative": "You address the Forge-Kings directly \u2014 not the Justicar, but the ancestor spirits behind it. The rune-network pauses its threat assessment for a moment. Something in the chamber's foundation registers the address as a valid petition. The Justicar does not stand down, but its earthquake opener holds while it completes the evaluation. You have until it finishes."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "The address does not reach the Forge-Kings' frequency. The Justicar begins its rotation."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Justicar does not receive petitions. That was the Foreman's function."
+            }
+          }
+        ],
+        "stageBranches": [
+          {
+            "condition": {
+              "type": "has_item",
+              "value": "petitioners_verdict"
+            },
+            "nextStageId": 99,
+            "overrideDescription": "The Petitioners' Verdict resonates with the Throne's active rune-network. A secondary passage opens in the chamber wall \u2014 the Forge-Kings' private record room, where the full succession lineage is stored. The Justicar steps aside from the passage. It recognizes the Verdict as the Throne's own document. Whatever is in that room, you have been authorized to see it.",
+            "chance": 0.3
+          },
+          {
+            "condition": null,
+            "nextStageId": null
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion_major",
+            "dropChance": 0.55,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "stamina_potion_major",
+            "dropChance": 0.45,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "hammer_void_tier5",
+            "dropChance": 0.25,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "maul_fatigue_tier5",
+            "dropChance": 0.2,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "acc_ring_obsidian_tier5",
+            "dropChance": 0.2,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "chest_phoenix_plate_tier6",
+            "dropChance": 0.1,
+            "rarity": "legendary"
+          }
+        ]
+      },
+      {
+        "stageId": 99,
+        "title": "The Forge-Kings' Record",
+        "secretPath": true,
+        "description": "The private record room holds the full succession lineage \u2014 four hundred years of Forge-King judgments, intact. The Third Heir's claim is complete, documented, and unambiguous. Two Ancestor Shades guard it. They are not hostile to someone the Throne has authorized. They are hostile to the possibility that the document leaves without being understood.",
+        "enemies": [
+          {
+            "enemyTypeID": "hall_ancestor_shade",
+            "countRange": [
+              2,
+              2
+            ],
+            "level": 48
+          }
+        ],
+        "preCombatOpportunities": [],
+        "lootTable": [
+          {
+            "itemID": "coronation_writ",
+            "dropChance": 1.0,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "hammer_phoenix_tier6",
+            "dropChance": 0.35,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "shield_chronos_tier6",
+            "dropChance": 0.3,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "acc_amulet_void_tier6",
+            "dropChance": 0.25,
+            "rarity": "legendary"
+          }
+        ]
+      }
+    ],
+    "rewards": {
+      "baseXP": 28000,
+      "baseGold": 320,
+      "lootTable": [
+        {
+          "itemID": "hammer_void_tier5",
+          "dropChance": 0.45,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "maul_fatigue_tier5",
+          "dropChance": 0.35,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "greataxe_radiant_tier5",
+          "dropChance": 0.3,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "acc_belt_titan_tier5",
+          "dropChance": 0.3,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "chest_phoenix_plate_tier6",
+          "dropChance": 0.2,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "hammer_phoenix_tier6",
+          "dropChance": 0.15,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "health_potion_major",
+          "dropChance": 0.6,
+          "rarity": "uncommon"
+        }
+      ],
+      "secretLootTable": [
+        {
+          "itemID": "coronation_writ",
+          "dropChance": 1.0,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "hammer_phoenix_tier6",
+          "dropChance": 0.55,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "shield_chronos_tier6",
+          "dropChance": 0.5,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "acc_amulet_void_tier6",
+          "dropChance": 0.4,
+          "rarity": "legendary"
+        }
+      ]
+    },
+    "tags": [
+      "dwarven",
+      "mountain",
+      "martial"
+    ]
+  },
+  {
+    "id": "challenge_reconciliation_of_elara",
+    "name": "The Reconciliation of Elara",
+    "description": "The Core and the Fragment have been trying to merge for fifty years. They cannot do it while the Architect's agents hold the bridge between them. The location is half living wood, half shattered glass \u2014 the geography of something that split under pressure and has been trying to heal ever since. The Fraying corruption that has taken root here is fighting the reconciliation because a unified Elara is the one thing that can hold the Whispering Woods against the final assault.",
+    "difficulty": 11,
+    "recommendedLevel": 43,
+    "minPartySize": 1,
+    "maxPartySize": 4,
+    "lore": [
+      {
+        "unlocksAfter": 1,
+        "text": "Elara did not split because she was weak. She split because the Fragment was the part of her that still believed the pact with the water spirit could be honored. The Core did not believe this. Rather than resolve the disagreement, she separated into the part that could survive and the part that could not stop trying. The Fragment has been trying for fifty years."
+      },
+      {
+        "unlocksAfter": 5,
+        "text": "The Light Binders are not protecting the reconciliation. They are protecting their version of it \u2014 one in which the Core absorbs the Fragment rather than merges with it. They believe the Fragment's fifty years of suffering have made it unstable. They are correct. They believe this means it should be contained rather than healed. This is the same logic that made the split necessary in the first place."
+      },
+      {
+        "unlocksAfter": 15,
+        "text": "The Fraying corruptions at the bridge are not the Architect's agents. They are the residue of every time the Core and Fragment attempted to merge and failed. Each failed attempt left something behind \u2014 a scar that developed its own kind of hostility. The bridge is littered with fifty years of unsuccessful reconciliations. The Architect did not plant them. It has simply been feeding on them."
+      },
+      {
+        "unlocksAfter": 1,
+        "requiresSecret": true,
+        "text": "The reconciliation completes when the Fragment is acknowledged, not absorbed. The Core's error \u2014 and the Light Binders' error \u2014 was treating the Fragment's suffering as damage to be corrected. The oath the Fragment has been keeping for fifty years is valid. It was always valid. Elara Unified is not a corrected version of Elara. She is Elara with the full weight of what she chose to remember."
+      }
+    ],
+    "stages": [
+      {
+        "stageId": 1,
+        "title": "The Root Bridges",
+        "description": "The outer bridges are held by Canopy Pruners moving in fast arcs and Light Binders anchored at range. The Pruners use nature_pierce to apply bleed while closing; the Binders apply shadowed from distance and use dispel to strip any buffs the party built crossing the outer approaches.",
+        "enemies": [
+          {
+            "enemyTypeID": "gallery_canopy_pruner",
+            "countRange": [
+              2,
+              4
+            ],
+            "level": 42
+          },
+          {
+            "enemyTypeID": "reconciliation_light_binder",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 43
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "elara_oath_stone_bridge",
+            "name": "The Shrine's Pact",
+            "spawnChance": 0.75,
+            "checkType": "item",
+            "requiredItemID": "oath_stone",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "reconciliation_light_binder",
+              "count": 1,
+              "narrative": "The Oath Stone resonates at the Fragment's frequency \u2014 the same pact-magic that has held the Shrine together for fifty years. One Light Binder registers it as a legitimate passage token, the kind issued to messengers between the Core and Fragment during the early years of the split. She steps aside. The others don't override the reclassification. It would require admitting the passage system still functions."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You have no passage credential the bridge recognizes."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Root Bridges do not open for uninvited guests. The Light Binders enforce this with precision."
+            }
+          },
+          {
+            "id": "elara_harmony_root_walk",
+            "name": "Move With the Wood",
+            "spawnChance": 0.6,
+            "checkType": "stat",
+            "checkStat": "harmony",
+            "difficultyThreshold": 88,
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "gallery_canopy_pruner",
+              "count": 2,
+              "narrative": "The living wood of the bridge responds to harmonic attunement \u2014 your party's frequency close enough to the First Tree's own that two Pruners pause mid-sweep, uncertain whether you are intruders or growth. By the time they resolve the question, you have already moved past them. They do not pursue. The wood did not flag you as a threat and they defer to the wood."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "Your attunement is close but not precise enough. The Pruners register the attempt and tighten the sweep."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The bridge's living wood reads hostility where you cannot mask it. The Pruners move to intercept."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion",
+            "dropChance": 0.5,
+            "rarity": "common"
+          },
+          {
+            "itemID": "mana_potion",
+            "dropChance": 0.45,
+            "rarity": "common"
+          },
+          {
+            "itemID": "verdant_word_seal",
+            "dropChance": 0.25,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "bow_shadow_tier4",
+            "dropChance": 0.2,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "staff_barrier_tier4",
+            "dropChance": 0.15,
+            "rarity": "uncommon"
+          }
+        ]
+      },
+      {
+        "stageId": 2,
+        "title": "The Council Spires",
+        "description": "The spires are where the Fraying corruption has concentrated \u2014 failed reconciliation attempts made hostile. Mirror Wardens hold the center using block and dispel to strip the party's buffs while shielding themselves. Fraying Corruptions drift between them applying mana_burn and drain_reserves to choke mana-dependent parties.",
+        "enemies": [
+          {
+            "enemyTypeID": "gallery_mirror_warden",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 44
+          },
+          {
+            "enemyTypeID": "reconciliation_fraying_corruption",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 43
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "elara_seed_spire_resonance",
+            "name": "The Gallery's Seed",
+            "spawnChance": 0.7,
+            "checkType": "item",
+            "requiredItemID": "seed_of_first_tree",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "reconciliation_fraying_corruption",
+              "count": 2,
+              "narrative": "The Seed of the First Tree is anathema to failed reconciliation residue \u2014 it carries the potential of completion, and the Fraying corruptions at the spires are made of incompletion. Two dissolve on contact with the seed's resonance, the entropy that held them together suddenly insufficient against something that still believes it can grow. The Mirror Wardens watch this with undisguised unease."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You have no anchor against the corruptions' frequency."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The failed reconciliation residue does not respond to force. It responds to resolution. You don't have the right kind."
+            }
+          },
+          {
+            "id": "elara_ambition_mirror_gap",
+            "name": "Find the Gap",
+            "spawnChance": 0.55,
+            "checkType": "stat",
+            "checkStat": "ambition",
+            "difficultyThreshold": 92,
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "gallery_mirror_warden",
+              "count": 1,
+              "narrative": "The Mirror Wardens' defense is reflective \u2014 they respond to what they read in the attacker's approach. You move without a clear aggressive intention, and one Warden's reflective matrix finds nothing to mirror. It disengages from the line to recalibrate, leaving a gap the others cannot close before you are already through it."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "The Wardens read your intent clearly enough to close the gap before you reach it."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Mirror Wardens hold their formation. There is no gap that persistence alone will open."
+            }
+          }
+        ],
+        "stageBranches": [
+          {
+            "condition": {
+              "type": "has_item",
+              "value": "oath_stone"
+            },
+            "nextStageId": 99,
+            "overrideDescription": "At the spires' center, the Oath Stone and the Seed of the First Tree resonate together \u2014 the pact-magic of the Shrine meeting the growth-potential of the Gallery in the one place where both frequencies coexist. A path opens that was not there before. The Mirror Wardens step aside. Whatever is at the end of it, the bridge has decided you are authorized to reach it.",
+            "chance": 0.3
+          },
+          {
+            "condition": null,
+            "nextStageId": null
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion",
+            "dropChance": 0.45,
+            "rarity": "common"
+          },
+          {
+            "itemID": "mana_potion",
+            "dropChance": 0.5,
+            "rarity": "common"
+          },
+          {
+            "itemID": "staff_life_tier5",
+            "dropChance": 0.2,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "bow_sleep_tier5",
+            "dropChance": 0.2,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "acc_cloak_shadow_tier5",
+            "dropChance": 0.15,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "totem_void_tier5",
+            "dropChance": 0.15,
+            "rarity": "rare"
+          }
+        ]
+      },
+      {
+        "stageId": 3,
+        "title": "The Heart Tree Chamber",
+        "description": "Elara Unified stands at the First Tree's core, the merger still new enough to be unstable. She opens with soul_shatter to apply harmony_discord across the party \u2014 reducing healing effectiveness before her own holy_word and mass_heal make the healing-denial sting \u2014 then follows with sacred_roots and nature_wrap as damage. The fight is a race between her sustain and your damage.",
+        "enemies": [
+          {
+            "enemyTypeID": "reconciliation_light_binder",
+            "countRange": [
+              1,
+              1
+            ],
+            "level": 45
+          },
+          {
+            "enemyTypeID": "elara_unified",
+            "countRange": [
+              1,
+              1
+            ],
+            "level": 50
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "elara_unified_oath_recognition",
+            "name": "Name What She Kept",
+            "spawnChance": 0.8,
+            "checkType": "item",
+            "requiredItemID": "oath_stone",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "reconciliation_light_binder",
+              "count": 1,
+              "narrative": "You present the Oath Stone and name the original water spirit pact \u2014 the one the Fragment spent fifty years keeping in Elara's absence. Elara Unified goes still. The Light Binder beside her looks at her, then at you, then leaves without instruction. Elara has not dismissed the hostility, but the fight, when it comes, will be about something real rather than the defense of a position."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "Without the Oath Stone, you cannot speak to what the Fragment preserved. Elara Unified does not acknowledge what you cannot name."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "Elara Unified is too recently merged to receive strangers without credentials. The Light Binder holds position."
+            }
+          },
+          {
+            "id": "elara_harmony_direct_address",
+            "name": "Speak to the Fragment",
+            "spawnChance": 0.5,
+            "checkType": "stat",
+            "checkStat": "harmony",
+            "difficultyThreshold": 95,
+            "successEffect": {
+              "type": "apply_buff",
+              "narrative": "You address the Fragment directly \u2014 not Elara Unified, but the part that kept the pact. Something in the merged entity recognizes the address. The soul_shatter opener holds. She is still going to fight you; the merger is too new for anything else. But the opening will be sacred_roots rather than soul_shatter, and that difference is real."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You cannot reach the Fragment separately from the Core. The merger is complete enough that the address lands on both at once, and the Core is not ready to receive it."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "Elara Unified does not separate into addressable halves. She is whole now, and the whole is not currently in a mood to listen."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion_major",
+            "dropChance": 0.55,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "mana_potion_major",
+            "dropChance": 0.5,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "staff_life_tier5",
+            "dropChance": 0.25,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "staff_protection_tier5",
+            "dropChance": 0.2,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "acc_amulet_soul_tier5",
+            "dropChance": 0.2,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "chest_storm_vestments_tier5",
+            "dropChance": 0.15,
+            "rarity": "rare"
+          }
+        ]
+      },
+      {
+        "stageId": 99,
+        "title": "The Harmony Convergence",
+        "secretPath": true,
+        "description": "With both the Oath Stone and the Seed of the First Tree, the bridge recognizes you as a legitimate witness to the reconciliation rather than an intrusion. Elara Unified meets you here. She is not hostile. The fight, if it comes, is not about the reconciliation \u2014 it is about whether the newly-merged Elara trusts that the world outside the Woods is worth the cost of leaving the quarantine. Two Fraying Corruptions remain at the periphery; they have not dissolved because they are waiting to see if the reconciliation holds.",
+        "enemies": [
+          {
+            "enemyTypeID": "reconciliation_fraying_corruption",
+            "countRange": [
+              2,
+              2
+            ],
+            "level": 47
+          }
+        ],
+        "preCombatOpportunities": [],
+        "lootTable": [
+          {
+            "itemID": "unified_seed",
+            "dropChance": 1.0,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "staff_cosmic_tier6",
+            "dropChance": 0.35,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "totem_chronos_tier6",
+            "dropChance": 0.3,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "head_chronos_diadem_tier6",
+            "dropChance": 0.25,
+            "rarity": "legendary"
+          }
+        ]
+      }
+    ],
+    "rewards": {
+      "baseXP": 28000,
+      "baseGold": 320,
+      "lootTable": [
+        {
+          "itemID": "staff_life_tier5",
+          "dropChance": 0.45,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "staff_protection_tier5",
+          "dropChance": 0.35,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "totem_void_tier5",
+          "dropChance": 0.3,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "acc_amulet_soul_tier5",
+          "dropChance": 0.3,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "chest_chronos_robe_tier6",
+          "dropChance": 0.2,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "staff_cosmic_tier6",
+          "dropChance": 0.15,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "mana_potion_major",
+          "dropChance": 0.6,
+          "rarity": "uncommon"
+        }
+      ],
+      "secretLootTable": [
+        {
+          "itemID": "unified_seed",
+          "dropChance": 1.0,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "staff_cosmic_tier6",
+          "dropChance": 0.55,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "totem_chronos_tier6",
+          "dropChance": 0.5,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "head_chronos_diadem_tier6",
+          "dropChance": 0.4,
+          "rarity": "legendary"
+        }
+      ]
+    },
+    "tags": [
+      "elven",
+      "nature",
+      "sacred"
+    ]
+  },
+  {
+    "id": "challenge_sigil_bearers_keep",
+    "name": "The Sigil-Bearer's Keep",
+    "description": "The Field of Shattered Vows gathered the residue of broken oaths. This is where it reports. A former Verdant Word priest has merged with the Architect's sigil and now coordinates the Fraying's advance on the Spire \u2014 not as a corrupted victim still fighting his own nature, but as a conscious agent who has made his choice. The Architect does not need proxies here. It speaks directly.",
+    "difficulty": 11,
+    "recommendedLevel": 43,
+    "minPartySize": 1,
+    "maxPartySize": 4,
+    "lore": [
+      {
+        "unlocksAfter": 1,
+        "text": "The Keep was a Verdant Word garrison post before the dissolution. The Sigil-Bearer was its commander. He survived the coup because he was not in the Spire when Valerius acted \u2014 he was here, waiting for orders that never came. He spent ten years waiting. Then the Architect arrived and gave him something to do."
+      },
+      {
+        "unlocksAfter": 5,
+        "text": "The Corrupted Priests in the Keep are not converts. They are former Order members the Sigil-Bearer personally recruited after the dissolution \u2014 colleagues, subordinates, friends. He did not corrupt them against their will. He made an argument. Most of them found it persuasive. The argument was: the Verdant Word failed because it tried to hold back entropy. Serving it is the only honest position left."
+      },
+      {
+        "unlocksAfter": 15,
+        "text": "The Architect does not control the Sigil-Bearer. It collaborates with him. The distinction matters: a controlled agent can be freed. A collaborator believes in the work. The Sigil-Bearer has reviewed the Architect's case for entropy over order and found it sound. He has been building on it for forty years. Some of his extensions are original."
+      },
+      {
+        "unlocksAfter": 1,
+        "requiresSecret": false,
+        "text": "When the Sigil-Bearer speaks to the player \u2014 'You remember because you are broken too' \u2014 he is not taunting. He is making an offer. The Sharded Survivor's existence is predicated on a rupture in the original binding magic. From the Architect's perspective, the player is not its enemy. They are its most successful proof of concept. He is genuinely curious whether they understand this yet."
+      }
+    ],
+    "stages": [
+      {
+        "stageId": 1,
+        "title": "The Outer Ward",
+        "description": "The Keep's outer ward is held by Oath Breakers drifting between Shadow Weavers who maintain the ambient corruption. The Weavers here are more coordinated than the Field's \u2014 they use shout to push the Oath Breaker pressure before committing their own shadow_bolt and silence, keeping the party's healers locked out while the bleed stacks.",
+        "enemies": [
+          {
+            "enemyTypeID": "field_oath_breaker",
+            "countRange": [
+              2,
+              4
+            ],
+            "level": 42
+          },
+          {
+            "enemyTypeID": "field_shadow_weaver",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 43
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "keep_verdant_seal_ward",
+            "name": "Verdant Word Command Authority",
+            "spawnChance": 0.7,
+            "checkType": "item",
+            "requiredItemID": "verdant_word_seal",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "field_oath_breaker",
+              "count": 2,
+              "narrative": "The Verdant Word seal carries the garrison's original authorization frequency \u2014 the Sigil-Bearer was its commander, and command credentials still propagate through the Keep's residual rune-network. Two Oath Breakers halt as the frequency registers. They do not dissolve; they simply stop receiving targeting instructions for long enough that your party is past them."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You have no credential that predates the Sigil-Bearer's authority here."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The outer ward does not open for the unauthorized."
+            }
+          },
+          {
+            "id": "keep_fire_purge_ward",
+            "name": "Burn the Approach",
+            "spawnChance": 0.65,
+            "checkType": "skill",
+            "requiredSkillTag": "fire",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "field_shadow_weaver",
+              "count": 1,
+              "narrative": "Fire severs shadow anchors cleanly \u2014 the Keep's Weavers are better-anchored than the Field's, but not immune. One loses her connection to the ambient corruption network before she can reestablish it. The others adjust their formation to cover the gap. They have been briefed on fire as a threat vector. They just could not close fast enough."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You have no fire skill. The Shadow Weavers hold their network without interruption."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Weavers' network is fully active. Nothing you have can sever it from outside."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion",
+            "dropChance": 0.5,
+            "rarity": "common"
+          },
+          {
+            "itemID": "mana_potion",
+            "dropChance": 0.45,
+            "rarity": "common"
+          },
+          {
+            "itemID": "verdant_word_seal",
+            "dropChance": 0.25,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "staff_shadow_tier4",
+            "dropChance": 0.2,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "chest_celestial_robe_tier4",
+            "dropChance": 0.15,
+            "rarity": "uncommon"
+          }
+        ]
+      },
+      {
+        "stageId": 2,
+        "title": "The Keep Interior",
+        "description": "The interior is held by Corrupted Priests \u2014 former Order members who made an argument and found it persuasive. They fight with the precision of trained clergy: penitent_strike drains conviction while healing the caster, corrupting_hex layers cursed and conviction_drain on the same target, and judgment_field provides holy-damage control. Field Wraiths drift between them as ambient pressure.",
+        "enemies": [
+          {
+            "enemyTypeID": "keep_corrupted_priest",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 44
+          },
+          {
+            "enemyTypeID": "field_fraying_wraith",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 43
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "keep_holy_challenge_priests",
+            "name": "Invoke the Order's Name",
+            "spawnChance": 0.65,
+            "checkType": "skill",
+            "requiredSkillTag": "holy",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "keep_corrupted_priest",
+              "count": 1,
+              "narrative": "Holy magic invokes the Verdant Word's original frequency \u2014 the same one these priests trained under. One hesitates. Not from loyalty, but from the muscle memory of forty years of practice. The hesitation is brief and she resumes, but it costs her the opening timing. Her conviction_drain opener lands a turn late, and that gap is enough."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You have no holy skill to invoke. The Priests engage without hesitation."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Corrupted Priests do not respond to appeals. They have already heard the counter-argument and rejected it."
+            }
+          },
+          {
+            "id": "keep_conviction_hold_interior",
+            "name": "Stand the Ground",
+            "spawnChance": 0.55,
+            "checkType": "stat",
+            "checkStat": "conviction",
+            "difficultyThreshold": 92,
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "field_fraying_wraith",
+              "count": 2,
+              "narrative": "The Fraying Wraiths anchor to doubt and hesitation \u2014 a party moving with complete conviction registers as a harder target than the entropy they are made of. Two break off before contact, redirecting toward easier ground. The Priests notice. They recalibrate their approach, but the adjustment costs them formation coherence before they are ready."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "Your conviction wavers enough for the Wraiths to find purchase. They close."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Wraiths read the hesitation in your approach from the outer ward. They are already positioned."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion",
+            "dropChance": 0.45,
+            "rarity": "common"
+          },
+          {
+            "itemID": "mana_potion",
+            "dropChance": 0.5,
+            "rarity": "common"
+          },
+          {
+            "itemID": "scepter_celestial_tier4",
+            "dropChance": 0.2,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "tome_void_tier5",
+            "dropChance": 0.2,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "acc_cloak_shadow_tier5",
+            "dropChance": 0.15,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "wand_void_tier5",
+            "dropChance": 0.15,
+            "rarity": "rare"
+          }
+        ]
+      },
+      {
+        "stageId": 3,
+        "title": "The Sigil Chamber",
+        "description": "The Sigil-Bearer stands at the Keep's core with one Corrupted Priest flanking him. He opens with soul_shatter \u2014 harmony_discord and ambition_falter across the party, the paired degradation previewing what the Architect does at scale. He follows with decay_aura for sustained shadow pressure and corrupting_hex on whoever looks most likely to cleanse. He will tell you why you are here. He is not wrong about all of it.",
+        "enemies": [
+          {
+            "enemyTypeID": "keep_corrupted_priest",
+            "countRange": [
+              1,
+              1
+            ],
+            "level": 46
+          },
+          {
+            "enemyTypeID": "keep_sigil_bearer",
+            "countRange": [
+              1,
+              1
+            ],
+            "level": 50
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "keep_sigil_fragment_confrontation",
+            "name": "Present the Inverted Glyph",
+            "spawnChance": 0.8,
+            "checkType": "item",
+            "requiredItemID": "sigil_fragment",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "keep_corrupted_priest",
+              "count": 1,
+              "narrative": "The Sigil-Bearer sees the fragment and goes still. You have been to the Field. You have recovered a piece of the original inversion. He looks at the Priest beside him and says something you do not catch. The Priest leaves \u2014 not because he has been dismissed, but because the Sigil-Bearer wants this conversation to be private. Whatever happens next will be between the two of you."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You arrive without evidence of what you know. The Sigil-Bearer treats you as a routine intrusion."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Sigil-Bearer has been expecting someone. He is not yet certain it is you."
+            }
+          },
+          {
+            "id": "keep_conviction_answer_architect",
+            "name": "Answer the Architect",
+            "spawnChance": 0.5,
+            "checkType": "stat",
+            "checkStat": "conviction",
+            "difficultyThreshold": 95,
+            "successEffect": {
+              "type": "apply_buff",
+              "narrative": "The Sigil-Bearer tells you that you remember because you are broken too. You do not deny it. You tell him what you remember the world being before the break, and you name it as worth repairing. He listens \u2014 genuinely. He has not heard that argument made without desperation before. His soul_shatter opener holds while he considers it. He will still fight you. But the conversation has already happened, and it will matter."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You cannot answer the Architect's logic with sufficient force. The Sigil-Bearer opens without ceremony."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Sigil-Bearer does not invite the conversation. He has had it already, with himself, and reached a conclusion."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion_major",
+            "dropChance": 0.55,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "mana_potion_major",
+            "dropChance": 0.5,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "tome_void_tier5",
+            "dropChance": 0.25,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "scepter_void_tier5",
+            "dropChance": 0.2,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "acc_ring_obsidian_tier5",
+            "dropChance": 0.2,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "chest_storm_vestments_tier5",
+            "dropChance": 0.15,
+            "rarity": "rare"
+          }
+        ]
+      }
+    ],
+    "rewards": {
+      "baseXP": 28000,
+      "baseGold": 320,
+      "lootTable": [
+        {
+          "itemID": "tome_void_tier5",
+          "dropChance": 0.45,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "scepter_void_tier5",
+          "dropChance": 0.4,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "wand_void_tier5",
+          "dropChance": 0.35,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "acc_amulet_soul_tier5",
+          "dropChance": 0.3,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "chest_chronos_robe_tier6",
+          "dropChance": 0.2,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "scepter_chronos_tier6",
+          "dropChance": 0.15,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "architects_seal",
+          "dropChance": 0.5,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "mana_potion_major",
+          "dropChance": 0.6,
+          "rarity": "uncommon"
+        }
+      ]
+    },
+    "tags": [
+      "shadow",
+      "corrupted",
+      "arcane"
+    ]
+  },
+  {
+    "id": "challenge_architects_first_hand",
+    "name": "The Architect's First Hand",
+    "description": "The original Verdant Word binding site has been partially phased out of normal reality. The Architect has been using the three hundred years of oath-residue saturating this ground as raw material. It is not corrupting things here. It is building them. The constructs that emerge from the phased ruins are not spirits, not ghosts, not turned priests. They are the Architect's first original work \u2014 entropy given deliberate shape for the first time since the world broke.",
+    "difficulty": 12,
+    "recommendedLevel": 48,
+    "minPartySize": 1,
+    "maxPartySize": 4,
+    "lore": [
+      {
+        "unlocksAfter": 1,
+        "text": "The original binding attempt on this site failed because the Verdant Word tried to contain the Architect rather than address it. The containment circle is still here, partially phased \u2014 the Architect has been living inside it for three hundred years, using the circle's own structure as a scaffold. The prison became the workshop."
+      },
+      {
+        "unlocksAfter": 5,
+        "text": "The Oath Shards are not animated by spirits. They are animated by the weight of specific promises \u2014 each one corresponds to a documented broken oath from the Vale's records. The Architect cross-referenced three hundred years of pact-failures and found that certain combinations of broken promises, pressed together under sufficient entropy pressure, produce locomotion. It took two hundred and forty years to find the right combinations."
+      },
+      {
+        "unlocksAfter": 15,
+        "text": "The First Hand does not attack the player the way other enemies do. It studies them. Every skill the party uses, every status effect applied, every debuff resisted \u2014 the First Hand is recording the data. The Architect has never encountered a Sharded Survivor before. It is genuinely uncertain what one is. The fight is a calibration exercise."
+      },
+      {
+        "unlocksAfter": 1,
+        "requiresSecret": true,
+        "text": "The First Hand's final words before dissolution: 'Insufficient data. Recommend direct engagement.' It is not reporting to the Architect. It is the Architect \u2014 a fragment of its attention, briefly localized. The recommendation travels inward. Something at the center of the Fraying updates its model of what the player is. The Spire's defenses will be different now."
+      }
+    ],
+    "stages": [
+      {
+        "stageId": 1,
+        "title": "The Phased Approach",
+        "description": "The ruins flicker between present and fifty-years-ago \u2014 pristine Verdant Word architecture bleeding through the blackened stone. Oath Shards drift between the phases, each one a crystallized broken promise given locomotion by entropy pressure. Fraying Architects move behind them, marking targets with siphon_ward before the Shards close.",
+        "enemies": [
+          {
+            "enemyTypeID": "first_hand_oath_shard",
+            "countRange": [
+              3,
+              5
+            ],
+            "level": 46
+          },
+          {
+            "enemyTypeID": "first_hand_fraying_architect",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 48
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "firsthand_thrain_report_approach",
+            "name": "Thrain's Coordinates",
+            "spawnChance": 0.75,
+            "checkType": "item",
+            "requiredItemID": "thrains_complete_report",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "first_hand_fraying_architect",
+              "count": 1,
+              "narrative": "Thrain's complete report includes the directing sigil's resonance frequency \u2014 the specific harmonic the Architect uses to coordinate its constructs across the field. You broadcast it back at the nearest Fraying Architect before it can recalibrate. The construct interprets the frequency as a recall order and phases out. The Oath Shards it was coordinating lose their formation coherence for long enough to matter."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "Without Thrain's frequency data, you have no way to interrupt the Architects' coordination signal."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Fraying Architects are fully networked. There is no gap in their signal from outside."
+            }
+          },
+          {
+            "id": "firsthand_fire_shard_purge",
+            "name": "Burn the Oath-Weight",
+            "spawnChance": 0.65,
+            "checkType": "skill",
+            "requiredSkillTag": "fire",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "first_hand_oath_shard",
+              "count": 2,
+              "narrative": "Oath Shards are compressed broken-promise residue \u2014 the same substrate that fire magic disrupts in the Field of Shattered Vows, but denser. Two shatter under the heat before they can phase into attack posture, the entropy binding them insufficient against direct combustion. The fragments dissolve rather than reassembling. The Architect has not yet engineered fire resistance into this batch."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You have no fire skill. The Oath Shards' entropy binding holds."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Shards are too dense to disrupt without fire. They phase through your approach."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion_major",
+            "dropChance": 0.5,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "mana_potion_major",
+            "dropChance": 0.45,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "staff_cosmic_tier6",
+            "dropChance": 0.2,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "tome_chronos_tier6",
+            "dropChance": 0.2,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "acc_cloak_star_tier6",
+            "dropChance": 0.15,
+            "rarity": "rare"
+          }
+        ]
+      },
+      {
+        "stageId": 2,
+        "title": "The Binding Chamber",
+        "description": "The original containment circle is still legible in the floor \u2014 three hundred years of entropy pressure have not erased it, only inverted it. Entropy Weavers work the circle's nodes, using reality_fracture to destabilize the party's positioning while applying cursed_blood to whoever holds still. Null Sentinels anchor the perimeter, draining life and siphoning ward-buffs from anything that engages them directly.",
+        "enemies": [
+          {
+            "enemyTypeID": "first_hand_entropy_weaver",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 48
+          },
+          {
+            "enemyTypeID": "first_hand_null_sentinel",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 49
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "firsthand_architects_seal_circle",
+            "name": "Invert the Coordination Signal",
+            "spawnChance": 0.7,
+            "checkType": "item",
+            "requiredItemID": "architects_seal",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "first_hand_entropy_weaver",
+              "count": 1,
+              "narrative": "The Architect's own coordination seal, turned against its network. One Entropy Weaver receives the signal as a recall command and phases toward the circle's exit node before the network corrects the error. The correction takes several seconds. In that window, the Weaver is gone and the remaining constructs have temporarily lost their formation logic."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "Without the Architect's own signal, you cannot touch the coordination network."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The constructs' network is self-correcting against external interference. You have nothing that speaks its language."
+            }
+          },
+          {
+            "id": "firsthand_arcane_circle_read",
+            "name": "Read the Inverted Circle",
+            "spawnChance": 0.6,
+            "checkType": "skill",
+            "requiredSkillTag": "arcane",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "first_hand_null_sentinel",
+              "count": 1,
+              "narrative": "The containment circle is still a circle \u2014 its inversion does not erase its original logic, only reverses it. A party fluent in arcane frequencies can read the original Verdant Word inscription through the entropy overlay and identify the Sentinel's anchor node. You disrupt the node before the Sentinel can reestablish its drain. It phases out of the chamber's perimeter rather than hold an unanchored position."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "The circle's inversion layer is too dense to read without arcane attunement. The Sentinels' anchors hold."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "You cannot reach the Sentinels' anchor nodes without reading the circle. The drain begins immediately."
+            }
+          }
+        ],
+        "stageBranches": [
+          {
+            "condition": {
+              "type": "has_item",
+              "value": "thrains_complete_report"
+            },
+            "nextStageId": 99,
+            "overrideDescription": "Thrain's report includes a partial map of the sigil's resonance nodes \u2014 the frequency points the Architect uses to anchor itself to a location. One of them is here, in the binding chamber's floor, beneath the inverted circle. The node is accessible. A party that knows it exists can reach it before the First Hand realizes what they are doing.",
+            "chance": 0.25
+          },
+          {
+            "condition": null,
+            "nextStageId": null
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion_major",
+            "dropChance": 0.5,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "mana_potion_major",
+            "dropChance": 0.45,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "scepter_chronos_tier6",
+            "dropChance": 0.2,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "wand_chronos_tier6",
+            "dropChance": 0.2,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "acc_ring_dragon_tier6",
+            "dropChance": 0.2,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "chest_abyssal_cuirass_tier7",
+            "dropChance": 0.1,
+            "rarity": "legendary"
+          }
+        ]
+      },
+      {
+        "stageId": 3,
+        "title": "The Assembly Floor",
+        "description": "The First Hand manifests at the chamber's center \u2014 not emerging from anywhere, simply becoming present, the way a thought becomes a decision. It does not move like a creature. It reconfigures. It opens with soul_shatter to establish its baseline read on the party's stat profile, then cycles reality_fracture and decay_aura to maintain pressure while applying cursed_blood to the highest-harmony target. It is collecting data. It will use what it learns.",
+        "enemies": [
+          {
+            "enemyTypeID": "first_hand_oath_shard",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 50
+          },
+          {
+            "enemyTypeID": "architects_first_hand",
+            "countRange": [
+              1,
+              1
+            ],
+            "level": 55
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "firsthand_sigil_fragment_disrupt",
+            "name": "Present the Design Flaw",
+            "spawnChance": 0.8,
+            "checkType": "item",
+            "requiredItemID": "sigil_fragment",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "first_hand_oath_shard",
+              "count": 2,
+              "narrative": "The sigil fragment carries the Verdant Word's original binding glyph \u2014 the same design the Architect has been living inside for three hundred years. When you present it, the First Hand goes still for a full three seconds. It is not threatened. It is processing. In that window, the Oath Shards maintaining the assembly floor's perimeter lose their coordination signal and dissolve. The First Hand resumes, but the perimeter is gone."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "Without the original glyph, you have nothing that references the Architect's own architecture against it."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The First Hand begins its assessment without ceremony. You are an input it has not yet categorized."
+            }
+          },
+          {
+            "id": "firsthand_conviction_refuse_categorization",
+            "name": "Refuse to Be Measured",
+            "spawnChance": 0.5,
+            "checkType": "stat",
+            "checkStat": "conviction",
+            "difficultyThreshold": 96,
+            "successEffect": {
+              "type": "apply_buff",
+              "narrative": "The First Hand's opening assessment relies on the party holding position long enough for its data collection to complete. You do not hold position. You advance immediately, refusing the calibration window. The soul_shatter opener holds \u2014 the First Hand cannot apply harmony_discord to a party that hasn't given it a baseline to discord. It recalculates. The recalculation costs it the first turn."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "The First Hand completes its baseline assessment before you can close. The soul_shatter lands on full data."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The First Hand does not require your cooperation to calibrate. It can work from incomplete data."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion_major",
+            "dropChance": 0.6,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "mana_potion_major",
+            "dropChance": 0.55,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "staff_divine_tier7",
+            "dropChance": 0.2,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "tome_abyss_tier7",
+            "dropChance": 0.2,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "acc_amulet_void_tier6",
+            "dropChance": 0.2,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "first_hand_shard",
+            "dropChance": 0.55,
+            "rarity": "legendary"
+          }
+        ]
+      },
+      {
+        "stageId": 99,
+        "title": "The Anchor Node",
+        "secretPath": true,
+        "description": "Beneath the inverted circle, the Architect's resonance node is a fist-sized point of absolute stillness in the middle of all the entropy. It is not defended \u2014 the Architect did not anticipate that anyone would know it was here. Two Null Sentinels hold the passage on reflex, not on instruction. The node itself is not hostile. It is simply the Architect, present at one remove, trying to understand why you are touching it.",
+        "enemies": [
+          {
+            "enemyTypeID": "first_hand_null_sentinel",
+            "countRange": [
+              2,
+              2
+            ],
+            "level": 52
+          }
+        ],
+        "preCombatOpportunities": [],
+        "lootTable": [
+          {
+            "itemID": "resonance_node_fragment",
+            "dropChance": 1.0,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "scepter_abyss_tier7",
+            "dropChance": 0.4,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "acc_amulet_omnipotence_tier7",
+            "dropChance": 0.35,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "chest_ascension_vestments_tier7",
+            "dropChance": 0.3,
+            "rarity": "legendary"
+          }
+        ]
+      }
+    ],
+    "rewards": {
+      "baseXP": 35000,
+      "baseGold": 400,
+      "lootTable": [
+        {
+          "itemID": "staff_divine_tier7",
+          "dropChance": 0.4,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "tome_abyss_tier7",
+          "dropChance": 0.35,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "scepter_abyss_tier7",
+          "dropChance": 0.3,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "chest_ascension_vestments_tier7",
+          "dropChance": 0.25,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "acc_amulet_omnipotence_tier7",
+          "dropChance": 0.25,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "first_hand_shard",
+          "dropChance": 0.45,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "health_potion_major",
+          "dropChance": 0.6,
+          "rarity": "uncommon"
+        }
+      ],
+      "secretLootTable": [
+        {
+          "itemID": "resonance_node_fragment",
+          "dropChance": 1.0,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "scepter_abyss_tier7",
+          "dropChance": 0.6,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "acc_amulet_omnipotence_tier7",
+          "dropChance": 0.5,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "chest_ascension_vestments_tier7",
+          "dropChance": 0.45,
+          "rarity": "legendary"
+        }
+      ]
+    },
+    "tags": [
+      "corrupted",
+      "arcane",
+      "shadow"
+    ]
   }
 ]

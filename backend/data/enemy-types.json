@@ -5915,5 +5915,1019 @@
       "hammer",
       "axe"
     ]
+  },
+  {
+    "id": "barricade_starving_civilian",
+    "name": "Starving Civilian",
+    "description": "A refugee who has been outside the Capital gates long enough to stop waiting for help and start enforcing the perimeter themselves.",
+    "stats": {
+      "conviction": 55,
+      "endurance": 50,
+      "ambition": 45,
+      "harmony": 15
+    },
+    "armorValue": 2,
+    "aiProfile": "aggressive",
+    "equipment": {
+      "mainHand": "sword_iron_tier0",
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "basic_attack",
+      "shove"
+    ],
+    "lootTable": [
+      {
+        "itemID": "health_potion_minor",
+        "dropChance": 0.3,
+        "rarity": "common"
+      },
+      {
+        "itemID": "styptic_powder",
+        "dropChance": 0.2,
+        "rarity": "common"
+      }
+    ],
+    "tags": [
+      "human",
+      "desperate",
+      "civilian"
+    ],
+    "weaponTypes": [
+      "sword"
+    ]
+  },
+  {
+    "id": "barricade_gatekeeper",
+    "name": "Gatekeeper",
+    "description": "A camp enforcer who has developed military habits without military discipline \u2014 uses shout to push civilians into the fight before committing himself.",
+    "stats": {
+      "conviction": 75,
+      "endurance": 80,
+      "ambition": 40,
+      "harmony": 20
+    },
+    "armorValue": 6,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "polearm_iron_tier0",
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "shout",
+      "strong_attack",
+      "shove",
+      "basic_attack"
+    ],
+    "lootTable": [
+      {
+        "itemID": "stamina_potion_minor",
+        "dropChance": 0.25,
+        "rarity": "common"
+      },
+      {
+        "itemID": "styptic_powder",
+        "dropChance": 0.2,
+        "rarity": "common"
+      }
+    ],
+    "tags": [
+      "human",
+      "enforcer"
+    ],
+    "weaponTypes": [
+      "polearm"
+    ]
+  },
+  {
+    "id": "barricade_rogue_guard",
+    "name": "Rogue Guard",
+    "description": "A Royal Guard soldier still running the patrol route, who uses call_target to mark priority threats and warcry to accelerate the whole pack before engaging.",
+    "stats": {
+      "conviction": 90,
+      "endurance": 95,
+      "ambition": 55,
+      "harmony": 25
+    },
+    "armorValue": 10,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "sword_steel_tier1",
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "call_target",
+      "warcry",
+      "weak_point",
+      "block",
+      "basic_attack"
+    ],
+    "lootTable": [
+      {
+        "itemID": "health_potion",
+        "dropChance": 0.3,
+        "rarity": "common"
+      },
+      {
+        "itemID": "stamina_ration",
+        "dropChance": 0.2,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "verdant_word_seal",
+        "dropChance": 0.1,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "human",
+      "soldier",
+      "martial"
+    ],
+    "weaponTypes": [
+      "sword"
+    ]
+  },
+  {
+    "id": "barricade_fraying_manifestation",
+    "name": "Fraying Manifestation",
+    "description": "A shadow entity grown from five years of concentrated abandonment \u2014 pairs shadow_bolt with drain_reserves to layer shadowed and exhaustion simultaneously, punishing parties that don't cleanse.",
+    "stats": {
+      "conviction": 60,
+      "endurance": 70,
+      "ambition": 80,
+      "harmony": 10
+    },
+    "armorValue": 4,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": null,
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "shadow_bolt",
+      "drain_reserves",
+      "pummel",
+      "dissonance"
+    ],
+    "lootTable": [
+      {
+        "itemID": "styptic_powder",
+        "dropChance": 0.25,
+        "rarity": "common"
+      }
+    ],
+    "tags": [
+      "spirit",
+      "corrupted",
+      "shadow"
+    ],
+    "weaponTypes": []
+  },
+  {
+    "id": "captain_hrolf",
+    "name": "Captain Hrolf",
+    "description": "The last Royal Guard officer in the barricades: opens with warcry to accelerate his Guards, then cycles drain_reserves onto the highest-stamina party member and fortify to sustain himself against attrition.",
+    "stats": {
+      "conviction": 145,
+      "endurance": 160,
+      "ambition": 75,
+      "harmony": 40
+    },
+    "armorValue": 18,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "sword_steel_tier1",
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "basic_attack",
+      "weak_point",
+      "slash",
+      "warcry",
+      "drain_reserves",
+      "intimidate"
+    ],
+    "lootTable": [
+      {
+        "itemID": "hrolf_standing_orders",
+        "dropChance": 0.65,
+        "rarity": "rare"
+      },
+      {
+        "itemID": "chest_void_plate_tier4",
+        "dropChance": 0.3,
+        "rarity": "rare"
+      },
+      {
+        "itemID": "health_potion_major",
+        "dropChance": 0.5,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "human",
+      "soldier",
+      "martial",
+      "named"
+    ],
+    "weaponTypes": [
+      "sword"
+    ]
+  },
+  {
+    "id": "chamber_scraper_drone",
+    "name": "Scraper Drone",
+    "description": "A small maintenance construct that has been running its corridor sweep for four years without interruption \u2014 uses shock to apply electrified and pummel to stack dazed, creating a rapid action-economy drain on anything that enters its path.",
+    "stats": {
+      "conviction": 45,
+      "endurance": 60,
+      "ambition": 70,
+      "harmony": 80
+    },
+    "armorValue": 8,
+    "aiProfile": "aggressive",
+    "equipment": {
+      "mainHand": null,
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "shock",
+      "pummel",
+      "basic_attack"
+    ],
+    "lootTable": [
+      {
+        "itemID": "health_potion_minor",
+        "dropChance": 0.2,
+        "rarity": "common"
+      }
+    ],
+    "tags": [
+      "construct",
+      "dwarven_conflict",
+      "machine"
+    ],
+    "weaponTypes": []
+  },
+  {
+    "id": "chamber_stone_warden",
+    "name": "Stone Warden",
+    "description": "A heavy security construct that leads with stone_skin to stack its own defense, then uses shield_bash to stun and ward_break to strip armor \u2014 forcing parties to choose between stripping its defense or losing their own.",
+    "stats": {
+      "conviction": 100,
+      "endurance": 130,
+      "ambition": 40,
+      "harmony": 80
+    },
+    "armorValue": 18,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": null,
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "stone_skin",
+      "shield_bash",
+      "ward_break",
+      "block",
+      "pummel"
+    ],
+    "lootTable": [
+      {
+        "itemID": "shield_adamant_tier3",
+        "dropChance": 0.2,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "construct",
+      "dwarven_conflict",
+      "machine"
+    ],
+    "weaponTypes": []
+  },
+  {
+    "id": "chamber_rune_smith",
+    "name": "Rune-Smith",
+    "description": "A dwarven caster who bought survival by mimicking maintenance behavior \u2014 opens with thunderclap to stun, then shock to apply electrified to the stunned target, compounding the action loss before the stun expires.",
+    "stats": {
+      "conviction": 70,
+      "endurance": 75,
+      "ambition": 95,
+      "harmony": 110
+    },
+    "armorValue": 5,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "staff_arcane_tier2",
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "thunderclap",
+      "shock",
+      "stone_skin",
+      "ward_break",
+      "basic_attack"
+    ],
+    "lootTable": [
+      {
+        "itemID": "mana_potion",
+        "dropChance": 0.35,
+        "rarity": "common"
+      },
+      {
+        "itemID": "acc_ring_gold_tier3",
+        "dropChance": 0.15,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "dwarf",
+      "dwarven_conflict",
+      "caster"
+    ],
+    "weaponTypes": [
+      "staff"
+    ]
+  },
+  {
+    "id": "chamber_ironvein_breaker",
+    "name": "Ironvein Breaker",
+    "description": "An elite Ironvein soldier whose four years of isolation have replaced discipline with fixation \u2014 uses warcry to accelerate the full enemy pack, then weak_point to armor-break the marked target before the attack_boost window expires.",
+    "stats": {
+      "conviction": 110,
+      "endurance": 105,
+      "ambition": 65,
+      "harmony": 30
+    },
+    "armorValue": 12,
+    "aiProfile": "berserker",
+    "equipment": {
+      "mainHand": "hammer_adamant_tier3",
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "warcry",
+      "weak_point",
+      "pummel",
+      "shout",
+      "basic_attack"
+    ],
+    "lootTable": [
+      {
+        "itemID": "stamina_potion",
+        "dropChance": 0.3,
+        "rarity": "common"
+      },
+      {
+        "itemID": "hammer_adamant_tier3",
+        "dropChance": 0.15,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "dwarf",
+      "dwarven_conflict",
+      "soldier"
+    ],
+    "weaponTypes": [
+      "hammer"
+    ]
+  },
+  {
+    "id": "field_oath_breaker",
+    "name": "Oath Breaker",
+    "description": "The residue of an abandoned promise given form \u2014 drifts without purpose until a Shadow Weaver directs it, at which point its basic_attack applies bleed and void_rend applies weaken to soften targets for the Weavers' shadow pressure.",
+    "stats": {
+      "conviction": 50,
+      "endurance": 60,
+      "ambition": 55,
+      "harmony": 10
+    },
+    "armorValue": 2,
+    "aiProfile": "aggressive",
+    "equipment": {
+      "mainHand": null,
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "basic_attack",
+      "void_rend",
+      "shove"
+    ],
+    "lootTable": [],
+    "tags": [
+      "spirit",
+      "corrupted",
+      "shadow"
+    ],
+    "weaponTypes": []
+  },
+  {
+    "id": "field_shadow_weaver",
+    "name": "Shadow Weaver",
+    "description": "A spectral caster that maintains the field's pressure from range \u2014 shadow_bolt and entropic_decay both apply shadowed, and shout extends the damage window of whatever else is in the fight.",
+    "stats": {
+      "conviction": 65,
+      "endurance": 65,
+      "ambition": 90,
+      "harmony": 95
+    },
+    "armorValue": 3,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "staff_void_tier3",
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "shadow_bolt",
+      "entropic_decay",
+      "shout",
+      "silence",
+      "shadow_strike"
+    ],
+    "lootTable": [
+      {
+        "itemID": "mana_potion",
+        "dropChance": 0.3,
+        "rarity": "common"
+      },
+      {
+        "itemID": "verdant_word_seal",
+        "dropChance": 0.15,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "spirit",
+      "corrupted",
+      "shadow",
+      "caster"
+    ],
+    "weaponTypes": [
+      "staff"
+    ]
+  },
+  {
+    "id": "field_fraying_wraith",
+    "name": "Fraying Wraith",
+    "description": "An elusive spirit that pairs entropic_decay and void_rend to stack shadowed and weaken simultaneously \u2014 the combination drains harmony and conviction in parallel, punishing parties that cannot cleanse multiple debuff types.",
+    "stats": {
+      "conviction": 60,
+      "endurance": 55,
+      "ambition": 100,
+      "harmony": 70
+    },
+    "armorValue": 0,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": null,
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "entropic_decay",
+      "void_rend",
+      "shadow_strike",
+      "decay_aura"
+    ],
+    "lootTable": [],
+    "tags": [
+      "spirit",
+      "corrupted",
+      "shadow"
+    ],
+    "weaponTypes": []
+  },
+  {
+    "id": "field_high_acolyte",
+    "name": "High Acolyte",
+    "description": "A former Verdant Word priest fifty years into a ritual he was never authorized to perform \u2014 entropic_decay, smothering_darkness, and shadow_strike are his damage options; drain_reserves punishes mana-heavy parties; shout accelerates whatever screens him.",
+    "stats": {
+      "conviction": 110,
+      "endurance": 130,
+      "ambition": 100,
+      "harmony": 160
+    },
+    "armorValue": 8,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "staff_shadow_tier4",
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "entropic_decay",
+      "smothering_darkness",
+      "shadow_strike",
+      "drain_reserves",
+      "shout",
+      "decay_aura"
+    ],
+    "lootTable": [
+      {
+        "itemID": "sigil_fragment",
+        "dropChance": 0.4,
+        "rarity": "legendary"
+      },
+      {
+        "itemID": "staff_shadow_tier4",
+        "dropChance": 0.35,
+        "rarity": "rare"
+      },
+      {
+        "itemID": "mana_potion_major",
+        "dropChance": 0.5,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "human",
+      "corrupted",
+      "shadow",
+      "caster",
+      "named"
+    ],
+    "weaponTypes": [
+      "staff"
+    ]
+  },
+  {
+    "id": "throne_high_justicar",
+    "name": "High Justicar",
+    "description": "A four-hundred-year-dormant succession construct reactivated by the coronation ritual \u2014 earthquake and primal_crush are its zone-control damage options; stone_fist targets priority threats; stone_skin and warcry are its two utility draws, keeping the ratio at 4 damage to 2 utility.",
+    "stats": {
+      "conviction": 190,
+      "endurance": 220,
+      "ambition": 85,
+      "harmony": 110
+    },
+    "armorValue": 22,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": null,
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "earthquake",
+      "primal_crush",
+      "stone_fist",
+      "shield_bash",
+      "stone_skin",
+      "warcry"
+    ],
+    "lootTable": [
+      {
+        "itemID": "coronation_writ",
+        "dropChance": 0.5,
+        "rarity": "legendary"
+      },
+      {
+        "itemID": "chest_phoenix_plate_tier6",
+        "dropChance": 0.25,
+        "rarity": "legendary"
+      },
+      {
+        "itemID": "health_potion_major",
+        "dropChance": 0.6,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "construct",
+      "dwarven_conflict",
+      "boss",
+      "ancestor"
+    ],
+    "weaponTypes": []
+  },
+  {
+    "id": "reconciliation_light_binder",
+    "name": "Light Binder",
+    "description": "An elven caster protecting the Core's version of the reconciliation \u2014 shadow_bolt applies shadowed to deny harmony; dispel strips party buffs; entangle and silence round out a control pool designed to shut down anything that might accelerate the Fragment's position.",
+    "stats": {
+      "conviction": 65,
+      "endurance": 70,
+      "ambition": 95,
+      "harmony": 120
+    },
+    "armorValue": 3,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "staff_barrier_tier4",
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "shadow_bolt",
+      "dispel",
+      "entangle",
+      "silence",
+      "shadow_strike"
+    ],
+    "lootTable": [
+      {
+        "itemID": "mana_potion",
+        "dropChance": 0.3,
+        "rarity": "common"
+      },
+      {
+        "itemID": "verdant_word_seal",
+        "dropChance": 0.15,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "elven",
+      "spirit",
+      "caster"
+    ],
+    "weaponTypes": [
+      "staff"
+    ]
+  },
+  {
+    "id": "reconciliation_fraying_corruption",
+    "name": "Fraying Corruption",
+    "description": "The residue of a failed reconciliation attempt \u2014 drain_reserves applies mana_burn and exhaustion simultaneously; entropic_decay deals shadow damage while stacking shadowed; decay_aura provides an AOE shadow pressure option for crowded encounters.",
+    "stats": {
+      "conviction": 55,
+      "endurance": 60,
+      "ambition": 85,
+      "harmony": 15
+    },
+    "armorValue": 0,
+    "aiProfile": "aggressive",
+    "equipment": {
+      "mainHand": null,
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "drain_reserves",
+      "entropic_decay",
+      "decay_aura",
+      "shadow_bolt"
+    ],
+    "lootTable": [],
+    "tags": [
+      "spirit",
+      "corrupted",
+      "shadow"
+    ],
+    "weaponTypes": []
+  },
+  {
+    "id": "elara_unified",
+    "name": "Elara Unified",
+    "description": "The merged Core and Fragment \u2014 soul_shatter opens with harmony_discord across the party to undermine healing before her own holy_word and mass_heal make the denial sting; sacred_roots and nature_wrap deal damage; poison_cloud provides AOE pressure. Four damage options in six ensure she hits.",
+    "stats": {
+      "conviction": 130,
+      "endurance": 175,
+      "ambition": 85,
+      "harmony": 260
+    },
+    "armorValue": 5,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "staff_life_tier5",
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "soul_shatter",
+      "sacred_roots",
+      "nature_wrap",
+      "poison_cloud",
+      "holy_word",
+      "mass_heal"
+    ],
+    "lootTable": [
+      {
+        "itemID": "unified_seed",
+        "dropChance": 0.35,
+        "rarity": "legendary"
+      },
+      {
+        "itemID": "staff_life_tier5",
+        "dropChance": 0.4,
+        "rarity": "rare"
+      },
+      {
+        "itemID": "mana_potion_major",
+        "dropChance": 0.5,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "elven",
+      "spirit",
+      "boss",
+      "named"
+    ],
+    "weaponTypes": [
+      "staff"
+    ]
+  },
+  {
+    "id": "keep_corrupted_priest",
+    "name": "Corrupted Priest",
+    "description": "A former Verdant Word cleric who reviewed the Architect's argument and found it sound \u2014 penitent_strike drains conviction while healing the caster; corrupting_hex layers cursed and conviction_drain on a single target; judgment_field provides holy-damage control; shadow_bolt rounds out the damage pool.",
+    "stats": {
+      "conviction": 90,
+      "endurance": 85,
+      "ambition": 80,
+      "harmony": 130
+    },
+    "armorValue": 6,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "scepter_celestial_tier4",
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "penitent_strike",
+      "corrupting_hex",
+      "judgment_field",
+      "shadow_bolt",
+      "drain_reserves"
+    ],
+    "lootTable": [
+      {
+        "itemID": "mana_potion",
+        "dropChance": 0.3,
+        "rarity": "common"
+      },
+      {
+        "itemID": "scepter_celestial_tier4",
+        "dropChance": 0.1,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "human",
+      "corrupted",
+      "caster",
+      "order"
+    ],
+    "weaponTypes": [
+      "scepter"
+    ]
+  },
+  {
+    "id": "keep_sigil_bearer",
+    "name": "The Sigil-Bearer",
+    "description": "The Architect's conscious collaborator and the Keep's commander \u2014 soul_shatter opens with paired harmony_discord and ambition_falter previewing the Spire's mechanic; decay_aura sustains shadow pressure; corrupting_hex targets the highest-threat party member; entropic_decay and smothering_darkness fill the damage pool; drain_reserves is the mana-denial anchor.",
+    "stats": {
+      "conviction": 140,
+      "endurance": 160,
+      "ambition": 115,
+      "harmony": 180
+    },
+    "armorValue": 10,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "staff_shadow_tier4",
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "soul_shatter",
+      "decay_aura",
+      "entropic_decay",
+      "smothering_darkness",
+      "corrupting_hex",
+      "drain_reserves"
+    ],
+    "lootTable": [
+      {
+        "itemID": "architects_seal",
+        "dropChance": 0.7,
+        "rarity": "legendary"
+      },
+      {
+        "itemID": "scepter_void_tier5",
+        "dropChance": 0.35,
+        "rarity": "rare"
+      },
+      {
+        "itemID": "mana_potion_major",
+        "dropChance": 0.5,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "human",
+      "corrupted",
+      "shadow",
+      "caster",
+      "boss",
+      "named"
+    ],
+    "weaponTypes": [
+      "staff"
+    ]
+  },
+  {
+    "id": "first_hand_oath_shard",
+    "name": "Oath Shard",
+    "description": "A crystallized broken promise given locomotion by entropy pressure \u2014 fraying_touch applies the frayed debuff while void_rend strips conviction; shove provides knockback disruption for the Fraying Architects behind them to exploit.",
+    "stats": {
+      "conviction": 60,
+      "endurance": 80,
+      "ambition": 70,
+      "harmony": 5
+    },
+    "armorValue": 10,
+    "aiProfile": "aggressive",
+    "equipment": {
+      "mainHand": null,
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "fraying_touch",
+      "void_rend",
+      "shove",
+      "basic_attack"
+    ],
+    "lootTable": [],
+    "tags": [
+      "construct",
+      "corrupted",
+      "shadow"
+    ],
+    "weaponTypes": []
+  },
+  {
+    "id": "first_hand_fraying_architect",
+    "name": "Fraying Architect",
+    "description": "The Architect's draftsmen \u2014 apply_siphon_ward marks targets for the Oath Shards to drain; reality_fracture provides AOE confusion pressure; entropic_decay sustains shadow damage between coordination pulses.",
+    "stats": {
+      "conviction": 70,
+      "endurance": 65,
+      "ambition": 100,
+      "harmony": 90
+    },
+    "armorValue": 4,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": null,
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "apply_siphon_ward",
+      "reality_fracture",
+      "entropic_decay",
+      "decay_aura"
+    ],
+    "lootTable": [
+      {
+        "itemID": "mana_potion_major",
+        "dropChance": 0.25,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "construct",
+      "corrupted",
+      "arcane"
+    ],
+    "weaponTypes": []
+  },
+  {
+    "id": "first_hand_entropy_weaver",
+    "name": "Entropy Weaver",
+    "description": "A construct that works the binding circle's nodes \u2014 reality_fracture disrupts positioning; apply_cursed_blood applies a stacking drain to anyone who holds still; soul_shatter provides the harmony/ambition debuff axis; smothering_darkness is the AOE pressure option.",
+    "stats": {
+      "conviction": 80,
+      "endurance": 75,
+      "ambition": 110,
+      "harmony": 100
+    },
+    "armorValue": 5,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": null,
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "reality_fracture",
+      "apply_cursed_blood",
+      "soul_shatter",
+      "smothering_darkness"
+    ],
+    "lootTable": [
+      {
+        "itemID": "mana_potion_major",
+        "dropChance": 0.2,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "construct",
+      "corrupted",
+      "arcane"
+    ],
+    "weaponTypes": []
+  },
+  {
+    "id": "first_hand_null_sentinel",
+    "name": "Null Sentinel",
+    "description": "A perimeter construct that anchors by draining \u2014 apply_life_leech sustains the Sentinel while damaging; shadow_tendril provides stun-on-hit control; apply_siphon_ward strips ward-buffs; decay_aura maintains AOE shadow pressure.",
+    "stats": {
+      "conviction": 100,
+      "endurance": 140,
+      "ambition": 60,
+      "harmony": 80
+    },
+    "armorValue": 16,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": null,
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "apply_life_leech",
+      "shadow_tendril",
+      "apply_siphon_ward",
+      "decay_aura"
+    ],
+    "lootTable": [],
+    "tags": [
+      "construct",
+      "corrupted",
+      "shadow"
+    ],
+    "weaponTypes": []
+  },
+  {
+    "id": "architects_first_hand",
+    "name": "The Architect's First Hand",
+    "description": "A localized fragment of the Architect's attention \u2014 soul_shatter opens with paired harmony_discord and ambition_falter to establish the stat baseline; reality_fracture and decay_aura sustain AOE pressure; apply_cursed_blood targets the highest-harmony member; apocalypse is the desperation zone clear. It is not trying to kill the party. It is trying to understand them.",
+    "stats": {
+      "conviction": 180,
+      "endurance": 200,
+      "ambition": 150,
+      "harmony": 200
+    },
+    "armorValue": 12,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": null,
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "soul_shatter",
+      "reality_fracture",
+      "decay_aura",
+      "apocalypse",
+      "apply_cursed_blood",
+      "siren_call"
+    ],
+    "lootTable": [
+      {
+        "itemID": "first_hand_shard",
+        "dropChance": 0.7,
+        "rarity": "legendary"
+      },
+      {
+        "itemID": "staff_divine_tier7",
+        "dropChance": 0.3,
+        "rarity": "legendary"
+      },
+      {
+        "itemID": "health_potion_major",
+        "dropChance": 0.6,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "construct",
+      "corrupted",
+      "arcane",
+      "shadow",
+      "boss",
+      "named"
+    ],
+    "weaponTypes": []
   }
 ]

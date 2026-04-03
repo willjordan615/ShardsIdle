@@ -12104,5 +12104,72 @@
       "physical",
       "control"
     ]
+  },
+  {
+    "id": "cleanse_weaken",
+    "name": "Cleanse Weakness",
+    "category": "HEALING",
+    "description": "Removes the weaken status from the target.",
+    "basePower": 1.0,
+    "costType": "none",
+    "costAmount": 0,
+    "requiredLevel": 1,
+    "scalingFactors": {
+      "harmony": 0.5
+    },
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "delay": 500,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "apply_buff",
+        "targets": "self",
+        "scalesBy": "harmony",
+        "magnitude": 1.0,
+        "debuff": "weaken",
+        "duration": 0,
+        "chance": 1.0
+      }
+    ],
+    "tags": [
+      "physical",
+      "consumable"
+    ]
+  },
+  {
+    "id": "restore_stamina",
+    "name": "Restore Stamina",
+    "category": "HEALING",
+    "description": "Restores a moderate amount of stamina to the user.",
+    "basePower": 1.0,
+    "costType": "none",
+    "costAmount": 0,
+    "requiredLevel": 1,
+    "scalingFactors": {
+      "endurance": 0.6
+    },
+    "baseHitChance": 1.0,
+    "critChance": 0.0,
+    "delay": 500,
+    "hitCount": {
+      "fixed": 1
+    },
+    "effects": [
+      {
+        "type": "heal",
+        "targets": "self",
+        "scalesBy": "endurance",
+        "magnitude": 1.2,
+        "duration": 0,
+        "chance": 1.0
+      }
+    ],
+    "tags": [
+      "physical",
+      "consumable"
+    ]
   }
 ]
