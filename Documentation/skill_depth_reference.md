@@ -1,13 +1,14 @@
-# Shards Idle â€” Skill Depth Reference
-*Generated from skills.json. Used by AI sessions for content generation â€” enemy skill pools, bot pools, challenge design.*
+# Shards Idle — Skill Depth Reference
+*Generated from skills.json. Used by AI sessions for content generation — enemy skill pools, bot pools, challenge design.*
+*Re-run `generate_skill_depth_reference.py` from the project root after adding new skills.*
 
 ## What Depth Means
 
 Depth reflects position in the combo discovery tree:
-- **Depth 1** â€” Base skills. No parents. Available from the start.
-- **Depth 2** â€” First-tier combos. Require two depth-1 parents.
-- **Depth 3** â€” Second-tier combos. At least one depth-2 parent.
-- **Depth 4+** â€” Advanced combos. Rare, powerful, thematically significant.
+- **Depth 1** — Base skills. No parents. Available from the start.
+- **Depth 2** — First-tier combos. Require two depth-1 parents.
+- **Depth 3** — Second-tier combos. At least one depth-2 parent.
+- **Depth 4+** — Advanced combos. Rare, powerful, thematically significant.
 
 ## Content Generation Guidelines
 
@@ -15,12 +16,12 @@ Depth reflects position in the combo discovery tree:
 
 | Enemy Level Range | Max Depth | Notes |
 |---|---|---|
-| 1â€“3 | 1â€“2 | Grunts and fodder. Depth 2 only on brutes or notable enemies. |
-| 4â€“8 | 2â€“3 | Veterans and specialists. Depth 3 appropriate for mid-tier enemies. |
-| 9â€“15 | 3â€“4 | Elite enemies and mini-bosses. Depth 4 reserved for named elites. |
-| 16â€“25 | 4 | Strong named enemies. Depth 4 across the board is acceptable. |
-| 26+ | 4â€“5 | Boss-tier only. Depth 5+ should be rare and intentional. |
-| Boss/Unique | 4â€“6 | Bosses can reach d5â€“6. Depth 7 only for endgame/lore enemies. |
+| 1–3 | 1–2 | Grunts and fodder. Depth 2 only on brutes or notable enemies. |
+| 4–8 | 2–3 | Veterans and specialists. Depth 3 appropriate for mid-tier enemies. |
+| 9–15 | 3–4 | Elite enemies and mini-bosses. Depth 4 reserved for named elites. |
+| 16–25 | 4 | Strong named enemies. Depth 4 across the board is acceptable. |
+| 26+ | 4–5 | Boss-tier only. Depth 5+ should be rare and intentional. |
+| Boss/Unique | 4–6 | Bosses can reach d5–6. Depth 7 only for endgame/lore enemies. |
 
 ### Bot Skill Pools (procedural generation)
 
@@ -28,10 +29,10 @@ Bots use the same thresholds, applied by bot level:
 
 | Bot Level | Max Depth Available |
 |---|---|
-| 1â€“12 | 1â€“2 (static bots.json) |
-| 13â€“19 | 2 |
-| 20â€“39 | 3 |
-| 40â€“100 | 4 |
+| 1–12 | 1–2 (static bots.json) |
+| 13–19 | 2 |
+| 20–39 | 3 |
+| 40–100 | 4 |
 | Never | 5+ (bots never reach d5+) |
 
 ### Thematic Fit by Category
@@ -46,11 +47,11 @@ When assigning skills to an enemy archetype, match category to role:
 | Mage/Caster | DAMAGE_MAGIC, DAMAGE_AOE | BUFF |
 | Support/Healer | HEALING, HEALING_AOE | BUFF, RESTORATION |
 | Utility/Shaman | RESTORATION, UTILITY, BUFF | CONTROL |
-| Beast/Animal | DAMAGE_SINGLE, DAMAGE_PROC | â€” |
+| Beast/Animal | DAMAGE_SINGLE, DAMAGE_PROC | — |
 | Undead/Spirit | CONTROL, DAMAGE_MAGIC | HEALING (self-sustain) |
 | Elemental | DAMAGE_AOE, DAMAGE_MAGIC | CONTROL |
 
-**Note:** CONTROL skills that apply taunt (provoke, goad, jeer, intimidate, incite, infuriate) are all depth 2â€“4 and should only appear on enemies that are meant to draw aggro.
+**Note:** CONTROL skills that apply taunt (provoke, goad, jeer, intimidate, incite, infuriate) are all depth 2–4 and should only appear on enemies that are meant to draw aggro.
 
 ---
 
@@ -60,55 +61,67 @@ When assigning skills to an enemy archetype, match category to role:
 
 | Skill ID | Name | Category | Group | Parents |
 |---|---|---|---|---|
-| `throw_knife` | Throw Knife | CONSUMABLE_DAMAGE | Consumable | â€” |
-| `shove` | Shove | CONTROL | Control | â€” |
-| `channel` | Channel | DAMAGE_MAGIC | Damage (Magic/AOE) | â€” |
-| `skill_fireball` | Fireball | DAMAGE_MAGIC | Damage (Magic/AOE) | â€” |
-| `skill_lightning` | Lightning Strike | DAMAGE_MAGIC | Damage (Magic/AOE) | â€” |
-| `aim` | Aim | DAMAGE_SINGLE | Damage (Physical) | â€” |
-| `basic_attack` | Basic Attack | DAMAGE_SINGLE | Damage (Physical) | â€” |
-| `untrained_strike` | Untrained Strike | DAMAGE_SINGLE | Damage (Physical) | â€” |
-| `block` | Block | DEFENSE | Defense | â€” |
-| `footwork` | Footwork | DEFENSE | Defense | â€” |
-| `misdirect` | Misdirect | DEFENSE | Defense | â€” |
-| `first_aid` | First Aid | HEALING | Healing | â€” |
-| `heal_major` | Major Heal | HEALING | Healing | â€” |
-| `skill_resurrect` | Resurrect | HEALING | Healing | â€” |
-| `skill_resurrect_party` | Mass Resurrect | HEALING | Healing | â€” |
-| `attunement` | Attunement | UTILITY | Support/Buff | â€” |
-| `bloodlust` | Bloodlust | BUFF | Support/Buff | â€” |
-| `buff_all_stats` | All Stats Buff | BUFF | Support/Buff | â€” |
-| `buff_defense` | Defense Buff | BUFF | Support/Buff | â€” |
-| `buff_loot_rate` | Loot Rate Buff | BUFF | Support/Buff | â€” |
-| `buff_speed` | Speed Buff | BUFF | Support/Buff | â€” |
-| `buff_strength` | Strength Buff | BUFF | Support/Buff | â€” |
-| `catch_breath` | Catch Breath | NO_RESOURCES | Support/Buff | â€” |
-| `climb_surface` | Climb | UTILITY | Support/Buff | â€” |
-| `desperate_attack` | Desperate Attack | NO_RESOURCES | Support/Buff | â€” |
-| `focus` | Focus | BUFF | Support/Buff | â€” |
-| `last_stand` | Last Stand | NO_RESOURCES | Support/Buff | â€” |
-| `light_area` | Light Area | UTILITY | Support/Buff | â€” |
-| `mental_fog` | Mental Fog | NO_RESOURCES | Support/Buff | â€” |
-| `prayer` | Prayer | BUFF | Support/Buff | â€” |
-| `rest` | Rest | RESTORATION | Support/Buff | â€” |
-| `restore_mana_major` | Major Mana Restoration | RESTORATION | Support/Buff | â€” |
-| `restore_mana_minor` | Minor Mana Restoration | RESTORATION | Support/Buff | â€” |
-| `restore_stam_minor` | Minor Stamina Restoration | RESTORATION | Support/Buff | â€” |
-| `restore_stam_small` | Small Stamina Restoration | RESTORATION | Support/Buff | â€” |
-| `reveal_area` | Reveal Area | UTILITY | Support/Buff | â€” |
-| `sense` | Sense | UTILITY | Support/Buff | â€” |
-| `shout` | Shout | BUFF | Support/Buff | â€” |
-| `skill_teleport` | Teleport | UTILITY | Support/Buff | â€” |
-| `skill_teleport_safe` | Safe Teleport | UTILITY | Support/Buff | â€” |
-| `unlock_door` | Unlock Door | UTILITY | Support/Buff | â€” |
-| `wild_flail` | Wild Flail | NO_RESOURCES | Support/Buff | â€” |
-| `deploy_caltrops` | Deploy Caltrops | TRAP | TRAP | â€” |
-| `deploy_trap_stun` | Deploy Stun Trap | TRAP | TRAP | â€” |
+| `elixir_of_vitality` | Elixir of Vitality | CONSUMABLE_HEALING | Consumable | — |
+| `heal_major2` | Major Heal | CONSUMABLE_HEALING | Consumable | — |
+| `heal_minor` | Minor Heal | CONSUMABLE_HEALING | Consumable | — |
+| `heal_standard` | Heal | CONSUMABLE_HEALING | Consumable | — |
+| `purge` | Purge | CONSUMABLE_HEALING | Consumable | — |
+| `restore_mana_major` | Major Mana Restoration | CONSUMABLE_RESTORATION | Consumable | — |
+| `restore_mana_major2` | Major Mana Restoration | CONSUMABLE_RESTORATION | Consumable | — |
+| `restore_mana_minor` | Minor Mana Restoration | CONSUMABLE_RESTORATION | Consumable | — |
+| `restore_stam` | Stamina Restoration | CONSUMABLE_RESTORATION | Consumable | — |
+| `restore_stam_major` | Major Stamina Restoration | CONSUMABLE_RESTORATION | Consumable | — |
+| `restore_stam_small` | Small Stamina Restoration | CONSUMABLE_RESTORATION | Consumable | — |
+| `skill_fireball` | Fireball | CONSUMABLE_DAMAGE | Consumable | — |
+| `skill_lightning` | Lightning Strike | CONSUMABLE_DAMAGE | Consumable | — |
+| `skill_teleport` | Teleport | CONSUMABLE_ESCAPE | Consumable | — |
+| `throw_knife` | Throw Knife | CONSUMABLE_DAMAGE | Consumable | — |
+| `drain_reserves` | Drain Reserves | CONTROL | Control | — |
+| `misdirect` | Misdirect | CONTROL | Control | — |
+| `shove` | Shove | CONTROL | Control | — |
+| `channel` | Channel | DAMAGE_MAGIC | Damage (Magic/AOE) | — |
+| `aim` | Aim | DAMAGE_SINGLE | Damage (Physical) | — |
+| `basic_attack` | Basic Attack | DAMAGE_SINGLE | Damage (Physical) | — |
+| `untrained_strike` | Untrained Strike | DAMAGE_SINGLE | Damage (Physical) | — |
+| `block` | Block | DEFENSE | Defense | — |
+| `footwork` | Footwork | DEFENSE | Defense | — |
+| `cleanse_weaken` | Cleanse Weakness | HEALING | Healing | — |
+| `first_aid` | First Aid | HEALING | Healing | — |
+| `heal_major` | Major Heal | HEALING | Healing | — |
+| `restore_stamina` | Restore Stamina | HEALING | Healing | — |
+| `attunement` | Attunement | UTILITY | Support/Buff | — |
+| `bloodlust` | Bloodlust | BUFF | Support/Buff | — |
+| `buff_loot_rate` | Loot Rate Buff | BUFF | Support/Buff | — |
+| `catch_breath` | Catch Breath | NO_RESOURCES | Support/Buff | — |
+| `climb_surface` | Climb | UTILITY | Support/Buff | — |
+| `desperate_attack` | Desperate Attack | NO_RESOURCES | Support/Buff | — |
+| `focus` | Focus | BUFF | Support/Buff | — |
+| `last_stand` | Last Stand | NO_RESOURCES | Support/Buff | — |
+| `light_area` | Light Area | UTILITY | Support/Buff | — |
+| `mental_fog` | Mental Fog | NO_RESOURCES | Support/Buff | — |
+| `prayer` | Prayer | BUFF | Support/Buff | — |
+| `rest` | Rest | RESTORATION | Support/Buff | — |
+| `restore_stam_minor` | Minor Stamina Restoration | RESTORATION | Support/Buff | — |
+| `reveal_area` | Reveal Area | UTILITY | Support/Buff | — |
+| `sense` | Sense | UTILITY | Support/Buff | — |
+| `shout` | Shout | BUFF | Support/Buff | — |
+| `skill_teleport_safe` | Safe Teleport | UTILITY | Support/Buff | — |
+| `unlock_door` | Unlock Door | UTILITY | Support/Buff | — |
+| `wild_flail` | Wild Flail | NO_RESOURCES | Support/Buff | — |
+| `buff_all_stats` | All Stats Buff | CONSUMABLE_BUFF | CONSUMABLE_BUFF | — |
+| `buff_defense` | Defense Buff | CONSUMABLE_BUFF | CONSUMABLE_BUFF | — |
+| `buff_speed` | Speed Buff | CONSUMABLE_BUFF | CONSUMABLE_BUFF | — |
+| `buff_strength` | Strength Buff | CONSUMABLE_BUFF | CONSUMABLE_BUFF | — |
+| `deploy_caltrops` | Deploy Caltrops | CONSUMABLE_CONTROL | CONSUMABLE_CONTROL | — |
+| `deploy_trap_stun` | Deploy Stun Trap | CONSUMABLE_CONTROL | CONSUMABLE_CONTROL | — |
 
 ### Depth 2
 
 | Skill ID | Name | Category | Group | Parents |
 |---|---|---|---|---|
+| `dissonance` | Dissonance | CONTROL | Control | proc_chime, shove |
+| `hex` | Hex | CONTROL | Control | sense, shove |
+| `lullaby` | Lullaby | CONTROL | Control | proc_lullaby, misdirect |
 | `provoke` | Provoke | CONTROL | Control | misdirect, block |
 | `arcane_bolt` | Arcane Bolt | DAMAGE_MAGIC | Damage (Magic/AOE) | channel, focus |
 | `chill` | Chill | DAMAGE_MAGIC | Damage (Magic/AOE) | channel, rest |
@@ -120,6 +133,7 @@ When assigning skills to an enemy archetype, match category to role:
 | `lunge` | Lunge | DAMAGE_SINGLE | Damage (Physical) | basic_attack, footwork |
 | `pierce` | Pierce | DAMAGE_SINGLE | Damage (Physical) | aim, footwork |
 | `pummel` | Pummel | DAMAGE_SINGLE | Damage (Physical) | shove, basic_attack |
+| `rhythmic_strike` | Rhythmic Strike | DAMAGE_SINGLE | Damage (Physical) | focus, attunement |
 | `skirmish` | Skirmish | DAMAGE_SINGLE | Damage (Physical) | aim, footwork |
 | `slash` | Slash | DAMAGE_SINGLE | Damage (Physical) | basic_attack, aim |
 | `smite` | Smite | DAMAGE_SINGLE | Damage (Physical) | prayer, basic_attack |
@@ -127,17 +141,20 @@ When assigning skills to an enemy archetype, match category to role:
 | `weak_point` | Weak Point | DAMAGE_SINGLE | Damage (Physical) | aim, sense |
 | `fortify` | Fortify | DEFENSE | Defense | restore_stam_minor, block |
 | `stone_skin` | Stone Skin | DEFENSE | Defense | block, attunement |
+| `ward` | Ward | DEFENSE | Defense | block, attunement |
 | `holy_light` | Holy Light | HEALING | Healing | prayer, first_aid |
-| `mend` | Mend | HEALING | Healing | first_aid, use_health_potion_minor |
+| `mend` | Mend | HEALING | Healing | first_aid, heal_major |
 | `nature_touch` | Nature Touch | HEALING | Healing | attunement, shove |
 | `second_wind` | Second Wind | HEALING | Healing | restore_stam_minor, first_aid |
+| `spirit_link` | Spirit Link | HEALING | Healing | first_aid, proc_harmony |
 | `berserker_stance` | Berserker Stance | BUFF | Support/Buff | bloodlust, block |
 | `blood_rage` | Blood Rage | BUFF | Support/Buff | bloodlust, shout |
 | `call_target` | Call Target | UTILITY | Support/Buff | aim, shout |
 | `focused_rest` | Focused Rest | RESTORATION | Support/Buff | rest, focus |
 | `iron_will` | Iron Will | RESTORATION | Support/Buff | restore_stam_minor, shout |
-| `shadow_step` | Shadow Step | UTILITY | Support/Buff | misdirect, footwork |
 | `silent_prayer` | Silent Prayer | UTILITY | Support/Buff | prayer, misdirect |
+| `song_of_vigor` | Song of Vigor | BUFF | Support/Buff | proc_melody, shout |
+| `spirit_tap` | Spirit Tap | RESTORATION | Support/Buff | rest, attunement |
 | `stalk` | Stalk | UTILITY | Support/Buff | footwork, misdirect |
 | `vitality_boost` | Vitality Boost | BUFF | Support/Buff | rest, attunement |
 | `warcry` | Warcry | BUFF | Support/Buff | shout, focus |
@@ -146,9 +163,11 @@ When assigning skills to an enemy archetype, match category to role:
 
 | Skill ID | Name | Category | Group | Parents |
 |---|---|---|---|---|
+| `corrupting_hex` | Corrupting Hex | CONTROL | Control | hex, proc_lullaby |
 | `dispel` | Dispel | CONTROL | Control | sense, nature_touch |
 | `entangle` | Entangle | CONTROL | Control | nature_touch, footwork |
 | `goad` | Goad | CONTROL | Control | provoke, strong_attack |
+| `haunting_refrain` | Haunting Refrain | CONTROL | Control | dissonance, proc_echo |
 | `jeer` | Jeer | CONTROL | Control | provoke, shout |
 | `nature_wrap` | Nature Wrap | CONTROL | Control | nature_touch, shove |
 | `burning_aura` | Burning Aura | DAMAGE_AOE | Damage (Magic/AOE) | produce_flame, shout |
@@ -164,15 +183,14 @@ When assigning skills to an enemy archetype, match category to role:
 | `scorched_shot` | Scorched Shot | DAMAGE_MAGIC | Damage (Magic/AOE) | produce_flame, aim |
 | `septic_flame` | Septic Flame | DAMAGE_MAGIC | Damage (Magic/AOE) | produce_flame, apply_poison |
 | `shadow_bolt` | Shadow Bolt | DAMAGE_MAGIC | Damage (Magic/AOE) | arcane_bolt, misdirect |
-| `shockwave` | Shockwave | DAMAGE_AOE | Damage (Magic/AOE) | shove, shock |
 | `sleet` | Sleet | DAMAGE_MAGIC | Damage (Magic/AOE) | shock, chill |
+| `spirit_drain` | Spirit Drain | DAMAGE_MAGIC | Damage (Magic/AOE) | spirit_tap, hex |
 | `storm_seed` | Storm Seed | DAMAGE_MAGIC | Damage (Magic/AOE) | shock, nature_touch |
 | `thunderclap` | Thunderclap | DAMAGE_MAGIC | Damage (Magic/AOE) | shock, shove |
 | `volatile_venom` | Volatile Venom | DAMAGE_MAGIC | Damage (Magic/AOE) | apply_poison, arcane_bolt |
 | `acid_splash` | Acid Splash | DAMAGE_SINGLE | Damage (Physical) | apply_poison, chill |
 | `arcane_lunge` | Arcane Lunge | DAMAGE_SINGLE | Damage (Physical) | lunge, arcane_bolt |
 | `arcane_pummel` | Arcane Pummel | DAMAGE_SINGLE | Damage (Physical) | pummel, arcane_strike |
-| `assassinate` | Assassinate | DAMAGE_SINGLE | Damage (Physical) | shadow_step, weak_point |
 | `blood_letting` | Blood Letting | DAMAGE_SINGLE | Damage (Physical) | slash, sense |
 | `counter_strike` | Counter Strike | DAMAGE_SINGLE | Damage (Physical) | block, slash |
 | `flaming_edge` | Flaming Edge | DAMAGE_SINGLE | Damage (Physical) | slash, produce_flame |
@@ -183,7 +201,6 @@ When assigning skills to an enemy archetype, match category to role:
 | `ice_pierce` | Ice Pierce | DAMAGE_SINGLE | Damage (Physical) | pierce, chill |
 | `ice_shard` | Ice Shard | DAMAGE_SINGLE | Damage (Physical) | chill, aim |
 | `nature_pierce` | Nature Pierce | DAMAGE_SINGLE | Damage (Physical) | pierce, nature_touch |
-| `phantom_lunge` | Phantom Lunge | DAMAGE_SINGLE | Damage (Physical) | lunge, shadow_step |
 | `poison_lunge` | Poison Lunge | DAMAGE_SINGLE | Damage (Physical) | lunge, apply_poison |
 | `riposte` | Riposte | DAMAGE_SINGLE | Damage (Physical) | block, pierce |
 | `runic_smash` | Runic Smash | DAMAGE_SINGLE | Damage (Physical) | pummel, arcane_bolt |
@@ -206,25 +223,29 @@ When assigning skills to an enemy archetype, match category to role:
 | `life_link` | Life Link | HEALING | Healing | holy_light, attunement |
 | `regrowth` | Regrowth | HEALING | Healing | nature_touch, first_aid |
 | `sacred_grove` | Sacred Grove | HEALING_AOE | Healing | holy_light, nature_touch |
+| `soothing_verse` | Soothing Verse | HEALING_AOE | Healing | lullaby, first_aid |
+| `chorus` | Chorus | BUFF | Support/Buff | song_of_vigor, warcry |
 | `echoing_prayer` | Echoing Prayer | BUFF | Support/Buff | prayer, warcry |
 | `mana_cycle` | Mana Cycle | RESTORATION | Support/Buff | vitality_boost, arcane_bolt |
-| `shadow_misdirection` | Shadow Misdirection | UTILITY | Support/Buff | shadow_step, misdirect |
-| `stalking_shadow` | Stalking Shadow | UTILITY | Support/Buff | stalk, shadow_step |
+| `shadow_step` | Shadow Step | UTILITY | Support/Buff | stalk, footwork |
+| `totemic_aura` | Totemic Aura | BUFF | Support/Buff | ward, shout |
 | `vitality_surge` | Vitality Surge | BUFF | Support/Buff | vitality_boost, shout |
 
 ### Depth 4
 
 | Skill ID | Name | Category | Group | Parents |
 |---|---|---|---|---|
+| `ancestral_shroud` | Ancestral Shroud | CONTROL | Control | corrupting_hex, sense |
 | `frozen_cry` | Frozen Cry | CONTROL | Control | warcry, frost_nova |
 | `holy_roots` | Holy Roots | CONTROL | Control | smite, entangle |
 | `incite` | Incite | CONTROL | Control | goad, lunge |
-| `intimidate` | Intimidate | CONTROL | Control | jeer, shockwave |
 | `judgment_field` | Judgment Field | CONTROL | Control | holy_word, entangle |
 | `primal_crush` | Primal Crush | CONTROL | Control | nature_wrap, stone_fist |
 | `sacred_roots` | Sacred Roots | CONTROL | Control | entangle, holy_light |
 | `shadow_tendril` | Shadow Tendril | CONTROL | Control | shadow_bolt, attunement |
+| `siren_call` | Siren Call | CONTROL | Control | haunting_refrain, proc_harmony |
 | `ward_break` | Ward Break | CONTROL | Control | thunderclap, stone_fist |
+| `battle_hymn` | Battle Hymn | DAMAGE_AOE | Damage (Magic/AOE) | rhythmic_strike, chorus |
 | `blizzard` | Blizzard | DAMAGE_AOE | Damage (Magic/AOE) | frost_nova, shout |
 | `chain_lightning` | Chain Lightning | DAMAGE_AOE | Damage (Magic/AOE) | lightning_chain, focus |
 | `decay_aura` | Decay Aura | DAMAGE_AOE | Damage (Magic/AOE) | shadow_bolt, attunement |
@@ -234,10 +255,13 @@ When assigning skills to an enemy archetype, match category to role:
 | `meteor` | Meteor | DAMAGE_AOE | Damage (Magic/AOE) | fireball, aim |
 | `plague_carrier` | Plague Carrier | DAMAGE_AOE | Damage (Magic/AOE) | venomous_slash, poison_cloud |
 | `ring_of_fire` | Ring of Fire | DAMAGE_AOE | Damage (Magic/AOE) | burning_aura, footwork |
+| `shockwave` | Shockwave | DAMAGE_AOE | Damage (Magic/AOE) | channel, thunderclap |
+| `spirit_storm` | Spirit Storm | DAMAGE_AOE | Damage (Magic/AOE) | spirit_drain, totemic_aura |
 | `storm_hammer` | Storm Hammer | DAMAGE_AOE | Damage (Magic/AOE) | shocking_blow, strong_attack |
 | `venom_storm` | Venom Storm | DAMAGE_AOE | Damage (Magic/AOE) | poison_cloud, lightning_chain |
 | `water_bolt` | Water Bolt | DAMAGE_MAGIC | Damage (Magic/AOE) | shock, entangle |
 | `arcane_dash` | Arcane Dash | DAMAGE_SINGLE | Damage (Physical) | arcane_lunge, footwork |
+| `assassinate` | Assassinate | DAMAGE_SINGLE | Damage (Physical) | shadow_step, weak_point |
 | `blood_ice` | Blood Ice | DAMAGE_SINGLE | Damage (Physical) | chill, blood_letting |
 | `corrosive_wound` | Corrosive Wound | DAMAGE_SINGLE | Damage (Physical) | venomous_slash, acid_splash |
 | `divine_judgment` | Divine Judgment | DAMAGE_SINGLE | Damage (Physical) | holy_smite, focus |
@@ -245,11 +269,11 @@ When assigning skills to an enemy archetype, match category to role:
 | `ice_lance` | Ice Lance | DAMAGE_SINGLE | Damage (Physical) | ice_shard, pierce |
 | `inferno_slice` | Inferno Slice | DAMAGE_SINGLE | Damage (Physical) | flaming_edge, lunge |
 | `penitent_strike` | Penitent Strike | DAMAGE_SINGLE | Damage (Physical) | smite, blood_letting |
+| `phantom_lunge` | Phantom Lunge | DAMAGE_SINGLE | Damage (Physical) | lunge, shadow_step |
 | `shadow_riposte` | Shadow Riposte | DAMAGE_SINGLE | Damage (Physical) | counter_strike, shadow_step |
 | `shadow_strike` | Shadow Strike | DAMAGE_SINGLE | Damage (Physical) | shadow_bolt, basic_attack |
 | `shadow_wound` | Shadow Wound | DAMAGE_SINGLE | Damage (Physical) | slash, shadow_bolt |
 | `shield_bash` | Shield Bash | DAMAGE_SINGLE | Damage (Physical) | counter_strike, shove |
-| `silent_death` | Silent Death | DAMAGE_SINGLE | Damage (Physical) | assassinate, shadow_step |
 | `bark_carapace` | Bark Carapace | DEFENSE | Defense | nature_wrap, stone_skin |
 | `divine_barrier` | Divine Barrier | DEFENSE | Defense | mana_shield, prayer |
 | `sanctuary` | Sanctuary | DEFENSE | Defense | holy_word, block |
@@ -259,27 +283,34 @@ When assigning skills to an enemy archetype, match category to role:
 | `martyrdom` | Martyrdom | HEALING_AOE | Healing | healing_light, basic_attack |
 | `mass_heal` | Mass Heal | HEALING_AOE | Healing | healing_light, rest |
 | `persistent_life` | Persistent Life | HEALING | Healing | regrowth, rest |
-| `resurrection_rite` | Resurrection Rite | HEALING | Healing | holy_word, first_aid |
+| `resurrection_rite` | Bless | HEALING | Healing | holy_word, first_aid |
 | `retaliatory_heal` | Retaliatory Heal | HEALING | Healing | mend, counter_strike |
 | `rooted_healing` | Rooted Healing | HEALING_AOE | Healing | healing_light, entangle |
 | `thorned_regeneration` | Thorned Regeneration | HEALING | Healing | regrowth, nature_wrap |
 | `blood_fury` | Blood Fury | BUFF | Support/Buff | blood_letting, shout |
+| `grand_symphony` | Grand Symphony | BUFF | Support/Buff | chorus, proc_resonance |
 | `mental_fortitude` | Mental Fortitude | BUFF | Support/Buff | mind_spike, focus |
+| `shadow_misdirection` | Shadow Misdirection | UTILITY | Support/Buff | shadow_step, misdirect |
 | `shadow_veil` | Shadow Veil | UTILITY | Support/Buff | shadow_bolt, misdirect |
+| `stalking_shadow` | Stalking Shadow | UTILITY | Support/Buff | stalk, shadow_step |
 | `terror_cry` | Terror Cry | BUFF | Support/Buff | warcry, shadow_bolt |
 
 ### Depth 5
 
 | Skill ID | Name | Category | Group | Parents |
 |---|---|---|---|---|
+| `intimidate` | Intimidate | CONTROL | Control | jeer, shockwave |
 | `shadow_grasp` | Shadow Grasp | CONTROL | Control | shadow_tendril, entangle |
 | `silence` | Silence | CONTROL | Control | shadow_veil, misdirect |
+| `soul_shatter` | Soul Shatter | CONTROL | Control | ancestral_shroud, corrupting_hex |
 | `tidal_grasp` | Tidal Grasp | CONTROL | Control | water_bolt, shove |
 | `bio_hazard` | Bio Hazard | DAMAGE_AOE | Damage (Magic/AOE) | plague_carrier, nature_touch |
+| `discordant_surge` | Discordant Surge | DAMAGE_AOE | Damage (Magic/AOE) | battle_hymn, proc_chime |
 | `heavens_fury` | Heaven's Fury | DAMAGE_AOE | Damage (Magic/AOE) | divine_judgment, holy_word |
 | `hellfire` | Hellfire | DAMAGE_AOE | Damage (Magic/AOE) | ring_of_fire, shadow_bolt |
 | `permafrost` | Permafrost | DAMAGE_AOE | Damage (Magic/AOE) | blizzard, frostbite |
 | `plague_bloom` | Plague Bloom | DAMAGE_AOE | Damage (Magic/AOE) | plague_carrier, regrowth |
+| `plague_wind` | Plague Wind | DAMAGE_AOE | Damage (Magic/AOE) | ancestral_shroud, proc_melody |
 | `thunder_god` | Thunder God | DAMAGE_AOE | Damage (Magic/AOE) | storm_hammer, shock |
 | `titan_foot` | Titan Foot | DAMAGE_AOE | Damage (Magic/AOE) | primal_crush, footwork |
 | `toxic_fog` | Toxic Fog | DAMAGE_AOE | Damage (Magic/AOE) | poison_cloud, shadow_veil |
@@ -288,6 +319,7 @@ When assigning skills to an enemy archetype, match category to role:
 | `bleed_out` | Bleed Out | DAMAGE_SINGLE | Damage (Physical) | blood_fury, weak_point |
 | `blink_strike` | Blink Strike | DAMAGE_SINGLE | Damage (Physical) | arcane_dash, arcane_bolt |
 | `phoenix_strike` | Phoenix Strike | DAMAGE_SINGLE | Damage (Physical) | inferno_slice, mend |
+| `silent_death` | Silent Death | DAMAGE_SINGLE | Damage (Physical) | assassinate, shadow_step |
 | `void_rend` | Void Rend | DAMAGE_SINGLE | Damage (Physical) | shadow_strike, slash |
 | `divine_reflection` | Divine Reflection | DEFENSE | Defense | spell_reflection, holy_light |
 | `psychic_barrier` | Psychic Barrier | DEFENSE | Defense | mental_fortitude, arcane_barrier |
@@ -296,7 +328,6 @@ When assigning skills to an enemy archetype, match category to role:
 | `berserker_rage` | Berserker Rage | BUFF | Support/Buff | blood_fury, warcry |
 | `mirror_image` | Mirror Image | UTILITY | Support/Buff | spell_reflection, shadow_veil |
 | `shadow_clone` | Shadow Clone | UTILITY | Support/Buff | shadow_veil, misdirect |
-| `void_walk` | Void Walk | UTILITY | Support/Buff | silent_death, shadow_step |
 
 ### Depth 6
 
@@ -315,7 +346,7 @@ When assigning skills to an enemy archetype, match category to role:
 | `executioner` | Executioner | DAMAGE_SINGLE | Damage (Physical) | bleed_out, smite |
 | `necromancy` | Necromancy | HEALING | Healing | shadow_grasp, first_aid |
 | `demon_form` | Demon Form | BUFF | Support/Buff | void_rend, shadow_clone |
-| `spirit_walk` | Spirit Walk | UTILITY | Support/Buff | void_walk, attunement |
+| `void_walk` | Void Walk | UTILITY | Support/Buff | silent_death, shadow_step |
 
 ### Depth 7
 
@@ -323,3 +354,4 @@ When assigning skills to an enemy archetype, match category to role:
 |---|---|---|---|---|
 | `lord_of_decay` | Lord of Decay | DAMAGE_AOE | Damage (Magic/AOE) | bio_hazard, necromancy |
 | `omnipotence` | Omnipotence | BUFF | Support/Buff | mind_control, warcry |
+| `spirit_walk` | Spirit Walk | UTILITY | Support/Buff | void_walk, attunement |

@@ -6929,5 +6929,1278 @@
       "named"
     ],
     "weaponTypes": []
+  },
+  {
+    "id": "drift_oath_breaker",
+    "name": "Oath Breaker",
+    "description": "A spectral laborer still loading crates that no longer exist onto a dock that is sinking \u2014 uses basic_attack to apply bleed and shove to displace defenders before the shadow casters can work.",
+    "stats": {
+      "conviction": 60,
+      "endurance": 70,
+      "ambition": 55,
+      "harmony": 15
+    },
+    "armorValue": 2,
+    "aiProfile": "aggressive",
+    "equipment": {
+      "mainHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "basic_attack",
+      "shove",
+      "void_rend"
+    ],
+    "lootTable": [],
+    "tags": [
+      "spirit",
+      "corrupted",
+      "shadow"
+    ],
+    "weaponTypes": []
+  },
+  {
+    "id": "drift_shadow_weaver",
+    "name": "Shadow Weaver",
+    "description": "A spectral merchant whose ledgers have become spellbooks \u2014 shadow_bolt applies shadowed to reduce harmony while entropic_decay stacks the pressure, and shout extends every debuff window in the fight.",
+    "stats": {
+      "conviction": 65,
+      "endurance": 70,
+      "ambition": 85,
+      "harmony": 100
+    },
+    "armorValue": 3,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "staff_void_tier3"
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "shadow_bolt",
+      "entropic_decay",
+      "shout",
+      "drain_reserves"
+    ],
+    "lootTable": [
+      {
+        "itemID": "mana_potion",
+        "dropChance": 0.3,
+        "rarity": "common"
+      },
+      {
+        "itemID": "verdant_word_seal",
+        "dropChance": 0.12,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "spirit",
+      "corrupted",
+      "shadow",
+      "caster"
+    ],
+    "weaponTypes": [
+      "staff"
+    ]
+  },
+  {
+    "id": "drift_fraying_wraith",
+    "name": "Fraying Wraith",
+    "description": "A spirit that has come apart at the edges \u2014 pairs entropic_decay and void_rend to stack shadowed and weaken simultaneously, punishing parties that cannot cleanse multiple debuffs at once.",
+    "stats": {
+      "conviction": 65,
+      "endurance": 60,
+      "ambition": 105,
+      "harmony": 75
+    },
+    "armorValue": 0,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "entropic_decay",
+      "void_rend",
+      "shadow_bolt",
+      "drain_reserves"
+    ],
+    "lootTable": [],
+    "tags": [
+      "spirit",
+      "corrupted",
+      "shadow"
+    ],
+    "weaponTypes": []
+  },
+  {
+    "id": "drift_station_master",
+    "name": "The Station Master",
+    "description": "A halfling ferryman who chose to stay when the station started sinking and kept choosing to stay until he ran out of choices \u2014 drain_reserves and shadow_bolt are his primary tools; shout extends the debuff window across the whole encounter; soul_shatter opens every serious engagement. The ledger he carries is still accurate. He updates it.",
+    "stats": {
+      "conviction": 160,
+      "endurance": 185,
+      "ambition": 100,
+      "harmony": 150
+    },
+    "armorValue": 8,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "staff_shadow_tier4"
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "soul_shatter",
+      "drain_reserves",
+      "shadow_bolt",
+      "shout",
+      "entropic_decay",
+      "decay_aura"
+    ],
+    "lootTable": [
+      {
+        "itemID": "ferryfolk_lantern",
+        "dropChance": 0.12,
+        "rarity": "legendary"
+      },
+      {
+        "itemID": "monitoring_crystal",
+        "dropChance": 0.3,
+        "rarity": "rare"
+      },
+      {
+        "itemID": "mana_potion_major",
+        "dropChance": 0.5,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "halfling",
+      "corrupted",
+      "shadow",
+      "boss",
+      "named"
+    ],
+    "weaponTypes": [
+      "staff"
+    ]
+  },
+  {
+    "id": "quarantine_overseer_grell",
+    "name": "Overseer Grell",
+    "description": "A former Royal Guard officer who volunteered to command the Quarantine because he believed the Guard's duty was to contain damage, not prevent it \u2014 drain_reserves targets whoever is sustaining the party, intimidate locks a target's options, and fortify keeps him standing while the corruption finishes his work.",
+    "stats": {
+      "conviction": 155,
+      "endurance": 170,
+      "ambition": 70,
+      "harmony": 45
+    },
+    "armorValue": 16,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "sword_adamant_tier3"
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "drain_reserves",
+      "intimidate",
+      "fortify",
+      "warcry",
+      "weak_point",
+      "basic_attack"
+    ],
+    "lootTable": [
+      {
+        "itemID": "royal_guard_insignia",
+        "dropChance": 0.6,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "chest_void_plate_tier4",
+        "dropChance": 0.25,
+        "rarity": "rare"
+      },
+      {
+        "itemID": "health_potion_major",
+        "dropChance": 0.5,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "human",
+      "soldier",
+      "martial",
+      "named"
+    ],
+    "weaponTypes": [
+      "sword"
+    ]
+  },
+  {
+    "id": "reach_choir_marshal_veth",
+    "name": "Choir-Marshal Veth",
+    "description": "The Tidebound officer who established the Southern Reach forward base and has held it for five years while Malacor works the Sanctum connection elsewhere \u2014 undertow and tidal_grasp control the battlefield's movement while drain_reserves punishes mana-dependent parties; she coordinates from the ley line altar because standing on it gives her a direct feed from the flood's advance.",
+    "stats": {
+      "conviction": 155,
+      "endurance": 175,
+      "ambition": 95,
+      "harmony": 140
+    },
+    "armorValue": 10,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "polearm_aethelgard_tier4"
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "undertow",
+      "tidal_grasp",
+      "drain_reserves",
+      "shout",
+      "water_bolt",
+      "chill"
+    ],
+    "lootTable": [
+      {
+        "itemID": "thrains_complete_report",
+        "dropChance": 0.35,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "polearm_aethelgard_tier4",
+        "dropChance": 0.25,
+        "rarity": "rare"
+      },
+      {
+        "itemID": "mana_potion_major",
+        "dropChance": 0.5,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "monitoring_crystal",
+        "dropChance": 0.05,
+        "rarity": "legendary"
+      }
+    ],
+    "tags": [
+      "tidebound",
+      "water",
+      "boss",
+      "named",
+      "soldier"
+    ],
+    "weaponTypes": [
+      "polearm",
+      "scepter"
+    ]
+  },
+  {
+    "id": "archive_seal_warden",
+    "name": "Seal Warden",
+    "description": "A spectral archivist still maintaining the seal protocols that were his final assignment \u2014 uses misdirect to pull the party's targeting away from priority records, and shock to apply electrified to anyone who lingers near a sealed vault long enough to read it.",
+    "stats": {
+      "conviction": 70,
+      "endurance": 80,
+      "ambition": 80,
+      "harmony": 95
+    },
+    "armorValue": 3,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "wand_shadow_tier2"
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "shock",
+      "misdirect",
+      "shout",
+      "mental_fog",
+      "sleet"
+    ],
+    "lootTable": [
+      {
+        "itemID": "mana_potion",
+        "dropChance": 0.3,
+        "rarity": "common"
+      },
+      {
+        "itemID": "verdant_word_seal",
+        "dropChance": 0.15,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "spirit",
+      "corrupted",
+      "arcane",
+      "caster"
+    ],
+    "weaponTypes": [
+      "wand",
+      "tome"
+    ]
+  },
+  {
+    "id": "archive_redactor",
+    "name": "Redactor",
+    "description": "A former High Council scribe whose purpose was editing the official record of the dissolution vote \u2014 shadow_bolt applies shadowed to reduce the party's harmony while silence locks out anyone who relies on mana to read what he is trying to hide.",
+    "stats": {
+      "conviction": 75,
+      "endurance": 75,
+      "ambition": 85,
+      "harmony": 110
+    },
+    "armorValue": 2,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "tome_shadow_tier1"
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "shadow_bolt",
+      "silence",
+      "misdirect",
+      "drain_reserves",
+      "shout"
+    ],
+    "lootTable": [
+      {
+        "itemID": "mana_potion",
+        "dropChance": 0.25,
+        "rarity": "common"
+      },
+      {
+        "itemID": "athenaeum_scroll",
+        "dropChance": 0.2,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "spirit",
+      "corrupted",
+      "shadow",
+      "caster"
+    ],
+    "weaponTypes": [
+      "tome",
+      "wand"
+    ]
+  },
+  {
+    "id": "archive_vault_guardian",
+    "name": "Vault Guardian",
+    "description": "A construct sealed into the archive's deepest chamber to enforce the document lock \u2014 stone_skin into shield_bash is its standard sequence, and ward_break strips party defenses before the Seal Wardens follow up.",
+    "stats": {
+      "conviction": 110,
+      "endurance": 135,
+      "ambition": 45,
+      "harmony": 60
+    },
+    "armorValue": 16,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "stone_skin",
+      "shield_bash",
+      "ward_break",
+      "block",
+      "pummel"
+    ],
+    "lootTable": [
+      {
+        "itemID": "health_potion",
+        "dropChance": 0.3,
+        "rarity": "common"
+      }
+    ],
+    "tags": [
+      "construct",
+      "corrupted",
+      "arcane"
+    ],
+    "weaponTypes": []
+  },
+  {
+    "id": "archive_high_redactor",
+    "name": "The High Redactor",
+    "description": "The councillor who authored the false dissolution record and has been maintaining its seals for fifty years \u2014 soul_shatter is his opener to read the party's profile; drain_reserves punishes mana-dependent parties; smothering_darkness closes off the vault when the fight turns against him.",
+    "stats": {
+      "conviction": 150,
+      "endurance": 170,
+      "ambition": 105,
+      "harmony": 185
+    },
+    "armorValue": 8,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "tome_void_tier5"
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "soul_shatter",
+      "drain_reserves",
+      "smothering_darkness",
+      "shadow_bolt",
+      "silence",
+      "shout"
+    ],
+    "lootTable": [
+      {
+        "itemID": "athenaeum_scroll",
+        "dropChance": 0.6,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "verdant_word_seal",
+        "dropChance": 0.4,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "tome_void_tier5",
+        "dropChance": 0.25,
+        "rarity": "rare"
+      },
+      {
+        "itemID": "sigil_fragment",
+        "dropChance": 0.05,
+        "rarity": "legendary"
+      }
+    ],
+    "tags": [
+      "spirit",
+      "corrupted",
+      "shadow",
+      "boss",
+      "named",
+      "caster"
+    ],
+    "weaponTypes": [
+      "tome",
+      "staff"
+    ]
+  },
+  {
+    "id": "caravan_verse_warden",
+    "name": "Verse Warden",
+    "description": "A halfling pilgrim who has been walking with the caravan long enough that the song has become load-bearing \u2014 shout extends the High Cantor's buff windows and nature_touch heals the singers who are flagging, making him harder to ignore than his stats suggest.",
+    "stats": {
+      "conviction": 65,
+      "endurance": 75,
+      "ambition": 70,
+      "harmony": 100
+    },
+    "armorValue": 2,
+    "aiProfile": "support",
+    "equipment": {
+      "mainHand": "totem_carved_tier1"
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "shout",
+      "nature_touch",
+      "regrowth",
+      "first_aid",
+      "entangle"
+    ],
+    "lootTable": [],
+    "tags": [
+      "halfling",
+      "sacred",
+      "spirit"
+    ],
+    "weaponTypes": [
+      "totem",
+      "flute"
+    ]
+  },
+  {
+    "id": "caravan_tidebound_silencer",
+    "name": "Tidebound Silencer",
+    "description": "An assassin sent by the Sanctum to stop the True Name from reaching the Spire \u2014 shadow_bolt and drain_reserves are the primary tools; silence is the objective, not a tactical option.",
+    "stats": {
+      "conviction": 85,
+      "endurance": 80,
+      "ambition": 100,
+      "harmony": 60
+    },
+    "armorValue": 5,
+    "aiProfile": "aggressive",
+    "equipment": {
+      "mainHand": "dagger_shadow_tier3"
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "shadow_bolt",
+      "drain_reserves",
+      "silence",
+      "shadow_step",
+      "basic_attack"
+    ],
+    "lootTable": [
+      {
+        "itemID": "mana_potion",
+        "dropChance": 0.3,
+        "rarity": "common"
+      },
+      {
+        "itemID": "dagger_shadow_tier3",
+        "dropChance": 0.1,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "tidebound",
+      "shadow",
+      "assassin"
+    ],
+    "weaponTypes": [
+      "dagger"
+    ]
+  },
+  {
+    "id": "caravan_chorus_initiate",
+    "name": "Chorus Initiate",
+    "description": "The youngest members of the caravan \u2014 they have memorized only fragments of the True Name, but those fragments still carry harmonic weight; basic_attack is all they have, but the song running through them makes them harder to put down than their stats suggest.",
+    "stats": {
+      "conviction": 55,
+      "endurance": 65,
+      "ambition": 60,
+      "harmony": 70
+    },
+    "armorValue": 1,
+    "aiProfile": "aggressive",
+    "equipment": {
+      "mainHand": "totem_bone_tier0"
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "basic_attack",
+      "shout",
+      "shove"
+    ],
+    "lootTable": [],
+    "tags": [
+      "halfling",
+      "sacred"
+    ],
+    "weaponTypes": [
+      "flute",
+      "totem"
+    ]
+  },
+  {
+    "id": "caravan_high_cantor",
+    "name": "The High Cantor",
+    "description": "He has been walking with the caravan for forty years carrying the complete True Name in his head, and he is not going to let anyone through to the Spire until he knows whether they are there to help or harm \u2014 holy_word sustains the singers around him; battle_hymn turns the song into a weapon; drain_reserves punishes anyone relying on mana to fight through the sound.",
+    "stats": {
+      "conviction": 140,
+      "endurance": 160,
+      "ambition": 85,
+      "harmony": 200
+    },
+    "armorValue": 4,
+    "aiProfile": "support",
+    "equipment": {
+      "mainHand": "totem_spirit_tier2"
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "holy_word",
+      "battle_hymn",
+      "drain_reserves",
+      "shout",
+      "sacred_roots",
+      "forest_embrace"
+    ],
+    "lootTable": [
+      {
+        "itemID": "songbook_of_lyra",
+        "dropChance": 0.15,
+        "rarity": "legendary"
+      },
+      {
+        "itemID": "silver_halfling_coin",
+        "dropChance": 0.4,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "health_potion_major",
+        "dropChance": 0.5,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "halfling",
+      "sacred",
+      "boss",
+      "named",
+      "caster"
+    ],
+    "weaponTypes": [
+      "totem",
+      "flute",
+      "bell"
+    ]
+  },
+  {
+    "id": "rejected_iron_conscript",
+    "name": "Iron Conscript",
+    "description": "A dwarven soldier who refused to accept the Third Heir's coronation and has been holding this pass against the new king's supply lines for months \u2014 slash and blood_letting stack bleed to wear down attrition fighters, and warcry accelerates the whole pack before the veterans commit.",
+    "stats": {
+      "conviction": 80,
+      "endurance": 95,
+      "ambition": 65,
+      "harmony": 35
+    },
+    "armorValue": 8,
+    "aiProfile": "aggressive",
+    "equipment": {
+      "mainHand": "axe_mithril_tier2"
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "basic_attack",
+      "slash",
+      "blood_letting",
+      "warcry",
+      "shove"
+    ],
+    "lootTable": [
+      {
+        "itemID": "stamina_potion",
+        "dropChance": 0.25,
+        "rarity": "common"
+      },
+      {
+        "itemID": "health_potion",
+        "dropChance": 0.2,
+        "rarity": "common"
+      }
+    ],
+    "tags": [
+      "dwarf",
+      "dwarven_conflict",
+      "soldier"
+    ],
+    "weaponTypes": [
+      "axe",
+      "hammer"
+    ]
+  },
+  {
+    "id": "rejected_siege_caster",
+    "name": "Siege Caster",
+    "description": "A dwarven runesmith who has been repurposing the pass's original ward-stones into offensive installations \u2014 thunderclap into shock stacks dazed and electrified simultaneously, and ward_break strips whatever defensive buffs the party entered with.",
+    "stats": {
+      "conviction": 75,
+      "endurance": 80,
+      "ambition": 85,
+      "harmony": 115
+    },
+    "armorValue": 6,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "staff_arcane_tier2"
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "thunderclap",
+      "shock",
+      "ward_break",
+      "shout",
+      "sleet"
+    ],
+    "lootTable": [
+      {
+        "itemID": "mana_potion",
+        "dropChance": 0.3,
+        "rarity": "common"
+      },
+      {
+        "itemID": "staff_arcane_tier2",
+        "dropChance": 0.1,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "dwarf",
+      "dwarven_conflict",
+      "caster"
+    ],
+    "weaponTypes": [
+      "staff",
+      "wand"
+    ]
+  },
+  {
+    "id": "rejected_vanguard_captain",
+    "name": "Vanguard Captain",
+    "description": "The Rejected Alliance's field commander at the pass \u2014 a former Ironvein officer who led the border garrison before the succession and has been running the siege with the same methodical patience he applied to border enforcement; counter_strike and warcry accelerate the whole line, and intimidate locks the party's highest-threat member out of their rotation.",
+    "stats": {
+      "conviction": 170,
+      "endurance": 195,
+      "ambition": 90,
+      "harmony": 60
+    },
+    "armorValue": 18,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "polearm_wind_tier5"
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "counter_strike",
+      "warcry",
+      "intimidate",
+      "shield_bash",
+      "slash",
+      "basic_attack"
+    ],
+    "lootTable": [
+      {
+        "itemID": "loyalist_seal",
+        "dropChance": 0.5,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "polearm_wind_tier5",
+        "dropChance": 0.25,
+        "rarity": "rare"
+      },
+      {
+        "itemID": "chest_dragon_scale_tier5",
+        "dropChance": 0.2,
+        "rarity": "rare"
+      },
+      {
+        "itemID": "health_potion_major",
+        "dropChance": 0.5,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "heirs_signet",
+        "dropChance": 0.05,
+        "rarity": "legendary"
+      }
+    ],
+    "tags": [
+      "dwarf",
+      "dwarven_conflict",
+      "boss",
+      "named",
+      "soldier"
+    ],
+    "weaponTypes": [
+      "polearm",
+      "axe"
+    ]
+  },
+  {
+    "id": "wound_echo_shard",
+    "name": "Echo Shard",
+    "description": "A fragment of the Architect's attention given temporary form from the residue of three hundred years of broken oaths \u2014 void_rend and entropic_decay stack weaken and shadowed simultaneously, and it does not fight so much as demonstrate what the party's weaknesses are.",
+    "stats": {
+      "conviction": 70,
+      "endurance": 65,
+      "ambition": 95,
+      "harmony": 80
+    },
+    "armorValue": 0,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "void_rend",
+      "entropic_decay",
+      "shadow_bolt",
+      "decay_aura"
+    ],
+    "lootTable": [],
+    "tags": [
+      "spirit",
+      "corrupted",
+      "shadow",
+      "arcane"
+    ],
+    "weaponTypes": []
+  },
+  {
+    "id": "wound_fraying_herald",
+    "name": "Fraying Herald",
+    "description": "A former Verdant Word priest who volunteered to carry the Architect's sigil and has been its voice in the field for fifty years \u2014 soul_shatter opens every engagement to read the party's profile; smothering_darkness and drain_reserves are the follow-up; shout accelerates whatever Echo Shards are still active.",
+    "stats": {
+      "conviction": 130,
+      "endurance": 145,
+      "ambition": 110,
+      "harmony": 170
+    },
+    "armorValue": 8,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "staff_shadow_tier4"
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "soul_shatter",
+      "smothering_darkness",
+      "drain_reserves",
+      "shout",
+      "shadow_bolt",
+      "decay_aura"
+    ],
+    "lootTable": [
+      {
+        "itemID": "sigil_fragment",
+        "dropChance": 0.3,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "mana_potion_major",
+        "dropChance": 0.4,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "human",
+      "corrupted",
+      "shadow",
+      "caster"
+    ],
+    "weaponTypes": [
+      "staff"
+    ]
+  },
+  {
+    "id": "wound_the_wound",
+    "name": "The Wound",
+    "description": "Not a creature. A concentration of the Architect's attention at the shrine's core \u2014 it does not move, it propagates; lord_of_decay and smothering_darkness are its damage expressions; soul_shatter runs on a fixed cycle to keep reading the party's stat profile; drain_reserves fires whenever a mana-heavy target is identified. The Architect is not here. But it is paying attention.",
+    "stats": {
+      "conviction": 200,
+      "endurance": 220,
+      "ambition": 110,
+      "harmony": 190
+    },
+    "armorValue": 12,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "lord_of_decay",
+      "smothering_darkness",
+      "soul_shatter",
+      "drain_reserves",
+      "decay_aura",
+      "entropic_decay"
+    ],
+    "lootTable": [
+      {
+        "itemID": "architects_seal",
+        "dropChance": 0.5,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "sigil_fragment",
+        "dropChance": 0.35,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "staff_shadow_tier4",
+        "dropChance": 0.2,
+        "rarity": "rare"
+      },
+      {
+        "itemID": "first_hand_shard",
+        "dropChance": 0.05,
+        "rarity": "legendary"
+      }
+    ],
+    "tags": [
+      "spirit",
+      "corrupted",
+      "shadow",
+      "boss",
+      "arcane"
+    ],
+    "weaponTypes": []
+  },
+  {
+    "id": "gates_fraying_sealer",
+    "name": "Fraying Sealer",
+    "description": "A manifestation of the Capital's fifty years of sealed gates given hostile form \u2014 it is actively reapplying the Fraying's lock on the mechanisms Hrolf is trying to open; shadow_bolt applies shadowed to reduce party harmony while drain_reserves targets whoever is sustaining the operation.",
+    "stats": {
+      "conviction": 80,
+      "endurance": 85,
+      "ambition": 90,
+      "harmony": 80
+    },
+    "armorValue": 3,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "shadow_bolt",
+      "drain_reserves",
+      "void_rend",
+      "entropic_decay"
+    ],
+    "lootTable": [],
+    "tags": [
+      "spirit",
+      "corrupted",
+      "shadow"
+    ],
+    "weaponTypes": []
+  },
+  {
+    "id": "gates_void_walker",
+    "name": "Void Walker",
+    "description": "An older Fraying manifestation that has been haunting the Capital's gate district since the sealing \u2014 smothering_darkness and decay_aura coordinate with the Sealers to layer shadow debuffs faster than the party can cleanse them.",
+    "stats": {
+      "conviction": 95,
+      "endurance": 100,
+      "ambition": 95,
+      "harmony": 85
+    },
+    "armorValue": 5,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "smothering_darkness",
+      "decay_aura",
+      "shadow_bolt",
+      "soul_shatter"
+    ],
+    "lootTable": [
+      {
+        "itemID": "mana_potion_major",
+        "dropChance": 0.25,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "spirit",
+      "corrupted",
+      "shadow"
+    ],
+    "weaponTypes": []
+  },
+  {
+    "id": "gates_atonement_knight",
+    "name": "Atonement Knight",
+    "description": "A Royal Guard veteran who stayed when Hrolf called \u2014 uses fortify and counter_strike to hold the line while the gate mechanisms work; warcry accelerates whoever is nearest to a mechanism before committing to direct engagement.",
+    "stats": {
+      "conviction": 110,
+      "endurance": 130,
+      "ambition": 65,
+      "harmony": 50
+    },
+    "armorValue": 16,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "sword_dragon_tier6"
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "fortify",
+      "counter_strike",
+      "warcry",
+      "shield_bash",
+      "block"
+    ],
+    "lootTable": [
+      {
+        "itemID": "health_potion_major",
+        "dropChance": 0.3,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "royal_guard_insignia",
+        "dropChance": 0.2,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "human",
+      "soldier",
+      "martial"
+    ],
+    "weaponTypes": [
+      "sword"
+    ]
+  },
+  {
+    "id": "nexus_void_remnant",
+    "name": "Void Remnant",
+    "description": "What happens to an oath-spirit when the Fraying has been at it long enough \u2014 the specific promise it was made from is no longer identifiable; void_rend and entropic_decay run simultaneously because it has stopped being selective about what it damages.",
+    "stats": {
+      "conviction": 90,
+      "endurance": 85,
+      "ambition": 100,
+      "harmony": 60
+    },
+    "armorValue": 0,
+    "aiProfile": "aggressive",
+    "equipment": {
+      "mainHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "void_rend",
+      "entropic_decay",
+      "decay_aura",
+      "shadow_bolt"
+    ],
+    "lootTable": [],
+    "tags": [
+      "spirit",
+      "corrupted",
+      "shadow",
+      "arcane"
+    ],
+    "weaponTypes": []
+  },
+  {
+    "id": "nexus_entropy_husk",
+    "name": "Entropy Husk",
+    "description": "A former Verdant Word priest so thoroughly saturated by the Nexus that the corruption has become load-bearing \u2014 removing it would collapse the structure it is part of; reality_fracture disorients the party's positioning while smothering_darkness closes off retreat.",
+    "stats": {
+      "conviction": 105,
+      "endurance": 110,
+      "ambition": 90,
+      "harmony": 130
+    },
+    "armorValue": 6,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "staff_shadow_tier4"
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "reality_fracture",
+      "smothering_darkness",
+      "drain_reserves",
+      "soul_shatter",
+      "shout"
+    ],
+    "lootTable": [
+      {
+        "itemID": "mana_potion_major",
+        "dropChance": 0.3,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "sigil_fragment",
+        "dropChance": 0.12,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "human",
+      "corrupted",
+      "shadow",
+      "caster"
+    ],
+    "weaponTypes": [
+      "staff"
+    ]
+  },
+  {
+    "id": "nexus_keeper",
+    "name": "The Nexus Keeper",
+    "description": "Not a person \u2014 a node. The point where the three hundred years of broken oaths from the Marsh, the Vale, and the Capital converge into a single concentrated weight; lord_of_decay is its primary expression, soul_shatter runs on a fixed cycle to profile incoming parties, and drain_reserves fires at anyone identified as the group's mana anchor.",
+    "stats": {
+      "conviction": 195,
+      "endurance": 215,
+      "ambition": 105,
+      "harmony": 175
+    },
+    "armorValue": 10,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "lord_of_decay",
+      "soul_shatter",
+      "drain_reserves",
+      "smothering_darkness",
+      "decay_aura",
+      "reality_fracture"
+    ],
+    "lootTable": [
+      {
+        "itemID": "architects_seal",
+        "dropChance": 0.55,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "resonance_node_fragment",
+        "dropChance": 0.3,
+        "rarity": "rare"
+      },
+      {
+        "itemID": "first_hand_shard",
+        "dropChance": 0.05,
+        "rarity": "legendary"
+      }
+    ],
+    "tags": [
+      "spirit",
+      "corrupted",
+      "shadow",
+      "boss",
+      "arcane"
+    ],
+    "weaponTypes": []
+  },
+  {
+    "id": "vanguard_fraying_assassin",
+    "name": "Fraying Assassin",
+    "description": "A targeted strike construct \u2014 the Architect assembled these from the camp's own oath-residue, using the proximity to three faction leaders as construction material; shadow_step into silent_death is the standard sequence, targeting whoever is closest to a faction leader.",
+    "stats": {
+      "conviction": 95,
+      "endurance": 80,
+      "ambition": 115,
+      "harmony": 55
+    },
+    "armorValue": 4,
+    "aiProfile": "aggressive",
+    "equipment": {
+      "mainHand": "dagger_soulreaper_tier5"
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "shadow_step",
+      "silent_death",
+      "void_rend",
+      "basic_attack",
+      "shadow_bolt"
+    ],
+    "lootTable": [
+      {
+        "itemID": "dagger_soulreaper_tier5",
+        "dropChance": 0.1,
+        "rarity": "rare"
+      }
+    ],
+    "tags": [
+      "spirit",
+      "corrupted",
+      "shadow",
+      "assassin"
+    ],
+    "weaponTypes": [
+      "dagger"
+    ]
+  },
+  {
+    "id": "vanguard_null_herald",
+    "name": "Null Herald",
+    "description": "The Architect's coordinator for the camp strike \u2014 its purpose is to suppress the faction leaders' ability to respond rather than kill them directly; soul_shatter profiles the camp's defense, drain_reserves targets the healers, and smothering_darkness closes the command tent.",
+    "stats": {
+      "conviction": 120,
+      "endurance": 130,
+      "ambition": 100,
+      "harmony": 160
+    },
+    "armorValue": 8,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "staff_cosmic_tier6"
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "soul_shatter",
+      "drain_reserves",
+      "smothering_darkness",
+      "decay_aura",
+      "shout",
+      "shadow_tendril"
+    ],
+    "lootTable": [
+      {
+        "itemID": "mana_potion_major",
+        "dropChance": 0.4,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "staff_cosmic_tier6",
+        "dropChance": 0.18,
+        "rarity": "rare"
+      }
+    ],
+    "tags": [
+      "spirit",
+      "corrupted",
+      "shadow",
+      "caster",
+      "arcane"
+    ],
+    "weaponTypes": [
+      "staff"
+    ]
+  },
+  {
+    "id": "vanguard_the_severance",
+    "name": "The Severance",
+    "description": "The Architect's primary strike against the camp \u2014 a single concentrated manifestation designed to sever the alliance before the march begins; it targets the highest-harmony party member first because that is who is sustaining the faction leaders' coordination; lord_of_decay, reality_fracture, and soul_shatter in rotation until the camp's command structure collapses.",
+    "stats": {
+      "conviction": 210,
+      "endurance": 230,
+      "ambition": 115,
+      "harmony": 185
+    },
+    "armorValue": 14,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "lord_of_decay",
+      "reality_fracture",
+      "soul_shatter",
+      "drain_reserves",
+      "smothering_darkness",
+      "decay_aura"
+    ],
+    "lootTable": [
+      {
+        "itemID": "resonance_node_fragment",
+        "dropChance": 0.35,
+        "rarity": "rare"
+      },
+      {
+        "itemID": "architects_seal",
+        "dropChance": 0.4,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "first_hand_shard",
+        "dropChance": 0.05,
+        "rarity": "legendary"
+      }
+    ],
+    "tags": [
+      "spirit",
+      "corrupted",
+      "shadow",
+      "boss",
+      "arcane"
+    ],
+    "weaponTypes": []
   }
 ]
