@@ -948,7 +948,7 @@
             "requiredSkillID": "misdirect",
             "checkStat": "ambition",
             "secondaryStat": "endurance",
-            "difficultyThreshold": 105,
+            "difficultyThreshold": 55,
             "successEffect": {
               "type": "remove_enemy",
               "magnitude": 1,
@@ -994,7 +994,7 @@
       {
         "stageId": 3,
         "title": "The Altar of the Spirit",
-        "description": "At the heart of the Sanctum stands the altar where Aethelgard's founders attempted their ritual \u2014 and where Archbishop Malacor has spent three centuries completing it.",
+        "description": "At the heart of the Sanctum stands the altar where Aethelgard's founders attempted their ritual \u2014 and where Archbishop Valerius has spent three centuries completing it.",
         "enemies": [
           {
             "enemyTypeID": "tide_lasher",
@@ -11293,6 +11293,399 @@
       "mercenary",
       "arcane",
       "oath"
+    ]
+  },
+  {
+    "id": "challenge_tidebound_forward_basin",
+    "name": "The Tidebound Forward Basin",
+    "description": "A flooded crater in the Northern Highlands where the Tidebound Vanguard has established its staging ground for the push south toward the Spire. High Chanter Malacor directs the operation from the Ley Line Altar at the basin's center. The water does not move. The air smells of ozone and rot.",
+    "difficulty": 9,
+    "recommendedLevel": 40,
+    "minPartySize": 1,
+    "maxPartySize": 4,
+    "lore": [
+      {
+        "unlocksAfter": 1,
+        "text": "Watch Commander Thrain named this basin in his report five years ago as the Tidebound's primary staging ground. The report reached the Capital. The Capital acknowledged receipt. Nothing was sent north in response. The vanguard has had five uncontested years to prepare."
+      },
+      {
+        "unlocksAfter": 5,
+        "text": "The basin's water has not moved since the vanguard arrived. It does not respond to wind or weather. The Drowned Scouts wade through it without disturbing the surface. The Tidebound do not control the water \u2014 the water is directing them. Malacor's role is not commander but interpreter, translating the spirit's intent into operational orders."
+      },
+      {
+        "unlocksAfter": 15,
+        "text": "The flooding of the Silver Vale is not the objective. It is the path. The water spirit is moving toward the Spire of Silent Conviction \u2014 specifically toward the unfinished vote in the sealed sub-basement, the concentrated point of broken oaths that the Fraying has been feeding on for fifty years. The flood is not destruction. It is delivery. Something is being carried to the Spire in the water, and Malacor knows what it is."
+      },
+      {
+        "unlocksAfter": 1,
+        "requiresSecret": true,
+        "text": "Thrain's complete report \u2014 the unredacted version, not the summary the Capital received \u2014 names the directing sigil explicitly. It is the same mark found on the Ironvein field orders and pressed into the corner of the Ledger Vault's sealed correspondence. The Architect has been coordinating the Tidebound advance, the dwarven succession crisis, and the Guild's economic strangulation simultaneously. Thrain sent the complete report to three recipients. Only one acknowledged it. The other two were the High Council and the Merchant Guild. Neither responded. The Capital did not fail to act because it didn't know. It failed to act because someone made sure it wouldn't."
+      }
+    ],
+    "stages": [
+      {
+        "stageId": 1,
+        "title": "The Outer Reeds",
+        "description": "Drowned Scouts patrol the flooded shallows in overlapping arcs, and Tide Lashers hold the approaches to the camp. They apply Bleed and Chilled in combination \u2014 the party that isn't managing both simultaneously will find their action economy collapsing before they reach the interior.",
+        "enemies": [
+          {
+            "enemyTypeID": "tidebound_drowned_scout",
+            "countRange": [
+              3,
+              4
+            ],
+            "level": 38
+          },
+          {
+            "enemyTypeID": "tidebound_tide_lasher",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 40
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "basin_monitoring_crystal",
+            "name": "Use the Monitoring Crystal",
+            "spawnChance": 0.7,
+            "checkType": "item",
+            "requiredItemID": "monitoring_crystal",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "tidebound_drowned_scout",
+              "count": 2,
+              "narrative": "The Monitoring Crystal resonates with the basin's water \u2014 it was calibrated to this frequency. Two Drowned Scouts halt and stand motionless, caught between their patrol instinct and whatever the crystal is broadcasting into the water. They do not recover before you've moved past them."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You have nothing that interferes with the patrol frequency."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Scouts have already marked your approach. The water told them before you arrived."
+            }
+          },
+          {
+            "id": "basin_fire_skill",
+            "name": "Burn the Reed Cover",
+            "spawnChance": 0.6,
+            "checkType": "skill",
+            "requiredSkillTag": "fire",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "tidebound_tide_lasher",
+              "count": 1,
+              "narrative": "Fire in a flooded basin is not obvious \u2014 but the reeds along the approach are dry above the waterline. One Tide Lasher breaks formation to prevent the fire spreading to the camp's supply cache. You move through the gap before he returns."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You have no fire skill to exploit the dry cover."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The reeds offer no tactical advantage without fire."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion_minor",
+            "dropChance": 0.45,
+            "rarity": "common"
+          },
+          {
+            "itemID": "stamina_potion",
+            "dropChance": 0.4,
+            "rarity": "common"
+          },
+          {
+            "itemID": "monitoring_crystal",
+            "dropChance": 0.15,
+            "rarity": "uncommon"
+          }
+        ]
+      },
+      {
+        "stageId": 2,
+        "title": "The Camp Perimeter",
+        "description": "Mist Weavers hold elevated positions on submerged ruins and apply Electrified to anyone who enters the perimeter, while Barnacle Brutes anchor the chokepoints and shove the party back into the Weavers' range. The combination is deliberate \u2014 the Tidebound have been running this approach for five years.",
+        "enemies": [
+          {
+            "enemyTypeID": "tidebound_mist_weaver",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 40
+          },
+          {
+            "enemyTypeID": "tidebound_barnacle_brute",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 41
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "basin_harmony_ritual",
+            "name": "Disrupt the Water Rite",
+            "spawnChance": 0.6,
+            "checkType": "stat",
+            "checkStat": "harmony",
+            "difficultyThreshold": 90,
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "tidebound_mist_weaver",
+              "count": 1,
+              "narrative": "The Mist Weavers maintain their elevated positions through a continuous low ritual that keeps them stable on the submerged ruins. You introduce dissonance into the frequency \u2014 not enough to collapse it, but enough that one Weaver loses footing and retreats to reestablish contact. The others compensate. The gap is brief."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "The ritual frequency is outside your range. The Weavers hold position."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Weavers are already in position. There is no approach that avoids their coverage."
+            }
+          },
+          {
+            "id": "basin_conviction_push",
+            "name": "Break the Line",
+            "spawnChance": 0.55,
+            "checkType": "stat",
+            "checkStat": "conviction",
+            "difficultyThreshold": 92,
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "tidebound_barnacle_brute",
+              "count": 1,
+              "narrative": "The Barnacle Brutes are immovable in water but slow on the transitions between submerged and dry ground. You hit one at the boundary before he's fully set. The impact doesn't move him \u2014 but it commits him to the wrong position, and the camp entrance opens for a moment."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "The Brutes are too well-positioned. You can't find a boundary transition in time."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The perimeter has no gaps. The Brutes have closed every one."
+            }
+          }
+        ],
+        "stageBranches": [
+          {
+            "condition": {
+              "type": "has_item",
+              "value": "monitoring_crystal"
+            },
+            "nextStageId": 99,
+            "overrideDescription": "The Monitoring Crystal resonates with something inside the command tent \u2014 a specific harmonic that suggests the tent contains the original signal source. Whatever Thrain was monitoring from the Watch, the record of it is here.",
+            "chance": 0.4
+          },
+          {
+            "nextStageId": null
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "mana_potion",
+            "dropChance": 0.4,
+            "rarity": "common"
+          },
+          {
+            "itemID": "health_potion",
+            "dropChance": 0.4,
+            "rarity": "common"
+          },
+          {
+            "itemID": "polearm_mithril_tier2",
+            "dropChance": 0.2,
+            "rarity": "uncommon"
+          }
+        ]
+      },
+      {
+        "stageId": 3,
+        "title": "The Ley Line Altar",
+        "description": "High Chanter Malacor stands at the altar with the last of the vanguard's Mist Weavers. He does not acknowledge the party as a threat \u2014 he acknowledges them as an interruption to a process that is nearly complete. The fight is an inconvenience he intends to resolve efficiently.",
+        "enemies": [
+          {
+            "enemyTypeID": "high_chanter_malacor",
+            "countRange": [
+              1,
+              1
+            ],
+            "level": 45
+          },
+          {
+            "enemyTypeID": "tidebound_mist_weaver",
+            "countRange": [
+              2,
+              2
+            ],
+            "level": 41
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "basin_malacor_confront",
+            "name": "Name the Sigil",
+            "spawnChance": 0.75,
+            "checkType": "item_and_stat",
+            "requiredItemID": "ironvein_field_orders",
+            "checkStat": "harmony",
+            "difficultyThreshold": 92,
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "tidebound_mist_weaver",
+              "count": 2,
+              "narrative": "You present the Ironvein field orders and identify the directing sigil. Malacor goes very still. He dismisses the Mist Weavers \u2014 not out of respect, but because what you've just demonstrated is that you understand what the sigil means, and that conversation requires privacy. He is not shaken. He is recalibrating."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You have the orders but Malacor does not recognize your authority to make the argument. He continues the ritual."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "Malacor does not pause the advance for uninvited guests."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion",
+            "dropChance": 0.5,
+            "rarity": "common"
+          },
+          {
+            "itemID": "mana_potion",
+            "dropChance": 0.45,
+            "rarity": "common"
+          },
+          {
+            "itemID": "scepter_mithril_tier2",
+            "dropChance": 0.2,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "polearm_mithril_tier2",
+            "dropChance": 0.2,
+            "rarity": "uncommon"
+          }
+        ]
+      },
+      {
+        "stageId": 99,
+        "title": "The Command Tent",
+        "secretPath": true,
+        "description": "The command tent holds the operational records of the entire southern advance \u2014 routing maps, supply schedules, and a sealed dispatch case bearing Malacor's personal mark. The Monitoring Crystal unlocks the case. What is inside is not military intelligence. It is a complete record of every directive the vanguard has received, and none of them originate from the water spirit.",
+        "enemies": [
+          {
+            "enemyTypeID": "high_chanter_malacor",
+            "countRange": [
+              1,
+              1
+            ],
+            "level": 47
+          },
+          {
+            "enemyTypeID": "tidebound_tide_lasher",
+            "countRange": [
+              2,
+              2
+            ],
+            "level": 42
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "basin_read_dispatch",
+            "name": "Read the Dispatch Case",
+            "spawnChance": 1.0,
+            "checkType": "random",
+            "successEffect": {
+              "type": "narrative_only",
+              "narrative": "The directives are precise \u2014 specific waypoints, specific timings, specific targets to avoid. The flood is not following the water spirit's will. The water spirit is following someone else's instructions, channelled through Malacor, who believes he is interpreting divine intent. The sigil on every directive is the same one on the Ironvein field orders. The same one in the Ledger Vault correspondence. The Architect has been directing this advance from the beginning. Malacor does not know. He arrives before you finish reading."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "The directives are precise \u2014 specific waypoints, specific timings, specific targets to avoid. The flood is not following the water spirit's will. The water spirit is following someone else's instructions, channelled through Malacor, who believes he is interpreting divine intent. The sigil on every directive is the same one on the Ironvein field orders. The same one in the Ledger Vault correspondence. The Architect has been directing this advance from the beginning. Malacor does not know. He arrives before you finish reading."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The directives are precise \u2014 specific waypoints, specific timings, specific targets to avoid. The flood is not following the water spirit's will. The water spirit is following someone else's instructions, channelled through Malacor, who believes he is interpreting divine intent. The sigil on every directive is the same one on the Ironvein field orders. The same one in the Ledger Vault correspondence. The Architect has been directing this advance from the beginning. Malacor does not know. He arrives before you finish reading."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "thrains_complete_report",
+            "dropChance": 1.0,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "scepter_mithril_tier2",
+            "dropChance": 0.55,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "mana_potion",
+            "dropChance": 0.5,
+            "rarity": "common"
+          }
+        ]
+      }
+    ],
+    "rewards": {
+      "baseXP": 26000,
+      "baseGold": 260,
+      "lootTable": [
+        {
+          "itemID": "polearm_mithril_tier2",
+          "dropChance": 0.45,
+          "rarity": "uncommon"
+        },
+        {
+          "itemID": "health_potion",
+          "dropChance": 0.5,
+          "rarity": "common"
+        },
+        {
+          "itemID": "mana_potion",
+          "dropChance": 0.5,
+          "rarity": "common"
+        },
+        {
+          "itemID": "monitoring_crystal",
+          "dropChance": 0.25,
+          "rarity": "uncommon"
+        }
+      ],
+      "secretLootTable": [
+        {
+          "itemID": "thrains_complete_report",
+          "dropChance": 1.0,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "scepter_mithril_tier2",
+          "dropChance": 0.6,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "mana_potion",
+          "dropChance": 0.6,
+          "rarity": "common"
+        }
+      ]
+    },
+    "tags": [
+      "coastal",
+      "arcane",
+      "undead"
     ]
   }
 ]

@@ -3943,17 +3943,14 @@
       "mainHand": "weapon_tidebound_harpoon"
     },
     "availableSkills": [
-      "shock",
       "water_bolt",
-      "shout",
-      "sacred_roots",
-      "entangle",
-      "forest_embrace",
-      "first_aid",
+      "shock",
       "undertow",
-      "tidal_grasp"
+      "shout",
+      "tidal_grasp",
+      "drain_reserves"
     ],
-    "skillSelectionCount": 6,
+    "skillSelectionCount": 2,
     "tags": [
       "tidebound",
       "water",
@@ -5740,6 +5737,183 @@
     "weaponTypes": [
       "sword",
       "mace"
+    ]
+  },
+  {
+    "id": "tidebound_drowned_scout",
+    "name": "Drowned Scout",
+    "description": "Vanguard soldiers who waded into the basin and didn't come back the same \u2014 they move through the flooded shallows faster than anything their size should.",
+    "stats": {
+      "conviction": 70,
+      "endurance": 80,
+      "ambition": 90,
+      "harmony": 35
+    },
+    "armorValue": 4,
+    "aiProfile": "aggressive",
+    "equipment": {
+      "mainHand": "polearm_steel_tier1",
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "basic_attack",
+      "slash",
+      "shove",
+      "chill"
+    ],
+    "lootTable": [
+      {
+        "itemID": "health_potion_minor",
+        "dropChance": 0.3,
+        "rarity": "common"
+      },
+      {
+        "itemID": "stamina_potion_minor",
+        "dropChance": 0.25,
+        "rarity": "common"
+      }
+    ],
+    "tags": [
+      "undead",
+      "coastal"
+    ],
+    "weaponTypes": [
+      "polearm",
+      "axe"
+    ]
+  },
+  {
+    "id": "tidebound_tide_lasher",
+    "name": "Tide Lasher",
+    "description": "Disciplined vanguard soldiers who maintain formation even in flooded terrain \u2014 they stack Bleed and Chilled in combination to drain both health and action economy.",
+    "stats": {
+      "conviction": 90,
+      "endurance": 100,
+      "ambition": 70,
+      "harmony": 50
+    },
+    "armorValue": 6,
+    "aiProfile": "aggressive",
+    "equipment": {
+      "mainHand": "polearm_mithril_tier2",
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "basic_attack",
+      "slash",
+      "chill",
+      "warcry"
+    ],
+    "lootTable": [
+      {
+        "itemID": "stamina_potion",
+        "dropChance": 0.3,
+        "rarity": "common"
+      },
+      {
+        "itemID": "health_potion_minor",
+        "dropChance": 0.25,
+        "rarity": "common"
+      }
+    ],
+    "tags": [
+      "undead",
+      "coastal",
+      "martial"
+    ],
+    "weaponTypes": [
+      "polearm"
+    ]
+  },
+  {
+    "id": "tidebound_mist_weaver",
+    "name": "Mist Weaver",
+    "description": "Ritual casters who stand on submerged ruins and use the basin's ambient charge to apply Electrified \u2014 they coordinate with the Tide Lashers to ensure the party is always managing two debuffs at once.",
+    "stats": {
+      "conviction": 65,
+      "endurance": 70,
+      "ambition": 85,
+      "harmony": 120
+    },
+    "armorValue": 3,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "scepter_nature_tier1",
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "basic_attack",
+      "shock",
+      "water_bolt",
+      "shout"
+    ],
+    "lootTable": [
+      {
+        "itemID": "mana_potion_minor",
+        "dropChance": 0.35,
+        "rarity": "common"
+      },
+      {
+        "itemID": "scepter_iron_tier0",
+        "dropChance": 0.2,
+        "rarity": "common"
+      }
+    ],
+    "tags": [
+      "undead",
+      "coastal",
+      "arcane"
+    ],
+    "weaponTypes": [
+      "scepter",
+      "wand"
+    ]
+  },
+  {
+    "id": "tidebound_barnacle_brute",
+    "name": "Barnacle Brute",
+    "description": "Heavily mutated vanguard soldiers whose armor has fused with the basin's mineral deposits \u2014 they absorb damage and shove the party out of position while the Mist Weavers work.",
+    "stats": {
+      "conviction": 110,
+      "endurance": 140,
+      "ambition": 40,
+      "harmony": 45
+    },
+    "armorValue": 12,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "hammer_mithril_tier2",
+      "offHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "basic_attack",
+      "block",
+      "shove",
+      "shield_bash"
+    ],
+    "lootTable": [
+      {
+        "itemID": "health_potion",
+        "dropChance": 0.3,
+        "rarity": "common"
+      },
+      {
+        "itemID": "chest_chain_hauberk_tier1",
+        "dropChance": 0.15,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "undead",
+      "coastal"
+    ],
+    "weaponTypes": [
+      "hammer",
+      "axe"
     ]
   }
 ]
