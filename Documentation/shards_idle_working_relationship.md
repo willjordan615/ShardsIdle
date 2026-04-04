@@ -198,3 +198,9 @@ Identical three-stage structures with the same debuff cadence regardless of sett
 "High Council / Vanguard Scouts / Alliance Marshals" appearing as enemies even when the faction is explicitly allied
 
 Treat the txt files as a location brief and theme statement. Build the challenge from the world, not from the template.
+
+| unified_seed | Unified Seed | reconciliation_of_elara | spire_fractured_time | Elara (Unified) — d16 |
+| heir_signet | Third Heir's Signet | (check challenges) | blood_oath_tribunal, merchants_ledger_vault, coronation_of_stone | — |
+| ironvein_field_orders | Thrain's Field Orders | tidebound_forward_basin | tidebound_forward_basin, chamber_of_petitioners | — |
+| seed_of_first_tree | Seed of the First Tree | (check challenges) | reconciliation_of_elara, echoing_caravan | — |
+| petitioners_verdict | The Petitioners' Verdict | (check challenges) | coronation_of_stone | — |

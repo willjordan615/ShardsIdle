@@ -1,153 +1,92 @@
-# Shards Idle — Session Handoff
-*Generated end of content generation session. Read before starting work.*
+Shards Idle — Session Handoff
+Generated end of session. Read before starting work.
 
----
+State of the Game
+All challenge content d1–d16 is written and live. The companion system is fully wired. Several item/skill gaps identified in the cross-challenge network have been resolved. The prestige loop (Sharding) is scoped but not yet implemented.
+Files modified this session:
 
-## State of the Game
+backend/routes/data.js — companions.json loaded into gameData
+backend/combatEngine.js — Krog enemy suppression when companion_krog_contracted is in party; weapon on-hit procs added to augmented skill pool; adaptiveEnemies block refactored to let for mutability
+backend/data/companions.json — 9 companions total; Valdris requiredItem corrected to coronation_writ; Bram added
+backend/data/items.json — greateaxe typo fixed; moon_touched_apple schema corrected; styptic_powder and stamina_ration wired to new cleanse skills
+backend/data/skills.json — two new skills: cleanse_bleed (Clot), cleanse_exhaustion (Second Wind)
+js/combat-system.js — companion auto-injection generalised to use allowedChallenges; no longer hardcoded to d16
+js/combat-log.js — questHints computed and passed into animateCombatRewards payload
+js/combat-rewards.js — quest item hint section added to rewards modal
+js/offline-summary.js — quest item hint section added to offline summary
+js/game-data.js — window.getQuestItemHints() helper added
 
-All challenge content from d1 through d16 is now written and appended to the live data files. The narrative arc is complete. The prestige loop (Sharding) exists in the story doc but is not yet mechanically implemented.
 
-**Files modified this session:**
-- `backend/data/challenges.json` — 52 challenges total, d1–d16
-- `backend/data/enemy-types.json` — 205 enemy types
-- `backend/data/items.json` — 573 items
-- `backend/combatEngine.js` — one new method and one new code block (see below)
-- `companions.json` — NEW FILE, not yet wired in (see below)
+What Needs Doing — Priority Order
+1. adaptiveEnemies smoketest
+The _resolveAdaptiveEnemies() method was added last session and is syntax-checked but not runtime-tested. When a party first reaches challenge_threshold_of_echoes stage 2 or challenge_spire_fractured_time stage 3, run a combat and paste the backend log. Verify:
 
----
+Correct variant spawns based on dominant stat (conviction/harmony/ambition ≥ 140)
+Base wraith spawns correctly for a balanced party
+Narrative log line appears
 
-## What Needs Wiring — Priority Order
+2. Prestige / Sharding system
+Scoped and ready to implement. Full design in StoryArc.zip / THE ECHO VISIONS_EPILOGUES.txt. The mechanical spec agreed this session:
 
-### 1. companions.json (frontend work)
-A new file following the `bots.json` schema. Contains five companion party members for the d16 raid: Krog, the High Cantor, Elara, Valdris, and Hrolf.
+Shard Memory passives — player picks memories based on challenges completed; each grants a themed stat bonus (Save Lyra → harmony, Prevent the Dissolution → conviction, etc.)
+Cycle XP/gold multiplier — small per-cycle bonus, caps at a reasonable ceiling
+Starting gear — one or two guaranteed items on cycle 2+, varying by memory choices
+Cosmetics — cycle counter in UI, title or avatar frame indicator
+Echo Visions — cinematic sequence on Sharding, full spec in story doc
+Reset — strips XP, gear, level; retains Shard Memories and cycle counter
 
-Before the player launches `challenge_spire_fractured_time`, the frontend should:
-1. Read `companions.json`
-2. For each companion, check `requiredItem` against the player's inventory
-3. For Hrolf specifically, also check `requiresChallengeNotCompleted: "challenge_gates_of_atonement"` — if the player cleared that challenge, Hrolf is dead and should not appear
-4. Surface available companions as optional party members
-5. Inject selected companions into `partySnapshots` before calling `runCombat`
+Memory availability gates on challenge completions — you only have "Save Lyra" if you cleared the Moonlit Ferry. Implementation needs: character schema changes, new prestige endpoint, Echo Visions UI, Sharding trigger post-d16.
+The world reacting to Shard Memories (altered challenges, living/dead NPCs, conditional enemy rosters) is expansion territory — not this implementation.
+3. World-reaction expansion
+Challenges behaving differently based on Shard Memory choices. Bram alive, Verdant Word standing, gates open from day one. Significant feature requiring conditional challenge/NPC state. Do not start until prestige loop is complete and stable.
 
-The engine handles companions as normal party members once they're in `partySnapshots`. No engine changes needed.
+Companion System — Current State
+9 companions in companions.json. Auto-inject on combat start based on player inventory and challenge ID. No player-facing UI — they simply appear in the fight.
+Scoped companions (allowedChallenges field):
 
-**Gate items:**
-- Krog → `blood_oath_token`
-- High Cantor → `songbook_of_lyra`
-- Elara → `unified_seed`
-- Valdris → `heirs_signet`
-- Hrolf → `hrolf_standing_orders` AND gates_of_atonement NOT completed
+companion_elara_fragment — oath_stone → gallery_fractured_light
+companion_krog_contracted — blood_oath_token → field_of_settled_debts (suppresses chieftain_krog enemy)
+companion_hrolf_gates — hrolf_standing_orders → gates_of_atonement
 
----
+D16 companions (no allowedChallenges — fallback to spire_fractured_time):
 
-### 2. adaptiveEnemies — smoketest needed
-A new engine feature added this session. The method `_resolveAdaptiveEnemies()` runs before `initializeEnemies` on any stage that has an `adaptiveEnemies` field.
+companion_chieftain_krog — blood_oath_token
+companion_high_cantor — songbook_of_lyra
+companion_elara_unified — unified_seed
+companion_valdris_third_heir — coronation_writ
+companion_captain_hrolf — hrolf_standing_orders AND gates_of_atonement NOT completed
+companion_bram_ferryman — ferryfolk_lantern
 
-Currently used in:
-- `challenge_threshold_of_echoes` stage 2 — swaps `threshold_future_wraith` for a party-profile-specific variant based on dominant stat (conviction/harmony/ambition ≥ 140)
-- `challenge_spire_fractured_time` stage 3 — same variants, same thresholds
 
-**Needs a smoketest** when the first party reaches these challenges. Specifically verify:
-- The correct variant spawns based on party stats
-- The base wraith spawns correctly when no stat meets threshold (balanced party)
-- The `narrative` log line appears in the backend log
+New Systems Added This Session
+Quest Item Hints
+window.getQuestItemHints(challenge, character) in game-data.js. Scans challenge opportunities and branch conditions for requiredItemID / has_item references, cross-checks against player inventory, returns hint objects for items the player is carrying that are relevant to the current challenge. Rendered in the rewards modal (combat-rewards.js) and offline summary (offline-summary.js) as a muted "✦ Your Pack" section.
+Weapon Proc Skills in Augmented Pool
+getAugmentedSkillPool now includes onhit_skillid_1/2/3 from equipped mainHand and offHand weapons. This unblocks the entire bard and shaman skill lines, which gate on proc_chime, proc_melody, proc_echo, proc_resonance, proc_harmony, and proc_lullaby. Previously these procs never entered the pool so their child combos could never fire or be discovered.
+New Consumable Skills
 
-The engine change is in `runCombat` around line 676 and the helper method `_resolveAdaptiveEnemies` sits just above `initializeEnemies`. It was syntax-checked but not runtime-tested.
+cleanse_bleed (Clot) — removes bleed and deep_wound via targeted cleanse
+cleanse_exhaustion (Second Wind) — removes exhaustion
 
----
+Wired to: styptic_powder → cleanse_bleed, stamina_ration → cleanse_exhaustion, moon_touched_apple → nature_touch (schema also corrected from non-standard fields).
 
-### 3. d16 maxPartySize
-`challenge_spire_fractured_time` has `maxPartySize: 8`. The engine does not enforce this — it's informational for the frontend. The party-building UI should allow up to 8 members for this challenge specifically (4 player + up to 4 companions, or any mix up to 8).
+Cross-Challenge Item Network
+Full list of items that carry between challenges. Quest items use slot_id1: "consumable" with no type field, consumable: false, stackable: false (except spire_fragment which is stackable). They are never consumed by opportunity checks.
+vulture_company_ledger, silver_halfling_coin, monitoring_crystal, thrains_complete_report, architects_seal, sigil_fragment, oath_stone, verdant_word_seal, royal_guard_insignia, guild_seal, unpaid_ledger, loyalist_seal, blood_oath_token, first_hand_shard, resonance_node_fragment, ferryfolk_lantern, heirs_signet, songbook_of_lyra, capital_key, dissolution_record, hrolf_standing_orders, ironvein_signet, athenaeum_scroll, coronation_writ, ancestral_verdict, spire_fragment, unified_seed, heir_signet, ironvein_field_orders, seed_of_first_tree, petitioners_verdict
+Note: heirs_signet (type: ring) and heir_signet (no type) are two distinct items. The former is used in the alliance arc and gates Elara Fragment; the latter is used in the tribunal/coronation arc.
 
----
-
-### 4. spire_fragment and Sharding
-`spire_fragment` is a stackable cross-challenge item that drops guaranteed from the Architect. It is designed to accumulate across runs and feed into the Sharding prestige mechanic when the player chooses to initiate it.
-
-The Sharding mechanic itself is **not yet implemented**. The story doc (`StoryArc.zip`) has full design spec including the Echo Visions cinematic sequence and the world-rewrite outcomes. When implementing, `spire_fragment` count could gate or flavour the Sharding options.
-
----
-
-### 5. greateaxe typo
-One item in `items.json` has `"type": "greateaxe"` (extra 'e') — likely a duplicate of a `greataxe` entry. Worth finding and cleaning.
-
----
-
-## New Systems Added This Session
-
-### adaptiveEnemies schema
-Optional field on any stage. Evaluated at stage start against party stats/skills. First matching condition wins.
-
-```json
-"adaptiveEnemies": [
-  {
-    "condition": {
-      "type": "stat_check",
-      "stat": "conviction",
-      "threshold": 140
-    },
-    "replace": {
-      "enemyTypeID": "base_enemy_id",
-      "withEnemyTypeID": "variant_enemy_id"
-    },
-    "narrative": "Optional backend log message."
-  }
-]
-```
-
-Supported condition types: `stat_check`, `has_skill_tag`, `has_skill`, `has_item`, `party_size`.
-Also supports `inject` instead of `replace` to add an enemy entry rather than substitute.
-
----
-
-### companions.json schema
-Follows `bots.json` exactly, with two additional fields:
-
-```json
-{
-  "requiredItem": "item_id",
-  "requiresChallengeNotCompleted": "challenge_id"
-}
-```
-
-`requiresChallengeNotCompleted` is optional and only present on Hrolf.
-
----
-
-## Cross-Challenge Item Network
-Full list of items that carry between challenges and unlock opportunities or branches:
-
-`vulture_company_ledger`, `silver_halfling_coin`, `monitoring_crystal`, `thrains_complete_report`, `architects_seal`, `sigil_fragment`, `oath_stone`, `verdant_word_seal`, `royal_guard_insignia`, `guild_seal`, `unpaid_ledger`, `loyalist_seal`, `blood_oath_token`, `first_hand_shard`, `resonance_node_fragment`, `ferryfolk_lantern`, `heirs_signet`, `songbook_of_lyra`, `capital_key`, `dissolution_record`, `hrolf_standing_orders`, `ironvein_signet`, `athenaeum_scroll`, `coronation_writ`, `ancestral_verdict`, `spire_fragment`
-
-Quest items (not consumed on use) have `slot_id1: "consumable"` and no `type` field.
-
----
-
-## Calibration Notes for When Players Reach d12+
-
+Calibration Notes for When Players Reach d12+
 No one has a character strong enough to play d12+ content yet. When they do, watch for:
 
-- **lord_of_decay / apocalypse / eternal_winter** — these are depth 6-7 skills on d15 bosses. If they're wiping parties too fast, consider reducing boss endurance rather than swapping skills.
-- **d15 boss differentiation** — Echo of Valerius uses `apocalypse` (holy fire), Threshold Keeper uses `eternal_winter` (cold/temporal), The Unmade uses `lord_of_decay` (entropy). Each is mechanically distinct.
-- **adaptiveEnemies thresholds** — the 140 stat threshold for wraith variants may be trivially exceeded by all d15 parties. Check typical stat ranges at level 60 and adjust if needed.
-- **Architect difficulty** — con 280, end 320, armorValue 20, level 70, `skillSelectionCount: 2` from a pool of 6. The two skills it picks per run make every attempt different. If it's too hard, shave endurance before touching skills.
+lord_of_decay / apocalypse / eternal_winter — depth 6-7 skills on d15 bosses. If wiping parties too fast, reduce boss endurance before touching skills.
+d15 boss differentiation — Echo of Valerius uses apocalypse, Threshold Keeper uses eternal_winter, The Unmade uses lord_of_decay. Each is mechanically distinct.
+adaptiveEnemies thresholds — the 140 stat threshold for wraith variants may be trivially exceeded by all d15 parties. Check typical stat ranges at level 60 and adjust if needed.
+Architect difficulty — con 280, end 320, armorValue 20, level 70, skillSelectionCount: 2 from a pool of 6.
 
----
 
-## Story Content Remaining
+Files to Read Before Starting Work
 
-The narrative arc is complete through d16. What exists in the story doc but is not yet in the game:
-
-- **The Sharding / Echo Visions** — prestige loop, world-rewrite cinematics, New Game+ with altered world state. Full spec in `StoryArc.zip / THE ECHO VISIONS_EPILOGUES.txt`.
-- **Shard Memory system** — the mechanic by which specific choices carry into the next cycle and change the world. Referenced in the story doc, not yet designed mechanically.
-- **Post-Sharding world state** — challenges should reflect different world states based on Shard Memory choices (Bram alive, Verdant Word standing, etc.). This is a significant feature requiring conditional challenge/NPC state.
-
----
-
-## Files to Read Before Starting Work
-
-1. `shards_idle_working_relationship.md` — how to work with this developer
-2. `challenge_generation_dossier.md` — schema reference and authoring rules for challenges
-3. `skill_depth_reference.md` — skill depth table for enemy calibration
-4. This document
-
-The story arc files (`StoryArc.zip`) are useful for lore context but the narrative is now fully implemented in challenge content — read them for tone reference, not as a spec to follow literally.
+shards_idle_working_relationship.md — how to work with this developer
+challenge_generation_dossier.md — schema reference and authoring rules
+skill_depth_reference.md — skill depth table for enemy calibration
+This document

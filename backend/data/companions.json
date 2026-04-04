@@ -7,18 +7,44 @@
     "race": "orc",
     "aiProfile": "berserker",
     "requiredItem": "blood_oath_token",
-    "stats": { "conviction": 200, "endurance": 240, "ambition": 110, "harmony": 80 },
+    "stats": {
+      "conviction": 200,
+      "endurance": 240,
+      "ambition": 110,
+      "harmony": 80
+    },
     "skills": [
-      { "skillID": "bloodlust",     "learned": true, "intrinsic": true, "skillXP": 0,    "skillLevel": 1,  "usageCount": 0 },
-      { "skillID": "berserker_rage","learned": true, "skillXP": 9000,  "skillLevel": 8,  "usageCount": 900 },
-      { "skillID": "blood_letting", "learned": true, "skillXP": 8000,  "skillLevel": 8,  "usageCount": 800 }
+      {
+        "skillID": "bloodlust",
+        "learned": true,
+        "intrinsic": true,
+        "skillXP": 0,
+        "skillLevel": 1,
+        "usageCount": 0
+      },
+      {
+        "skillID": "berserker_rage",
+        "learned": true,
+        "skillXP": 9000,
+        "skillLevel": 8,
+        "usageCount": 900
+      },
+      {
+        "skillID": "blood_letting",
+        "learned": true,
+        "skillXP": 8000,
+        "skillLevel": 8,
+        "usageCount": 800
+      }
     ],
     "equipment": {
       "mainHand": "axe_flame_tier3",
       "chest": "chest_dragon_scale_tier5",
       "accessory1": "acc_belt_titan_tier5"
     },
-    "consumables": { "health_potion_major": 3 }
+    "consumables": {
+      "health_potion_major": 3
+    }
   },
   {
     "characterID": "companion_high_cantor",
@@ -28,18 +54,45 @@
     "race": "halfling",
     "aiProfile": "support",
     "requiredItem": "songbook_of_lyra",
-    "stats": { "conviction": 120, "endurance": 150, "ambition": 90, "harmony": 260 },
+    "stats": {
+      "conviction": 120,
+      "endurance": 150,
+      "ambition": 90,
+      "harmony": 260
+    },
     "skills": [
-      { "skillID": "prayer",        "learned": true, "intrinsic": true, "skillXP": 0,    "skillLevel": 1,  "usageCount": 0 },
-      { "skillID": "battle_hymn",   "learned": true, "skillXP": 9000,  "skillLevel": 8,  "usageCount": 900 },
-      { "skillID": "holy_word",     "learned": true, "skillXP": 8000,  "skillLevel": 8,  "usageCount": 800 }
+      {
+        "skillID": "prayer",
+        "learned": true,
+        "intrinsic": true,
+        "skillXP": 0,
+        "skillLevel": 1,
+        "usageCount": 0
+      },
+      {
+        "skillID": "battle_hymn",
+        "learned": true,
+        "skillXP": 9000,
+        "skillLevel": 8,
+        "usageCount": 900
+      },
+      {
+        "skillID": "holy_word",
+        "learned": true,
+        "skillXP": 8000,
+        "skillLevel": 8,
+        "usageCount": 800
+      }
     ],
     "equipment": {
       "mainHand": "totem_ascension_tier7",
       "chest": "chest_ascension_vestments_tier7",
       "accessory1": "acc_amulet_soul_tier5"
     },
-    "consumables": { "health_potion_major": 2, "mana_potion_major": 3 }
+    "consumables": {
+      "health_potion_major": 2,
+      "mana_potion_major": 3
+    }
   },
   {
     "characterID": "companion_elara_unified",
@@ -49,18 +102,45 @@
     "race": "elf",
     "aiProfile": "support",
     "requiredItem": "unified_seed",
-    "stats": { "conviction": 130, "endurance": 160, "ambition": 100, "harmony": 240 },
+    "stats": {
+      "conviction": 130,
+      "endurance": 160,
+      "ambition": 100,
+      "harmony": 240
+    },
     "skills": [
-      { "skillID": "attunement",    "learned": true, "intrinsic": true, "skillXP": 0,    "skillLevel": 1,  "usageCount": 0 },
-      { "skillID": "forest_embrace","learned": true, "skillXP": 9000,  "skillLevel": 8,  "usageCount": 900 },
-      { "skillID": "sacred_roots",  "learned": true, "skillXP": 8000,  "skillLevel": 8,  "usageCount": 800 }
+      {
+        "skillID": "attunement",
+        "learned": true,
+        "intrinsic": true,
+        "skillXP": 0,
+        "skillLevel": 1,
+        "usageCount": 0
+      },
+      {
+        "skillID": "forest_embrace",
+        "learned": true,
+        "skillXP": 9000,
+        "skillLevel": 8,
+        "usageCount": 900
+      },
+      {
+        "skillID": "sacred_roots",
+        "learned": true,
+        "skillXP": 8000,
+        "skillLevel": 8,
+        "usageCount": 800
+      }
     ],
     "equipment": {
       "mainHand": "staff_life_tier5",
       "chest": "chest_leather_shadow_tier4",
       "accessory1": "acc_ring_obsidian_tier5"
     },
-    "consumables": { "health_potion_major": 2, "mana_potion_major": 3 }
+    "consumables": {
+      "health_potion_major": 2,
+      "mana_potion_major": 3
+    }
   },
   {
     "characterID": "companion_valdris_third_heir",
@@ -69,19 +149,45 @@
     "level": 62,
     "race": "dwarf",
     "aiProfile": "tactical",
-    "requiredItem": "heirs_signet",
-    "stats": { "conviction": 210, "endurance": 250, "ambition": 90, "harmony": 120 },
+    "requiredItem": "coronation_writ",
+    "stats": {
+      "conviction": 210,
+      "endurance": 250,
+      "ambition": 90,
+      "harmony": 120
+    },
     "skills": [
-      { "skillID": "restore_stam_minor", "learned": true, "intrinsic": true, "skillXP": 0, "skillLevel": 1, "usageCount": 0 },
-      { "skillID": "faith_armor",   "learned": true, "skillXP": 9000,  "skillLevel": 8,  "usageCount": 900 },
-      { "skillID": "ward_break",    "learned": true, "skillXP": 8000,  "skillLevel": 8,  "usageCount": 800 }
+      {
+        "skillID": "restore_stam_minor",
+        "learned": true,
+        "intrinsic": true,
+        "skillXP": 0,
+        "skillLevel": 1,
+        "usageCount": 0
+      },
+      {
+        "skillID": "faith_armor",
+        "learned": true,
+        "skillXP": 9000,
+        "skillLevel": 8,
+        "usageCount": 900
+      },
+      {
+        "skillID": "ward_break",
+        "learned": true,
+        "skillXP": 8000,
+        "skillLevel": 8,
+        "usageCount": 800
+      }
     ],
     "equipment": {
       "mainHand": "hammer_ascension_tier7",
       "chest": "chest_phoenix_plate_tier6",
       "accessory1": "acc_boots_phoenix_tier7"
     },
-    "consumables": { "health_potion_major": 4 }
+    "consumables": {
+      "health_potion_major": 4
+    }
   },
   {
     "characterID": "companion_captain_hrolf",
@@ -92,18 +198,44 @@
     "aiProfile": "tactical",
     "requiredItem": "hrolf_standing_orders",
     "requiresChallengeNotCompleted": "challenge_gates_of_atonement",
-    "stats": { "conviction": 190, "endurance": 210, "ambition": 100, "harmony": 60 },
+    "stats": {
+      "conviction": 190,
+      "endurance": 210,
+      "ambition": 100,
+      "harmony": 60
+    },
     "skills": [
-      { "skillID": "prayer",        "learned": true, "intrinsic": true, "skillXP": 0,    "skillLevel": 1,  "usageCount": 0 },
-      { "skillID": "counter_strike","learned": true, "skillXP": 9000,  "skillLevel": 8,  "usageCount": 900 },
-      { "skillID": "weak_point",    "learned": true, "skillXP": 8000,  "skillLevel": 8,  "usageCount": 800 }
+      {
+        "skillID": "prayer",
+        "learned": true,
+        "intrinsic": true,
+        "skillXP": 0,
+        "skillLevel": 1,
+        "usageCount": 0
+      },
+      {
+        "skillID": "counter_strike",
+        "learned": true,
+        "skillXP": 9000,
+        "skillLevel": 8,
+        "usageCount": 900
+      },
+      {
+        "skillID": "weak_point",
+        "learned": true,
+        "skillXP": 8000,
+        "skillLevel": 8,
+        "usageCount": 800
+      }
     ],
     "equipment": {
       "mainHand": "sword_void_tier6",
       "chest": "chest_phoenix_plate_tier6",
       "accessory1": "acc_cloak_eternal_tier7"
     },
-    "consumables": { "health_potion_major": 3 }
+    "consumables": {
+      "health_potion_major": 3
+    }
   },
   {
     "characterID": "companion_elara_fragment",
@@ -113,19 +245,48 @@
     "race": "elf",
     "aiProfile": "support",
     "requiredItem": "oath_stone",
-    "allowedChallenges": ["challenge_gallery_fractured_light"],
-    "note": "The Fragment — partial, suffering, still keeping a promise the Core abandoned. Weak by d16 standards but present. Her presence at d8 is the beginning of the relationship that pays off at d16.",
-    "stats": { "conviction": 55, "endurance": 65, "ambition": 50, "harmony": 120 },
+    "allowedChallenges": [
+      "challenge_gallery_fractured_light"
+    ],
+    "note": "The Fragment \u2014 partial, suffering, still keeping a promise the Core abandoned. Weak by d16 standards but present. Her presence at d8 is the beginning of the relationship that pays off at d16.",
+    "stats": {
+      "conviction": 55,
+      "endurance": 65,
+      "ambition": 50,
+      "harmony": 120
+    },
     "skills": [
-      { "skillID": "attunement",  "learned": true, "intrinsic": true, "skillXP": 0,   "skillLevel": 1, "usageCount": 0 },
-      { "skillID": "regrowth",    "learned": true, "skillXP": 800,   "skillLevel": 4, "usageCount": 80 },
-      { "skillID": "entangle",    "learned": true, "skillXP": 600,   "skillLevel": 3, "usageCount": 60 }
+      {
+        "skillID": "attunement",
+        "learned": true,
+        "intrinsic": true,
+        "skillXP": 0,
+        "skillLevel": 1,
+        "usageCount": 0
+      },
+      {
+        "skillID": "regrowth",
+        "learned": true,
+        "skillXP": 800,
+        "skillLevel": 4,
+        "usageCount": 80
+      },
+      {
+        "skillID": "entangle",
+        "learned": true,
+        "skillXP": 600,
+        "skillLevel": 3,
+        "usageCount": 60
+      }
     ],
     "equipment": {
       "mainHand": "scepter_nature_tier1",
       "chest": "chest_cloth_robe_tier1"
     },
-    "consumables": { "health_potion": 2, "mana_potion": 2 }
+    "consumables": {
+      "health_potion": 2,
+      "mana_potion": 2
+    }
   },
   {
     "characterID": "companion_krog_contracted",
@@ -135,19 +296,47 @@
     "race": "orc",
     "aiProfile": "berserker",
     "requiredItem": "blood_oath_token",
-    "allowedChallenges": ["challenge_field_of_settled_debts"],
-    "note": "Post-contract Krog — the Blood-Oath Ceremony has been completed, he is no longer an enemy. Same fighter, different allegiance. Available on repeat runs of the Field once the token exists.",
-    "stats": { "conviction": 180, "endurance": 210, "ambition": 90, "harmony": 80 },
+    "allowedChallenges": [
+      "challenge_field_of_settled_debts"
+    ],
+    "note": "Post-contract Krog \u2014 the Blood-Oath Ceremony has been completed, he is no longer an enemy. Same fighter, different allegiance. Available on repeat runs of the Field once the token exists.",
+    "stats": {
+      "conviction": 180,
+      "endurance": 210,
+      "ambition": 90,
+      "harmony": 80
+    },
     "skills": [
-      { "skillID": "bloodlust",     "learned": true, "intrinsic": true, "skillXP": 0,   "skillLevel": 1, "usageCount": 0 },
-      { "skillID": "berserker_rage","learned": true, "skillXP": 5000,  "skillLevel": 6, "usageCount": 500 },
-      { "skillID": "blood_letting", "learned": true, "skillXP": 4000,  "skillLevel": 5, "usageCount": 400 }
+      {
+        "skillID": "bloodlust",
+        "learned": true,
+        "intrinsic": true,
+        "skillXP": 0,
+        "skillLevel": 1,
+        "usageCount": 0
+      },
+      {
+        "skillID": "berserker_rage",
+        "learned": true,
+        "skillXP": 5000,
+        "skillLevel": 6,
+        "usageCount": 500
+      },
+      {
+        "skillID": "blood_letting",
+        "learned": true,
+        "skillXP": 4000,
+        "skillLevel": 5,
+        "usageCount": 400
+      }
     ],
     "equipment": {
       "mainHand": "axe_flame_tier3",
       "chest": "chest_warrior_plate_tier3"
     },
-    "consumables": { "health_potion_major": 3 }
+    "consumables": {
+      "health_potion_major": 3
+    }
   },
   {
     "characterID": "companion_hrolf_gates",
@@ -157,18 +346,95 @@
     "race": "human",
     "aiProfile": "tactical",
     "requiredItem": "hrolf_standing_orders",
-    "allowedChallenges": ["challenge_gates_of_atonement"],
-    "note": "Hrolf running the gate operation — he is present and fighting, the party is helping him hold the line. This is the challenge where he dies in canon if the player clears it. His presence here as a companion makes that death meaningful rather than incidental.",
-    "stats": { "conviction": 160, "endurance": 180, "ambition": 85, "harmony": 45 },
+    "allowedChallenges": [
+      "challenge_gates_of_atonement"
+    ],
+    "note": "Hrolf running the gate operation \u2014 he is present and fighting, the party is helping him hold the line. This is the challenge where he dies in canon if the player clears it. His presence here as a companion makes that death meaningful rather than incidental.",
+    "stats": {
+      "conviction": 160,
+      "endurance": 180,
+      "ambition": 85,
+      "harmony": 45
+    },
     "skills": [
-      { "skillID": "prayer",        "learned": true, "intrinsic": true, "skillXP": 0,   "skillLevel": 1, "usageCount": 0 },
-      { "skillID": "counter_strike","learned": true, "skillXP": 5500,  "skillLevel": 6, "usageCount": 550 },
-      { "skillID": "fortify",       "learned": true, "skillXP": 4500,  "skillLevel": 5, "usageCount": 450 }
+      {
+        "skillID": "prayer",
+        "learned": true,
+        "intrinsic": true,
+        "skillXP": 0,
+        "skillLevel": 1,
+        "usageCount": 0
+      },
+      {
+        "skillID": "counter_strike",
+        "learned": true,
+        "skillXP": 5500,
+        "skillLevel": 6,
+        "usageCount": 550
+      },
+      {
+        "skillID": "fortify",
+        "learned": true,
+        "skillXP": 4500,
+        "skillLevel": 5,
+        "usageCount": 450
+      }
     ],
     "equipment": {
       "mainHand": "sword_adamant_tier3",
       "chest": "chest_void_plate_tier4"
     },
-    "consumables": { "health_potion_major": 3 }
+    "consumables": {
+      "health_potion_major": 3
+    }
+  },
+  {
+    "characterID": "companion_bram_ferryman",
+    "characterName": "Bram",
+    "role": "Support",
+    "level": 58,
+    "race": "human",
+    "aiProfile": "support",
+    "requiredItem": "ferryfolk_lantern",
+    "note": "The ferryman who died owing a debt of song to Lyra. He has been on the river for fifty years. The lantern is his. He follows it.",
+    "stats": {
+      "conviction": 80,
+      "endurance": 110,
+      "ambition": 95,
+      "harmony": 220
+    },
+    "skills": [
+      {
+        "skillID": "attunement",
+        "learned": true,
+        "intrinsic": true,
+        "skillXP": 0,
+        "skillLevel": 1,
+        "usageCount": 0
+      },
+      {
+        "skillID": "lullaby",
+        "learned": true,
+        "skillXP": 7000,
+        "skillLevel": 7,
+        "usageCount": 700
+      },
+      {
+        "skillID": "spirit_link",
+        "learned": true,
+        "skillXP": 6000,
+        "skillLevel": 6,
+        "usageCount": 600
+      }
+    ],
+    "equipment": {
+      "mainHand": "staff_harmony_tier3",
+      "chest": "chest_druid_vestments_tier3",
+      "accessory1": "acc_amulet_soul_tier5"
+    },
+    "consumables": {
+      "health_potion_major": 2,
+      "mana_potion_major": 3
+    }
   }
 ]

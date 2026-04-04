@@ -12171,5 +12171,56 @@
       "physical",
       "consumable"
     ]
+  },
+  {
+    "id": "cleanse_bleed",
+    "name": "Clot",
+    "description": "Stops active bleeding and closes deep wounds. Applied externally; works immediately.",
+    "category": "CONSUMABLE_HEALING",
+    "isChildSkill": false,
+    "isStarterSkill": false,
+    "parentSkills": [],
+    "basePower": 0,
+    "cost": {},
+    "delay": 0,
+    "enemyUsable": false,
+    "effects": [
+      {
+        "type": "cleanse",
+        "targets": "self",
+        "statusIds": [
+          "bleed",
+          "deep_wound"
+        ]
+      }
+    ],
+    "tags": [
+      "healing"
+    ]
+  },
+  {
+    "id": "cleanse_exhaustion",
+    "name": "Second Wind",
+    "description": "Forces a short burst of restored stamina. Does not heal, does not last \u2014 but it gets you moving again.",
+    "category": "CONSUMABLE_HEALING",
+    "isChildSkill": false,
+    "isStarterSkill": false,
+    "parentSkills": [],
+    "basePower": 0,
+    "cost": {},
+    "delay": 0,
+    "enemyUsable": false,
+    "effects": [
+      {
+        "type": "cleanse",
+        "targets": "self",
+        "statusIds": [
+          "exhaustion"
+        ]
+      }
+    ],
+    "tags": [
+      "healing"
+    ]
   }
 ]
