@@ -481,29 +481,24 @@
     "skillSelectionCount": 6,
     "lootTable": [
       {
-        "itemID": "sword_bronze_tier1",
-        "dropChance": 0.6,
-        "rarity": "uncommon"
+        "itemID": "scepter_drowned_archbishop",
+        "dropChance": 0.55,
+        "rarity": "rare"
       },
       {
-        "itemID": "acc_amulet_silver_tier1",
-        "dropChance": 0.5,
-        "rarity": "uncommon"
-      },
-      {
-        "itemID": "chest_chain_hauberk_tier1",
-        "dropChance": 0.4,
-        "rarity": "uncommon"
-      },
-      {
-        "itemID": "head_chain_hood_tier1",
+        "itemID": "tome_ice_tier1",
         "dropChance": 0.35,
         "rarity": "uncommon"
       },
       {
-        "itemID": "health_potion",
-        "dropChance": 0.6,
+        "itemID": "acc_amulet_silver_tier1",
+        "dropChance": 0.3,
         "rarity": "uncommon"
+      },
+      {
+        "itemID": "health_potion",
+        "dropChance": 0.5,
+        "rarity": "common"
       }
     ],
     "availableSkills": [
@@ -639,8 +634,13 @@
     "skillSelectionCount": 3,
     "lootTable": [
       {
+        "itemID": "head_bone_circlet_tier0",
+        "dropChance": 0.35,
+        "rarity": "uncommon"
+      },
+      {
         "itemID": "health_potion_minor",
-        "dropChance": 0.25,
+        "dropChance": 0.4,
         "rarity": "common"
       },
       {
@@ -733,19 +733,19 @@
     "skillSelectionCount": 4,
     "lootTable": [
       {
-        "itemID": "axe_iron_tier0",
-        "dropChance": 0.5,
+        "itemID": "axe_grizzlethorn_chief",
+        "dropChance": 0.6,
         "rarity": "uncommon"
       },
       {
-        "itemID": "chest_leather_tunic_tier0",
-        "dropChance": 0.35,
-        "rarity": "common"
-      },
-      {
-        "itemID": "health_potion",
+        "itemID": "vulture_company_ledger",
         "dropChance": 0.4,
         "rarity": "uncommon"
+      },
+      {
+        "itemID": "health_potion_minor",
+        "dropChance": 0.5,
+        "rarity": "common"
       }
     ],
     "tags": [
@@ -849,7 +849,18 @@
       "wisp",
       "support"
     ],
-    "lootTable": [],
+    "lootTable": [
+      {
+        "itemID": "head_woven_mask_tier1",
+        "dropChance": 0.3,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "mana_potion_minor",
+        "dropChance": 0.35,
+        "rarity": "common"
+      }
+    ],
     "weaponTypes": [
       "flute",
       "wand",
@@ -3020,7 +3031,18 @@
       "dwarf",
       "tidebound"
     ],
-    "lootTable": [],
+    "lootTable": [
+      {
+        "itemID": "head_iron_coif_tier2",
+        "dropChance": 0.2,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "health_potion_minor",
+        "dropChance": 0.3,
+        "rarity": "common"
+      }
+    ],
     "weaponTypes": [
       "sword",
       "axe"
@@ -3921,7 +3943,18 @@
       "water",
       "human"
     ],
-    "lootTable": [],
+    "lootTable": [
+      {
+        "itemID": "head_barnacle_helm_tier3",
+        "dropChance": 0.2,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "chest_chain_tide_tier3",
+        "dropChance": 0.15,
+        "rarity": "uncommon"
+      }
+    ],
     "weaponTypes": [
       "hammer",
       "mace"
@@ -4462,23 +4495,28 @@
     ],
     "lootTable": [
       {
+        "itemID": "chest_justicar_verdict_plate",
+        "dropChance": 0.5,
+        "rarity": "rare"
+      },
+      {
         "itemID": "ancestral_verdict",
         "dropChance": 0.8,
         "rarity": "uncommon"
       },
       {
         "itemID": "ironvein_signet",
-        "dropChance": 0.5,
-        "rarity": "rare"
+        "dropChance": 0.4,
+        "rarity": "uncommon"
       },
       {
         "itemID": "head_knight_greathelm_tier3",
-        "dropChance": 0.25,
+        "dropChance": 0.3,
         "rarity": "rare"
       },
       {
-        "itemID": "hammer_mithril_tier2",
-        "dropChance": 0.3,
+        "itemID": "health_potion_major",
+        "dropChance": 0.5,
         "rarity": "uncommon"
       }
     ],
@@ -4618,9 +4656,14 @@
     ],
     "lootTable": [
       {
+        "itemID": "head_orc_bone_helm_tier3",
+        "dropChance": 0.2,
+        "rarity": "uncommon"
+      },
+      {
         "itemID": "chest_warrior_plate_tier3",
         "dropChance": 0.15,
-        "rarity": "rare"
+        "rarity": "uncommon"
       }
     ],
     "weaponTypes": [
@@ -4818,9 +4861,14 @@
     ],
     "lootTable": [
       {
+        "itemID": "head_orc_bone_helm_tier3",
+        "dropChance": 0.2,
+        "rarity": "uncommon"
+      },
+      {
         "itemID": "chest_warrior_plate_tier3",
         "dropChance": 0.15,
-        "rarity": "rare"
+        "rarity": "uncommon"
       }
     ],
     "weaponTypes": [
@@ -4857,7 +4905,18 @@
       "luminary",
       "nature"
     ],
-    "lootTable": [],
+    "lootTable": [
+      {
+        "itemID": "head_elven_canopy_hood_tier3",
+        "dropChance": 0.2,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "chest_leather_reinforced_tier3",
+        "dropChance": 0.18,
+        "rarity": "uncommon"
+      }
+    ],
     "weaponTypes": [
       "dagger",
       "handaxe"
@@ -4894,7 +4953,18 @@
       "nature",
       "shadow"
     ],
-    "lootTable": [],
+    "lootTable": [
+      {
+        "itemID": "chest_leather_shadow_tier4",
+        "dropChance": 0.18,
+        "rarity": "rare"
+      },
+      {
+        "itemID": "mana_potion",
+        "dropChance": 0.3,
+        "rarity": "common"
+      }
+    ],
     "weaponTypes": [
       "wand",
       "tome",
@@ -5808,6 +5878,16 @@
     ],
     "lootTable": [
       {
+        "itemID": "head_tidebound_warden_helm_tier4",
+        "dropChance": 0.15,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "chest_chain_tide_tier3",
+        "dropChance": 0.15,
+        "rarity": "uncommon"
+      },
+      {
         "itemID": "stamina_potion",
         "dropChance": 0.3,
         "rarity": "common"
@@ -5897,6 +5977,16 @@
     ],
     "lootTable": [
       {
+        "itemID": "head_barnacle_helm_tier3",
+        "dropChance": 0.2,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "chest_chain_tide_tier3",
+        "dropChance": 0.18,
+        "rarity": "uncommon"
+      },
+      {
         "itemID": "health_potion",
         "dropChance": 0.3,
         "rarity": "common"
@@ -5904,7 +5994,7 @@
       {
         "itemID": "chest_chain_hauberk_tier1",
         "dropChance": 0.15,
-        "rarity": "uncommon"
+        "rarity": "common"
       }
     ],
     "tags": [
@@ -6026,6 +6116,16 @@
       "basic_attack"
     ],
     "lootTable": [
+      {
+        "itemID": "head_capital_guard_coif_tier3",
+        "dropChance": 0.2,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "chest_chain_warden_tier4",
+        "dropChance": 0.15,
+        "rarity": "rare"
+      },
       {
         "itemID": "health_potion",
         "dropChance": 0.3,
@@ -8694,6 +8794,232 @@
       "spirit",
       "arcane",
       "shadow"
+    ],
+    "weaponTypes": []
+  },
+  {
+    "id": "spire_architect_shard",
+    "name": "Architect Shard",
+    "description": "A fragment of the Architect's attention given combat form \u2014 more coherent than the Echo Shards from the First Hand encounter because the Architect has had three hundred years of additional practice; void_rend and decay_aura in combination strip harmony and weaken simultaneously while soul_shatter feeds the combat data back to the Architect's core.",
+    "stats": {
+      "conviction": 120,
+      "endurance": 110,
+      "ambition": 120,
+      "harmony": 100
+    },
+    "armorValue": 8,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "void_rend",
+      "decay_aura",
+      "soul_shatter",
+      "entropic_decay",
+      "shadow_bolt"
+    ],
+    "lootTable": [
+      {
+        "itemID": "mana_potion_major",
+        "dropChance": 0.3,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "spirit",
+      "corrupted",
+      "shadow",
+      "arcane"
+    ],
+    "weaponTypes": []
+  },
+  {
+    "id": "the_architect_of_decay",
+    "name": "The Architect of Decay",
+    "description": "Not a monster. The accumulated weight of every broken promise in the Vale over three hundred years, given sufficient mass and attention to act with purpose. It does not hate the party. It is completing a process. lord_of_decay, apocalypse, and eternal_winter are its three damage expressions \u2014 the same skills its echoes used at d15, now running from the source; soul_shatter profiles every turn; reality_fracture tests formation; drain_reserves finds whoever is sustaining the effort and targets them specifically.",
+    "stats": {
+      "conviction": 280,
+      "endurance": 320,
+      "ambition": 140,
+      "harmony": 250
+    },
+    "armorValue": 20,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "lord_of_decay",
+      "apocalypse",
+      "eternal_winter",
+      "soul_shatter",
+      "reality_fracture",
+      "drain_reserves"
+    ],
+    "lootTable": [
+      {
+        "itemID": "spire_fragment",
+        "dropChance": 1.0,
+        "rarity": "legendary"
+      },
+      {
+        "itemID": "sword_abyss_tier8",
+        "dropChance": 0.4,
+        "rarity": "legendary"
+      },
+      {
+        "itemID": "staff_genesis_tier8",
+        "dropChance": 0.4,
+        "rarity": "legendary"
+      },
+      {
+        "itemID": "chest_omega_plate_tier8",
+        "dropChance": 0.35,
+        "rarity": "legendary"
+      },
+      {
+        "itemID": "chest_genesis_robe_tier8",
+        "dropChance": 0.35,
+        "rarity": "legendary"
+      },
+      {
+        "itemID": "acc_amulet_omnipotence_tier7",
+        "dropChance": 0.5,
+        "rarity": "legendary"
+      },
+      {
+        "itemID": "head_abyssal_helm_tier7",
+        "dropChance": 0.4,
+        "rarity": "legendary"
+      },
+      {
+        "itemID": "architects_seal",
+        "dropChance": 0.6,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "spirit",
+      "corrupted",
+      "shadow",
+      "arcane",
+      "boss"
+    ],
+    "weaponTypes": []
+  },
+  {
+    "id": "spire_architect_shard",
+    "name": "Architect Shard",
+    "description": "A fragment of the Architect's attention given combat form \u2014 more coherent than the Echo Shards from the First Hand encounter because the Architect has had three hundred years of additional practice; void_rend and decay_aura in combination strip harmony and weaken simultaneously while soul_shatter feeds the combat data back to the Architect's core.",
+    "stats": {
+      "conviction": 120,
+      "endurance": 110,
+      "ambition": 120,
+      "harmony": 100
+    },
+    "armorValue": 8,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "void_rend",
+      "decay_aura",
+      "soul_shatter",
+      "entropic_decay",
+      "shadow_bolt"
+    ],
+    "lootTable": [
+      {
+        "itemID": "mana_potion_major",
+        "dropChance": 0.3,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "spirit",
+      "corrupted",
+      "shadow",
+      "arcane"
+    ],
+    "weaponTypes": []
+  },
+  {
+    "id": "the_architect_of_decay",
+    "name": "The Architect of Decay",
+    "description": "Not a monster. The accumulated weight of every broken promise in the Vale over three hundred years, given sufficient mass and attention to act with purpose. It does not hate the party. It is completing a process. lord_of_decay, apocalypse, and eternal_winter are its three damage expressions \u2014 the same skills its echoes used at d15, now running from the source; soul_shatter profiles every turn; reality_fracture tests formation; drain_reserves finds whoever is sustaining the effort and targets them specifically.",
+    "stats": {
+      "conviction": 280,
+      "endurance": 320,
+      "ambition": 140,
+      "harmony": 250
+    },
+    "armorValue": 20,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "lord_of_decay",
+      "apocalypse",
+      "eternal_winter",
+      "soul_shatter",
+      "reality_fracture",
+      "drain_reserves"
+    ],
+    "lootTable": [
+      {
+        "itemID": "spire_fragment",
+        "dropChance": 1.0,
+        "rarity": "legendary"
+      },
+      {
+        "itemID": "sword_abyss_tier8",
+        "dropChance": 0.4,
+        "rarity": "legendary"
+      },
+      {
+        "itemID": "staff_genesis_tier8",
+        "dropChance": 0.4,
+        "rarity": "legendary"
+      },
+      {
+        "itemID": "chest_omega_plate_tier8",
+        "dropChance": 0.35,
+        "rarity": "legendary"
+      },
+      {
+        "itemID": "chest_genesis_robe_tier8",
+        "dropChance": 0.35,
+        "rarity": "legendary"
+      },
+      {
+        "itemID": "acc_amulet_omnipotence_tier7",
+        "dropChance": 0.5,
+        "rarity": "legendary"
+      },
+      {
+        "itemID": "head_abyssal_helm_tier7",
+        "dropChance": 0.4,
+        "rarity": "legendary"
+      },
+      {
+        "itemID": "architects_seal",
+        "dropChance": 0.6,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "spirit",
+      "corrupted",
+      "shadow",
+      "arcane",
+      "boss"
     ],
     "weaponTypes": []
   }

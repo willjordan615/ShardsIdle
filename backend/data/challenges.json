@@ -1260,6 +1260,11 @@
             "itemID": "consumable_potion_health_minor",
             "dropChance": 0.42,
             "rarity": "common"
+          },
+          {
+            "itemID": "head_bone_circlet_tier0",
+            "dropChance": 0.25,
+            "rarity": "uncommon"
           }
         ]
       },
@@ -1366,6 +1371,11 @@
             "itemID": "consumable_potion_mana_minor",
             "dropChance": 0.3,
             "rarity": "common"
+          },
+          {
+            "itemID": "head_woven_mask_tier1",
+            "dropChance": 0.25,
+            "rarity": "uncommon"
           }
         ],
         "stageBranches": [
@@ -1444,6 +1454,16 @@
         {
           "itemID": "bell_bronze_tier0",
           "dropChance": 0.2
+        },
+        {
+          "itemID": "head_woven_mask_tier1",
+          "dropChance": 0.3,
+          "rarity": "uncommon"
+        },
+        {
+          "itemID": "head_bone_circlet_tier0",
+          "dropChance": 0.25,
+          "rarity": "uncommon"
         }
       ],
       "secretLootTable": [
@@ -5654,6 +5674,11 @@
             "itemID": "hammer_mithril_tier2",
             "dropChance": 0.15,
             "rarity": "uncommon"
+          },
+          {
+            "itemID": "head_iron_coif_tier2",
+            "dropChance": 0.2,
+            "rarity": "uncommon"
           }
         ]
       },
@@ -5737,6 +5762,11 @@
           },
           {
             "itemID": "verdant_word_seal",
+            "dropChance": 0.2,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "head_iron_coif_tier2",
             "dropChance": 0.2,
             "rarity": "uncommon"
           }
@@ -5919,6 +5949,11 @@
         {
           "itemID": "polearm_storm_tier4",
           "dropChance": 0.12
+        },
+        {
+          "itemID": "head_iron_coif_tier2",
+          "dropChance": 0.3,
+          "rarity": "uncommon"
         }
       ],
       "secretLootTable": [
@@ -7450,6 +7485,16 @@
             "itemID": "verdant_word_seal",
             "dropChance": 0.28,
             "rarity": "uncommon"
+          },
+          {
+            "itemID": "head_barnacle_helm_tier3",
+            "dropChance": 0.18,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "chest_chain_tide_tier3",
+            "dropChance": 0.15,
+            "rarity": "uncommon"
           }
         ]
       },
@@ -7529,6 +7574,11 @@
             "itemID": "monitoring_crystal",
             "dropChance": 0.2,
             "rarity": "rare"
+          },
+          {
+            "itemID": "head_barnacle_helm_tier3",
+            "dropChance": 0.2,
+            "rarity": "uncommon"
           }
         ]
       },
@@ -7623,6 +7673,16 @@
           "itemID": "monitoring_crystal",
           "dropChance": 0.22,
           "rarity": "rare"
+        },
+        {
+          "itemID": "head_barnacle_helm_tier3",
+          "dropChance": 0.25,
+          "rarity": "uncommon"
+        },
+        {
+          "itemID": "chest_chain_tide_tier3",
+          "dropChance": 0.2,
+          "rarity": "uncommon"
         }
       ],
       "secretLootTable": [
@@ -8879,6 +8939,11 @@
             "itemID": "scepter_adamant_tier3",
             "dropChance": 0.18,
             "rarity": "uncommon"
+          },
+          {
+            "itemID": "head_orc_bone_helm_tier3",
+            "dropChance": 0.2,
+            "rarity": "uncommon"
           }
         ]
       },
@@ -8958,6 +9023,11 @@
             "itemID": "chest_warrior_plate_tier3",
             "dropChance": 0.18,
             "rarity": "rare"
+          },
+          {
+            "itemID": "head_orc_bone_helm_tier3",
+            "dropChance": 0.2,
+            "rarity": "uncommon"
           }
         ]
       },
@@ -9056,6 +9126,11 @@
         {
           "itemID": "greataxe_rage_tier5",
           "dropChance": 0.12
+        },
+        {
+          "itemID": "head_orc_bone_helm_tier3",
+          "dropChance": 0.25,
+          "rarity": "uncommon"
         }
       ],
       "secretLootTable": [
@@ -9209,6 +9284,16 @@
             "itemID": "verdant_word_seal",
             "dropChance": 0.2,
             "rarity": "uncommon"
+          },
+          {
+            "itemID": "head_elven_canopy_hood_tier3",
+            "dropChance": 0.2,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "chest_leather_reinforced_tier3",
+            "dropChance": 0.18,
+            "rarity": "uncommon"
           }
         ]
       },
@@ -9313,6 +9398,11 @@
             "itemID": "verdant_word_seal",
             "dropChance": 0.25,
             "rarity": "uncommon"
+          },
+          {
+            "itemID": "chest_leather_shadow_tier4",
+            "dropChance": 0.15,
+            "rarity": "rare"
           }
         ]
       },
@@ -9391,6 +9481,11 @@
           {
             "itemID": "verdant_word_seal",
             "dropChance": 0.35,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "head_elven_canopy_hood_tier3",
+            "dropChance": 0.2,
             "rarity": "uncommon"
           }
         ]
@@ -9503,6 +9598,21 @@
         {
           "itemID": "staff_void_tier3",
           "dropChance": 0.12
+        },
+        {
+          "itemID": "head_elven_canopy_hood_tier3",
+          "dropChance": 0.28,
+          "rarity": "uncommon"
+        },
+        {
+          "itemID": "chest_leather_reinforced_tier3",
+          "dropChance": 0.22,
+          "rarity": "uncommon"
+        },
+        {
+          "itemID": "chest_leather_shadow_tier4",
+          "dropChance": 0.18,
+          "rarity": "rare"
         }
       ],
       "secretLootTable": [
@@ -11504,6 +11614,11 @@
             "itemID": "polearm_mithril_tier2",
             "dropChance": 0.2,
             "rarity": "uncommon"
+          },
+          {
+            "itemID": "head_tidebound_warden_helm_tier4",
+            "dropChance": 0.18,
+            "rarity": "uncommon"
           }
         ]
       },
@@ -11573,6 +11688,16 @@
           {
             "itemID": "polearm_mithril_tier2",
             "dropChance": 0.2,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "head_tidebound_warden_helm_tier4",
+            "dropChance": 0.2,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "chest_chain_tide_tier3",
+            "dropChance": 0.18,
             "rarity": "uncommon"
           }
         ]
@@ -11661,6 +11786,16 @@
         {
           "itemID": "monitoring_crystal",
           "dropChance": 0.25,
+          "rarity": "uncommon"
+        },
+        {
+          "itemID": "head_tidebound_warden_helm_tier4",
+          "dropChance": 0.28,
+          "rarity": "uncommon"
+        },
+        {
+          "itemID": "chest_chain_tide_tier3",
+          "dropChance": 0.22,
           "rarity": "uncommon"
         }
       ],
@@ -11808,6 +11943,11 @@
             "itemID": "chest_warrior_plate_tier3",
             "dropChance": 0.15,
             "rarity": "uncommon"
+          },
+          {
+            "itemID": "head_capital_guard_coif_tier3",
+            "dropChance": 0.2,
+            "rarity": "uncommon"
           }
         ]
       },
@@ -11906,6 +12046,11 @@
           {
             "itemID": "chest_void_plate_tier4",
             "dropChance": 0.15,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "chest_chain_warden_tier4",
+            "dropChance": 0.18,
             "rarity": "rare"
           }
         ]
@@ -12049,6 +12194,16 @@
           "itemID": "health_potion_major",
           "dropChance": 0.6,
           "rarity": "uncommon"
+        },
+        {
+          "itemID": "head_capital_guard_coif_tier3",
+          "dropChance": 0.28,
+          "rarity": "uncommon"
+        },
+        {
+          "itemID": "chest_chain_warden_tier4",
+          "dropChance": 0.22,
+          "rarity": "rare"
         }
       ]
     },
@@ -20357,6 +20512,717 @@
       "arcane",
       "sacred",
       "corrupted"
+    ]
+  },
+  {
+    "id": "challenge_spire_fractured_time",
+    "name": "The Spire of Fractured Time",
+    "description": "The Spire exists outside normal time \u2014 its architecture shifts between the Verdant Word at its height, the present decay, and a future where the Fraying won. The Allied Vanguard holds the foothills. The party ascends alone. Everything the Architect has learned from three hundred years of watching the Vale break, and from every encounter since the First Hand, is waiting inside. The Architect did not expect to be challenged here. It expected to rise unimpeded. It has been adjusting its expectations for some time.",
+    "difficulty": 16,
+    "recommendedLevel": 64,
+    "minPartySize": 1,
+    "maxPartySize": 8,
+    "lore": [
+      {
+        "unlocksAfter": 1,
+        "text": "The Spire was not built by the Verdant Word. It predates them by four centuries. The Order found it, understood approximately half of what it was for, and built their authority around the half they understood. The half they did not understand is what the Architect has been living in for three hundred years. The Spire is not the Order's monument to binding magic. It is the place where the original promise was made \u2014 the first oath, spoken before there was a Verdant Word to witness it. The Order built their entire tradition on top of something they never fully read."
+      },
+      {
+        "unlocksAfter": 5,
+        "text": "The Architect does not speak during the fight the way it spoke through the Sigil-Bearer's Keep. It has moved past language. What the party experiences instead is the specific weight of every broken promise that was made in their presence since they woke in the Starter Town \u2014 the ferryman's debt, the Guild's ledger, the dissolution vote, all of it, pressing back. The Architect is not attacking the party. It is showing them what they walked through to get here. The distinction matters less than the damage."
+      },
+      {
+        "unlocksAfter": 15,
+        "text": "Containing the Architect does not heal the world. The party who stands at the Spire's summit, looking over a stable but scarred Vale, is looking at the best available outcome \u2014 not a good one. The dead do not return. The ruins do not rebuild. Fifty years of decay does not reverse in a day. What changes is that the decay stops spreading. The wound is no longer getting worse. That is not nothing. The party that understands this and comes back anyway \u2014 that is the vigil."
+      },
+      {
+        "unlocksAfter": 1,
+        "requiresSecret": true,
+        "text": "The resonance node at the Spire's deepest level is not an anchor point the Architect created. It is the original promise \u2014 the first oath, still running, three hundred years later, in the place where it was spoken. The Architect did not corrupt it. It built around it. Everything the Fraying has done since the dissolution is load-bearing on a promise that was never broken. The world did not decay because the magic failed. It decayed because people stopped honoring what the magic was made to protect. The node does not need to be destroyed. It needs to be acknowledged. The party that reaches it and stands still for long enough will hear it. It sounds like nothing they have heard before. It sounds like the world before it broke."
+      }
+    ],
+    "stages": [
+      {
+        "stageId": 1,
+        "title": "The Phased Halls",
+        "description": "The Spire's entrance level shifts between the Order at its height \u2014 pristine architecture, bright magic, the Verdant Word going about its business \u2014 and the present ruin. The shift takes thirty seconds and does not warn you. The enemies in the hall are the Architect's most recent production: oath-residue constructs assembled from the history the party has walked through. They carry the faces of things the party has already defeated. The Architect has been keeping records.",
+        "enemies": [
+          {
+            "enemyTypeID": "field_oath_breaker",
+            "countRange": [
+              2,
+              4
+            ],
+            "level": 62
+          },
+          {
+            "enemyTypeID": "wound_echo_shard",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 62
+          },
+          {
+            "enemyTypeID": "spire_architect_shard",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 63
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "spire_blood_oath_krog",
+            "name": "The Stone-Tusk Contract",
+            "spawnChance": 0.9,
+            "checkType": "item",
+            "requiredItemID": "blood_oath_token",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "field_oath_breaker",
+              "count": 3,
+              "narrative": "The Blood-Oath Token broadcasts the Stone-Tusk's binding frequency into the hall. The Oath Breakers assembled from the Vale's broken promises receive a completed promise as a direct counter-signal. Three dissolve. A kept oath is the one thing the Architect cannot replicate. Krog's voice echoes up from the foothills: the war drums have started."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You carry no completed contract. The Oath Breakers hold their form."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Phased Halls do not respond to general approach. The Architect's constructs begin their assessment."
+            }
+          },
+          {
+            "id": "spire_songbook_cantor",
+            "name": "The True Name",
+            "spawnChance": 0.85,
+            "checkType": "item",
+            "requiredItemID": "songbook_of_lyra",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "wound_echo_shard",
+              "count": 2,
+              "narrative": "The Songbook carries the True Name's binding frequency \u2014 forty-seven verses of a promise that was never broken. Echo Shards assembled from the Fraying's accumulated weight dissolve when the frequency resonates in the hall. Two come apart before they can coalesce into attack posture. From somewhere below, the High Cantor resumes the Song at a different verse than where he stopped. He has been calibrating the acoustics of the Spire from the foothills."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You carry no binding frequency. The Echo Shards hold."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The True Name is not here. The Shards coalesce without interference."
+            }
+          },
+          {
+            "id": "spire_unified_seed_elara",
+            "name": "The Reconciled Wood",
+            "spawnChance": 0.8,
+            "checkType": "item",
+            "requiredItemID": "unified_seed",
+            "successEffect": {
+              "type": "apply_buff",
+              "narrative": "The Unified Seed carries the frequency of Elara's reconciliation \u2014 the Core and Fragment merged, the elven quarantine ended. In the Spire's phase-shifted hall, where the original binding's remnants are still present in the architecture, the Seed resonates against the walls and applies the Verdant Word's original protective harmonic to the party. It lasts three turns. Elara, at the tree line below, feels the resonance and adjusts her position. She is holding the flanks. She will hold them as long as needed."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You carry nothing that resonates with the original binding's remnants."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The hall's phase-shift does not respond to general presence."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion_major",
+            "dropChance": 0.6,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "mana_potion_major",
+            "dropChance": 0.55,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "sword_chronos_tier7",
+            "dropChance": 0.15,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "tome_abyss_tier7",
+            "dropChance": 0.15,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "acc_ring_singularity_tier7",
+            "dropChance": 0.12,
+            "rarity": "legendary"
+          }
+        ]
+      },
+      {
+        "stageId": 2,
+        "title": "The Fractured Present",
+        "description": "The architecture stabilizes into the current Spire \u2014 the decayed version, the one that has been absorbing the Fraying's pressure for fifty years. The First Hand's direct successors are here: Entropy Weavers and Null Sentinels, more coherent than the phased-hall constructs because they were assembled more recently. The Architect's ambient pressure is active from turn 1 \u2014 a persistent decay_aura in the walls that the party cannot remove, only endure. This is the Architect on its home ground.",
+        "enemies": [
+          {
+            "enemyTypeID": "first_hand_entropy_weaver",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 64
+          },
+          {
+            "enemyTypeID": "first_hand_null_sentinel",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 64
+          },
+          {
+            "enemyTypeID": "spire_architect_shard",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 64
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "spire_heirs_signet_valdris",
+            "name": "The Ancestral Recognition",
+            "spawnChance": 0.85,
+            "checkType": "item",
+            "requiredItemID": "heirs_signet",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "first_hand_null_sentinel",
+              "count": 1,
+              "narrative": "The Heir's Signet activates the dwarven ancestral ward protocols \u2014 the same ones that disrupted the Null Herald during the camp assassination attempt. One Null Sentinel receives the ward signal as an authority override and phases toward the Spire's exit rather than engage. The Architect corrects the signal in four seconds. In those four seconds, the Sentinel is gone and the remaining constructs have lost formation coherence. Valdris, below, straightens. The ancestors have acknowledged the Spire."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You carry no ancestral authority signal. The Null Sentinels hold their drain positions."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Spire's construct network does not respond to general approach."
+            }
+          },
+          {
+            "id": "spire_first_hand_shard_present",
+            "name": "Return the Calibration Data",
+            "spawnChance": 0.75,
+            "checkType": "item",
+            "requiredItemID": "first_hand_shard",
+            "successEffect": {
+              "type": "apply_buff",
+              "narrative": "The First Hand Shard carries the Architect's own calibration data from the d12 encounter \u2014 the profile it compiled before dissolution. Presenting it in the present-layer hall broadcasts the data as a completed assessment signal: the party has already been profiled, classified, and found sufficient to reach this level. The Entropy Weavers' soul_shatter openers receive the existing profile and skip their setup turns. Their follow-up actions fire without the setup window. That is worse in isolation. It is better than giving them the setup window and the follow-up."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You carry no prior calibration data. The Entropy Weavers run their full assessment sequence."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Architect profiles every party fresh at this level. You have no shortcut."
+            }
+          },
+          {
+            "id": "spire_capital_key_present",
+            "name": "The Capital's Authorization",
+            "spawnChance": 0.7,
+            "checkType": "item",
+            "requiredItemID": "capital_key",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "spire_architect_shard",
+              "count": 1,
+              "narrative": "The Capital Key carries the authorization frequency of every officer who held command of the Capital's defenses. In the Spire's present-layer \u2014 where the Architect has been coordinating the Fraying's advance against the Capital for fifty years \u2014 the frequency reads as an enemy signal from inside its own network. One Architect Shard receives it as a threat-inbound alert and phases toward the Spire's perimeter rather than the party. The Architect corrects the error. The Shard does not return in time."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You carry no Capital authorization frequency. The Architect Shards hold their positions."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The present-layer constructs do not respond to external authority signals."
+            }
+          }
+        ],
+        "stageBranches": [
+          {
+            "condition": {
+              "type": "has_item",
+              "value": "resonance_node_fragment"
+            },
+            "nextStageId": 99,
+            "overrideDescription": "The resonance node fragment is responding to something below the present-layer floor \u2014 a frequency that has been running since before the Verdant Word, since before the Spire was the Spire. The Architect has built around it for three hundred years without touching it. There is a passage down. The Architect did not seal it because it believed no one would know to look.",
+            "chance": 0.3
+          },
+          {
+            "condition": null,
+            "nextStageId": null
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion_major",
+            "dropChance": 0.6,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "mana_potion_major",
+            "dropChance": 0.55,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "polearm_void_tier7",
+            "dropChance": 0.15,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "scepter_abyss_tier7",
+            "dropChance": 0.15,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "acc_cloak_eternal_tier7",
+            "dropChance": 0.12,
+            "rarity": "legendary"
+          }
+        ]
+      },
+      {
+        "stageId": 3,
+        "title": "The Projected Future",
+        "description": "The architecture shifts to the ruined wasteland timeline \u2014 the Spire in the future where the Architect rose unimpeded and the Vale became what it was always becoming. The Future Wraiths here are the Threshold Keeper's projections deployed at the Architect's request: failure scenarios specific to this party, generated from everything the Spire has observed since the Wound in the World. And the Echo of Valerius returns \u2014 the Architect's best calibration tool, used here as a screen before the final stage. This is where underprepared parties break.",
+        "enemies": [
+          {
+            "enemyTypeID": "threshold_future_wraith",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 65
+          },
+          {
+            "enemyTypeID": "rally_echo_of_valerius",
+            "countRange": [
+              1,
+              1
+            ],
+            "level": 66
+          }
+        ],
+        "adaptiveEnemies": [
+          {
+            "condition": {
+              "type": "stat_check",
+              "stat": "conviction",
+              "threshold": 140
+            },
+            "replace": {
+              "enemyTypeID": "threshold_future_wraith",
+              "withEnemyTypeID": "threshold_future_wraith_physical"
+            },
+            "narrative": "The Future Wraiths coalesce into blade-forms \u2014 the Spire has updated its profile data since the Threshold."
+          },
+          {
+            "condition": {
+              "type": "stat_check",
+              "stat": "harmony",
+              "threshold": 140
+            },
+            "replace": {
+              "enemyTypeID": "threshold_future_wraith",
+              "withEnemyTypeID": "threshold_future_wraith_caster"
+            },
+            "narrative": "The Future Wraiths coalesce into null-forms \u2014 silence loaded, drain_reserves targeting the harmony anchors."
+          },
+          {
+            "condition": {
+              "type": "stat_check",
+              "stat": "ambition",
+              "threshold": 140
+            },
+            "replace": {
+              "enemyTypeID": "threshold_future_wraith",
+              "withEnemyTypeID": "threshold_future_wraith_rogue"
+            },
+            "narrative": "The Future Wraiths coalesce into speed-forms \u2014 shadow_step active, matching the party's pace."
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "spire_dissolution_record_valerius",
+            "name": "Name the Pact",
+            "spawnChance": 0.85,
+            "checkType": "item",
+            "requiredItemID": "dissolution_record",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "threshold_future_wraith",
+              "count": 2,
+              "narrative": "The dissolution record is the Spire's own founding document \u2014 the vote it was built to administer, returned to the place it was made. The Future Wraiths, assembled from failure projections, receive the record's activation of the three dissenting votes as a signal that the archive is complete. Two dissolve: their construction parameters were drawn from a future where the record stayed sealed. The record is no longer sealed. Those futures no longer compute."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You carry no founding document. The Future Wraiths hold their failure projections."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Spire's future-layer does not respond to partial evidence."
+            }
+          },
+          {
+            "id": "spire_sigil_fragment_echo",
+            "name": "Name What Valerius Was",
+            "spawnChance": 0.75,
+            "checkType": "item",
+            "requiredItemID": "sigil_fragment",
+            "successEffect": {
+              "type": "apply_buff",
+              "narrative": "The sigil fragment carries the Architect's own pact-seal \u2014 the specific mark of what Valerius agreed to. Holding it up in the Echo's presence names the Echo for what it is: not Valerius, but the weight of his specific decision. The Echo of Valerius goes still for three seconds \u2014 not threatened, processing. It is the Architect's construct, and the Architect has just been shown its own founding document from the party's side of the negotiation. The Echo's soul_shatter opener fires on a party that has not held still for it. The data is partial. The first turn is the party's."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You carry nothing that names the pact specifically. The Echo of Valerius opens with full assessment."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Echo does not require its nature to be acknowledged. It requires the party to be assessed."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion_major",
+            "dropChance": 0.65,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "mana_potion_major",
+            "dropChance": 0.6,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "staff_divine_tier7",
+            "dropChance": 0.18,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "axe_ascension_tier7",
+            "dropChance": 0.15,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "acc_amulet_omnipotence_tier7",
+            "dropChance": 0.14,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "head_abyssal_helm_tier7",
+            "dropChance": 0.12,
+            "rarity": "legendary"
+          }
+        ]
+      },
+      {
+        "stageId": 4,
+        "title": "The Architect of Decay",
+        "description": "The Architect is at the Spire's summit \u2014 not elevated, not enthroned, simply present at the point where the original promise was spoken and the three hundred years of its unraveling have converged. It does not move like a creature. It reconfigures. The Architect Shards around it are not bodyguards \u2014 they are extensions of its attention, fragments that will reassemble as long as the Architect itself is active. The fight ends when the Architect is contained. It does not end before that.",
+        "enemies": [
+          {
+            "enemyTypeID": "spire_architect_shard",
+            "countRange": [
+              2,
+              4
+            ],
+            "level": 66
+          },
+          {
+            "enemyTypeID": "the_architect_of_decay",
+            "countRange": [
+              1,
+              1
+            ],
+            "level": 70
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "spire_architects_seal_final",
+            "name": "Broadcast the Architect's Own Frequency",
+            "spawnChance": 0.9,
+            "checkType": "item",
+            "requiredItemID": "architects_seal",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "spire_architect_shard",
+              "count": 2,
+              "narrative": "The Architect's own coordination seal, broadcast at the summit, reads to the Shards as a recall signal from their source. Two phases toward the Architect's core rather than the party \u2014 not away, toward, which is the same as away from the fight. The Architect corrects the error in three seconds. In those three seconds, two Shards are gone and the Architect has spent its first action on network maintenance rather than assessment. It is a small advantage. At this level, small advantages are what survival looks like."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You carry nothing that speaks the Architect's coordination frequency at this depth."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Architect's summit network is self-correcting against external signals. You have nothing that reaches it."
+            }
+          },
+          {
+            "id": "spire_dissolution_record_architect",
+            "name": "Present the Founding Document",
+            "spawnChance": 0.8,
+            "checkType": "item",
+            "requiredItemID": "dissolution_record",
+            "successEffect": {
+              "type": "apply_buff",
+              "narrative": "The dissolution record is the Architect's origin document \u2014 the vote that created the conditions for its existence. When presented at the summit, the Architect goes still for five seconds. It is not threatened. It is processing an input it has never received: the evidence of its own creation, returned to the place it was generated, by the party it was designed to stop. The five seconds cost it its opening soul_shatter and reality_fracture. When it resumes, it opens with lord_of_decay. That is more dangerous in isolation. The party has not given it the setup window it was designed to use."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You carry no founding document. The Architect opens with full assessment and sequence."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Architect does not require context to begin. It has been preparing for this engagement for three hundred years."
+            }
+          },
+          {
+            "id": "spire_conviction_face_architect",
+            "name": "Advance Without Ceremony",
+            "spawnChance": 0.6,
+            "checkType": "stat",
+            "checkStat": "conviction",
+            "difficultyThreshold": 98,
+            "successEffect": {
+              "type": "apply_buff",
+              "narrative": "The Architect's opening sequence requires the party to hold position long enough for soul_shatter to complete a full profile read. A party that advances immediately without ceremony \u2014 no items, no preparation, just forward \u2014 gives it nothing to read. The soul_shatter fires on a moving target with incomplete data. The Architect recalibrates. The recalibration costs it the first turn. A party that has reached the Architect's summit with sufficient conviction has earned the right to be underestimated."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "The Architect completes its assessment before you close the distance. It has everything it needs."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Architect does not require your stillness to profile you. It has been watching since the Wound in the World."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion_major",
+            "dropChance": 0.7,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "mana_potion_major",
+            "dropChance": 0.65,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "sword_abyss_tier8",
+            "dropChance": 0.25,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "staff_genesis_tier8",
+            "dropChance": 0.25,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "chest_omega_plate_tier8",
+            "dropChance": 0.22,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "chest_genesis_robe_tier8",
+            "dropChance": 0.22,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "acc_amulet_omnipotence_tier7",
+            "dropChance": 0.3,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "spire_fragment",
+            "dropChance": 1.0,
+            "rarity": "legendary"
+          }
+        ]
+      },
+      {
+        "stageId": 99,
+        "title": "The Original Promise",
+        "secretPath": true,
+        "description": "Below the present-layer floor, below the Architect's three hundred years of construction, the original promise is still running. It sounds like nothing the party has heard before. One Architect Shard holds the passage \u2014 not by instruction, by reflex. The Architect did not tell it to guard this room because the Architect did not believe anyone would know the room existed. The Shard is here because some part of the Architect's distributed attention has always been here, listening to the promise it was built around, unable to touch it.",
+        "enemies": [
+          {
+            "enemyTypeID": "spire_architect_shard",
+            "countRange": [
+              1,
+              1
+            ],
+            "level": 68
+          }
+        ],
+        "preCombatOpportunities": [],
+        "lootTable": [
+          {
+            "itemID": "spire_fragment",
+            "dropChance": 1.0,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "resonance_node_fragment",
+            "dropChance": 1.0,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "sword_eternal_tier8",
+            "dropChance": 0.5,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "tome_genesis_tier8",
+            "dropChance": 0.5,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "scepter_genesis_tier8",
+            "dropChance": 0.5,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "acc_ring_singularity_tier7",
+            "dropChance": 0.6,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "head_ascension_crown_tier7",
+            "dropChance": 0.5,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "health_potion_major",
+            "dropChance": 0.8,
+            "rarity": "uncommon"
+          }
+        ]
+      }
+    ],
+    "rewards": {
+      "baseXP": 100000,
+      "baseGold": 1200,
+      "lootTable": [
+        {
+          "itemID": "sword_abyss_tier8",
+          "dropChance": 0.45,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "staff_genesis_tier8",
+          "dropChance": 0.45,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "chest_omega_plate_tier8",
+          "dropChance": 0.4,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "chest_genesis_robe_tier8",
+          "dropChance": 0.4,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "tome_genesis_tier8",
+          "dropChance": 0.38,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "scepter_genesis_tier8",
+          "dropChance": 0.38,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "acc_amulet_omnipotence_tier7",
+          "dropChance": 0.5,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "acc_ring_singularity_tier7",
+          "dropChance": 0.45,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "head_abyssal_helm_tier7",
+          "dropChance": 0.4,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "head_ascension_crown_tier7",
+          "dropChance": 0.35,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "spire_fragment",
+          "dropChance": 1.0,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "health_potion_major",
+          "dropChance": 0.8,
+          "rarity": "uncommon"
+        }
+      ],
+      "secretLootTable": [
+        {
+          "itemID": "resonance_node_fragment",
+          "dropChance": 1.0,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "sword_eternal_tier8",
+          "dropChance": 0.65,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "tome_genesis_tier8",
+          "dropChance": 0.65,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "scepter_genesis_tier8",
+          "dropChance": 0.65,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "acc_ring_singularity_tier7",
+          "dropChance": 0.7,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "head_ascension_crown_tier7",
+          "dropChance": 0.65,
+          "rarity": "legendary"
+        }
+      ]
+    },
+    "tags": [
+      "corrupted",
+      "arcane",
+      "sacred"
     ]
   }
 ]

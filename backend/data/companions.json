@@ -1,0 +1,108 @@
+[
+  {
+    "characterID": "companion_chieftain_krog",
+    "characterName": "Chieftain Krog",
+    "role": "Berserker",
+    "level": 62,
+    "race": "orc",
+    "aiProfile": "berserker",
+    "requiredItem": "blood_oath_token",
+    "stats": { "conviction": 200, "endurance": 240, "ambition": 110, "harmony": 80 },
+    "skills": [
+      { "skillID": "bloodlust",     "learned": true, "intrinsic": true, "skillXP": 0,    "skillLevel": 1,  "usageCount": 0 },
+      { "skillID": "berserker_rage","learned": true, "skillXP": 9000,  "skillLevel": 8,  "usageCount": 900 },
+      { "skillID": "blood_letting", "learned": true, "skillXP": 8000,  "skillLevel": 8,  "usageCount": 800 }
+    ],
+    "equipment": {
+      "mainHand": "axe_flame_tier3",
+      "chest": "chest_dragon_scale_tier5",
+      "accessory1": "acc_belt_titan_tier5"
+    },
+    "consumables": { "health_potion_major": 3 }
+  },
+  {
+    "characterID": "companion_high_cantor",
+    "characterName": "The High Cantor",
+    "role": "Support",
+    "level": 62,
+    "race": "halfling",
+    "aiProfile": "support",
+    "requiredItem": "songbook_of_lyra",
+    "stats": { "conviction": 120, "endurance": 150, "ambition": 90, "harmony": 260 },
+    "skills": [
+      { "skillID": "prayer",        "learned": true, "intrinsic": true, "skillXP": 0,    "skillLevel": 1,  "usageCount": 0 },
+      { "skillID": "battle_hymn",   "learned": true, "skillXP": 9000,  "skillLevel": 8,  "usageCount": 900 },
+      { "skillID": "holy_word",     "learned": true, "skillXP": 8000,  "skillLevel": 8,  "usageCount": 800 }
+    ],
+    "equipment": {
+      "mainHand": "totem_ascension_tier7",
+      "chest": "chest_ascension_vestments_tier7",
+      "accessory1": "acc_amulet_soul_tier5"
+    },
+    "consumables": { "health_potion_major": 2, "mana_potion_major": 3 }
+  },
+  {
+    "characterID": "companion_elara_unified",
+    "characterName": "Elara",
+    "role": "Support",
+    "level": 62,
+    "race": "elf",
+    "aiProfile": "support",
+    "requiredItem": "unified_seed",
+    "stats": { "conviction": 130, "endurance": 160, "ambition": 100, "harmony": 240 },
+    "skills": [
+      { "skillID": "attunement",    "learned": true, "intrinsic": true, "skillXP": 0,    "skillLevel": 1,  "usageCount": 0 },
+      { "skillID": "forest_embrace","learned": true, "skillXP": 9000,  "skillLevel": 8,  "usageCount": 900 },
+      { "skillID": "sacred_roots",  "learned": true, "skillXP": 8000,  "skillLevel": 8,  "usageCount": 800 }
+    ],
+    "equipment": {
+      "mainHand": "staff_life_tier5",
+      "chest": "chest_leather_shadow_tier4",
+      "accessory1": "acc_ring_obsidian_tier5"
+    },
+    "consumables": { "health_potion_major": 2, "mana_potion_major": 3 }
+  },
+  {
+    "characterID": "companion_valdris_third_heir",
+    "characterName": "Valdris",
+    "role": "Defender",
+    "level": 62,
+    "race": "dwarf",
+    "aiProfile": "tactical",
+    "requiredItem": "heirs_signet",
+    "stats": { "conviction": 210, "endurance": 250, "ambition": 90, "harmony": 120 },
+    "skills": [
+      { "skillID": "restore_stam_minor", "learned": true, "intrinsic": true, "skillXP": 0, "skillLevel": 1, "usageCount": 0 },
+      { "skillID": "faith_armor",   "learned": true, "skillXP": 9000,  "skillLevel": 8,  "usageCount": 900 },
+      { "skillID": "ward_break",    "learned": true, "skillXP": 8000,  "skillLevel": 8,  "usageCount": 800 }
+    ],
+    "equipment": {
+      "mainHand": "hammer_ascension_tier7",
+      "chest": "chest_phoenix_plate_tier6",
+      "accessory1": "acc_boots_phoenix_tier7"
+    },
+    "consumables": { "health_potion_major": 4 }
+  },
+  {
+    "characterID": "companion_captain_hrolf",
+    "characterName": "Captain Hrolf",
+    "role": "Bruiser",
+    "level": 62,
+    "race": "human",
+    "aiProfile": "tactical",
+    "requiredItem": "hrolf_standing_orders",
+    "requiresChallengeNotCompleted": "challenge_gates_of_atonement",
+    "stats": { "conviction": 190, "endurance": 210, "ambition": 100, "harmony": 60 },
+    "skills": [
+      { "skillID": "prayer",        "learned": true, "intrinsic": true, "skillXP": 0,    "skillLevel": 1,  "usageCount": 0 },
+      { "skillID": "counter_strike","learned": true, "skillXP": 9000,  "skillLevel": 8,  "usageCount": 900 },
+      { "skillID": "weak_point",    "learned": true, "skillXP": 8000,  "skillLevel": 8,  "usageCount": 800 }
+    ],
+    "equipment": {
+      "mainHand": "sword_void_tier6",
+      "chest": "chest_phoenix_plate_tier6",
+      "accessory1": "acc_cloak_eternal_tier7"
+    },
+    "consumables": { "health_potion_major": 3 }
+  }
+]
