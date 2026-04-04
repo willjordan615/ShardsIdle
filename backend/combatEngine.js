@@ -671,8 +671,18 @@ class CombatEngine {
       }
 
       //console.log(`\n[STAGE] Starting Stage ${stage.stageId}: ${stage.title}`);
-      
-      const enemies = this.initializeEnemies(stage.enemies);
+
+      // --- ADAPTIVE ENEMIES ---
+      // Evaluate adaptiveEnemies conditions against the party profile and
+      // replace enemy types in the stage's enemy list before spawning.
+      // Conditions use the same types as stageBranches (stat_check, has_skill_tag, etc.).
+      // Only the FIRST matching condition fires — conditions are evaluated in order.
+      const stageEnemyDefs = stage.adaptiveEnemies && stage.adaptiveEnemies.length > 0
+          ? this._resolveAdaptiveEnemies(stage.enemies, stage.adaptiveEnemies, playerCharacters)
+          : stage.enemies;
+      // ----------------------
+
+      const enemies = this.initializeEnemies(stageEnemyDefs);
       const initiative = this.calculateInitiative(playerCharacters, enemies, partySnapshots);
       const turnOrder = [...initiative].sort((a, b) => b.initiative - a.initiative);
 
@@ -3341,6 +3351,85 @@ _applyLootTagFlavour(item, tagDef) {
         combatants.push(e); // push reference, not copy
     });
     return combatants;
+  }
+
+  /**
+   * Resolve adaptiveEnemies for a stage.
+   * Evaluates each adaptive entry's condition against the party and replaces
+   * matching enemy types in the base enemy list. First match wins.
+   * Returns a new enemy definitions array — never mutates the original stage data.
+   */
+  _resolveAdaptiveEnemies(baseEnemies, adaptiveEnemies, playerCharacters) {
+      const defs = baseEnemies.map(e => ({ ...e })); // shallow clone each def
+
+      for (const adaptive of adaptiveEnemies) {
+          const cond = adaptive.condition;
+          if (!cond) continue;
+
+          let conditionMet = false;
+
+          if (cond.type === 'stat_check') {
+              // Any alive party member meeting the threshold qualifies.
+              // Uses the highest value across the party for the named stat.
+              const best = playerCharacters
+                  .filter(p => !p.defeated)
+                  .reduce((max, p) => Math.max(max, p.stats?.[cond.stat] || 0), 0);
+              conditionMet = best >= cond.threshold;
+          } else if (cond.type === 'has_skill_tag') {
+              const taggedSkillIds = this.skills
+                  .filter(s => s.tags && s.tags.includes(cond.value))
+                  .map(s => s.id);
+              conditionMet = playerCharacters.some(p => {
+                  if (p.defeated) return false;
+                  const pool = this.getAugmentedSkillPool(p);
+                  return taggedSkillIds.some(id => pool.has(id));
+              });
+          } else if (cond.type === 'has_skill') {
+              conditionMet = playerCharacters.some(p =>
+                  !p.defeated && p.skills?.some(s =>
+                      s.skillID === cond.value && (s.skillLevel || 0) >= 1
+                  )
+              );
+          } else if (cond.type === 'has_item') {
+              conditionMet = playerCharacters.some(p =>
+                  !p.defeated && (
+                      (p.consumables?.[cond.value] > 0) ||
+                      (p.consumableStash?.[cond.value] > 0)
+                  )
+              );
+          } else if (cond.type === 'party_size') {
+              const alive = playerCharacters.filter(p => !p.defeated).length;
+              conditionMet = (cond.min === undefined || alive >= cond.min) &&
+                             (cond.max === undefined || alive <= cond.max);
+          }
+
+          if (!conditionMet) continue;
+
+          // Apply the replacement — swap all instances of the target type
+          if (adaptive.replace) {
+              const { enemyTypeID, withEnemyTypeID } = adaptive.replace;
+              defs.forEach(def => {
+                  if (def.enemyTypeID === enemyTypeID) {
+                      def.enemyTypeID = withEnemyTypeID;
+                  }
+              });
+              if (adaptive.narrative) {
+                  console.log(`[ADAPTIVE] Stage substitution: ${enemyTypeID} → ${withEnemyTypeID}. ${adaptive.narrative}`);
+              }
+          }
+
+          // Apply an injection — add a new enemy entry
+          if (adaptive.inject) {
+              defs.push({ ...adaptive.inject });
+              if (adaptive.narrative) {
+                  console.log(`[ADAPTIVE] Stage injection: ${adaptive.inject.enemyTypeID}. ${adaptive.narrative}`);
+              }
+          }
+
+          break; // first match wins
+      }
+
+      return defs;
   }
 
   initializeEnemies(enemyDefinitions) {

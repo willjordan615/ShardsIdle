@@ -8202,5 +8202,499 @@
       "arcane"
     ],
     "weaponTypes": []
+  },
+  {
+    "id": "rally_echo_conscript",
+    "name": "Echo Conscript",
+    "description": "A construct assembled from the residue of soldiers who died at the Barricades of Sorrow \u2014 it wears the face of the Capital's failure; basic_attack and blood_letting stack bleed pressure the way exhausted soldiers do, without tactics, because there were no tactics left.",
+    "stats": {
+      "conviction": 85,
+      "endurance": 95,
+      "ambition": 70,
+      "harmony": 20
+    },
+    "armorValue": 8,
+    "aiProfile": "aggressive",
+    "equipment": {
+      "mainHand": "sword_dragon_tier6"
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "basic_attack",
+      "blood_letting",
+      "slash",
+      "warcry"
+    ],
+    "lootTable": [
+      {
+        "itemID": "health_potion_major",
+        "dropChance": 0.25,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "spirit",
+      "corrupted",
+      "shadow",
+      "human"
+    ],
+    "weaponTypes": [
+      "sword"
+    ]
+  },
+  {
+    "id": "rally_echo_acolyte",
+    "name": "Echo Acolyte",
+    "description": "An echo of the Verdant Word priests who chose silence over intervention \u2014 entropic_decay and drain_reserves are what fifty years of doing nothing looks like when given combat form; shout extends every failure window in the encounter.",
+    "stats": {
+      "conviction": 95,
+      "endurance": 90,
+      "ambition": 95,
+      "harmony": 130
+    },
+    "armorValue": 5,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "staff_cosmic_tier6"
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "entropic_decay",
+      "drain_reserves",
+      "shout",
+      "shadow_bolt",
+      "decay_aura"
+    ],
+    "lootTable": [
+      {
+        "itemID": "mana_potion_major",
+        "dropChance": 0.3,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "spirit",
+      "corrupted",
+      "shadow",
+      "caster"
+    ],
+    "weaponTypes": [
+      "staff"
+    ]
+  },
+  {
+    "id": "rally_echo_of_valerius",
+    "name": "The Echo of Valerius",
+    "description": "The Architect's most precise construct \u2014 an echo of High Pontiff Valerius assembled from the residue of the dissolution vote itself; soul_shatter runs continuously because Valerius always opened with an assessment; apocalypse is the payload \u2014 the Order's own holy fire turned against the world it was built to protect; smothering_darkness is what the Order's silence looked like from the outside.",
+    "stats": {
+      "conviction": 220,
+      "endurance": 245,
+      "ambition": 120,
+      "harmony": 200
+    },
+    "armorValue": 15,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "staff_divine_tier7"
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "soul_shatter",
+      "apocalypse",
+      "smothering_darkness",
+      "decay_aura",
+      "drain_reserves",
+      "shout"
+    ],
+    "lootTable": [
+      {
+        "itemID": "staff_divine_tier7",
+        "dropChance": 0.3,
+        "rarity": "legendary"
+      },
+      {
+        "itemID": "dissolution_record",
+        "dropChance": 0.12,
+        "rarity": "legendary"
+      },
+      {
+        "itemID": "architects_seal",
+        "dropChance": 0.5,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "spirit",
+      "corrupted",
+      "shadow",
+      "boss",
+      "named",
+      "caster"
+    ],
+    "weaponTypes": [
+      "staff"
+    ]
+  },
+  {
+    "id": "threshold_past_echo",
+    "name": "Past Echo",
+    "description": "A temporal residue of a party that reached the Threshold and was turned back \u2014 it fights with the skills of whoever it echoes, which the Spire has recorded from every failed approach in fifty years; void_rend and entropic_decay are the most common because desperation tends toward the same tools.",
+    "stats": {
+      "conviction": 100,
+      "endurance": 95,
+      "ambition": 100,
+      "harmony": 80
+    },
+    "armorValue": 6,
+    "aiProfile": "aggressive",
+    "equipment": {
+      "mainHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "void_rend",
+      "entropic_decay",
+      "shadow_step",
+      "basic_attack",
+      "slash"
+    ],
+    "lootTable": [],
+    "tags": [
+      "spirit",
+      "arcane",
+      "shadow"
+    ],
+    "weaponTypes": []
+  },
+  {
+    "id": "threshold_future_wraith",
+    "name": "Future Wraith",
+    "description": "A projection of a timeline where the party fails \u2014 the Spire generates them as deterrents; reality_fracture disorients spatial positioning while soul_shatter reads the party's current profile and feeds it back to the Threshold Keeper.",
+    "stats": {
+      "conviction": 110,
+      "endurance": 100,
+      "ambition": 110,
+      "harmony": 90
+    },
+    "armorValue": 4,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "reality_fracture",
+      "soul_shatter",
+      "smothering_darkness",
+      "drain_reserves"
+    ],
+    "lootTable": [
+      {
+        "itemID": "mana_potion_major",
+        "dropChance": 0.3,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "spirit",
+      "arcane",
+      "shadow"
+    ],
+    "weaponTypes": []
+  },
+  {
+    "id": "threshold_keeper",
+    "name": "The Threshold Keeper",
+    "description": "Not a guardian placed here \u2014 the Spire's own defensive will, given temporary form to assess incoming parties; it does not fight to destroy, it fights to measure; eternal_winter tests whether the party can sustain through absolute temporal pressure; soul_shatter runs between attacks to update the assessment; reality_fracture is the Spire checking whether the party holds formation under genuine temporal stress.",
+    "stats": {
+      "conviction": 230,
+      "endurance": 250,
+      "ambition": 125,
+      "harmony": 210
+    },
+    "armorValue": 16,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "eternal_winter",
+      "soul_shatter",
+      "reality_fracture",
+      "smothering_darkness",
+      "drain_reserves",
+      "decay_aura"
+    ],
+    "lootTable": [
+      {
+        "itemID": "resonance_node_fragment",
+        "dropChance": 0.4,
+        "rarity": "rare"
+      },
+      {
+        "itemID": "acc_amulet_omnipotence_tier7",
+        "dropChance": 0.25,
+        "rarity": "legendary"
+      },
+      {
+        "itemID": "first_hand_shard",
+        "dropChance": 0.05,
+        "rarity": "legendary"
+      }
+    ],
+    "tags": [
+      "spirit",
+      "arcane",
+      "boss"
+    ],
+    "weaponTypes": []
+  },
+  {
+    "id": "vault_unmade_scribe",
+    "name": "Unmade Scribe",
+    "description": "A spectral archivist maintaining records the Order chose not to keep \u2014 spells cast and then sealed, oaths broken by the Verdant Word itself; misdirect and drain_reserves enforce the same silence the Order used to bury its own apostasy.",
+    "stats": {
+      "conviction": 80,
+      "endurance": 85,
+      "ambition": 90,
+      "harmony": 110
+    },
+    "armorValue": 3,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": "tome_abyss_tier7"
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "misdirect",
+      "drain_reserves",
+      "shadow_bolt",
+      "silence",
+      "shout"
+    ],
+    "lootTable": [
+      {
+        "itemID": "athenaeum_scroll",
+        "dropChance": 0.25,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "mana_potion_major",
+        "dropChance": 0.3,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "spirit",
+      "corrupted",
+      "arcane",
+      "caster"
+    ],
+    "weaponTypes": [
+      "tome"
+    ]
+  },
+  {
+    "id": "vault_unmade_ward",
+    "name": "Unmade Ward",
+    "description": "A construct assembled from the sealing magic the Order used to lock its own failures away \u2014 stone_skin and ward_break in sequence, because the Order always defended its suppressions before attacking the thing being suppressed.",
+    "stats": {
+      "conviction": 120,
+      "endurance": 145,
+      "ambition": 55,
+      "harmony": 80
+    },
+    "armorValue": 18,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "stone_skin",
+      "ward_break",
+      "shield_bash",
+      "block",
+      "pummel"
+    ],
+    "lootTable": [
+      {
+        "itemID": "health_potion_major",
+        "dropChance": 0.3,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "construct",
+      "corrupted",
+      "arcane"
+    ],
+    "weaponTypes": []
+  },
+  {
+    "id": "vault_the_unmade",
+    "name": "The Unmade",
+    "description": "The Verdant Order's collective apostasy given a single coherent form \u2014 every broken oath the Order made to itself, every spell cast and then sealed, every truth they chose not to record; soul_shatter reads the party because the Order always assessed before it acted; lord_of_decay is what three centuries of the Order's self-betrayal produces when it stops pretending it isn't happening.",
+    "stats": {
+      "conviction": 235,
+      "endurance": 255,
+      "ambition": 125,
+      "harmony": 215
+    },
+    "armorValue": 14,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "soul_shatter",
+      "lord_of_decay",
+      "smothering_darkness",
+      "reality_fracture",
+      "drain_reserves",
+      "decay_aura"
+    ],
+    "lootTable": [
+      {
+        "itemID": "dissolution_record",
+        "dropChance": 0.3,
+        "rarity": "legendary"
+      },
+      {
+        "itemID": "tome_abyss_tier7",
+        "dropChance": 0.25,
+        "rarity": "legendary"
+      },
+      {
+        "itemID": "architects_seal",
+        "dropChance": 0.45,
+        "rarity": "uncommon"
+      },
+      {
+        "itemID": "first_hand_shard",
+        "dropChance": 0.05,
+        "rarity": "legendary"
+      }
+    ],
+    "tags": [
+      "spirit",
+      "corrupted",
+      "arcane",
+      "boss"
+    ],
+    "weaponTypes": []
+  },
+  {
+    "id": "threshold_future_wraith_physical",
+    "name": "Future Wraith (Blade-Echo)",
+    "description": "A failure-projection calibrated for conviction-heavy parties \u2014 it mirrors their own approach: counter_strike and shield_bash punish committed physical attackers, stone_skin absorbs the burst they depend on, and soul_shatter profiles the gap between their offense and their recovery.",
+    "stats": {
+      "conviction": 130,
+      "endurance": 130,
+      "ambition": 90,
+      "harmony": 70
+    },
+    "armorValue": 14,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "counter_strike",
+      "shield_bash",
+      "stone_skin",
+      "soul_shatter",
+      "pummel"
+    ],
+    "lootTable": [
+      {
+        "itemID": "health_potion_major",
+        "dropChance": 0.3,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "spirit",
+      "arcane",
+      "shadow"
+    ],
+    "weaponTypes": []
+  },
+  {
+    "id": "threshold_future_wraith_caster",
+    "name": "Future Wraith (Null-Echo)",
+    "description": "A failure-projection calibrated for harmony-heavy caster parties \u2014 silence and drain_reserves are its primary tools; it attacks the resource pools that high-harmony parties depend on; soul_shatter profiles which caster is the anchor so smothering_darkness can close that option first.",
+    "stats": {
+      "conviction": 90,
+      "endurance": 100,
+      "ambition": 115,
+      "harmony": 130
+    },
+    "armorValue": 4,
+    "aiProfile": "tactical",
+    "equipment": {
+      "mainHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "silence",
+      "drain_reserves",
+      "soul_shatter",
+      "smothering_darkness",
+      "shadow_bolt"
+    ],
+    "lootTable": [
+      {
+        "itemID": "mana_potion_major",
+        "dropChance": 0.4,
+        "rarity": "uncommon"
+      }
+    ],
+    "tags": [
+      "spirit",
+      "arcane",
+      "shadow"
+    ],
+    "weaponTypes": []
+  },
+  {
+    "id": "threshold_future_wraith_rogue",
+    "name": "Future Wraith (Speed-Echo)",
+    "description": "A failure-projection calibrated for ambition-heavy parties \u2014 it matches their mobility and punishes the overextension that fast parties tend toward; shadow_step into silent_death mirrors the approach of high-ambition builds; reality_fracture disrupts the positioning they rely on.",
+    "stats": {
+      "conviction": 100,
+      "endurance": 90,
+      "ambition": 135,
+      "harmony": 85
+    },
+    "armorValue": 4,
+    "aiProfile": "aggressive",
+    "equipment": {
+      "mainHand": null
+    },
+    "skillSelectionCount": 2,
+    "availableSkills": [
+      "shadow_step",
+      "silent_death",
+      "reality_fracture",
+      "soul_shatter",
+      "void_rend"
+    ],
+    "lootTable": [
+      {
+        "itemID": "stamina_potion",
+        "dropChance": 0.35,
+        "rarity": "common"
+      }
+    ],
+    "tags": [
+      "spirit",
+      "arcane",
+      "shadow"
+    ],
+    "weaponTypes": []
   }
 ]

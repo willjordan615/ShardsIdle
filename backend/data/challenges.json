@@ -19191,5 +19191,1172 @@
       "martial",
       "corrupted"
     ]
+  },
+  {
+    "id": "challenge_rally_of_the_broken",
+    "name": "The Rally of the Broken",
+    "description": "The night before the march, the Architect sends its final attempt to stop the alliance \u2014 not assassins this time, not manifestations of entropy. Echoes. The faces of everyone who failed: the conscripts who died at the Barricades, the priests who chose silence, the councillors who voted yes. Assembled from the residue of their specific failures, wearing their specific faces, and sent to fight the people they are responsible for. The alliance holds the camp perimeter. The party holds the line against history.",
+    "difficulty": 15,
+    "recommendedLevel": 60,
+    "minPartySize": 1,
+    "maxPartySize": 4,
+    "lore": [
+      {
+        "unlocksAfter": 1,
+        "text": "The Architect did not invent the echoes. It found them \u2014 the residue of specific people who made specific choices and died carrying the weight of those choices. The Barricades conscripts, the priests who filed nothing, the councillors who voted for a pact they did not understand. The Architect compressed that residue into combat-functional forms and sent them to the foothills. What the alliance is fighting is not a construct. It is the actual weight of the last fifty years, given enough coherence to swing a weapon."
+      },
+      {
+        "unlocksAfter": 5,
+        "text": "The Echo of Valerius is not an accurate representation of who Valerius was. The Architect assembled it from the dissolution vote's residue \u2014 the weight of what Valerius did, not who he was. The real Valerius was afraid. The record shows it. The Echo has no fear because the Architect did not have access to his fear, only his actions. What the party fights at the end is the worst version of a man, stripped of the humanity that would have made him something other than a weapon."
+      },
+      {
+        "unlocksAfter": 15,
+        "text": "Krog watched the Rally from the camp perimeter. When it was over, he said one sentence to the Third Heir: 'They sent us the people we failed.' The Third Heir did not answer. The High Cantor, who had been singing quietly throughout the entire engagement, stopped singing when the Echo of Valerius dissolved. He stood in silence for approximately thirty seconds. Then he resumed. He sang slightly louder than before. He sang that way for the rest of the night."
+      }
+    ],
+    "stages": [
+      {
+        "stageId": 1,
+        "title": "The Familiar Dead",
+        "description": "The Echo Conscripts arrive first \u2014 the faces of the Barricades dead, the Capital refugees, the guards who died holding the wrong line on someone else's orders. They fight with the exhausted aggression of people who ran out of options before they ran out of enemies. The alliance's perimeter scouts are holding the outer ring. The party takes the center.",
+        "enemies": [
+          {
+            "enemyTypeID": "rally_echo_conscript",
+            "countRange": [
+              3,
+              5
+            ],
+            "level": 58
+          },
+          {
+            "enemyTypeID": "rally_echo_acolyte",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 58
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "rally_capital_key_echo",
+            "name": "Present the Capital Key",
+            "spawnChance": 0.75,
+            "checkType": "item",
+            "requiredItemID": "capital_key",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "rally_echo_conscript",
+              "count": 2,
+              "narrative": "The Capital Key carries the authorization frequency of every officer who held command of the Capital's defenses. The Echo Conscripts were assembled from the residue of soldiers who served under those officers. When the Key broadcasts its frequency, two Conscripts receive it as a stand-down order from their command chain. The order is fifty years late. They follow it anyway. The Architect did not build in a contingency for valid command authority."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You carry nothing the Conscripts' assembled command-memory recognizes."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Echo Conscripts do not respond to authority they were not given."
+            }
+          },
+          {
+            "id": "rally_fire_echo_residue",
+            "name": "Burn the Echo Substrate",
+            "spawnChance": 0.6,
+            "checkType": "skill",
+            "requiredSkillTag": "fire",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "rally_echo_acolyte",
+              "count": 1,
+              "narrative": "Echo constructs are compressed personal residue \u2014 denser than ambient oath-remnants, but still oath-residue in structure. One Echo Acolyte comes apart under direct combustion before it can establish its drain_reserves sequence. The Architect built the echoes for psychological impact, not fire resistance. It did not anticipate a party that would treat the faces of the familiar dead as a tactical problem rather than a moral one."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You have no fire skill. The Echo Acolyte's drain sequence begins."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Echo substrate holds without fire disruption."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion_major",
+            "dropChance": 0.5,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "mana_potion_major",
+            "dropChance": 0.45,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "sword_void_tier6",
+            "dropChance": 0.12,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "acc_cloak_star_tier6",
+            "dropChance": 0.1,
+            "rarity": "rare"
+          }
+        ]
+      },
+      {
+        "stageId": 2,
+        "title": "The Weight of Silence",
+        "description": "The Echo Acolytes arrive in force \u2014 the faces of the Order's priests who filed nothing, said nothing, and died having done nothing. They fight with the specific efficiency of people who spent fifty years perfecting inaction and are now applying that same precision to harm. The alliance perimeter is holding but thin. The Cantor has stopped singing. He recognizes the faces.",
+        "enemies": [
+          {
+            "enemyTypeID": "rally_echo_acolyte",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 59
+          },
+          {
+            "enemyTypeID": "rally_echo_conscript",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 59
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "rally_dissolution_record_acolytes",
+            "name": "Present the Dissolution Record",
+            "spawnChance": 0.65,
+            "checkType": "item",
+            "requiredItemID": "dissolution_record",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "rally_echo_acolyte",
+              "count": 2,
+              "narrative": "The dissolution record carries the three dissenting votes \u2014 the priests who refused and died for it. The Echo Acolytes were assembled from the residue of priests who did not dissent. When the record's harmonic activates in their presence, two Acolytes receive the dissent frequency as a direct contrast to their own construction substrate. The contrast dissolves them. They were made from the weight of choosing silence. The record is the weight of choosing to speak. The two cannot coexist at close range."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You carry nothing that speaks the dissenting councillors' frequency."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Echo Acolytes are assembled from silence. They are not affected by arguments they were built to ignore."
+            }
+          },
+          {
+            "id": "rally_harmony_cantor_anchor",
+            "name": "Signal the High Cantor",
+            "spawnChance": 0.55,
+            "checkType": "stat",
+            "checkStat": "harmony",
+            "difficultyThreshold": 94,
+            "successEffect": {
+              "type": "apply_buff",
+              "narrative": "The High Cantor has stopped singing because he recognizes the faces. A party with sufficient harmony can reach his frequency from across the camp \u2014 not calling to him, simply resonating at the pitch he uses for the True Name's opening verse. He hears it. He understands what it means: someone who knows the Song is asking him to continue. He resumes. The Song's harmonic field spreads across the engagement zone. The Echo Acolytes' drain sequences become less precise in the presence of an active binding frequency."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You cannot reach the Cantor's frequency. He remains silent. The Echo Acolytes' drain sequences run at full effect."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Cantor does not hear you through the engagement noise. His silence continues."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion_major",
+            "dropChance": 0.5,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "mana_potion_major",
+            "dropChance": 0.45,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "staff_cosmic_tier6",
+            "dropChance": 0.14,
+            "rarity": "rare"
+          },
+          {
+            "itemID": "acc_amulet_void_tier6",
+            "dropChance": 0.12,
+            "rarity": "rare"
+          }
+        ]
+      },
+      {
+        "stageId": 3,
+        "title": "The Echo of Valerius",
+        "description": "The Echo of Valerius arrives last and alone. It is the height of the High Pontiff, wearing the vestments of the Order at its peak, carrying the staff he held when he slaughtered the Council. It is not Valerius. It is what Valerius did, given enough mass to walk. The alliance goes quiet. The war drums stop. Krog, from the perimeter, says: 'Finish it.'",
+        "enemies": [
+          {
+            "enemyTypeID": "rally_echo_acolyte",
+            "countRange": [
+              1,
+              1
+            ],
+            "level": 60
+          },
+          {
+            "enemyTypeID": "rally_echo_of_valerius",
+            "countRange": [
+              1,
+              1
+            ],
+            "level": 63
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "rally_sigil_fragment_valerius",
+            "name": "Name the Pact",
+            "spawnChance": 0.7,
+            "checkType": "item",
+            "requiredItemID": "sigil_fragment",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "rally_echo_acolyte",
+              "count": 1,
+              "narrative": "The sigil fragment carries the Architect's mark \u2014 the specific seal of the pact Valerius made. Holding it up in the Echo's presence names what the Echo is: the weight of that specific pact, not the man who made it. The remaining Echo Acolyte, assembled from priests who served under Valerius, receives the naming as a dissolution signal. It came here to serve a person. The person has been named as a pact. Service to a pact that has been made explicit is not service \u2014 it is complicity. The Acolyte dissolves."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You carry nothing that names the pact specifically."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Echo of Valerius does not require its nature to be acknowledged. It requires the party to be assessed."
+            }
+          },
+          {
+            "id": "rally_conviction_face_echo",
+            "name": "Advance Without Hesitation",
+            "spawnChance": 0.5,
+            "checkType": "stat",
+            "checkStat": "conviction",
+            "difficultyThreshold": 96,
+            "successEffect": {
+              "type": "apply_buff",
+              "narrative": "The Echo of Valerius opens with soul_shatter \u2014 the same assessment Valerius ran before every significant decision. It requires the party to hold position long enough for the read to complete. A party that advances immediately gives it nothing to read. The soul_shatter fires on a moving target. The data is incomplete. The Echo's second action is a recalibration rather than lord_of_decay. That recalibration is the window."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "The Echo completes its soul_shatter assessment before you can close the distance."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Echo of Valerius has assessed better parties than this. It does not require your stillness to calibrate."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion_major",
+            "dropChance": 0.65,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "mana_potion_major",
+            "dropChance": 0.6,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "staff_divine_tier7",
+            "dropChance": 0.22,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "acc_cloak_eternal_tier7",
+            "dropChance": 0.18,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "acc_amulet_omnipotence_tier7",
+            "dropChance": 0.15,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "dissolution_record",
+            "dropChance": 0.05,
+            "rarity": "legendary"
+          }
+        ]
+      }
+    ],
+    "rewards": {
+      "baseXP": 60000,
+      "baseGold": 700,
+      "lootTable": [
+        {
+          "itemID": "staff_divine_tier7",
+          "dropChance": 0.35,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "acc_cloak_eternal_tier7",
+          "dropChance": 0.3,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "acc_amulet_omnipotence_tier7",
+          "dropChance": 0.28,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "acc_ring_singularity_tier7",
+          "dropChance": 0.25,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "architects_seal",
+          "dropChance": 0.4,
+          "rarity": "uncommon"
+        },
+        {
+          "itemID": "health_potion_major",
+          "dropChance": 0.7,
+          "rarity": "uncommon"
+        },
+        {
+          "itemID": "dissolution_record",
+          "dropChance": 0.04,
+          "rarity": "legendary"
+        }
+      ]
+    },
+    "tags": [
+      "corrupted",
+      "shadow",
+      "sacred"
+    ]
+  },
+  {
+    "id": "challenge_threshold_of_echoes",
+    "name": "The Threshold of Echoes",
+    "description": "The floating antechamber outside the Spire of Fractured Time, where the architecture shifts between past, present, and future without warning and the air smells of fifty years of failed attempts. Every party that reached this point and turned back left a temporal residue. Every party that was destroyed here left a more coherent one. The Spire does not want to be entered. It generates its own defense from the evidence of everyone who has tried.",
+    "difficulty": 15,
+    "recommendedLevel": 60,
+    "minPartySize": 1,
+    "maxPartySize": 4,
+    "lore": [
+      {
+        "unlocksAfter": 1,
+        "text": "The Threshold exists because the Spire's binding magic requires a confirmation before it permits entry \u2014 not a password, a proof of intent. The Verdant Word built the confirmation requirement after the first attempted entry fifty years ago failed catastrophically and left residue that has been fighting off subsequent attempts ever since. The irony is that the catastrophic first attempt was the Verdant Word itself, trying to re-enter the Spire after the dissolution to undo what Valerius had done. They built the Threshold's defenses by accident."
+      },
+      {
+        "unlocksAfter": 5,
+        "text": "The Past Echoes that drift the Threshold's outer level are not generic temporal residue. They are specific \u2014 parties that reached this point carrying the wrong purpose, or insufficient purpose, or purpose that collapsed under the Threshold Keeper's assessment. The Keeper does not destroy failed parties. It archives them as deterrents. The most recent Past Echo at the outer level is approximately six months old. Someone came very close. The Echo fights with skills the party might recognize, if they have been paying attention to the Vale's recent history."
+      },
+      {
+        "unlocksAfter": 15,
+        "text": "The Threshold Keeper is not hostile to the party. It is indifferent in the way a test is indifferent. It will fight at maximum capacity regardless of what the party has accumulated, what purpose they carry, what allies they have built. It is assessing whether the party can survive what is on the other side of the Spire door. Everything the party does here is seen by the Spire itself. Everything the party survives here tells the Spire what to prepare for. The party that walks through the door will not surprise what is waiting inside. It will simply be the party that was sufficient."
+      }
+    ],
+    "stages": [
+      {
+        "stageId": 1,
+        "title": "The Failed Approaches",
+        "description": "The Threshold's outer level is where the oldest echoes drift \u2014 parties from decades ago, carrying purposes the Fraying has had time to corrupt into something hostile. Past Echoes move in the patrol patterns of the parties they were made from. The architecture shifts every few minutes, which means the patrol patterns don't repeat cleanly. The parties the Echoes were made from learned this. The Echoes have not.",
+        "enemies": [
+          {
+            "enemyTypeID": "threshold_past_echo",
+            "countRange": [
+              3,
+              5
+            ],
+            "level": 58
+          },
+          {
+            "enemyTypeID": "threshold_future_wraith",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 58
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "threshold_resonance_node_approach",
+            "name": "Broadcast the Resonance Frequency",
+            "spawnChance": 0.75,
+            "checkType": "item",
+            "requiredItemID": "resonance_node_fragment",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "threshold_past_echo",
+              "count": 2,
+              "narrative": "The resonance node fragment carries the Architect's anchor frequency from deep inside the Spire's own structure. At the Threshold, the Spire reads that frequency as an inside-out signal \u2014 something that has already been past the door and come back. Two Past Echoes receive the signal as a superseding temporal marker and phase out, their archive function overridden by the evidence that something with this frequency has been further in than they were archived from."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You carry nothing the Spire reads as a prior-entry marker."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Past Echoes are archived by the Threshold. They do not defer to external signals."
+            }
+          },
+          {
+            "id": "threshold_arcane_read_echoes",
+            "name": "Read the Echo Residue",
+            "spawnChance": 0.65,
+            "checkType": "skill",
+            "requiredSkillTag": "arcane",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "threshold_future_wraith",
+              "count": 1,
+              "narrative": "The Future Wraiths are temporal projections \u2014 they exist slightly ahead of the present moment and use that offset to apply reality_fracture before the party can respond. A party fluent in arcane frequencies can read the temporal offset directly and close the gap before the Wraith establishes it. One Wraith finds its offset advantage neutralized; it exists in the present moment with the party rather than ahead of it, which means its reality_fracture has no purchase. It phases out rather than fight from an equal temporal position."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You cannot read the temporal offset. The Future Wraith maintains its projective advantage."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Future Wraiths' temporal offset is inaccessible without arcane attunement."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion_major",
+            "dropChance": 0.5,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "mana_potion_major",
+            "dropChance": 0.45,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "scepter_abyss_tier7",
+            "dropChance": 0.12,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "acc_ring_singularity_tier7",
+            "dropChance": 0.1,
+            "rarity": "legendary"
+          }
+        ]
+      },
+      {
+        "stageId": 2,
+        "title": "The Recent Failures",
+        "description": "The inner Threshold holds the more recent echoes \u2014 and the Future Wraiths here are not generic projections. The Spire has been monitoring this party since the Wound in the World, cataloguing their skills, their dominant stats, their approach patterns. The Future Wraiths generated for this specific party reflect the failure modes the Spire considers most likely given what it has observed. They fight like a version of the party that lost.",
+        "enemies": [
+          {
+            "enemyTypeID": "threshold_future_wraith",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 59
+          },
+          {
+            "enemyTypeID": "threshold_past_echo",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 59
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "threshold_first_hand_shard_inner",
+            "name": "Present the First Hand Shard",
+            "spawnChance": 0.7,
+            "checkType": "item",
+            "requiredItemID": "first_hand_shard",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "threshold_future_wraith",
+              "count": 2,
+              "narrative": "The First Hand Shard carries the Architect's calibration data \u2014 the profile the First Hand compiled before dissolution and sent inward to update the Spire's model of the party. The Future Wraiths were generated from the Spire's current failure projections. When the First Hand's data is presented, the Spire receives an older, incomplete version of the party profile. Two Future Wraiths were generated from the updated profile. The older data invalidates their construction parameters. They dissolve. The Spire updates its model again. It is paying very close attention."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You carry no prior Architect profile data. The Future Wraiths were generated from the Spire's current model."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Spire's current profile is the only one the Wraiths respond to."
+            }
+          },
+          {
+            "id": "threshold_conviction_hold_form",
+            "name": "Hold Formation Under Fracture",
+            "spawnChance": 0.6,
+            "checkType": "stat",
+            "checkStat": "conviction",
+            "difficultyThreshold": 94,
+            "successEffect": {
+              "type": "apply_buff",
+              "narrative": "The inner Threshold's ambient temporal instability applies a continuous reality_fracture effect that disrupts formation positioning before the fight begins. A party with sufficient conviction can establish and maintain formation against the ambient fracture \u2014 not neutralizing it, but refusing to be displaced by it. The Future Wraiths' generated failure scenarios assumed a disrupted party. A party in formation does not match the projected failure parameters. The Wraiths' opening sequences misfire."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "The ambient reality_fracture displaces your formation before you can establish it."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "You cannot hold formation against the inner Threshold's ambient fracture effect."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion_major",
+            "dropChance": 0.5,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "mana_potion_major",
+            "dropChance": 0.45,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "tome_abyss_tier7",
+            "dropChance": 0.14,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "acc_belt_world_tier7",
+            "dropChance": 0.12,
+            "rarity": "legendary"
+          }
+        ],
+        "adaptiveEnemies": [
+          {
+            "condition": {
+              "type": "stat_check",
+              "stat": "conviction",
+              "threshold": 140
+            },
+            "replace": {
+              "enemyTypeID": "threshold_future_wraith",
+              "withEnemyTypeID": "threshold_future_wraith_physical"
+            },
+            "narrative": "The Future Wraiths coalesce into blade-forms \u2014 counter-stancing, shield-bashing, matching the party's physical approach with its own mirror."
+          },
+          {
+            "condition": {
+              "type": "stat_check",
+              "stat": "harmony",
+              "threshold": 140
+            },
+            "replace": {
+              "enemyTypeID": "threshold_future_wraith",
+              "withEnemyTypeID": "threshold_future_wraith_caster"
+            },
+            "narrative": "The Future Wraiths coalesce into null-forms \u2014 silence already loaded, drain_reserves targeting the harmony anchors before the fight begins."
+          },
+          {
+            "condition": {
+              "type": "stat_check",
+              "stat": "ambition",
+              "threshold": 140
+            },
+            "replace": {
+              "enemyTypeID": "threshold_future_wraith",
+              "withEnemyTypeID": "threshold_future_wraith_rogue"
+            },
+            "narrative": "The Future Wraiths coalesce into speed-forms \u2014 shadow_step already active, matching the party's pace before they can establish positioning advantage."
+          }
+        ]
+      },
+      {
+        "stageId": 3,
+        "title": "The Threshold Keeper",
+        "description": "The Keeper manifests at the Spire's door \u2014 not blocking it, standing beside it, which is a distinction the party will understand when they realize it steps aside if the fight ends in the party's favor. It is the Spire's final assessment, not its final refusal. It fights at maximum capacity. It does not hold back because the party has proven themselves elsewhere. Proof from elsewhere is not proof at the Threshold. The Keeper has seen parties that accumulated everything and still failed here. It takes each assessment fresh.",
+        "enemies": [
+          {
+            "enemyTypeID": "threshold_past_echo",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 60
+          },
+          {
+            "enemyTypeID": "threshold_keeper",
+            "countRange": [
+              1,
+              1
+            ],
+            "level": 64
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "threshold_all_cross_challenge",
+            "name": "Present the Alliance's Evidence",
+            "spawnChance": 0.8,
+            "checkType": "item",
+            "requiredItemID": "dissolution_record",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "threshold_past_echo",
+              "count": 2,
+              "narrative": "The dissolution record carries the Spire's own original purpose \u2014 the vote it was built to administer, the oaths it was built to witness. When presented at the door, the Spire reads it as a return of its own founding document. The two Past Echoes at the entrance receive a termination signal from the Spire's core: the archive function is no longer required because the original record has been returned. They dissolve. The Keeper does not stand down. The Keeper never stood down for a document. But the past echoes are gone, and the fight is simpler."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You carry nothing the Spire reads as a founding document."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Past Echoes are not governed by the Spire's founding purpose. They are governed by its archive function."
+            }
+          },
+          {
+            "id": "threshold_harmony_spire_attune",
+            "name": "Attune to the Spire's Frequency",
+            "spawnChance": 0.55,
+            "checkType": "stat",
+            "checkStat": "harmony",
+            "difficultyThreshold": 96,
+            "successEffect": {
+              "type": "apply_buff",
+              "narrative": "The Spire's core frequency is audible at the Threshold door \u2014 the same harmonic the original binding ran on, still resonant after fifty years of decay. A party with sufficient harmony can attune to it before the Keeper begins its assessment. The Keeper's soul_shatter profiles the party against the Spire's threat model. A party already resonant with the Spire's core frequency reads as partially aligned rather than adversarial. The Keeper's first action is a recalibrated assessment rather than lord_of_decay. That is a meaningful difference."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You cannot attune to the Spire's core frequency. The Keeper's assessment begins from a threat baseline."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Spire's frequency requires harmonic attunement to access. The Keeper's threat assessment proceeds as designed."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion_major",
+            "dropChance": 0.65,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "mana_potion_major",
+            "dropChance": 0.6,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "staff_divine_tier7",
+            "dropChance": 0.25,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "acc_amulet_omnipotence_tier7",
+            "dropChance": 0.22,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "acc_ring_singularity_tier7",
+            "dropChance": 0.2,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "resonance_node_fragment",
+            "dropChance": 0.4,
+            "rarity": "rare"
+          }
+        ]
+      }
+    ],
+    "rewards": {
+      "baseXP": 60000,
+      "baseGold": 700,
+      "lootTable": [
+        {
+          "itemID": "staff_divine_tier7",
+          "dropChance": 0.4,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "scepter_abyss_tier7",
+          "dropChance": 0.35,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "tome_abyss_tier7",
+          "dropChance": 0.32,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "acc_amulet_omnipotence_tier7",
+          "dropChance": 0.3,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "acc_ring_singularity_tier7",
+          "dropChance": 0.28,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "resonance_node_fragment",
+          "dropChance": 0.45,
+          "rarity": "rare"
+        },
+        {
+          "itemID": "health_potion_major",
+          "dropChance": 0.7,
+          "rarity": "uncommon"
+        },
+        {
+          "itemID": "first_hand_shard",
+          "dropChance": 0.04,
+          "rarity": "legendary"
+        }
+      ]
+    },
+    "tags": [
+      "arcane",
+      "shadow",
+      "corrupted"
+    ]
+  },
+  {
+    "id": "challenge_vault_of_the_unmade",
+    "name": "The Vault of the Unmade",
+    "description": "A sealed chamber beneath the Spire of Silent Conviction where the Verdant Word stored the things they chose not to be \u2014 spells cast and then renounced, oaths sworn and then abandoned by the Order itself, the magic of their own apostasy locked away because acknowledging it would have required acknowledging what they were becoming. The Architect never needed to corrupt this place. It was already doing the work.",
+    "difficulty": 15,
+    "recommendedLevel": 60,
+    "minPartySize": 1,
+    "maxPartySize": 4,
+    "lore": [
+      {
+        "unlocksAfter": 1,
+        "text": "The Vault was created during the Order's third decade, when the High Council first began making decisions it could not justify publicly. The sealing protocol was not designed to contain dangerous magic \u2014 it was designed to contain embarrassing magic. Spells that worked but shouldn't have. Oaths that were honored in letter but not in spirit. The entire catalogue of the Order's gradual compromise with what it claimed to stand against. The Vault is not a dungeon. It is a conscience. It is what the Verdant Word looked like from the inside."
+      },
+      {
+        "unlocksAfter": 5,
+        "text": "The Unmade Scribes maintain the Vault's records with the same meticulous attention the living archivists applied \u2014 because they are the living archivists, or were, before the sealing protocols consumed them when the Order dissolved and the Vault lost its maintenance staff. They did not become hostile when the Order fell. They became hostile when the last living archivist died of old age six years ago and there was no one left to tell them the job was over."
+      },
+      {
+        "unlocksAfter": 15,
+        "text": "The Unmade at the Vault's core is not a construct the Architect sent. It is what grew in the sealed space when fifty years of the Order's suppressed apostasy reached critical mass without anyone applying the maintenance seals. The Architect has been aware of it for thirty years. It has not touched it. The Unmade is doing more damage to the Vale's binding magic by simply existing than the Architect could achieve by directing it. Some weapons are better left where they fell."
+      }
+    ],
+    "stages": [
+      {
+        "stageId": 1,
+        "title": "The Outer Records",
+        "description": "The Vault's entrance level holds the oldest records \u2014 the Order's earliest compromises, the spells that were cast in year three and sealed in year four. The Unmade Scribes here are maintaining those records with perfect accuracy. The records are appalling. The Scribes are not aware of this. They are archivists. They maintain what they are given.",
+        "enemies": [
+          {
+            "enemyTypeID": "vault_unmade_scribe",
+            "countRange": [
+              3,
+              5
+            ],
+            "level": 58
+          },
+          {
+            "enemyTypeID": "vault_unmade_ward",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 58
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "vault_athenaeum_scroll_records",
+            "name": "Present Athenaeum Clearance",
+            "spawnChance": 0.75,
+            "checkType": "item",
+            "requiredItemID": "athenaeum_scroll",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "vault_unmade_scribe",
+              "count": 2,
+              "narrative": "The Athenaeum Scroll carries the Order's reading authorization frequency \u2014 the same credential the living archivists used to access the outer records. Two Unmade Scribes receive it and recategorize the party as maintenance personnel. The recategorization is reflexive, fifty-years-old, and completely correct by the protocol they are running. They resume their record maintenance. They do not question why maintenance personnel arrived six years after the last living archivist died. That is not in the protocol."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You carry no reading authorization. The Scribes' access protocol begins."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Vault's outer records require Order clearance. You do not have it."
+            }
+          },
+          {
+            "id": "vault_pierce_ward_armor",
+            "name": "Exploit the Sealing Flaw",
+            "spawnChance": 0.6,
+            "checkType": "skill",
+            "requiredSkillTag": "physical",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "vault_unmade_ward",
+              "count": 1,
+              "narrative": "The Unmade Wards were assembled from the Order's sealing magic \u2014 specifically, from the spells used to close off the compromised records. Those sealing spells had a structural flaw the Order's engineers documented and then sealed: the joint between the outer shield and the locomotion channel. A party trained in armor penetration can find the documented flaw in the Ward's construction and exploit it before the stone_skin response activates. The Ward's armorValue is 18. The joint is not armored."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You cannot find the sealing flaw without penetration-focused training."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Unmade Ward's construction flaw is not visible without armor penetration expertise."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion_major",
+            "dropChance": 0.5,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "mana_potion_major",
+            "dropChance": 0.45,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "athenaeum_scroll",
+            "dropChance": 0.3,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "tome_abyss_tier7",
+            "dropChance": 0.1,
+            "rarity": "legendary"
+          }
+        ]
+      },
+      {
+        "stageId": 2,
+        "title": "The Middle Records",
+        "description": "The Vault's second level is where the Order's compromises became systemic \u2014 the decade when every significant decision was made in private, ratified in public with edited minutes, and sealed here with the original language. The Unmade Scribes here are more coherent than the outer level's archivists because the records they maintain are more coherent. Sustained, organized apostasy produces more stable residue than opportunistic compromise.",
+        "enemies": [
+          {
+            "enemyTypeID": "vault_unmade_ward",
+            "countRange": [
+              2,
+              3
+            ],
+            "level": 59
+          },
+          {
+            "enemyTypeID": "vault_unmade_scribe",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 59
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "vault_verdant_seal_middle",
+            "name": "Present a Verdant Word Seal",
+            "spawnChance": 0.7,
+            "checkType": "item",
+            "requiredItemID": "verdant_word_seal",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "vault_unmade_ward",
+              "count": 1,
+              "narrative": "The Verdant Word Seal carries the Order's active priesthood authorization \u2014 the credential that allowed priests to move through sealed areas without triggering the Ward protocols. One Unmade Ward receives the authorization and runs its access check. The check finds the seal valid. The check finds the personnel list has not been updated in fifty years. The check defaults to access granted. The Ward steps aside. Its protocol has a gap the Order's engineers were aware of and sealed documentation about. The documentation is in this room."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You carry no priesthood authorization."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The middle-level Wards require active priesthood clearance. You do not have it."
+            }
+          },
+          {
+            "id": "vault_harmony_read_records",
+            "name": "Listen to the Sealed Oaths",
+            "spawnChance": 0.55,
+            "checkType": "stat",
+            "checkStat": "harmony",
+            "difficultyThreshold": 94,
+            "successEffect": {
+              "type": "apply_buff",
+              "narrative": "The sealed oaths in this section of the Vault are still active \u2014 they are running as harmonics in the room's air, suppressed but not dissolved. A party with sufficient harmony can key into the frequencies and identify which sealed oath the nearest Ward is anchored to. Addressing the oath directly \u2014 acknowledging it as a real promise that was made and broken \u2014 causes the Ward to run its conflict protocol: it is a sealing construct, and a party that acknowledges what it is sealing is performing the function the construct was built for. The Ward pauses for three seconds. Three seconds is enough."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "The sealed oath harmonics are too suppressed for your baseline. The Wards operate without conflict."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "You cannot reach the sealed oath frequencies. The Wards' sealing function proceeds undisrupted."
+            }
+          }
+        ],
+        "stageBranches": [
+          {
+            "condition": {
+              "type": "has_item",
+              "value": "sigil_fragment"
+            },
+            "nextStageId": 99,
+            "overrideDescription": "The sigil fragment resonates against the Vault's deepest seals \u2014 the ones the Order applied to records they were most afraid of. The resonance locates a passage the Order sealed from the outside rather than the inside, which means it was sealed to keep someone out rather than to keep something in. The Architect knows about this room. It has never entered. There is a reason it has never entered.",
+            "chance": 0.3
+          },
+          {
+            "condition": null,
+            "nextStageId": null
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion_major",
+            "dropChance": 0.5,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "mana_potion_major",
+            "dropChance": 0.45,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "scepter_abyss_tier7",
+            "dropChance": 0.14,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "acc_gloves_time_tier7",
+            "dropChance": 0.12,
+            "rarity": "legendary"
+          }
+        ]
+      },
+      {
+        "stageId": 3,
+        "title": "The Core Apostasy",
+        "description": "The Vault's deepest chamber holds the records the Order was most afraid of \u2014 the ones from the final decade before the dissolution, when the High Council had fully understood what they were becoming and continued anyway. The Unmade is at the chamber's center. It does not have a face. It does not have a name. It has the specific shape of an institution that knew exactly what it was doing and decided that was acceptable.",
+        "enemies": [
+          {
+            "enemyTypeID": "vault_unmade_scribe",
+            "countRange": [
+              1,
+              2
+            ],
+            "level": 60
+          },
+          {
+            "enemyTypeID": "vault_the_unmade",
+            "countRange": [
+              1,
+              1
+            ],
+            "level": 64
+          }
+        ],
+        "preCombatOpportunities": [
+          {
+            "id": "vault_dissolution_record_unmade",
+            "name": "Read the Record Into the Chamber",
+            "spawnChance": 0.7,
+            "checkType": "item",
+            "requiredItemID": "dissolution_record",
+            "successEffect": {
+              "type": "remove_enemy",
+              "enemyTypeID": "vault_unmade_scribe",
+              "count": 2,
+              "narrative": "The dissolution record is the Vault's missing final entry \u2014 the event that made everything sealed here relevant and then prevented anyone from accessing it. When read aloud in the core chamber, it activates the Vault's original completion protocol: the archive is complete when the dissolution record is filed. Two Unmade Scribes receive the filing signal and enter completion mode, which ends their maintenance function. They do not fight in completion mode. They wait. The Unmade does not have a completion protocol. The Unmade has never had a completion protocol."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "You carry nothing that completes the Vault's archive."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Vault's archive has no final entry. The Scribes' maintenance function continues indefinitely."
+            }
+          },
+          {
+            "id": "vault_conviction_face_unmade",
+            "name": "Face What the Order Was",
+            "spawnChance": 0.5,
+            "checkType": "stat",
+            "checkStat": "conviction",
+            "difficultyThreshold": 96,
+            "successEffect": {
+              "type": "apply_buff",
+              "narrative": "The Unmade's soul_shatter opener reads the party's profile by looking for hesitation \u2014 it was assembled from the Order's documented record of every moment the High Council flinched. A party that advances without hesitation gives it nothing to read. It is not that the soul_shatter misses. It lands and finds: a party that already knows what they are walking into and has decided that is acceptable. The Unmade runs its recalibration. It has never encountered a party whose profile matches the thing it was made from."
+            },
+            "failureEffect": {
+              "type": "narrative_only",
+              "narrative": "The soul_shatter reads hesitation. The Unmade has extensive records on hesitation."
+            },
+            "fallbackEffect": {
+              "type": "narrative_only",
+              "narrative": "The Unmade was assembled from the documentation of every moment the Order flinched. It is very good at identifying flinching."
+            }
+          }
+        ],
+        "lootTable": [
+          {
+            "itemID": "health_potion_major",
+            "dropChance": 0.65,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "mana_potion_major",
+            "dropChance": 0.6,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "tome_abyss_tier7",
+            "dropChance": 0.25,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "staff_divine_tier7",
+            "dropChance": 0.22,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "acc_amulet_omnipotence_tier7",
+            "dropChance": 0.18,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "dissolution_record",
+            "dropChance": 0.05,
+            "rarity": "legendary"
+          }
+        ]
+      },
+      {
+        "stageId": 99,
+        "title": "The Truth Revealed",
+        "secretPath": true,
+        "description": "The room the Architect has never entered holds one document \u2014 not a record of what the Order did, but a record of what the Order was originally for: the founding charter of the Verdant Word, written three hundred years ago, before any of the compromises. It describes a purpose so clean and complete that the Order's entire history reads as a betrayal of a single paragraph. The guardian here is not an Unmade construct. It is the charter's sealing ward \u2014 the Vault's own original integrity, fighting to protect the only document in this place that should not be sealed.",
+        "enemies": [
+          {
+            "enemyTypeID": "vault_unmade_ward",
+            "countRange": [
+              1,
+              1
+            ],
+            "level": 62
+          }
+        ],
+        "preCombatOpportunities": [],
+        "lootTable": [
+          {
+            "itemID": "dissolution_record",
+            "dropChance": 1.0,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "tome_abyss_tier7",
+            "dropChance": 0.5,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "acc_amulet_omnipotence_tier7",
+            "dropChance": 0.45,
+            "rarity": "legendary"
+          },
+          {
+            "itemID": "verdant_word_seal",
+            "dropChance": 0.7,
+            "rarity": "uncommon"
+          },
+          {
+            "itemID": "health_potion_major",
+            "dropChance": 0.75,
+            "rarity": "uncommon"
+          }
+        ]
+      }
+    ],
+    "rewards": {
+      "baseXP": 60000,
+      "baseGold": 700,
+      "lootTable": [
+        {
+          "itemID": "tome_abyss_tier7",
+          "dropChance": 0.4,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "scepter_abyss_tier7",
+          "dropChance": 0.35,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "wand_abyss_tier7",
+          "dropChance": 0.32,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "staff_divine_tier7",
+          "dropChance": 0.3,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "acc_amulet_omnipotence_tier7",
+          "dropChance": 0.28,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "architects_seal",
+          "dropChance": 0.4,
+          "rarity": "uncommon"
+        },
+        {
+          "itemID": "health_potion_major",
+          "dropChance": 0.7,
+          "rarity": "uncommon"
+        },
+        {
+          "itemID": "dissolution_record",
+          "dropChance": 0.04,
+          "rarity": "legendary"
+        }
+      ],
+      "secretLootTable": [
+        {
+          "itemID": "dissolution_record",
+          "dropChance": 1.0,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "tome_abyss_tier7",
+          "dropChance": 0.6,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "acc_amulet_omnipotence_tier7",
+          "dropChance": 0.55,
+          "rarity": "legendary"
+        },
+        {
+          "itemID": "staff_divine_tier7",
+          "dropChance": 0.5,
+          "rarity": "legendary"
+        }
+      ]
+    },
+    "tags": [
+      "arcane",
+      "sacred",
+      "corrupted"
+    ]
   }
 ]
