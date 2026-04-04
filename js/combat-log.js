@@ -1929,6 +1929,11 @@ try {
         if (newUnlocks.length > 0 && typeof populateUnlockFanfare === 'function') {
             populateUnlockFanfare(newUnlocks);
         }
+        const _hintChallenge = window.currentState?.selectedChallenge;
+        const _hintChar      = Object.values(savedCharacters)[0] || null;
+        const questHints     = (typeof window.getQuestItemHints === 'function')
+            ? window.getQuestItemHints(_hintChallenge, _hintChar)
+            : [];
         animateCombatRewards({
             result:     combatData.result || 'victory',
             loot:       lootPayload,
@@ -1936,6 +1941,7 @@ try {
             skillXP:    skillXPGains,
             newUnlocks,
             autoEquips: typeof autoEquips !== 'undefined' ? autoEquips : [],
+            questHints,
         });
     }
 

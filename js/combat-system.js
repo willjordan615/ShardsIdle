@@ -423,6 +423,49 @@ async function startCombat(forcedChallengeId) {
             avatarColor: member.avatarColor || null
         }));
 
+        // Inject story companions whose gates are met for this challenge
+        const companions = window.gameData?.companions || [];
+        if (companions.length > 0) {
+            const challengeID = currentState.selectedChallenge.id;
+            const playerChar = currentState.currentParty.find(m =>
+                !m.characterID?.startsWith('bot_') && !m.characterID?.startsWith('import_')
+            );
+            const inventory = playerChar?.inventory || [];
+            const completions = playerChar?.combatStats?.challengeCompletions || {};
+
+            for (const companion of companions) {
+                // Scope check: allowedChallenges list, or fallback to d16 if absent
+                const allowed = companion.allowedChallenges
+                    ? companion.allowedChallenges.includes(challengeID)
+                    : challengeID === 'challenge_spire_fractured_time';
+                if (!allowed) continue;
+
+                const hasItem = inventory.some(i => i.itemID === companion.requiredItem);
+                if (!hasItem) continue;
+
+                if (companion.requiresChallengeNotCompleted) {
+                    const cleared = (completions[companion.requiresChallengeNotCompleted]?.completions || 0) > 0;
+                    if (cleared) continue;
+                }
+
+                partySnapshots.push({
+                    characterID: companion.characterID,
+                    characterName: companion.characterName,
+                    level: companion.level,
+                    stats: companion.stats,
+                    skills: companion.skills,
+                    consumables: companion.consumables || {},
+                    equipment: companion.equipment,
+                    isImported: false,
+                    aiProfile: companion.aiProfile || 'balanced',
+                    race: companion.race || null,
+                    avatarId: null,
+                    avatarColor: null
+                });
+                console.log(`[COMPANIONS] ${companion.characterName} joined the party.`);
+            }
+        }
+
         const requestBody = {
             partySnapshots,
             challengeID: currentState.selectedChallenge.id,

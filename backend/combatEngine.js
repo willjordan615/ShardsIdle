@@ -677,9 +677,15 @@ class CombatEngine {
       // replace enemy types in the stage's enemy list before spawning.
       // Conditions use the same types as stageBranches (stat_check, has_skill_tag, etc.).
       // Only the FIRST matching condition fires — conditions are evaluated in order.
-      const stageEnemyDefs = stage.adaptiveEnemies && stage.adaptiveEnemies.length > 0
+      let stageEnemyDefs = stage.adaptiveEnemies && stage.adaptiveEnemies.length > 0
           ? this._resolveAdaptiveEnemies(stage.enemies, stage.adaptiveEnemies, playerCharacters)
           : stage.enemies;
+
+      // If companion_krog_contracted is in the party, suppress the enemy version of Krog
+      // so he doesn't appear on both sides of the fight.
+      if (partySnapshots.some(s => s.characterID === 'companion_krog_contracted')) {
+          stageEnemyDefs = stageEnemyDefs.filter(e => e.enemyTypeID !== 'chieftain_krog');
+      }
       // ----------------------
 
       const enemies = this.initializeEnemies(stageEnemyDefs);

@@ -192,6 +192,16 @@
 
         const footerDelay = (0.35 + lootCount * 0.1).toFixed(2);
 
+        // Quest item hints — items in inventory that are referenced by this challenge
+        const hintsHTML = payload.questHints?.length ? `
+            <div class="rm-section rm-hints-section" style="--rm-delay:${footerDelay}s; margin-bottom:0.5rem;">
+                <div class="rm-section-label" style="color:var(--text-muted);">✦ Your Pack</div>
+                ${payload.questHints.map(h => `
+                    <div style="color:var(--text-muted); font-size:0.82rem; font-style:italic; margin-bottom:4px; padding-left:4px;">
+                        ${h.text}
+                    </div>`).join('')}
+            </div>` : '';
+
         // Inject all at once — no flicker
         inner.innerHTML = `
             <div class="rm-title" style="color:${titleColor};">${titleText}</div>
@@ -200,6 +210,7 @@
             ${autoEquipHTML}
             ${charXPHTML}
             ${skillXPHTML}
+            ${hintsHTML}
             <div class="rm-footer rm-section" style="--rm-delay:${footerDelay}s">
                 <p id="autoRestartText" class="rm-countdown"></p>
                 <div class="rm-footer-btns">

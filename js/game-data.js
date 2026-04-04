@@ -1267,3 +1267,52 @@ function getComboHints(character, skillID) {
     setTimeout(poll, 1500);
     setInterval(poll, POLL_INTERVAL);
 })();
+
+// ── Quest Item Hints ──────────────────────────────────────────────────────────
+// Returns hint objects for any quest items the player holds that are referenced
+// in the current challenge's opportunities or branch conditions.
+// Used by the rewards modal and offline summary to nudge players toward
+// re-attempting with the right items in their pack.
+window.getQuestItemHints = function(challenge, character) {
+    if (!challenge || !character) return [];
+
+    const inventory = character.inventory || [];
+    const items     = window.gameData?.gear || [];
+
+    // Collect all item IDs referenced in this challenge's opportunities and branches
+    const referencedItems = new Set();
+    for (const stage of (challenge.stages || [])) {
+        for (const opp of (stage.preCombatOpportunities || [])) {
+            if (opp.requiredItemID) referencedItems.add(opp.requiredItemID);
+        }
+        for (const branch of (stage.stageBranches || [])) {
+            if (branch.condition?.type === 'has_item' && branch.condition?.value) {
+                referencedItems.add(branch.condition.value);
+            }
+        }
+    }
+
+    if (referencedItems.size === 0) return [];
+
+    // Find which of those items the player is carrying
+    const hints = [];
+    for (const itemID of referencedItems) {
+        const held = inventory.find(i => i.itemID === itemID);
+        if (!held) continue;
+
+        const def = items.find(i => i.id === itemID);
+        if (!def) continue;
+
+        // Only hint for quest items (slot_id1 consumable, no type)
+        if (def.slot_id1 !== 'consumable' || def.type) continue;
+
+        const name = held.itemName || def.name || itemID;
+        hints.push({
+            itemID,
+            name,
+            text: `You carry the ${name}. It may open a different path if you return.`,
+        });
+    }
+
+    return hints;
+};

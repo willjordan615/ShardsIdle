@@ -17458,7 +17458,7 @@
   {
     "id": "greataxe_wood_tier0",
     "name": "Woodcutter's Greataxe",
-    "type": "greateaxe",
+    "type": "greataxe",
     "slot_id1": "mainHand",
     "slot_id2": null,
     "dmg_type_1": "Slashing",

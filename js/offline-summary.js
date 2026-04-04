@@ -240,6 +240,19 @@ function _renderOfflineSummary(summary, primaryChar) {
             ${goldLine}
         </div>
 
+        <!-- Quest item hints -->
+        ${(() => {
+            const ch = window.gameData?.challenges?.find(c => c.id === summary.challengeId);
+            const hints = (typeof window.getQuestItemHints === 'function')
+                ? window.getQuestItemHints(ch, primaryChar)
+                : [];
+            if (!hints.length) return '';
+            return `<div class="section os-hints" style="margin-bottom:0.75rem;">
+                <div class="os-section-label" style="color:var(--text-muted);">✦ Your Pack</div>
+                ${hints.map(h => `<div style="color:var(--text-muted); font-size:0.82rem; font-style:italic; margin-bottom:4px;">${h.text}</div>`).join('')}
+            </div>`;
+        })()}
+
         <!-- Actions -->
         <div class="os-actions">
             <button onclick="_dismissOfflineSummary(false)" class="secondary os-btn">
