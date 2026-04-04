@@ -2315,6 +2315,20 @@ _applyLootTagFlavour(item, tagDef) {
         });
     }
 
+    // Weapon on-hit procs — add proc skill IDs from equipped mainHand/offHand
+    // so child skills with proc parents (e.g. proc_chime + shove → dissonance) can fire
+    const weaponSlots = ['mainHand', 'offHand'];
+    for (const slot of weaponSlots) {
+        const weaponId = character.equipment?.[slot];
+        if (!weaponId) continue;
+        const weaponDef = this.gear.find(g => g.id === weaponId);
+        if (!weaponDef) continue;
+        for (let i = 1; i <= 3; i++) {
+            const procId = weaponDef[`onhit_skillid_${i}`];
+            if (procId) pool.add(procId);
+        }
+    }
+
     // Drop any IDs that don't resolve to a known skill — prevents "Skill not found"
     // from stale discovered skills or renamed entries in a character's skill array.
     for (const id of pool) {
