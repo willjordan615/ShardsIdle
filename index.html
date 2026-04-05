@@ -1978,9 +1978,9 @@ function mapStartScrambleLoop(id, len, el) {
   }, 120);
 }
 function mapGetState(c, lvl) {
-  if (lvl >= c.minLvl) return 'available';
-  if (lvl >= c.minLvl - 5) return 'near';
-  if (lvl >= c.minLvl - 20) return 'approaching';
+  if (lvl >= c.minLvl - 7) return 'available';
+  if (lvl >= c.minLvl - 14) return 'near';
+  if (lvl >= c.minLvl - 21) return 'approaching';
   return 'locked';
 }
 
