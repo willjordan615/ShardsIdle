@@ -2157,7 +2157,7 @@ function mapInitPanZoom() {
     panY = clamp(panY, Math.min(0, wh - ih), Math.max(0, wh - ih));
     inner.style.transform = `translate(${panX}px,${panY}px) scale(${scale})`;
     // Expand label max-width as we zoom in so names truncate less
-    const labelWidth = Math.round(168 / scale);
+    const labelWidth = Math.round(168 * scale);
     inner.querySelectorAll('.map-node-label').forEach(el => {
       el.style.maxWidth = labelWidth + 'px';
     });
