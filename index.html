@@ -1967,8 +1967,21 @@ function mapStartScramble(id, name, el) {
 
 // ── NODE STATE ───────────────────────────────────────────────────────────────
 
+function mapStartScrambleLoop(id, len, el) {
+  if (mapScrambles[id]) return; // already running
+  mapScrambles[id] = setInterval(() => {
+    if (el && el.parentNode) {
+      el.textContent = Array.from({length: len}, () =>
+        MAP_GLYPHS[Math.floor(Math.random() * MAP_GLYPHS.length)]
+      ).join('');
+    }
+  }, 120);
+}
 function mapGetState(c, lvl) {
-  return lvl >= c.minLvl ? 'available' : lvl >= c.minLvl - 20 ? 'near' : 'locked';
+  if (lvl >= c.minLvl) return 'available';
+  if (lvl >= c.minLvl - 5) return 'near';
+  if (lvl >= c.minLvl - 20) return 'approaching';
+  return 'locked';
 }
 
 // ── BUILD NODES ──────────────────────────────────────────────────────────────
@@ -2047,19 +2060,30 @@ function mapBuildNodes(level) {
       pip.style.color = 'var(--red)';
       pip.style.borderColor = 'var(--red)';
       pip.style.boxShadow = '0 0 8px rgba(232,72,74,0.3)';
+    } else if (pip && newState === 'approaching') {
+      pip.textContent = '';
+      pip.style.borderColor = 'var(--red)';
+      pip.style.color = '';
+      pip.style.boxShadow = '';
+      pip.style.display = '';
     } else if (pip) {
       pip.textContent = '';
       pip.style.borderColor = '';
       pip.style.color = '';
       pip.style.boxShadow = '';
+      pip.style.display = '';
     }
     const lbl = document.getElementById('maplbl-' + c.id);
     if (newState === 'available' || newState === 'active') {
       if (revealing) { lbl.textContent = mapGlyphCache[c.id]; mapStartScramble(c.id, c.name, lbl); }
       else if (!mapScrambles[c.id]) lbl.textContent = c.name;
     } else if (newState === 'near') {
-      lbl.textContent = mapGlyphCache[c.id].slice(0, Math.ceil(c.name.length * 0.3));
+      mapStartScrambleLoop(c.id, c.name.length, lbl);
+    } else if (newState === 'approaching') {
+      if (mapScrambles[c.id]) { clearInterval(mapScrambles[c.id]); delete mapScrambles[c.id]; }
+      lbl.textContent = mapGlyphCache[c.id].slice(0, Math.ceil(c.name.length * 0.4));
     } else {
+      if (mapScrambles[c.id]) { clearInterval(mapScrambles[c.id]); delete mapScrambles[c.id]; }
       lbl.textContent = mapGlyphCache[c.id].slice(0, 2);
     }
   });
