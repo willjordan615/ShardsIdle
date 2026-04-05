@@ -2052,13 +2052,20 @@ function mapInitPanZoom() {
 
   img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;';
 
-  let scale = 1, panX = 0, panY = 0;
+  const IMG_W = 1408, IMG_H = 768;
+  function getMinScale() {
+    return Math.max(wrap.offsetWidth / IMG_W, wrap.offsetHeight / IMG_H);
+  }
+
+  let scale = getMinScale(), panX = 0, panY = 0;
   let dragging = false, startX = 0, startY = 0, startPanX = 0, startPanY = 0;
-  const MIN = 0.5, MAX = 3;
+  const MAX = 3;
 
   function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 
   function applyTransform() {
+    const MIN = getMinScale();
+    scale = clamp(scale, MIN, MAX);
     const ww = wrap.offsetWidth, wh = wrap.offsetHeight;
     const iw = ww * scale, ih = wh * scale;
     panX = clamp(panX, Math.min(0, ww - iw), Math.max(0, ww - iw));
@@ -2071,7 +2078,7 @@ function mapInitPanZoom() {
     const rect = wrap.getBoundingClientRect();
     const mx = e.clientX - rect.left, my = e.clientY - rect.top;
     const delta = e.deltaY < 0 ? 1.1 : 0.9;
-    const newScale = clamp(scale * delta, MIN, MAX);
+    const newScale = clamp(scale * delta, getMinScale(), MAX);
     panX = mx - (mx - panX) * (newScale / scale);
     panY = my - (my - panY) * (newScale / scale);
     scale = newScale;
@@ -2113,7 +2120,7 @@ function mapInitPanZoom() {
         const mx = (a.clientX + b.clientX) / 2 - rect.left;
         const my = (a.clientY + b.clientY) / 2 - rect.top;
         const delta = dist / lastDist;
-        const newScale = clamp(scale * delta, MIN, MAX);
+        const newScale = clamp(scale * delta, getMinScale(), MAX);
         panX = mx - (mx - panX) * (newScale / scale);
         panY = my - (my - panY) * (newScale / scale);
         scale = newScale;
@@ -2144,12 +2151,12 @@ function mapInitPanZoom() {
   window.mapZoom = function (delta) {
     const ww = wrap.offsetWidth, wh = wrap.offsetHeight;
     const mx = ww / 2, my = wh / 2;
-    const newScale = clamp(scale * delta, MIN, MAX);
+    const newScale = clamp(scale * delta, getMinScale(), MAX);
     panX = mx - (mx - panX) * (newScale / scale);
     panY = my - (my - panY) * (newScale / scale);
     scale = newScale; applyTransform();
   };
-  window.mapResetView = function () { scale = 1; panX = 0; panY = 0; applyTransform(); };
+  window.mapResetView = function () { scale = getMinScale(); panX = 0; panY = 0; applyTransform(); };
   wrap.style.cursor = 'grab';
   applyTransform();
 }
