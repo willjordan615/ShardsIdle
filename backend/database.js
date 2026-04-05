@@ -256,9 +256,10 @@ async function initializeCharacterSnapshotsTable() {
 
     // Migration: add offline idle session tracking columns
     for (const [col, def] of [
-        ['idleChallengeId', 'TEXT DEFAULT NULL'],
-        ['idlePartyIds',    'TEXT DEFAULT NULL'],
-        ['idleStartedAt',   'INTEGER DEFAULT NULL'],
+        ['idleChallengeId',    'TEXT DEFAULT NULL'],
+        ['idlePartyIds',       'TEXT DEFAULT NULL'],
+        ['idleStartedAt',      'INTEGER DEFAULT NULL'],
+        ['idleGeneratedBots',  'TEXT DEFAULT NULL'],
     ]) {
         await new Promise((resolve) => {
             db.run(`ALTER TABLE characters ADD COLUMN ${col} ${def}`, (err) => {
@@ -273,11 +274,11 @@ async function initializeCharacterSnapshotsTable() {
 
 // ── Idle session helpers ──────────────────────────────────────────────────────
 
-function setIdleSession(characterId, challengeId, partyIds) {
+function setIdleSession(characterId, challengeId, partyIds, generatedBotSnapshots) {
     return new Promise((resolve, reject) => {
         db.run(
-            `UPDATE characters SET idleChallengeId = ?, idlePartyIds = ?, idleStartedAt = ? WHERE id = ?`,
-            [challengeId, JSON.stringify(partyIds), Date.now(), characterId],
+            `UPDATE characters SET idleChallengeId = ?, idlePartyIds = ?, idleStartedAt = ?, idleGeneratedBots = ? WHERE id = ?`,
+            [challengeId, JSON.stringify(partyIds), Date.now(), JSON.stringify(generatedBotSnapshots || []), characterId],
             (err) => { if (err) reject(err); else resolve(); }
         );
     });
@@ -286,15 +287,16 @@ function setIdleSession(characterId, challengeId, partyIds) {
 function getIdleSession(characterId) {
     return new Promise((resolve, reject) => {
         db.get(
-            `SELECT idleChallengeId, idlePartyIds, idleStartedAt FROM characters WHERE id = ?`,
+            `SELECT idleChallengeId, idlePartyIds, idleStartedAt, idleGeneratedBots FROM characters WHERE id = ?`,
             [characterId],
             (err, row) => {
                 if (err) return reject(err);
                 if (!row || !row.idleStartedAt) return resolve(null);
                 resolve({
-                    challengeId:  row.idleChallengeId,
-                    partyIds:     JSON.parse(row.idlePartyIds || '[]'),
-                    startedAt:    row.idleStartedAt,
+                    challengeId:           row.idleChallengeId,
+                    partyIds:              JSON.parse(row.idlePartyIds || '[]'),
+                    startedAt:             row.idleStartedAt,
+                    generatedBotSnapshots: JSON.parse(row.idleGeneratedBots || '[]'),
                 });
             }
         );

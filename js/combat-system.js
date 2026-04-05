@@ -635,10 +635,24 @@ function _notifyIdleStart() {
     const partyIds    = (currentState.currentParty || []).map(m => m.characterID || m.id).filter(Boolean);
     const primaryId   = partyIds.find(id => !id.startsWith('bot_') && !id.startsWith('import_'));
     if (!primaryId || !challengeId) return;
+    // Snapshot generated bots (bot_gen_*) in full — they don't exist in bots.json on the server
+    const generatedBotSnapshots = (currentState.currentParty || [])
+        .filter(m => (m.characterID || m.id || '').startsWith('bot_gen_'))
+        .map(m => ({
+            characterID:   m.characterID || m.id,
+            characterName: m.characterName || m.name,
+            race:          m.race,
+            level:         m.level,
+            stats:         m.stats,
+            skills:        m.skills,
+            equipment:     m.equipment,
+            consumables:   m.consumables || {},
+            aiProfile:     m.aiProfile || 'balanced',
+        }));
     authFetch(`${BACKEND_URL}/api/combat/idle/start`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ characterId: primaryId, challengeId, partyIds }),
+        body:    JSON.stringify({ characterId: primaryId, challengeId, partyIds, generatedBotSnapshots }),
     }).catch(e => console.warn('[IDLE] Failed to stamp idle session:', e.message));
 }
 

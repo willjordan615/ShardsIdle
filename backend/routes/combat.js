@@ -532,12 +532,12 @@ router.post('/admin/prune-logs', async (req, res) => {
 
 // POST /idle/start — persist idle session when the loop activates
 router.post('/idle/start', requireAuth, async (req, res) => {
-    const { characterId, challengeId, partyIds } = req.body;
+    const { characterId, challengeId, partyIds, generatedBotSnapshots } = req.body;
     if (!characterId || !challengeId || !Array.isArray(partyIds)) {
         return res.status(400).json({ error: 'characterId, challengeId, and partyIds are required' });
     }
     try {
-        await db.setIdleSession(characterId, challengeId, partyIds);
+        await db.setIdleSession(characterId, challengeId, partyIds, generatedBotSnapshots || []);
         res.json({ ok: true });
     } catch (err) {
         console.error('[IDLE] Failed to set idle session:', err);
@@ -590,8 +590,14 @@ router.post('/idle/collect', requireAuth, async (req, res) => {
         releaseLocks = await acquireCharacterLocks(ownedIds);
 
         // Build party snapshots from live DB state
+        const storedBotSnapshots = session.generatedBotSnapshots || [];
         const partySnapshots = await Promise.all(partyIds.map(async (id) => {
             if (id.startsWith('bot_')) {
+                if (id.startsWith('bot_gen_')) {
+                    // Generated bots don't exist in bots.json — use the snapshot stored at idle/start
+                    const stored = storedBotSnapshots.find(b => b.characterID === id);
+                    return stored ? { ...stored, isBot: true } : null;
+                }
                 const bots = JSON.parse(fs.readFileSync(path.join(dataDir, 'bots.json'), 'utf8'));
                 const bot = bots.find(b => b.characterID === id);
                 return bot ? { ...bot, characterID: bot.characterID, characterName: bot.name, isBot: true } : null;
