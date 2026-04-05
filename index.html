@@ -2136,11 +2136,13 @@ function mapInitPanZoom() {
     inner.style.transform = `translate(${panX}px,${panY}px) scale(${scale})`;
   }
 
-  sizeInner();
-  scale = getMinScale();
-  panX = (wrap.offsetWidth - parseFloat(inner.style.width) * scale) / 2;
-  panY = (wrap.offsetHeight - parseFloat(inner.style.height) * scale) / 2;
-  applyTransform();
+  requestAnimationFrame(() => {
+    sizeInner();
+    scale = getMinScale();
+    panX = (wrap.offsetWidth - parseFloat(inner.style.width) * scale) / 2;
+    panY = (wrap.offsetHeight - parseFloat(inner.style.height) * scale) / 2;
+    applyTransform();
+  });
 
   wrap.addEventListener('wheel', e => {
     e.preventDefault();
