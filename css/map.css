@@ -4,8 +4,7 @@
    to the viewport height and let mapWrap (flex:1) fill the remainder. */
 body:has(#map.screen.active) {
     height: 100vh;
-    height: 100dvh; /* dvh excludes mobile browser chrome; falls back to vh */
-    overflow: hidden;
+    height: 100dvh;
 }
 body:has(#map.screen.active) .container {
     height: 100%;
