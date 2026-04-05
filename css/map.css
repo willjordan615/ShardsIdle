@@ -28,42 +28,42 @@ body:has(#map.screen.active) header {
 }
 
 .map-node-pip {
-  width: 9px; height: 9px;
+  width: 18px; height: 18px;
   border-radius: 50%;
-  border: 1px solid #2e2010;
-  background: #120e06;
+  border: 2px solid var(--gold-border);
+  background: var(--ink-deep);
   transition: all .25s;
   flex-shrink: 0;
 }
-.map-node.state-available .map-node-pip { border-color: #c8a84b; background: #2a1e08; box-shadow: 0 0 5px #c8a84b55, 0 0 10px #c8a84b22; }
-.map-node.state-active    .map-node-pip { border-color: #f0d070; background: #3a2a0a; box-shadow: 0 0 10px #c8a84b99; width: 11px; height: 11px; animation: mapNodePulse 2.5s ease-in-out infinite; }
-.map-node.state-locked    .map-node-pip { border-color: #2a2010; background: #0d0a05; opacity: .55; }
-.map-node.state-near      .map-node-pip { border-color: #6a5020; background: #180f04; opacity: .75; }
+.map-node.state-available .map-node-pip { border-color: var(--gold); background: var(--ink-mid); box-shadow: 0 0 10px rgba(212,175,55,0.33), 0 0 20px rgba(212,175,55,0.13); }
+.map-node.state-active    .map-node-pip { border-color: var(--gold-bright); background: var(--ink-surface); box-shadow: 0 0 20px rgba(212,175,55,0.6); width: 22px; height: 22px; animation: mapNodePulse 2.5s ease-in-out infinite; }
+.map-node.state-locked    .map-node-pip { border-color: var(--gold-border); background: var(--ink-deep); opacity: .55; }
+.map-node.state-near      .map-node-pip { border-color: var(--gold-dim); background: var(--ink-dark); opacity: .75; }
 .map-node:hover                   .map-node-pip { transform: scale(1.6); }
 .map-node.state-available:hover   .map-node-pip,
-.map-node.state-active:hover      .map-node-pip { box-shadow: 0 0 16px #c8a84bcc; }
+.map-node.state-active:hover      .map-node-pip { box-shadow: 0 0 32px rgba(212,175,55,0.8); }
 
 @keyframes mapNodePulse {
-  0%, 100% { box-shadow: 0 0 10px #c8a84b99; }
-  50%       { box-shadow: 0 0 18px #c8a84bcc; }
+  0%, 100% { box-shadow: 0 0 20px rgba(212,175,55,0.6); }
+  50%       { box-shadow: 0 0 36px rgba(212,175,55,0.8); }
 }
 
 .map-node-label {
-  font-family: 'Crimson Text', serif;
-  font-size: 8.5px;
+  font-family: var(--font-display);
+  font-size: 17px;
   line-height: 1.2;
   text-align: center;
   white-space: nowrap;
-  max-width: 84px;
+  max-width: 168px;
   overflow: hidden;
   text-overflow: ellipsis;
   pointer-events: none;
   text-shadow: 0 1px 3px rgba(0,0,0,.95), 0 0 8px rgba(0,0,0,.8);
 }
-.map-node.state-available .map-node-label { color: #b09040; }
-.map-node.state-active    .map-node-label { color: #d4b050; }
-.map-node.state-locked    .map-node-label { color: #3a2a12; }
-.map-node.state-near      .map-node-label { color: #5a3e18; }
+.map-node.state-available .map-node-label { color: var(--gold); }
+.map-node.state-active    .map-node-label { color: var(--gold-bright); }
+.map-node.state-locked    .map-node-label { color: var(--text-muted); }
+.map-node.state-near      .map-node-label { color: var(--gold-dim); }
 
 /* ── MODAL ──────────────────────────────────────────────────────────────── */
 
