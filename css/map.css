@@ -1,6 +1,21 @@
 /* ── MAP SCREEN ─────────────────────────────────────────────────────────── */
 
-#map.screen.active { display: flex !important; flex-direction: column; }
+/* Body and container don't have a fixed height, so we anchor the map screen
+   to the viewport height and let mapWrap (flex:1) fill the remainder. */
+body:has(#map.screen.active) {
+    height: 100vh;
+    height: 100dvh; /* dvh excludes mobile browser chrome; falls back to vh */
+    overflow: hidden;
+}
+body:has(#map.screen.active) .container {
+    height: 100%;
+    max-width: 100%;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+#map.screen.active { display: flex !important; flex-direction: column; flex: 1; min-height: 0; }
 
 /* ── NODES ──────────────────────────────────────────────────────────────── */
 
