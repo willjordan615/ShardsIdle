@@ -2091,40 +2091,31 @@ function mapInitPanZoom() {
   if (!wrap || !layer || !img || wrap._panZoomInit) return;
   wrap._panZoomInit = true;
 
-  const IMG_RATIO = 1408 / 768;
+  const IMG_W = 1408, IMG_H = 768;
 
-  // Size inner to the image's natural aspect ratio filling the wrap
-  function sizeInner() {
-    const ww = wrap.offsetWidth, wh = wrap.offsetHeight;
-    let iw, ih;
-    if (ww / wh > IMG_RATIO) {
-      // Wrap is wider than image ratio — fit to width
-      iw = ww; ih = ww / IMG_RATIO;
-    } else {
-      // Wrap is taller — fit to height
-      iw = wh * IMG_RATIO; ih = wh;
-    }
-    inner.style.width = iw + 'px';
-    inner.style.height = ih + 'px';
-    // Center the inner in the wrap initially
-    panX = (ww - iw * scale) / 2;
-    panY = (wh - ih * scale) / 2;
-  }
-
-  inner.style.cssText = 'position:absolute;transform-origin:0 0;';
+  const inner = document.createElement('div');
+  inner.id = 'mapInner';
+  inner.style.cssText = 'position:absolute;top:0;left:0;transform-origin:0 0;';
   wrap.appendChild(inner);
   inner.appendChild(img);
   inner.appendChild(layer);
-
   const vig = wrap.querySelector('div[style*="radial-gradient"]');
   if (vig) inner.appendChild(vig);
 
   img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:fill;display:block;';
 
-  const IMG_W = 1408, IMG_H = 768;
+  function sizeInner() {
+    const ww = wrap.offsetWidth, wh = wrap.offsetHeight;
+    let iw, ih;
+    if (ww / wh > IMG_W / IMG_H) { iw = ww; ih = ww / (IMG_W / IMG_H); }
+    else { iw = wh * (IMG_W / IMG_H); ih = wh; }
+    inner.style.width = iw + 'px';
+    inner.style.height = ih + 'px';
+  }
+
   function getMinScale() {
-    const iw = parseFloat(inner.style.width) || 1;
-    const ih = parseFloat(inner.style.height) || 1;
+    const iw = parseFloat(inner.style.width) || IMG_W;
+    const ih = parseFloat(inner.style.height) || IMG_H;
     return Math.max(wrap.offsetWidth / iw, wrap.offsetHeight / ih);
   }
 
@@ -2147,6 +2138,8 @@ function mapInitPanZoom() {
 
   sizeInner();
   scale = getMinScale();
+  panX = (wrap.offsetWidth - parseFloat(inner.style.width) * scale) / 2;
+  panY = (wrap.offsetHeight - parseFloat(inner.style.height) * scale) / 2;
   applyTransform();
 
   wrap.addEventListener('wheel', e => {
@@ -2157,8 +2150,7 @@ function mapInitPanZoom() {
     const newScale = clamp(scale * delta, getMinScale(), MAX);
     panX = mx - (mx - panX) * (newScale / scale);
     panY = my - (my - panY) * (newScale / scale);
-    scale = newScale;
-    applyTransform();
+    scale = newScale; applyTransform();
   }, {passive: false});
 
   wrap.addEventListener('mousedown', e => {
@@ -2199,8 +2191,7 @@ function mapInitPanZoom() {
         const newScale = clamp(scale * delta, getMinScale(), MAX);
         panX = mx - (mx - panX) * (newScale / scale);
         panY = my - (my - panY) * (newScale / scale);
-        scale = newScale;
-        applyTransform();
+        scale = newScale; applyTransform();
       }
       lastDist = dist;
     } else if (e.touches.length === 1 && dragging) {
@@ -2216,15 +2207,15 @@ function mapInitPanZoom() {
   }, {passive: true});
 
   const controls = document.createElement('div');
-  controls.style.cssText = 'position:absolute;bottom:12px;right:12px;z-index:50;display:flex;flex-direction:column;gap:4px;';
+  controls.style.cssText = 'position:absolute;bottom:48px;right:12px;z-index:50;display:flex;flex-direction:column;gap:4px;';
   controls.innerHTML = `
     <button onclick="mapZoom(1.25)" style="width:28px;height:28px;background:#0f0d07;border:1px solid #2e2410;color:#c8a84b;font-size:16px;cursor:pointer;line-height:1;">+</button>
-    <button onclick="mapZoom(0.8)"  style="width:28px;height:28px;background:#0f0d07;border:1px solid #2e2410;color:#c8a84b;font-size:16px;cursor:pointer;line-height:1;">−</button>
+    <button onclick="mapZoom(0.8)" style="width:28px;height:28px;background:#0f0d07;border:1px solid #2e2410;color:#c8a84b;font-size:16px;cursor:pointer;line-height:1;">−</button>
     <button onclick="mapResetView()" style="width:28px;height:28px;background:#0f0d07;border:1px solid #2e2410;color:#c8a84b;font-size:10px;cursor:pointer;line-height:1;" title="Reset">⌂</button>
   `;
   wrap.appendChild(controls);
 
-  window.mapZoom = function (delta) {
+  window.mapZoom = function(delta) {
     const ww = wrap.offsetWidth, wh = wrap.offsetHeight;
     const mx = ww / 2, my = wh / 2;
     const newScale = clamp(scale * delta, getMinScale(), MAX);
@@ -2232,8 +2223,14 @@ function mapInitPanZoom() {
     panY = my - (my - panY) * (newScale / scale);
     scale = newScale; applyTransform();
   };
-  window.mapResetView = function () { scale = getMinScale(); panX = 0; panY = 0; applyTransform(); };
-  wrap.style.cursor = 'grab';
+  window.mapResetView = function() {
+    sizeInner();
+    scale = getMinScale();
+    panX = (wrap.offsetWidth - parseFloat(inner.style.width) * scale) / 2;
+    panY = (wrap.offsetHeight - parseFloat(inner.style.height) * scale) / 2;
+    applyTransform();
+  };
+    wrap.style.cursor = 'grab';
   applyTransform();
 }
 
