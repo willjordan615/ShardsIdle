@@ -1836,6 +1836,9 @@ MAP_CHALLENGES.forEach(c => {
   mapGlyphCache[c.id] = mapRg(c.name.length);
 });
 
+// Inject modal immediately so it exists before any click fires
+document.addEventListener('DOMContentLoaded', mapInjectModal);
+
 // ── MODAL (injected into body to avoid stacking context trap) ────────────────
 
 function mapInjectModal() {
