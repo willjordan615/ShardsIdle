@@ -1907,12 +1907,16 @@ function mapOpenModal(c) {
 
   const ov = document.getElementById('mapModalOverlay');
   ov.classList.add('visible');
-  // Drive visibility directly via style so modal works even if map.css fails to load
   ov.style.display = 'flex';
   ov.style.opacity = '1';
   ov.style.pointerEvents = 'all';
   const modal = document.getElementById('mapModal');
-  if (modal) modal.style.transform = 'translateY(0)';
+  if (modal) {
+    modal.style.display = 'block';
+    modal.style.width = '360px';
+    modal.style.minHeight = '200px';
+    modal.style.transform = 'translateY(0)';
+  }
 }
 
 window.mapCloseModal = function () {
