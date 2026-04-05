@@ -352,26 +352,28 @@
         <div id="consumableModal" style="display:none;"><div><div id="availableConsumablesList"></div><div id="beltList"></div></div></div>
 
         <!-- CHALLENGE SELECTION SCREEN -->
-        <div id="map" class="screen" style="padding:0; flex-direction:column; height:100%;">
-          <div class="nav-buttons" style="padding:10px 16px; flex-shrink:0; border-bottom:1px solid rgba(212,175,55,0.12);">
-            <button onclick="showScreen('detail')" class="secondary">← Back to Character</button>
-            <span style="font-family:'Cinzel',serif; font-size:10px; letter-spacing:3px; color:rgba(212,175,55,0.3); text-transform:uppercase; margin-left:16px;">The Silver Vale — Field Codex</span>
-          </div>
-          <div id="mapWrap" style="position:relative; width:100%; flex:1; overflow:hidden; min-height:400px;">
+        <div id="map" class="screen" style="padding:0;">
+          <div id="mapWrap">
             <img id="mapBgImg" src="/assets/map.png" alt="The Silver Vale"
-                 style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block;">
+                 style="position:absolute; inset:0; width:100%; height:100%; object-fit:contain; display:block; pointer-events:none;">
             <div style="position:absolute; inset:0; background:radial-gradient(ellipse 80% 70% at 55% 50%, transparent 40%, rgba(8,7,4,0.5) 100%); pointer-events:none; z-index:2;"></div>
             <div id="mapNodesLayer" style="position:absolute; inset:0; width:100%; height:100%; z-index:10;"></div>
-          </div>
-          <div style="display:flex; align-items:center; gap:16px; padding:8px 16px 10px; border-top:1px solid rgba(212,175,55,0.1); flex-shrink:0; background:rgba(10,9,5,0.8);">
-            <span style="font-family:'Cinzel',serif; font-size:9px; letter-spacing:2px; color:rgba(212,175,55,0.4); text-transform:uppercase; white-space:nowrap; flex-shrink:0;">
-              Level <span id="mapLevelDisplay" style="color:#c8a84b; font-family:'Crimson Text',serif; font-size:13px; letter-spacing:0;">—</span>
-            </span>
-            <div style="display:flex; gap:16px; margin-left:auto; flex-shrink:0;">
-              <div style="display:flex;align-items:center;gap:5px;font-size:9px;color:rgba(212,175,55,0.4);letter-spacing:1px;font-family:'Cinzel',serif;text-transform:uppercase;"><div style="width:7px;height:7px;border-radius:50%;background:#3a2a0a;border:1px solid #f0d070;box-shadow:0 0 4px #c8a84b88;flex-shrink:0;"></div>Active</div>
-              <div style="display:flex;align-items:center;gap:5px;font-size:9px;color:rgba(212,175,55,0.4);letter-spacing:1px;font-family:'Cinzel',serif;text-transform:uppercase;"><div style="width:7px;height:7px;border-radius:50%;background:#2a1e08;border:1px solid #c8a84b;flex-shrink:0;"></div>Available</div>
-              <div style="display:flex;align-items:center;gap:5px;font-size:9px;color:rgba(212,175,55,0.4);letter-spacing:1px;font-family:'Cinzel',serif;text-transform:uppercase;"><div style="width:7px;height:7px;border-radius:50%;background:#180f04;border:1px solid #6a5020;flex-shrink:0;"></div>Approaching</div>
-              <div style="display:flex;align-items:center;gap:5px;font-size:9px;color:rgba(212,175,55,0.4);letter-spacing:1px;font-family:'Cinzel',serif;text-transform:uppercase;"><div style="width:7px;height:7px;border-radius:50%;background:#0d0a05;border:1px solid #2a2010;opacity:0.6;flex-shrink:0;"></div>Unknown</div>
+            <!-- Nav overlaid top-left -->
+            <div style="position:absolute; top:0; left:0; right:0; z-index:30; display:flex; align-items:center; padding:10px 16px; background:linear-gradient(to bottom, rgba(5,4,2,0.7) 0%, transparent 100%); pointer-events:none;">
+              <button onclick="showScreen('detail')" class="secondary" style="pointer-events:all;">← Back to Character</button>
+              <span style="font-family:'Cinzel',serif; font-size:10px; letter-spacing:3px; color:rgba(212,175,55,0.3); text-transform:uppercase; margin-left:16px; pointer-events:none;">The Silver Vale — Field Codex</span>
+            </div>
+            <!-- Legend pinned to bottom -->
+            <div style="position:absolute; bottom:0; left:0; right:0; z-index:30; display:flex; align-items:center; gap:16px; padding:8px 16px 10px; background:linear-gradient(to top, rgba(5,4,2,0.8) 0%, transparent 100%);">
+              <span style="font-family:'Cinzel',serif; font-size:9px; letter-spacing:2px; color:rgba(212,175,55,0.4); text-transform:uppercase; white-space:nowrap; flex-shrink:0;">
+                Level <span id="mapLevelDisplay" style="color:#c8a84b; font-family:'Crimson Text',serif; font-size:13px; letter-spacing:0;">—</span>
+              </span>
+              <div style="display:flex; gap:16px; margin-left:auto; flex-shrink:0;">
+                <div style="display:flex;align-items:center;gap:5px;font-size:9px;color:rgba(212,175,55,0.4);letter-spacing:1px;font-family:'Cinzel',serif;text-transform:uppercase;"><div style="width:7px;height:7px;border-radius:50%;background:#3a2a0a;border:1px solid #f0d070;box-shadow:0 0 4px #c8a84b88;flex-shrink:0;"></div>Active</div>
+                <div style="display:flex;align-items:center;gap:5px;font-size:9px;color:rgba(212,175,55,0.4);letter-spacing:1px;font-family:'Cinzel',serif;text-transform:uppercase;"><div style="width:7px;height:7px;border-radius:50%;background:#2a1e08;border:1px solid #c8a84b;flex-shrink:0;"></div>Available</div>
+                <div style="display:flex;align-items:center;gap:5px;font-size:9px;color:rgba(212,175,55,0.4);letter-spacing:1px;font-family:'Cinzel',serif;text-transform:uppercase;"><div style="width:7px;height:7px;border-radius:50%;background:#180f04;border:1px solid #6a5020;flex-shrink:0;"></div>Approaching</div>
+                <div style="display:flex;align-items:center;gap:5px;font-size:9px;color:rgba(212,175,55,0.4);letter-spacing:1px;font-family:'Cinzel',serif;text-transform:uppercase;"><div style="width:7px;height:7px;border-radius:50%;background:#0d0a05;border:1px solid #2a2010;opacity:0.6;flex-shrink:0;"></div>Unknown</div>
+              </div>
             </div>
           </div>
         </div>

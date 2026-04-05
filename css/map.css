@@ -1,26 +1,30 @@
 /* ── MAP SCREEN ─────────────────────────────────────────────────────────── */
 
-/* Body and container don't have a fixed height, so we anchor the map screen
-   to the viewport height and let mapWrap (flex:1) fill the remainder. */
-body:has(#map.screen.active),
-body:has(#map.screen.active) html {
-    height: 100vh;
-    height: 100dvh;
+body:has(#map.screen.active) {
+    overflow: hidden;
 }
 body:has(#map.screen.active) .container {
-    height: 100vh;
-    height: 100dvh;
     max-width: 100%;
     padding: 0;
-    display: flex;
-    flex-direction: column;
 }
-
-#map.screen.active { display: flex !important; flex-direction: column; flex: 1; min-height: 0; animation: none; }
-
 body:has(#map.screen.active) #headerTopBar,
 body:has(#map.screen.active) header {
     display: none;
+}
+
+#map.screen.active {
+    display: block !important;
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    animation: none;
+}
+
+#mapWrap {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    cursor: grab;
 }
 
 .map-node-pip {
