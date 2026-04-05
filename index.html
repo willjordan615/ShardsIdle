@@ -67,20 +67,27 @@
         }
         .codex-section-label:first-child { margin-top: 0; }
     
+#map.screen.active{display:flex!important;flex-direction:column;}
 .map-node-pip{width:9px;height:9px;border-radius:50%;border:1px solid #2e2010;background:#120e06;transition:all .25s;flex-shrink:0}
-.map-node.state-available .map-node-pip{border-color:#c8a84b;background:#2a1e08;box-shadow:0 0 5px #c8a84b55,0 0 10px #c8a84b22}
-.map-node.state-active .map-node-pip{border-color:#f0d070;background:#3a2a0a;box-shadow:0 0 10px #c8a84b99;width:11px;height:11px;animation:mapNodePulse 2.5s ease-in-out infinite}
+.map-node.state-available #map.screen.active{display:flex!important;flex-direction:column;}
+.map-node-pip{border-color:#c8a84b;background:#2a1e08;box-shadow:0 0 5px #c8a84b55,0 0 10px #c8a84b22}
+.map-node.state-active #map.screen.active{display:flex!important;flex-direction:column;}
+.map-node-pip{border-color:#f0d070;background:#3a2a0a;box-shadow:0 0 10px #c8a84b99;width:11px;height:11px;animation:mapNodePulse 2.5s ease-in-out infinite}
 @keyframes mapNodePulse{0%,100%{box-shadow:0 0 10px #c8a84b99}50%{box-shadow:0 0 18px #c8a84bcc}}
-.map-node.state-locked .map-node-pip{border-color:#2a2010;background:#0d0a05;opacity:.55}
-.map-node.state-near .map-node-pip{border-color:#6a5020;background:#180f04;opacity:.75}
-.map-node:hover .map-node-pip{transform:scale(1.6)}
-.map-node.state-available:hover .map-node-pip,.map-node.state-active:hover .map-node-pip{box-shadow:0 0 16px #c8a84bcc}
+.map-node.state-locked #map.screen.active{display:flex!important;flex-direction:column;}
+.map-node-pip{border-color:#2a2010;background:#0d0a05;opacity:.55}
+.map-node.state-near #map.screen.active{display:flex!important;flex-direction:column;}
+.map-node-pip{border-color:#6a5020;background:#180f04;opacity:.75}
+.map-node:hover #map.screen.active{display:flex!important;flex-direction:column;}
+.map-node-pip{transform:scale(1.6)}
+.map-node.state-available:hover .map-node-pip,.map-node.state-active:hover #map.screen.active{display:flex!important;flex-direction:column;}
+.map-node-pip{box-shadow:0 0 16px #c8a84bcc}
 .map-node-label{font-family:'Crimson Text',serif;font-size:8.5px;line-height:1.2;text-align:center;white-space:nowrap;max-width:84px;overflow:hidden;text-overflow:ellipsis;pointer-events:none;text-shadow:0 1px 3px rgba(0,0,0,.95),0 0 8px rgba(0,0,0,.8)}
 .map-node.state-available .map-node-label{color:#b09040}
 .map-node.state-active .map-node-label{color:#d4b050}
 .map-node.state-locked .map-node-label{color:#3a2a12}
 .map-node.state-near .map-node-label{color:#5a3e18}
-#mapModalOverlay.visible{opacity:1!important;pointer-events:all!important}
+#mapModalOverlay.visible{display:flex!important;opacity:1!important;pointer-events:all!important}
 #mapModalOverlay.visible #mapModal{transform:translateY(0)!important}
 #mapBtnSelect:disabled{opacity:.35;cursor:not-allowed}
 
@@ -368,7 +375,7 @@
         <div id="consumableModal" style="display:none;"><div><div id="availableConsumablesList"></div><div id="beltList"></div></div></div>
 
         <!-- CHALLENGE SELECTION SCREEN -->
-        <div id="map" class="screen" style="padding:0; display:flex; flex-direction:column; height:100%;">
+        <div id="map" class="screen" style="padding:0; flex-direction:column; height:100%;">
           <div class="nav-buttons" style="padding:10px 16px; flex-shrink:0; border-bottom:1px solid rgba(212,175,55,0.12);">
             <button onclick="showScreen('detail')" class="secondary">← Back to Character</button>
             <span style="font-family:'Cinzel',serif; font-size:10px; letter-spacing:3px; color:rgba(212,175,55,0.3); text-transform:uppercase; margin-left:16px;">The Silver Vale — Field Codex</span>
@@ -391,7 +398,7 @@
             </div>
           </div>
           <!-- Challenge modal -->
-          <div id="mapModalOverlay" style="position:fixed;inset:0;background:rgba(5,4,2,0.72);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s;">
+          <div id="mapModalOverlay" style="position:fixed;inset:0;background:rgba(5,4,2,0.72);z-index:1000;display:none;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s;">
             <div id="mapModal" style="background:#0f0d07;border:1px solid #2e2410;width:360px;max-width:90vw;position:relative;transform:translateY(12px);transition:transform 0.2s;">
               <button onclick="mapCloseModal()" style="position:absolute;top:12px;right:14px;background:none;border:none;color:#3a2a10;font-size:16px;cursor:pointer;line-height:1;">×</button>
               <div style="padding:18px 20px 14px;border-bottom:1px solid #1e1a0a;">
@@ -1935,8 +1942,138 @@ window.initMapScreen=async function(characterId){
     const lvl=char?.level||1;
     document.getElementById('mapLevelDisplay').textContent=lvl;
     mapBuildNodes(lvl);
-  }catch(e){console.warn('[MAP] Could not load character level',e);mapBuildNodes(1);}
+    mapInitPanZoom();
+  }catch(e){console.warn('[MAP] Could not load character level',e);mapBuildNodes(1);mapInitPanZoom();}
 };
+
+// ── PAN & ZOOM ──────────────────────────────────────────────────────────────
+function mapInitPanZoom(){
+  const wrap=document.getElementById('mapWrap');
+  const layer=document.getElementById('mapNodesLayer');
+  const img=document.getElementById('mapBgImg');
+  if(!wrap||!layer||!img||wrap._panZoomInit)return;
+  wrap._panZoomInit=true;
+
+  // Inner container that we transform
+  const inner=document.createElement('div');
+  inner.id='mapInner';
+  inner.style.cssText='position:absolute;inset:0;width:100%;height:100%;transform-origin:0 0;will-change:transform;';
+  // Move img and nodesLayer inside inner
+  wrap.appendChild(inner);
+  inner.appendChild(img);
+  inner.appendChild(layer);
+  // Move vignette inside too
+  const vig=wrap.querySelector('div[style*="radial-gradient"]');
+  if(vig)inner.appendChild(vig);
+
+  img.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;';
+
+  let scale=1,panX=0,panY=0;
+  let dragging=false,startX=0,startY=0,startPanX=0,startPanY=0;
+  const MIN=0.5,MAX=3;
+
+  function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v));}
+
+  function applyTransform(){
+    // Clamp pan so map stays mostly in view
+    const ww=wrap.offsetWidth,wh=wrap.offsetHeight;
+    const iw=ww*scale,ih=wh*scale;
+    panX=clamp(panX,Math.min(0,ww-iw),Math.max(0,ww-iw));
+    panY=clamp(panY,Math.min(0,wh-ih),Math.max(0,wh-ih));
+    inner.style.transform=`translate(${panX}px,${panY}px) scale(${scale})`;
+  }
+
+  // Mouse wheel zoom
+  wrap.addEventListener('wheel',e=>{
+    e.preventDefault();
+    const rect=wrap.getBoundingClientRect();
+    const mx=e.clientX-rect.left,my=e.clientY-rect.top;
+    const delta=e.deltaY<0?1.1:0.9;
+    const newScale=clamp(scale*delta,MIN,MAX);
+    // Zoom toward mouse position
+    panX=mx-(mx-panX)*(newScale/scale);
+    panY=my-(my-panY)*(newScale/scale);
+    scale=newScale;
+    applyTransform();
+  },{passive:false});
+
+  // Mouse drag pan
+  wrap.addEventListener('mousedown',e=>{
+    if(e.button!==0)return;
+    dragging=true;startX=e.clientX;startY=e.clientY;
+    startPanX=panX;startPanY=panY;
+    wrap.style.cursor='grabbing';
+  });
+  window.addEventListener('mousemove',e=>{
+    if(!dragging)return;
+    panX=startPanX+(e.clientX-startX);
+    panY=startPanY+(e.clientY-startY);
+    applyTransform();
+  });
+  window.addEventListener('mouseup',()=>{dragging=false;wrap.style.cursor='';});
+
+  // Touch pan/pinch zoom
+  let touches={},lastDist=null;
+  wrap.addEventListener('touchstart',e=>{
+    Array.from(e.changedTouches).forEach(t=>touches[t.identifier]={x:t.clientX,y:t.clientY});
+    if(Object.keys(touches).length===1){
+      const t=e.touches[0];
+      dragging=true;startX=t.clientX;startY=t.clientY;startPanX=panX;startPanY=panY;
+    }
+    lastDist=null;
+  },{passive:true});
+  wrap.addEventListener('touchmove',e=>{
+    e.preventDefault();
+    if(e.touches.length===2){
+      dragging=false;
+      const a=e.touches[0],b=e.touches[1];
+      const dist=Math.hypot(b.clientX-a.clientX,b.clientY-a.clientY);
+      if(lastDist){
+        const rect=wrap.getBoundingClientRect();
+        const mx=(a.clientX+b.clientX)/2-rect.left;
+        const my=(a.clientY+b.clientY)/2-rect.top;
+        const delta=dist/lastDist;
+        const newScale=clamp(scale*delta,MIN,MAX);
+        panX=mx-(mx-panX)*(newScale/scale);
+        panY=my-(my-panY)*(newScale/scale);
+        scale=newScale;
+        applyTransform();
+      }
+      lastDist=dist;
+    } else if(e.touches.length===1&&dragging){
+      const t=e.touches[0];
+      panX=startPanX+(t.clientX-startX);
+      panY=startPanY+(t.clientY-startY);
+      applyTransform();
+    }
+  },{passive:false});
+  wrap.addEventListener('touchend',e=>{
+    Array.from(e.changedTouches).forEach(t=>delete touches[t.identifier]);
+    if(Object.keys(touches).length===0){dragging=false;lastDist=null;}
+  },{passive:true});
+
+  // Zoom controls
+  const controls=document.createElement('div');
+  controls.style.cssText='position:absolute;bottom:12px;right:12px;z-index:50;display:flex;flex-direction:column;gap:4px;';
+  controls.innerHTML=`
+    <button onclick="mapZoom(1.25)" style="width:28px;height:28px;background:#0f0d07;border:1px solid #2e2410;color:#c8a84b;font-size:16px;cursor:pointer;line-height:1;">+</button>
+    <button onclick="mapZoom(0.8)" style="width:28px;height:28px;background:#0f0d07;border:1px solid #2e2410;color:#c8a84b;font-size:16px;cursor:pointer;line-height:1;">−</button>
+    <button onclick="mapResetView()" style="width:28px;height:28px;background:#0f0d07;border:1px solid #2e2410;color:#c8a84b;font-size:10px;cursor:pointer;line-height:1;" title="Reset">⌂</button>
+  `;
+  wrap.appendChild(controls);
+
+  window.mapZoom=function(delta){
+    const ww=wrap.offsetWidth,wh=wrap.offsetHeight;
+    const mx=ww/2,my=wh/2;
+    const newScale=clamp(scale*delta,MIN,MAX);
+    panX=mx-(mx-panX)*(newScale/scale);
+    panY=my-(my-panY)*(newScale/scale);
+    scale=newScale;applyTransform();
+  };
+  window.mapResetView=function(){scale=1;panX=0;panY=0;applyTransform();};
+  wrap.style.cursor='grab';
+  applyTransform();
+}
 })();
 </script>
 
