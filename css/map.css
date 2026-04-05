@@ -38,8 +38,8 @@ body:has(#map.screen.active) header {
 .map-node.state-available .map-node-pip { border-color: var(--gold); background: var(--ink-mid); box-shadow: 0 0 10px rgba(212,175,55,0.33), 0 0 20px rgba(212,175,55,0.13); }
 .map-node.state-active    .map-node-pip { border-color: var(--gold-bright); background: var(--ink-surface); box-shadow: 0 0 20px rgba(212,175,55,0.6); width: 22px; height: 22px; animation: mapNodePulse 2.5s ease-in-out infinite; }
 .map-node.state-locked    .map-node-pip { border-color: var(--gold-border); background: var(--ink-deep); opacity: .55; }
-.map-node.state-near      .map-node-pip { border-color: var(--red); background: var(--ink-dark); opacity: .85; }
-.map-node.state-approaching .map-node-pip { border-color: var(--red); background: var(--ink-deep); opacity: .45; }
+.map-node.state-near      .map-node-pip { border-color: #6b3030; background: var(--ink-deep); opacity: .7; }
+.map-node.state-approaching .map-node-pip { border-color: #3a2020; background: var(--ink-deep); opacity: .4; }
 .map-node:hover                   .map-node-pip { transform: scale(1.6); }
 .map-node.state-available:hover   .map-node-pip,
 .map-node.state-active:hover      .map-node-pip { box-shadow: 0 0 32px rgba(212,175,55,0.8); }
@@ -63,9 +63,9 @@ body:has(#map.screen.active) header {
 }
 .map-node.state-available .map-node-label { color: var(--gold); }
 .map-node.state-active    .map-node-label { color: var(--gold-bright); }
-.map-node.state-locked    .map-node-label { color: var(--text-muted); }
-.map-node.state-near      .map-node-label { color: var(--red); }
-.map-node.state-approaching .map-node-label { color: var(--text-muted); opacity: .6; }
+.map-node.state-locked    .map-node-label { color: var(--text-muted); opacity: .5; }
+.map-node.state-near      .map-node-label { color: #6b3030; opacity: .7; }
+.map-node.state-approaching .map-node-label { color: var(--text-muted); opacity: .35; }
 
 /* ── MODAL ──────────────────────────────────────────────────────────────── */
 

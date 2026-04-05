@@ -2027,27 +2027,16 @@ function mapBuildNodes(level) {
       pip.style.fontFamily = 'var(--font-display)';
       pip.style.fontWeight = '700';
       pip.style.letterSpacing = '0';
-      if (level >= c.minLvl + 10) {
-        // Significantly overleveled — green
-        pip.style.borderColor = 'var(--green)';
-        pip.style.color = 'var(--green)';
-        pip.style.boxShadow = '0 0 10px rgba(76,217,100,0.4)';
-      } else if (level >= c.minLvl + 3) {
-        // Slightly overleveled — gold-green
-        pip.style.borderColor = '#a0c840';
-        pip.style.color = '#a0c840';
-        pip.style.boxShadow = '0 0 10px rgba(160,200,64,0.3)';
-      } else if (level >= c.minLvl) {
-        // At level — gold
-        pip.style.borderColor = '';
-        pip.style.color = 'var(--gold)';
-        pip.style.boxShadow = '';
-      } else {
-        // Shouldn't hit this for available, but fallback
-        pip.style.borderColor = '';
-        pip.style.color = 'var(--gold)';
-        pip.style.boxShadow = '';
-      }
+      // Continuous gradient: gold at minLvl, redder as level drops below minLvl
+      // t=0 is at minLvl (gold), t=1 is 21 levels below (deep red)
+      const t = Math.max(0, Math.min(1, (c.minLvl - level) / 21));
+      const r = Math.round(212 + (160 - 212) * t);   // 212 → 160
+      const g = Math.round(175 + (40  - 175) * t);   // 175 → 40
+      const b = Math.round(55  + (40  - 55)  * t);   // 55  → 40
+      const pipColor = `rgb(${r},${g},${b})`;
+      pip.style.borderColor = pipColor;
+      pip.style.color = pipColor;
+      pip.style.boxShadow = t > 0.5 ? '' : `0 0 8px rgba(${r},${g},${b},0.3)`;
     } else if (pip && newState === 'near') {
       // Show level but muted red — approaching but not ready
       pip.textContent = c.diff;
@@ -2057,12 +2046,21 @@ function mapBuildNodes(level) {
       pip.style.justifyContent = 'center';
       pip.style.fontFamily = 'var(--font-display)';
       pip.style.fontWeight = '700';
-      pip.style.color = 'var(--red)';
-      pip.style.borderColor = 'var(--red)';
-      pip.style.boxShadow = '0 0 8px rgba(232,72,74,0.3)';
+      const tNear = Math.max(0, Math.min(1, (c.minLvl - level) / 21));
+      const rN = Math.round(212 + (140 - 212) * tNear);
+      const gN = Math.round(175 + (30  - 175) * tNear);
+      const bN = Math.round(55  + (30  - 55)  * tNear);
+      const nearColor = `rgba(${rN},${gN},${bN},0.6)`;
+      pip.style.color = nearColor;
+      pip.style.borderColor = nearColor;
+      pip.style.boxShadow = '';
     } else if (pip && newState === 'approaching') {
       pip.textContent = '';
-      pip.style.borderColor = 'var(--red)';
+      const tApp = Math.max(0, Math.min(1, (c.minLvl - level) / 21));
+      const rA = Math.round(212 + (100 - 212) * tApp);
+      const gA = Math.round(175 + (20  - 175) * tApp);
+      const bA = Math.round(55  + (20  - 55)  * tApp);
+      pip.style.borderColor = `rgba(${rA},${gA},${bA},0.35)`;
       pip.style.color = '';
       pip.style.boxShadow = '';
       pip.style.display = '';
@@ -2078,7 +2076,7 @@ function mapBuildNodes(level) {
       if (revealing) { lbl.textContent = mapGlyphCache[c.id]; mapStartScramble(c.id, c.name, lbl); }
       else if (!mapScrambles[c.id]) lbl.textContent = c.name;
     } else if (newState === 'near') {
-      mapStartScrambleLoop(c.id, c.name.length, lbl);
+      mapStartScrambleLoop(c.id, Math.ceil(c.name.length * 0.5), lbl);
     } else if (newState === 'approaching') {
       if (mapScrambles[c.id]) { clearInterval(mapScrambles[c.id]); delete mapScrambles[c.id]; }
       lbl.textContent = mapGlyphCache[c.id].slice(0, Math.ceil(c.name.length * 0.4));
