@@ -2,12 +2,14 @@
 
 /* Body and container don't have a fixed height, so we anchor the map screen
    to the viewport height and let mapWrap (flex:1) fill the remainder. */
-body:has(#map.screen.active) {
+body:has(#map.screen.active),
+body:has(#map.screen.active) html {
     height: 100vh;
     height: 100dvh;
 }
 body:has(#map.screen.active) .container {
-    height: 100%;
+    height: 100vh;
+    height: 100dvh;
     max-width: 100%;
     padding: 0;
     display: flex;
