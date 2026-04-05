@@ -140,8 +140,7 @@ function toggleLore(id) {
  */
 function selectCharacterForChallenge(characterId) {
     currentState.detailCharacterId = characterId;
-    window.initMapScreen(characterId);
-    showScreen('map');
+    window.initMapScreen(characterId).then(() => showScreen('map'));
 }
 
 /**
