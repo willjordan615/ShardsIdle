@@ -1979,7 +1979,25 @@ function mapInitPanZoom() {
     }
   }, {passive: false});
   wrap.addEventListener('touchend', e => {
-    Array.from(e.changedTouches).forEach(t => delete touches[t.identifier]);
+    Array.from(e.changedTouches).forEach(t => {
+      // Tap detection: if the touch didn't move much, treat as a click on the node
+      if (Object.keys(touches).length === 1) {
+        const start = touches[t.identifier];
+        const dx = Math.abs(t.clientX - start.x);
+        const dy = Math.abs(t.clientY - start.y);
+        if (dx < 8 && dy < 8) {
+          // Find the map-node element at the tap point
+          const el = document.elementFromPoint(t.clientX, t.clientY);
+          const node = el && (el.closest ? el.closest('.map-node') : null);
+          if (node) {
+            const nodeId = node.id.replace('mapnode-', '');
+            const c = MAP_CHALLENGES.find(ch => ch.id === nodeId);
+            if (c) mapOpenModal(c);
+          }
+        }
+      }
+      delete touches[t.identifier];
+    });
     if (Object.keys(touches).length === 0) { dragging = false; lastDist = null; }
   }, {passive: true});
 
@@ -2015,4 +2033,4 @@ function mapInitPanZoom() {
 
     </script>
 
-</body>
+    </body>
