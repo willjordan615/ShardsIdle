@@ -1872,7 +1872,7 @@ function mapInjectModal() {
     const btn = document.getElementById('mapBtnSelect');
     if (!mapCurrentChallenge || btn.disabled) return;
     const full = window.gameData && window.gameData.challenges
-      ? window.gameData.challenges.find(c => c.id === mapCurrentChallenge.id)
+      ? window.gameData.challenges.find(c => c.id === mapCurrentChallenge.id || c.id === 'challenge_' + mapCurrentChallenge.id)
       : null;
     if (full && typeof selectChallenge === 'function') {
       mapCloseModal();
@@ -1888,14 +1888,30 @@ function mapOpenModal(c) {
   const s = mapNodeStates[c.id];
   const locked = s === 'locked' || s === 'near';
 
+  // Pull full data from gameData if available
+  const full = window.gameData && window.gameData.challenges
+    ? window.gameData.challenges.find(gc => gc.id === c.id || gc.id === 'challenge_' + c.id)
+    : null;
+
   document.getElementById('mapModalName').textContent = locked ? '???' : c.name;
   document.getElementById('mapModalDiff').textContent = locked
     ? '· · · · ·'
     : '✦'.repeat(Math.min(c.diff, 8)) + (c.diff > 8 ? '+' : '') + '  d' + c.diff;
   document.getElementById('mapModalTags').textContent = locked ? 'unknown territory' : c.tags.join(' · ');
-  document.getElementById('mapModalLore').textContent = locked
-    ? 'Your knowledge of this place has not yet surfaced from the deep.'
-    : c.lore;
+
+  // Use full description from gameData if available, fall back to hardcoded lore
+  const loreEl = document.getElementById('mapModalLore');
+  if (locked) {
+    loreEl.innerHTML = '<em>Your knowledge of this place has not yet surfaced from the deep.</em>';
+  } else if (full) {
+    loreEl.innerHTML = `
+      <div style="margin-bottom:8px;">${full.description || c.lore}</div>
+      <div style="font-size:11px;color:#6a5020;margin-bottom:4px;">Recommended Level: <span style="color:#c8a84b;">${full.recommendedLevel}</span></div>
+      <div style="font-size:11px;color:#6a5020;">Party: <span style="color:#c8a84b;">${full.minPartySize}–${full.maxPartySize} members</span></div>
+    `;
+  } else {
+    loreEl.innerHTML = `<em>${c.lore}</em>`;
+  }
 
   const st = document.getElementById('mapModalStatus');
   st.textContent = {available: '— available', active: '— active', locked: '— beyond your sight', near: '— coming into focus'}[s] || '';
