@@ -1968,7 +1968,7 @@ function mapStartScramble(id, name, el) {
 // ── NODE STATE ───────────────────────────────────────────────────────────────
 
 function mapGetState(c, lvl) {
-  return lvl >= c.minLvl ? 'available' : lvl >= c.minLvl - 10 ? 'near' : 'locked';
+  return lvl >= c.minLvl ? 'available' : lvl >= c.minLvl - 20 ? 'near' : 'locked';
 }
 
 // ── BUILD NODES ──────────────────────────────────────────────────────────────
@@ -2006,7 +2006,7 @@ function mapBuildNodes(level) {
     // Level number and color inside pip for available nodes
     const pip = document.getElementById('mappip-' + c.id);
     if (pip && (newState === 'available' || newState === 'active')) {
-      pip.textContent = c.minLvl;
+      pip.textContent = c.diff;
       pip.style.fontSize = '9px';
       pip.style.display = 'flex';
       pip.style.alignItems = 'center';
@@ -2037,7 +2037,7 @@ function mapBuildNodes(level) {
       }
     } else if (pip && newState === 'near') {
       // Show level but muted red — approaching but not ready
-      pip.textContent = c.minLvl;
+      pip.textContent = c.diff;
       pip.style.fontSize = '9px';
       pip.style.display = 'flex';
       pip.style.alignItems = 'center';
