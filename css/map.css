@@ -17,7 +17,10 @@ body:has(#map.screen.active) .container {
 
 #map.screen.active { display: flex !important; flex-direction: column; flex: 1; min-height: 0; }
 
-/* ── NODES ──────────────────────────────────────────────────────────────── */
+body:has(#map.screen.active) #headerTopBar,
+body:has(#map.screen.active) header {
+    display: none;
+}
 
 .map-node-pip {
   width: 9px; height: 9px;

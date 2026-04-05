@@ -134,11 +134,22 @@ function mapOpenModal(c) {
   btn.disabled = locked;
   btn.textContent = s === 'active' ? 'Currently Running' : 'Select Challenge';
 
-  document.getElementById('mapModalOverlay').classList.add('visible');
+  const ov = document.getElementById('mapModalOverlay');
+  ov.classList.add('visible');
+  // Drive visibility directly via style so modal works even if map.css fails to load
+  ov.style.display = 'flex';
+  ov.style.opacity = '1';
+  ov.style.pointerEvents = 'all';
+  const modal = document.getElementById('mapModal');
+  if (modal) modal.style.transform = 'translateY(0)';
 }
 
 window.mapCloseModal = function () {
-  document.getElementById('mapModalOverlay').classList.remove('visible');
+  const ov = document.getElementById('mapModalOverlay');
+  ov.classList.remove('visible');
+  ov.style.display = 'none';
+  ov.style.opacity = '0';
+  ov.style.pointerEvents = 'none';
   mapCurrentChallenge = null;
 };
 
@@ -290,13 +301,14 @@ function mapInitPanZoom() {
 
   let touches = {}, lastDist = null;
   wrap.addEventListener('touchstart', e => {
+    e.preventDefault();
     Array.from(e.changedTouches).forEach(t => touches[t.identifier] = {x: t.clientX, y: t.clientY});
     if (Object.keys(touches).length === 1) {
       const t = e.touches[0];
       dragging = true; startX = t.clientX; startY = t.clientY; startPanX = panX; startPanY = panY;
     }
     lastDist = null;
-  }, {passive: true});
+  }, {passive: false});
   wrap.addEventListener('touchmove', e => {
     e.preventDefault();
     if (e.touches.length === 2) {
