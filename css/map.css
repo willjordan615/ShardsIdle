@@ -1,0 +1,66 @@
+/* ── MAP SCREEN ─────────────────────────────────────────────────────────── */
+
+#map.screen.active { display: flex !important; flex-direction: column; }
+
+/* ── NODES ──────────────────────────────────────────────────────────────── */
+
+.map-node-pip {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  border: 1px solid #2e2010;
+  background: #120e06;
+  transition: all .25s;
+  flex-shrink: 0;
+}
+.map-node.state-available .map-node-pip { border-color: #c8a84b; background: #2a1e08; box-shadow: 0 0 5px #c8a84b55, 0 0 10px #c8a84b22; }
+.map-node.state-active    .map-node-pip { border-color: #f0d070; background: #3a2a0a; box-shadow: 0 0 10px #c8a84b99; width: 11px; height: 11px; animation: mapNodePulse 2.5s ease-in-out infinite; }
+.map-node.state-locked    .map-node-pip { border-color: #2a2010; background: #0d0a05; opacity: .55; }
+.map-node.state-near      .map-node-pip { border-color: #6a5020; background: #180f04; opacity: .75; }
+.map-node:hover                   .map-node-pip { transform: scale(1.6); }
+.map-node.state-available:hover   .map-node-pip,
+.map-node.state-active:hover      .map-node-pip { box-shadow: 0 0 16px #c8a84bcc; }
+
+@keyframes mapNodePulse {
+  0%, 100% { box-shadow: 0 0 10px #c8a84b99; }
+  50%       { box-shadow: 0 0 18px #c8a84bcc; }
+}
+
+.map-node-label {
+  font-family: 'Crimson Text', serif;
+  font-size: 8.5px;
+  line-height: 1.2;
+  text-align: center;
+  white-space: nowrap;
+  max-width: 84px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+  text-shadow: 0 1px 3px rgba(0,0,0,.95), 0 0 8px rgba(0,0,0,.8);
+}
+.map-node.state-available .map-node-label { color: #b09040; }
+.map-node.state-active    .map-node-label { color: #d4b050; }
+.map-node.state-locked    .map-node-label { color: #3a2a12; }
+.map-node.state-near      .map-node-label { color: #5a3e18; }
+
+/* ── MODAL ──────────────────────────────────────────────────────────────── */
+
+#mapModalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5,4,2,0.72);
+  z-index: 10000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+#mapModalOverlay.visible {
+  display: flex !important;
+  opacity: 1 !important;
+  pointer-events: all !important;
+}
+#mapModalOverlay.visible #mapModal { transform: translateY(0) !important; }
+
+#mapBtnSelect:disabled { opacity: .35; cursor: not-allowed; }
