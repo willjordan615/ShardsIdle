@@ -1524,6 +1524,7 @@
 
                 <!-- Tabs — reuse settings-tab classes -->
                 <div class="settings-tabs" style="margin:0; border-radius:0; flex-shrink:0; padding:0 0.5rem;">
+                    <button class="settings-tab"                     id="codex-tab-guide"   onclick="switchCodexTab('guide')">How to Play</button>
                     <button class="settings-tab settings-tab-active" id="codex-tab-skills"  onclick="switchCodexTab('skills')">Skills</button>
                     <button class="settings-tab"                     id="codex-tab-combos"  onclick="switchCodexTab('combos')">Combinations</button>
                     <button class="settings-tab"                     id="codex-tab-stats"   onclick="switchCodexTab('stats')">Statistics</button>
@@ -1533,6 +1534,38 @@
 
                 <!-- Scrollable content -->
                 <div style="overflow-y:auto; padding:1.4rem 1.5rem; flex:1; scrollbar-width:thin; scrollbar-color:var(--gold-dim) transparent;">
+
+                    <!-- ── HOW TO PLAY ── -->
+                    <div id="codex-pane-guide" style="display:none;">
+
+                        <div class="codex-section-label">The Game Loop</div>
+                        <p>Shards Idle is an asynchronous idle RPG. You build a party, select a challenge, and let combat run. The game observes how long your party takes to complete a run, then uses that average to simulate wins and losses over time — even when you're not watching. Come back later to collect rewards, upgrade your loadout, and push to harder content.</p>
+                        <p>You don't need to watch every fight. You're meant to check in, adjust, and leave again.</p>
+
+                        <div class="codex-section-label">Party Composition</div>
+                        <p>The game is designed around a party of four. Your character is one slot — the other three are filled by other players' characters or <strong style="color:var(--gold-bright);">bots</strong>. Bots are functional but limited: they use basic skill selections and don't adapt the way a real character does. A party of real players will consistently outperform a bot-filled one. Use the party formation screen to invite other players when you can.</p>
+
+                        <div class="codex-section-label">Skills</div>
+                        <p>Your character equips two active skills that fire in combat. Skills are learned from loot drops and upgraded over time. What you equip shapes how the combat AI plays your character — a healer-spec'd character should have healing skills equipped, not damage ones. The <strong style="color:var(--gold-bright);">Skills</strong> tab in this codex covers the full skill system, starter skills, and how skill combinations work.</p>
+
+                        <div class="codex-section-label">Gear and Consumables</div>
+                        <p>Gear drops from challenge loot tables and improves your stats directly. Higher-tier gear scales with challenge difficulty — there's no point farming tier 0 gear past the early game. Consumables sit in your belt slots and are used automatically in combat according to your combat style. Stock them before a run and they'll fire when the conditions are right.</p>
+
+                        <div class="codex-section-label">Selecting a Challenge</div>
+                        <p>From the character screen, use <strong style="color:var(--gold-bright);">Go to Map</strong> to open the Silver Vale. Challenges are pinned to the map — click a node to see its difficulty, lore, and requirements, then select it to proceed to party formation. Challenges you're close to in level will be visible; ones far above you will be obscured.</p>
+
+                        <div class="codex-section-label">Early Challenges</div>
+                        <p>The first few difficulty tiers are short and meant to be cleared quickly. Don't sit on the starting challenge longer than it takes to get a weapon upgrade and a feel for the combat log. Move up. The game opens up once you're past the tutorial tier.</p>
+
+                        <div class="codex-section-label">Reading the Combat Log</div>
+                        <p>Open the combat log and watch a full run. A single run gives you a real completion time — the game uses that as your baseline for idle simulation. A minute or two of observation is enough to know whether your party is comfortable with a challenge or struggling. If runs are timing out or ending in wipes, your gear or party composition needs work before you go idle.</p>
+                        <p>When you're ready to change challenges — close the idle loop, swap skills or gear on your character, update your party, and select a new challenge from the map. The loop resets cleanly.</p>
+
+                        <div style="margin-top:2rem; padding-top:1.2rem; border-top:1px solid var(--gold-border); display:flex; justify-content:flex-end;">
+                            <button onclick="dismissGuideForever()" style="font-family:var(--font-display); font-size:0.78rem; letter-spacing:0.1em; text-transform:uppercase; background:var(--ink-mid); color:var(--gold); border:1px solid var(--gold-border); padding:0.6rem 1.2rem; cursor:pointer; transition:all 0.2s;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--gold-border)'">Got it — don't show again</button>
+                        </div>
+
+                    </div>
 
                     <!-- ── SKILLS ── -->
                     <div id="codex-pane-skills">
@@ -1713,7 +1746,7 @@
         'Prayer','Produce Flame','Rest','Sense','Shock','Shout','Shove'
     ];
 
-    function openCodexModal() {
+    function openCodexModal(tab) {
         const pills = document.getElementById('codex-starter-pills');
         if (pills && !pills.dataset.rendered) {
             pills.innerHTML = _CODEX_STARTERS.map(s =>
@@ -1722,7 +1755,7 @@
             pills.dataset.rendered = '1';
         }
         document.getElementById('codexModal').style.display = 'block';
-        switchCodexTab('skills');
+        switchCodexTab(tab || 'skills');
     }
 
     function closeCodexModal() {
@@ -1730,7 +1763,7 @@
     }
 
     function switchCodexTab(tab) {
-        ['skills','combos','stats','combat','statuses'].forEach(t => {
+        ['guide','skills','combos','stats','combat','statuses'].forEach(t => {
             document.getElementById('codex-pane-' + t).style.display = t === tab ? '' : 'none';
             const btn = document.getElementById('codex-tab-' + t);
             if (btn) {
@@ -1738,6 +1771,11 @@
             }
         });
         if (tab === 'statuses') _renderCodexStatuses();
+    }
+
+    function dismissGuideForever() {
+        localStorage.setItem('si_guide_dismissed', '1');
+        closeCodexModal();
     }
 
     function _renderCodexStatuses() {

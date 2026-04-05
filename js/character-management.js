@@ -758,6 +758,7 @@ async function createCharacter() {
     }
     
     messagesDiv.innerHTML = '<p style="color: #4eff7f;">Character created successfully!</p>';
+    if (!localStorage.getItem('si_guide_dismissed')) localStorage.setItem('si_guide_pending', '1');
     _unlock();
     
     setTimeout(() => {
@@ -1073,6 +1074,10 @@ async function showCharacterDetail(characterId, opts = {}) {
         if (!silent) {
             showScreen('detail');
             if (typeof updateChallengeStatusBanner === 'function') updateChallengeStatusBanner();
+            if (localStorage.getItem('si_guide_pending') && !localStorage.getItem('si_guide_dismissed')) {
+                localStorage.removeItem('si_guide_pending');
+                if (typeof openCodexModal === 'function') openCodexModal('guide');
+            }
 
             if (hasXPHistory && xpBarEl) {
                 const prevXPToNext = getXPToNextLevel(opts.prevLevel);
