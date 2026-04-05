@@ -15,7 +15,7 @@ body:has(#map.screen.active) .container {
     flex-direction: column;
 }
 
-#map.screen.active { display: flex !important; flex-direction: column; flex: 1; min-height: 0; }
+#map.screen.active { display: flex !important; flex-direction: column; flex: 1; min-height: 0; animation: none; }
 
 body:has(#map.screen.active) #headerTopBar,
 body:has(#map.screen.active) header {
