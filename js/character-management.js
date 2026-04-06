@@ -699,6 +699,24 @@ async function createCharacter() {
                     lastUsed: null
                 });
             }
+            // Seed all root starter skills (no parentSkills) at level 0
+            // so they appear in the skill web from day one
+            const allSkills = window.gameData?.skills || [];
+            const starterIds = allSkills
+                .filter(s => !s.parentSkills || s.parentSkills.length === 0)
+                .map(s => s.id);
+            starterIds.forEach(id => {
+                if (!equipped.some(s => s.skillID === id)) {
+                    equipped.push({
+                        skillID: id,
+                        learned: true,
+                        usageCount: 0,
+                        skillXP: 0,
+                        skillLevel: 0,
+                        lastUsed: null
+                    });
+                }
+            });
             return equipped;
         })(),
         consumables: {},

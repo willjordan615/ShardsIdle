@@ -29,9 +29,10 @@
     const COLOR_DISC_TEXT   = '#e8e0d0';
     const COLOR_REACH       = '#3a4a6a';
     const COLOR_REACH_TEXT  = '#7a9acc';
-    const COLOR_EDGE_OWNED  = 'rgba(212,175,55,0.55)';
-    const COLOR_EDGE_DISC   = 'rgba(139,115,85,0.35)';
-    const COLOR_EDGE_REACH  = 'rgba(58,74,106,0.3)';
+    const COLOR_EDGE_OWNED    = 'rgba(212,175,55,0.55)';
+    const COLOR_EDGE_DISC     = 'rgba(139,115,85,0.35)';
+    const COLOR_EDGE_REACH    = 'rgba(58,74,106,0.3)';
+    const COLOR_EDGE_REVEALED = 'rgba(212,175,55,0.9)';
     const UNLOCK_XP         = 120;
 
     // ── State ────────────────────────────────────────────────────────────────
@@ -80,6 +81,7 @@
         return ids;
     }
 
+
     function _skillRecord(id) {
         return (_character.skills || []).find(s => s.skillID === id) || null;
     }
@@ -115,11 +117,8 @@
                 const state = (rec && rec.skillLevel >= 1) ? 'owned' : 'discovering';
                 visible.set(skill.id, { skill, state, rec, knownParents });
             } else if (knownParents.length >= 1) {
-                // Name revealed if any known parent is level 3+, or if player purchased reveal
-                const parentLevelRevealed = knownParents.some(pid => {
-                    const rec = _skillRecord(pid);
-                    return rec && rec.skillLevel >= 3;
-                });
+                // Name revealed if any known parent is owned (any level), or if player purchased reveal
+                const parentLevelRevealed = knownParents.some(pid => !!_skillRecord(pid));
                 const purchaseRevealed = (_character.revealedParents || []).includes(skill.id);
                 const nameRevealed = parentLevelRevealed || purchaseRevealed;
                 visible.set(skill.id, { skill, state: 'reachable', knownParents, nameRevealed, purchaseRevealed });
@@ -171,10 +170,12 @@
                 if (!visible.has(pid)) return;
                 const pNode = visible.get(pid);
                 const childState = node.state;
+                const isRevealed = childState === 'reachable' && (_character.revealedParents || []).includes(id);
                 const color = childState === 'owned'       ? COLOR_EDGE_OWNED
                             : childState === 'discovering' ? COLOR_EDGE_DISC
+                            : isRevealed                   ? COLOR_EDGE_REVEALED
                             :                                COLOR_EDGE_REACH;
-                _edges.push({ from: pNode, to: node, color });
+                _edges.push({ from: pNode, to: node, color, revealed: isRevealed });
             });
         });
 
@@ -373,6 +374,24 @@
             path.dataset.to   = edge.to.id;
             if (edge.color === COLOR_EDGE_REACH) {
                 path.setAttribute('stroke-dasharray', '4 4');
+            }
+            if (edge.revealed) {
+                path.setAttribute('stroke-width', '2');
+                // Animate: dash-draw then settle to solid
+                requestAnimationFrame(() => {
+                    const len = path.getTotalLength ? path.getTotalLength() : 200;
+                    path.style.strokeDasharray = len;
+                    path.style.strokeDashoffset = len;
+                    path.style.transition = 'stroke-dashoffset 0.7s ease-in-out';
+                    requestAnimationFrame(() => {
+                        path.style.strokeDashoffset = '0';
+                        setTimeout(() => {
+                            path.style.transition = '';
+                            path.style.strokeDasharray = '';
+                            path.style.strokeDashoffset = '';
+                        }, 750);
+                    });
+                });
             }
             _g.appendChild(path);
         });
