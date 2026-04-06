@@ -64,25 +64,35 @@ const MERCHANTS = [
   },
 ];
 
-// Current merchant offer — cleared on dismiss or navigation
-let currentMerchant = null;
-let currentMerchantStock = [];
+// Per-character merchant offers — keyed by characterId
+const _merchantOffers = {};
+
+function _getOffer(characterId) {
+  return _merchantOffers[characterId] || null;
+}
+
+function _setOffer(characterId, merchant, stock) {
+  _merchantOffers[characterId] = { merchant, stock };
+}
+
+function _clearOffer(characterId) {
+  delete _merchantOffers[characterId];
+}
 
 /**
- * Roll a merchant appearance. ~30% chance.
+ * Roll a merchant appearance for a specific character. ~30% chance.
  * Returns true if a merchant appeared.
  */
-function rollMerchantAppearance() {
-  if (currentMerchant) return false; // existing merchant stays until dismissed
+function rollMerchantAppearance(characterId) {
+  if (!characterId) return false;
+  if (_getOffer(characterId)) return false; // existing offer stays until dismissed
   if (Math.random() > 0.30) return false;
 
   const merchant = MERCHANTS[Math.floor(Math.random() * MERCHANTS.length)];
   const stock = buildMerchantStock(merchant);
   if (stock.length === 0) return false;
 
-  currentMerchant = merchant;
-  currentMerchantStock = stock;
-
+  _setOffer(characterId, merchant, stock);
   return true;
 }
 
@@ -118,14 +128,16 @@ function renderMerchant(character) {
   const slot = document.getElementById('merchantSlot');
   if (!slot) return;
 
-  if (!currentMerchant || currentMerchantStock.length === 0) {
+  const offer = character?.id ? _getOffer(character.id) : null;
+
+  if (!offer) {
     slot.innerHTML = '';
     slot.style.display = 'none';
     return;
   }
 
   const gold = character?.gold || 0;
-  const m = currentMerchant;
+  const m = offer.merchant;
   const isNew = slot.style.display === 'none' || slot.dataset.merchantId !== m.name;
 
   slot.style.display = 'block';
@@ -138,7 +150,7 @@ function renderMerchant(character) {
       </div>
       <div class="merchant-greeting">"${m.greeting}"</div>
       <div id="merchantStock">
-        ${currentMerchantStock.map((entry, idx) => renderStockEntry(entry, idx, gold)).join('')}
+        ${offer.stock.map((entry, idx) => renderStockEntry(entry, idx, gold)).join('')}
       </div>
     </div>
   `;
@@ -170,11 +182,12 @@ function renderStockEntry(entry, idx, gold) {
 }
 
 async function buyFromMerchant(idx) {
-  const entry = currentMerchantStock[idx];
-  if (!entry || entry.quantity <= 0) return;
-
   const characterId = currentState.detailCharacterId;
   if (!characterId) return;
+
+  const offer = _getOffer(characterId);
+  const entry = offer?.stock[idx];
+  if (!entry || entry.quantity <= 0) return;
 
   const character = await getCharacter(characterId);
   if (!character) return;
@@ -203,8 +216,8 @@ async function buyFromMerchant(idx) {
 }
 
 function dismissMerchant() {
-  currentMerchant = null;
-  currentMerchantStock = [];
+  const characterId = currentState.detailCharacterId;
+  if (characterId) _clearOffer(characterId);
   const slot = document.getElementById('merchantSlot');
   if (slot) { slot.innerHTML = ''; slot.style.display = 'none'; delete slot.dataset.merchantId; }
 }

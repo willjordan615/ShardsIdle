@@ -1872,9 +1872,10 @@ try {
 
         // Roll for traveling merchant on victory runs
         if (combatData.result === 'victory' && typeof rollMerchantAppearance === 'function') {
-            const appeared = rollMerchantAppearance();
+            const _merchantCharId = window.currentState.detailCharacterId;
+            const appeared = rollMerchantAppearance(_merchantCharId);
             if (appeared) {
-                const char = await getCharacter(window.currentState.detailCharacterId);
+                const char = await getCharacter(_merchantCharId);
                 if (char && typeof renderMerchant === 'function') renderMerchant(char);
             }
         }

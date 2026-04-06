@@ -115,12 +115,14 @@
                 const state = (rec && rec.skillLevel >= 1) ? 'owned' : 'discovering';
                 visible.set(skill.id, { skill, state, rec, knownParents });
             } else if (knownParents.length >= 1) {
-                // Name revealed if any known parent is level 3+
-                const nameRevealed = knownParents.some(pid => {
+                // Name revealed if any known parent is level 3+, or if player purchased reveal
+                const parentLevelRevealed = knownParents.some(pid => {
                     const rec = _skillRecord(pid);
                     return rec && rec.skillLevel >= 3;
                 });
-                visible.set(skill.id, { skill, state: 'reachable', knownParents, nameRevealed });
+                const purchaseRevealed = (_character.revealedParents || []).includes(skill.id);
+                const nameRevealed = parentLevelRevealed || purchaseRevealed;
+                visible.set(skill.id, { skill, state: 'reachable', knownParents, nameRevealed, purchaseRevealed });
             }
         });
 
@@ -379,6 +381,26 @@
         _nodes.forEach(node => _drawNode(node));
     }
 
+    function _revealCost(depth) {
+        // 100 at depth 1, 1000 at depth 2, 10000 at depth 3, etc.
+        return Math.pow(10, depth);
+    }
+
+    async function _purchaseReveal(node) {
+        const cost = _revealCost(node.depth);
+        if ((_character.gold || 0) < cost) {
+            showError(`Not enough gold. Revealing this path costs ${cost}g.`);
+            return;
+        }
+        _character.gold -= cost;
+        if (!_character.revealedParents) _character.revealedParents = [];
+        _character.revealedParents.push(node.id);
+        await saveCharacterToServer(_character);
+        // Redraw
+        _buildGraph();
+        _drawAll();
+    }
+
     function _drawNode(node) {
         const { x, y, state, skill, rec } = node;
         const nx = x - NODE_W / 2;
@@ -460,6 +482,37 @@
                 sub.setAttribute('fill', '#3a5a7a');
                 sub.textContent = '+ needs ???';
                 group.appendChild(sub);
+            }
+        }
+
+        // Reveal parents button for reachable nodes where name is known but parents are hidden
+        if (state === 'reachable' && node.nameRevealed && !node.purchaseRevealed) {
+            const missing = (skill.parentSkills || []).filter(p => !_ownedIds().has(p));
+            if (missing.length > 0) {
+                const cost = _revealCost(node.depth);
+                const canAfford = (_character.gold || 0) >= cost;
+                const fo = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
+                fo.setAttribute('x', '4');
+                fo.setAttribute('y', String(NODE_H + 4));
+                fo.setAttribute('width', String(NODE_W - 8));
+                fo.setAttribute('height', '20');
+                const btn = document.createElement('button');
+                btn.textContent = `Reveal parents: ${cost}g`;
+                btn.style.cssText = [
+                    'width:100%', 'height:20px', 'font-size:9px', 'cursor:' + (canAfford ? 'pointer' : 'not-allowed'),
+                    'background:' + (canAfford ? '#1a2a1a' : '#1a1a1a'),
+                    'color:' + (canAfford ? '#4cd964' : '#555'),
+                    'border:1px solid ' + (canAfford ? '#2a4a2a' : '#333'),
+                    'border-radius:3px', 'padding:0', 'font-family:Lato,sans-serif', 'letter-spacing:0.03em',
+                    'white-space:nowrap', 'overflow:hidden', 'text-overflow:ellipsis',
+                ].join(';');
+                if (canAfford) {
+                    btn.addEventListener('click', (e) => { e.stopPropagation(); _purchaseReveal(node); });
+                } else {
+                    btn.setAttribute('disabled', 'true');
+                }
+                fo.appendChild(btn);
+                group.appendChild(fo);
             }
         }
 
