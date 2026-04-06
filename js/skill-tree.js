@@ -182,7 +182,7 @@
         const maxX = Math.max(..._nodes.map(n => n.x)) + NODE_W;
         const maxY = Math.max(..._nodes.map(n => n.y)) + NODE_H;
         _canvasW = maxX + 60;
-        _canvasH = maxY + 60;
+        _canvasH = maxY + 110; // extra room for reveal/buy buttons below nodes
     }
 
     // ── Modal render ─────────────────────────────────────────────────────────
@@ -233,7 +233,7 @@
                     position:absolute; top:52px; left:0; right:0; bottom:28px;
                     overflow:hidden; cursor:grab;
                 ">
-                    <svg id="skillTreeSVG" style="display:block; width:100%; height:100%;"></svg>
+                    <svg id="skillTreeSVG" style="display:block; width:100%; height:100%; overflow:visible;"></svg>
                     <div id="skillTreeTooltip" style="
                         display:none; position:absolute;
                         background:linear-gradient(135deg,var(--window-base),var(--window-deep));
@@ -509,60 +509,49 @@
             }
         }
 
-        // Reveal parents button for reachable nodes where name is known but parents are hidden
+        // Reveal + Buy buttons for reachable nodes where name is known but parents are hidden
         if (state === 'reachable' && node.nameRevealed && !node.purchaseRevealed) {
             const missing = (skill.parentSkills || []).filter(p => !_ownedIds().has(p));
             if (missing.length > 0) {
-                const cost = _revealCost(node.depth);
-                const canAfford = (_character.gold || 0) >= cost;
-                const fo = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
-                fo.setAttribute('x', '4');
-                fo.setAttribute('y', String(NODE_H + 4));
-                fo.setAttribute('width', String(NODE_W - 8));
-                fo.setAttribute('height', '20');
-                const btn = document.createElement('button');
-                btn.textContent = `Reveal parents: ${cost}g`;
-                btn.style.cssText = [
-                    'width:100%', 'height:20px', 'font-size:9px', 'cursor:' + (canAfford ? 'pointer' : 'not-allowed'),
-                    'background:' + (canAfford ? '#1a2a1a' : '#1a1a1a'),
-                    'color:' + (canAfford ? '#4cd964' : '#555'),
-                    'border:1px solid ' + (canAfford ? '#2a4a2a' : '#333'),
-                    'border-radius:3px', 'padding:0', 'font-family:Lato,sans-serif', 'letter-spacing:0.03em',
-                    'white-space:nowrap', 'overflow:hidden', 'text-overflow:ellipsis',
-                ].join(';');
-                if (canAfford) {
-                    btn.addEventListener('click', (e) => { e.stopPropagation(); _purchaseReveal(node); });
-                } else {
-                    btn.setAttribute('disabled', 'true');
-                }
-                fo.appendChild(btn);
-                group.appendChild(fo);
-
-                // Buy parent button
+                const revCost = _revealCost(node.depth);
                 const buyCost = _buyCost(node.depth);
-                const canBuy = (_character.gold || 0) >= buyCost;
-                const foB = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
-                foB.setAttribute('x', '4');
-                foB.setAttribute('y', String(NODE_H + 28));
-                foB.setAttribute('width', String(NODE_W - 8));
-                foB.setAttribute('height', '20');
-                const btnB = document.createElement('button');
-                btnB.textContent = `Buy skill: ${buyCost}g`;
-                btnB.style.cssText = [
-                    'width:100%', 'height:20px', 'font-size:9px', 'cursor:' + (canBuy ? 'pointer' : 'not-allowed'),
-                    'background:' + (canBuy ? '#1a1a2a' : '#1a1a1a'),
-                    'color:' + (canBuy ? '#c8a84b' : '#555'),
-                    'border:1px solid ' + (canBuy ? '#2a2a4a' : '#333'),
-                    'border-radius:3px', 'padding:0', 'font-family:Lato,sans-serif', 'letter-spacing:0.03em',
-                    'white-space:nowrap', 'overflow:hidden', 'text-overflow:ellipsis',
-                ].join(';');
-                if (canBuy) {
-                    btnB.addEventListener('click', (e) => { e.stopPropagation(); _purchaseBuyParent(node); });
-                } else {
-                    btnB.setAttribute('disabled', 'true');
+                const canReveal = (_character.gold || 0) >= revCost;
+                const canBuy    = (_character.gold || 0) >= buyCost;
+                const BTN_H = 16, BTN_Y1 = NODE_H + 4, BTN_Y2 = NODE_H + 24;
+
+                function _svgBtn(y, label, active, clickFn) {
+                    const g2 = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    g2.style.cursor = active ? 'pointer' : 'default';
+                    const r = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    r.setAttribute('x', '4'); r.setAttribute('y', String(y));
+                    r.setAttribute('width', String(NODE_W - 8)); r.setAttribute('height', String(BTN_H));
+                    r.setAttribute('rx', '3');
+                    r.setAttribute('fill', active ? (clickFn === 'reveal' ? '#1a2a1a' : '#1a1a2a') : '#111');
+                    r.setAttribute('stroke', active ? (clickFn === 'reveal' ? '#2a4a2a' : '#2a2a4a') : '#222');
+                    r.setAttribute('stroke-width', '1');
+                    g2.appendChild(r);
+                    const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    t.setAttribute('x', String(NODE_W / 2));
+                    t.setAttribute('y', String(y + BTN_H / 2 + 1));
+                    t.setAttribute('text-anchor', 'middle');
+                    t.setAttribute('dominant-baseline', 'middle');
+                    t.setAttribute('font-size', '8');
+                    t.setAttribute('font-family', 'Lato,sans-serif');
+                    t.setAttribute('fill', active ? (clickFn === 'reveal' ? '#4cd964' : '#c8a84b') : '#444');
+                    t.textContent = label;
+                    g2.appendChild(t);
+                    if (active) {
+                        g2.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            if (clickFn === 'reveal') _purchaseReveal(node);
+                            else _purchaseBuyParent(node);
+                        });
+                    }
+                    return g2;
                 }
-                foB.appendChild(btnB);
-                group.appendChild(foB);
+
+                group.appendChild(_svgBtn(BTN_Y1, `Reveal parents: ${revCost}g`, canReveal, 'reveal'));
+                group.appendChild(_svgBtn(BTN_Y2, `Buy skill: ${buyCost}g`,      canBuy,    'buy'));
             }
         }
 
