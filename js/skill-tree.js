@@ -396,7 +396,31 @@
         if (!_character.revealedParents) _character.revealedParents = [];
         _character.revealedParents.push(node.id);
         await saveCharacterToServer(_character);
-        // Redraw
+        _buildGraph();
+        _drawAll();
+    }
+
+    function _buyCost(depth) {
+        return Math.floor(_revealCost(depth) * 0.75);
+    }
+
+    async function _purchaseBuyParent(node) {
+        const cost = _buyCost(node.depth);
+        if ((_character.gold || 0) < cost) {
+            showError(`Not enough gold. Purchasing this skill costs ${cost}g.`);
+            return;
+        }
+        const missing = (node.skill.parentSkills || []).filter(p => !_ownedIds().has(p));
+        if (!missing.length) return;
+        _character.gold -= cost;
+        if (!_character.skills) _character.skills = [];
+        // Add each missing parent at level 0 if not already known
+        missing.forEach(pid => {
+            if (!_character.skills.find(s => s.skillID === pid)) {
+                _character.skills.push({ skillID: pid, learned: true, skillXP: 0, skillLevel: 0, usageCount: 0 });
+            }
+        });
+        await saveCharacterToServer(_character);
         _buildGraph();
         _drawAll();
     }
@@ -513,6 +537,32 @@
                 }
                 fo.appendChild(btn);
                 group.appendChild(fo);
+
+                // Buy parent button
+                const buyCost = _buyCost(node.depth);
+                const canBuy = (_character.gold || 0) >= buyCost;
+                const foB = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
+                foB.setAttribute('x', '4');
+                foB.setAttribute('y', String(NODE_H + 28));
+                foB.setAttribute('width', String(NODE_W - 8));
+                foB.setAttribute('height', '20');
+                const btnB = document.createElement('button');
+                btnB.textContent = `Buy skill: ${buyCost}g`;
+                btnB.style.cssText = [
+                    'width:100%', 'height:20px', 'font-size:9px', 'cursor:' + (canBuy ? 'pointer' : 'not-allowed'),
+                    'background:' + (canBuy ? '#1a1a2a' : '#1a1a1a'),
+                    'color:' + (canBuy ? '#c8a84b' : '#555'),
+                    'border:1px solid ' + (canBuy ? '#2a2a4a' : '#333'),
+                    'border-radius:3px', 'padding:0', 'font-family:Lato,sans-serif', 'letter-spacing:0.03em',
+                    'white-space:nowrap', 'overflow:hidden', 'text-overflow:ellipsis',
+                ].join(';');
+                if (canBuy) {
+                    btnB.addEventListener('click', (e) => { e.stopPropagation(); _purchaseBuyParent(node); });
+                } else {
+                    btnB.setAttribute('disabled', 'true');
+                }
+                foB.appendChild(btnB);
+                group.appendChild(foB);
             }
         }
 
