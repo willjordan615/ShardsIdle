@@ -304,7 +304,7 @@
 
         // Clear loading state, rebuild canvas
         wrap.innerHTML = `
-            <svg id="skillTreeSVG" style="display:block; width:100%; height:100%;"></svg>
+            <svg id="skillTreeSVG" style="display:block; width:100%; height:100%; overflow:visible;"></svg>
             <div id="skillTreeTooltip" style="
                 display:none; position:absolute;
                 background:linear-gradient(135deg,var(--window-base),var(--window-deep));
@@ -381,13 +381,15 @@
         _nodes.forEach(node => _drawNode(node));
     }
 
-    function _revealCost(depth) {
+    function _revealCost(depth, knownParentCount) {
         // 100 at depth 1, 1000 at depth 2, 10000 at depth 3, etc.
-        return Math.pow(10, depth);
+        // Half price if player already knows one parent
+        const base = Math.pow(10, depth);
+        return knownParentCount >= 1 ? Math.floor(base * 0.5) : base;
     }
 
     async function _purchaseReveal(node) {
-        const cost = _revealCost(node.depth);
+        const cost = _revealCost(node.depth, (node.knownParents || []).length);
         if ((_character.gold || 0) < cost) {
             showError(`Not enough gold. Revealing this path costs ${cost}g.`);
             return;
@@ -396,6 +398,7 @@
         if (!_character.revealedParents) _character.revealedParents = [];
         _character.revealedParents.push(node.id);
         await saveCharacterToServer(_character);
+        _closeNodeMenu();
         _buildGraph();
         _drawAll();
     }
@@ -421,8 +424,108 @@
             }
         });
         await saveCharacterToServer(_character);
+        _closeNodeMenu();
         _buildGraph();
         _drawAll();
+    }
+
+    // ── Node context menu ────────────────────────────────────────────────────
+
+    let _nodeMenu = null;
+
+    function _closeNodeMenu() {
+        if (_nodeMenu) { _nodeMenu.remove(); _nodeMenu = null; }
+    }
+
+    function _showNodeMenu(node) {
+        _closeNodeMenu();
+
+        const wrap = document.getElementById('skillTreeCanvasWrap');
+        if (!wrap) return;
+
+        // Zoom to node
+        const ww = wrap.clientWidth, wh = wrap.clientHeight;
+        const targetZoom = 2;
+        const nodeCanvasX = node.x * targetZoom;
+        const nodeCanvasY = node.y * targetZoom;
+        _zoom = targetZoom;
+        _pan.x = ww / 2 - nodeCanvasX - (NODE_W * targetZoom) / 2;
+        _pan.y = wh / 2 - nodeCanvasY - (NODE_H * targetZoom) / 2;
+        _applyTransform();
+
+        // Position menu below node in screen space
+        const screenX = node.x * _zoom + _pan.x;
+        const screenY = node.y * _zoom + _pan.y + NODE_H * _zoom + 8;
+
+        const menu = document.createElement('div');
+        menu.id = 'stNodeMenu';
+        menu.style.cssText = [
+            'position:absolute',
+            `left:${Math.min(screenX, ww - 220)}px`,
+            `top:${Math.min(screenY, wh - 120)}px`,
+            'width:210px',
+            'background:linear-gradient(135deg,var(--window-base),var(--window-deep))',
+            'border:1px solid var(--gold-border)',
+            'border-radius:6px',
+            'padding:10px 12px',
+            'z-index:50',
+            'box-shadow:0 4px 20px rgba(0,0,0,0.7)',
+            'font-family:var(--font-body)',
+        ].join(';');
+
+        const { skill, state, knownParents } = node;
+        const gold = _character.gold || 0;
+
+        let html = `<div style="font-family:var(--font-display);color:var(--gold);font-size:0.85rem;margin-bottom:8px;">${skill.name}</div>`;
+
+        if (state === 'reachable') {
+            const missing = (skill.parentSkills || []).filter(p => !_ownedIds().has(p));
+            if (missing.length > 0 && !node.purchaseRevealed) {
+                const revCost = _revealCost(node.depth, (knownParents || []).length);
+                const buyCost = _buyCost(node.depth);
+                const canReveal = gold >= revCost;
+                const canBuy    = gold >= buyCost;
+
+                html += _menuBtn(`Reveal parents: ${revCost}g`, canReveal, 'stMenuReveal');
+                html += _menuBtn(`Buy skill: ${buyCost}g`, canBuy, 'stMenuBuy');
+            } else if (node.purchaseRevealed) {
+                const buyCost = _buyCost(node.depth);
+                const canBuy  = gold >= buyCost;
+                html += _menuBtn(`Buy skill: ${buyCost}g`, canBuy, 'stMenuBuy');
+            }
+        }
+
+        if (state === 'owned' || state === 'discovering') {
+            html += `<div style="color:var(--text-muted);font-size:0.78rem;">Nothing to purchase.</div>`;
+        }
+
+        html += `<div style="text-align:right;margin-top:8px;">
+            <button id="stMenuClose" style="font-size:0.72rem;background:none;border:none;color:var(--text-muted);cursor:pointer;">✕ Close</button>
+        </div>`;
+
+        menu.innerHTML = html;
+        wrap.appendChild(menu);
+        _nodeMenu = menu;
+
+        // Wire buttons
+        const revBtn = menu.querySelector('#stMenuReveal');
+        if (revBtn) revBtn.addEventListener('click', () => _purchaseReveal(node));
+        const buyBtn = menu.querySelector('#stMenuBuy');
+        if (buyBtn) buyBtn.addEventListener('click', () => _purchaseBuyParent(node));
+        menu.querySelector('#stMenuClose').addEventListener('click', _closeNodeMenu);
+    }
+
+    function _menuBtn(label, active, id) {
+        const bg     = active ? '#1a2010' : '#111';
+        const color  = active ? 'var(--gold)' : '#444';
+        const border = active ? 'var(--gold-border)' : '#222';
+        const cursor = active ? 'pointer' : 'not-allowed';
+        return `<button id="${id}" ${active ? '' : 'disabled'} style="
+            display:block; width:100%; text-align:left; margin-bottom:6px;
+            background:${bg}; color:${color}; border:1px solid ${border};
+            border-radius:4px; padding:6px 8px; font-size:0.78rem;
+            cursor:${cursor}; font-family:var(--font-body);
+        ">${label}</button>`;
     }
 
     function _drawNode(node) {
@@ -509,51 +612,7 @@
             }
         }
 
-        // Reveal + Buy buttons for reachable nodes where name is known but parents are hidden
-        if (state === 'reachable' && node.nameRevealed && !node.purchaseRevealed) {
-            const missing = (skill.parentSkills || []).filter(p => !_ownedIds().has(p));
-            if (missing.length > 0) {
-                const revCost = _revealCost(node.depth);
-                const buyCost = _buyCost(node.depth);
-                const canReveal = (_character.gold || 0) >= revCost;
-                const canBuy    = (_character.gold || 0) >= buyCost;
-                const BTN_H = 16, BTN_Y1 = NODE_H + 4, BTN_Y2 = NODE_H + 24;
 
-                function _svgBtn(y, label, active, clickFn) {
-                    const g2 = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-                    g2.style.cursor = active ? 'pointer' : 'default';
-                    const r = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                    r.setAttribute('x', '4'); r.setAttribute('y', String(y));
-                    r.setAttribute('width', String(NODE_W - 8)); r.setAttribute('height', String(BTN_H));
-                    r.setAttribute('rx', '3');
-                    r.setAttribute('fill', active ? (clickFn === 'reveal' ? '#1a2a1a' : '#1a1a2a') : '#111');
-                    r.setAttribute('stroke', active ? (clickFn === 'reveal' ? '#2a4a2a' : '#2a2a4a') : '#222');
-                    r.setAttribute('stroke-width', '1');
-                    g2.appendChild(r);
-                    const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                    t.setAttribute('x', String(NODE_W / 2));
-                    t.setAttribute('y', String(y + BTN_H / 2 + 1));
-                    t.setAttribute('text-anchor', 'middle');
-                    t.setAttribute('dominant-baseline', 'middle');
-                    t.setAttribute('font-size', '8');
-                    t.setAttribute('font-family', 'Lato,sans-serif');
-                    t.setAttribute('fill', active ? (clickFn === 'reveal' ? '#4cd964' : '#c8a84b') : '#444');
-                    t.textContent = label;
-                    g2.appendChild(t);
-                    if (active) {
-                        g2.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            if (clickFn === 'reveal') _purchaseReveal(node);
-                            else _purchaseBuyParent(node);
-                        });
-                    }
-                    return g2;
-                }
-
-                group.appendChild(_svgBtn(BTN_Y1, `Reveal parents: ${revCost}g`, canReveal, 'reveal'));
-                group.appendChild(_svgBtn(BTN_Y2, `Buy skill: ${buyCost}g`,      canBuy,    'buy'));
-            }
-        }
 
         // Level badge for owned
         if (state === 'owned' && rec && rec.skillLevel >= 1) {
@@ -586,8 +645,10 @@
             e.stopPropagation();
             if (_selectedNode === node.id) {
                 _selectedNode = null;
+                _closeNodeMenu();
             } else {
                 _selectedNode = node.id;
+                _showNodeMenu(node);
             }
             _applySelection();
         });
@@ -716,6 +777,7 @@
         _svg.addEventListener('click', (e) => {
             if (e.target === _svg || e.target === _g) {
                 _selectedNode = null;
+                _closeNodeMenu();
                 _applySelection();
             }
         });
