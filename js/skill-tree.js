@@ -190,27 +190,110 @@
             byDepth[d].push(node);
         });
 
-        // Owned first, then discovering, then reachable. Alphabetical within each.
-        const stateOrder = { owned: 0, discovering: 1, reachable: 2 };
-        Object.values(byDepth).forEach(row => {
-            row.sort((a, b) => {
-                const so = stateOrder[a.state] - stateOrder[b.state];
-                return so !== 0 ? so : a.skill.name.localeCompare(b.skill.name);
-            });
+        // ── Assign pixel positions — parent-centered DAG layout ───────────────
+        //
+        // Pass 1 (top-down): seed each node's x as the average x of its in-graph
+        //   parents. Roots are spread evenly. Then resolve overlaps within each row
+        //   by pushing nodes apart while preserving their relative order.
+        //
+        // Pass 2 (bottom-up, 3 iterations): re-center each node over the average x
+        //   of its in-graph children, then resolve overlaps again. This pulls parents
+        //   toward their children so clusters tighten up.
+
+        const depths = Object.keys(byDepth).map(Number).sort((a, b) => a - b);
+
+        // Assign y first — simple, just depth row.
+        depths.forEach(d => {
+            byDepth[d].forEach(node => { node.y = d * ROW_GAP + NODE_H / 2; });
         });
 
-        // ── Assign pixel positions ────────────────────────────────────────────
-        const depths = Object.keys(byDepth).map(Number).sort((a, b) => a - b);
+        // Helper: spread nodes in a row so none overlap.
+        // Sweeps left-to-right then right-to-left until stable (handles nudge-induced overlaps).
+        function spreadRow(row) {
+            if (row.length < 2) return;
+            row.sort((a, b) => a.x - b.x);
+            let changed = true;
+            let guard = 0;
+            while (changed && guard++ < 20) {
+                changed = false;
+                for (let i = 1; i < row.length; i++) {
+                    const minX = row[i - 1].x + COL_GAP;
+                    if (row[i].x < minX) { row[i].x = minX; changed = true; }
+                }
+                for (let i = row.length - 2; i >= 0; i--) {
+                    const maxX = row[i + 1].x - COL_GAP;
+                    if (row[i].x > maxX) { row[i].x = maxX; changed = true; }
+                }
+            }
+        }
+
+        // Pass 1: top-down, seed x from parent average
         depths.forEach(d => {
             const row = byDepth[d];
-            row.forEach((node, i) => {
-                node.x = i * COL_GAP + NODE_W / 2;
-                node.y = d * ROW_GAP + NODE_H / 2;
-            });
+            if (d === 0) {
+                // Roots: evenly spaced to start
+                row.forEach((node, i) => { node.x = i * COL_GAP + NODE_W / 2; });
+            } else {
+                row.forEach(node => {
+                    const inGraphParents = (node.skill.parentSkills || [])
+                        .map(pid => nodeMap.get(pid))
+                        .filter(Boolean);
+                    if (inGraphParents.length) {
+                        node.x = inGraphParents.reduce((sum, p) => sum + p.x, 0) / inGraphParents.length;
+                    } else {
+                        node.x = 0;
+                    }
+                });
+                spreadRow(row);
+            }
         });
 
-        _nodes = [];
-        nodeMap.forEach(n => _nodes.push(n));
+        // Pass 2: bottom-up re-centering (3 iterations to converge)
+        for (let iter = 0; iter < 3; iter++) {
+            // Bottom-up: nudge each non-root node toward average x of its in-graph children
+            [...depths].reverse().forEach(d => {
+                if (d === 0) return; // roots are anchors — never moved bottom-up
+                const row = byDepth[d];
+                row.forEach(node => {
+                    const children = _skillsData
+                        .filter(s => (s.parentSkills || []).includes(node.id) && nodeMap.has(s.id))
+                        .map(s => nodeMap.get(s.id));
+                    if (children.length) {
+                        const avgChildX = children.reduce((sum, c) => sum + c.x, 0) / children.length;
+                        // Blend: move 40% toward children's average
+                        node.x = node.x * 0.6 + avgChildX * 0.4;
+                    }
+                });
+                spreadRow(row);
+            });
+
+            // Top-down: re-anchor children to parents again
+            depths.forEach(d => {
+                if (d === 0) return;
+                const row = byDepth[d];
+                row.forEach(node => {
+                    const inGraphParents = (node.skill.parentSkills || [])
+                        .map(pid => nodeMap.get(pid))
+                        .filter(Boolean);
+                    if (inGraphParents.length) {
+                        const avgParentX = inGraphParents.reduce((sum, p) => sum + p.x, 0) / inGraphParents.length;
+                        node.x = node.x * 0.6 + avgParentX * 0.4;
+                    }
+                });
+                spreadRow(row);
+            });
+        }
+
+        // Shift everything so minimum x starts at NODE_W/2 (no negative coords)
+        const allNodes = [];
+        nodeMap.forEach(n => allNodes.push(n));
+        const minX = Math.min(...allNodes.map(n => n.x));
+        if (minX < NODE_W / 2) {
+            const shift = NODE_W / 2 - minX;
+            allNodes.forEach(n => { n.x += shift; });
+        }
+
+        _nodes = allNodes;
 
         // ── Canvas size ───────────────────────────────────────────────────────
         const maxX = Math.max(..._nodes.map(n => n.x)) + NODE_W;
