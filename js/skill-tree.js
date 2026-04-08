@@ -84,9 +84,6 @@
     function _buildGraph() {
         const owned    = _ownedIds();
         const skillMap = new Map(_skillsData.map(s => [s.id, s]));
-        const wrap     = document.getElementById('skillTreeCanvasWrap');
-        const W        = (wrap?.clientWidth  || 900) - PANEL_W;
-        const H        =  wrap?.clientHeight || 700;
 
         // Assign distances: 0 = owned, 1 = one hop, 2 = two hops
         const distMap = new Map();
@@ -111,33 +108,22 @@
             });
         });
 
-        // Initial positions: owned cluster in center, hops in rings
-        const cx = W / 2, cy = H / 2;
+        // Build node list without positions — positions assigned in _initCanvas
         const byDist = { 0: [], 1: [], 2: [] };
         distMap.forEach((dist, id) => {
             if (byDist[dist]) byDist[dist].push(id);
         });
 
         _nodes = [];
-        const ringR   = [0, 220, 460];
-        const jitters = [0, 40, 70];
-
         [0, 1, 2].forEach(dist => {
-            const ids  = byDist[dist];
-            const r    = ringR[dist];
-            const j    = jitters[dist];
-            const jitter = () => (Math.random() - 0.5) * j * 2;
-            ids.forEach((id, i) => {
-                const angle = (i / Math.max(1, ids.length)) * Math.PI * 2;
+            byDist[dist].forEach(id => {
                 _nodes.push({
                     id,
                     skill:  skillMap.get(id),
                     rec:    _skillRecord(id),
                     dist,
                     owned:  owned.has(id),
-                    x: cx + (dist === 0 && ids.length === 1 ? 0 : Math.cos(angle) * r) + jitter(),
-                    y: cy + (dist === 0 && ids.length === 1 ? 0 : Math.sin(angle) * r) + jitter(),
-                    vx: 0, vy: 0,
+                    x: 0, y: 0, vx: 0, vy: 0,
                 });
             });
         });
@@ -237,6 +223,24 @@
         const W = wrap.clientWidth, H = wrap.clientHeight;
         _pan.x = W / 2;
         _pan.y = H / 2;
+
+        // Assign initial positions now that dimensions are known
+        const cx = (W - PANEL_W) / 2;
+        const cy = H / 2;
+        const ringR   = [0, 220, 460];
+        const jitters = [0, 40, 70];
+        const byDist  = { 0: [], 1: [], 2: [] };
+        _nodes.forEach(n => { if (byDist[n.dist]) byDist[n.dist].push(n); });
+        [0, 1, 2].forEach(dist => {
+            const group  = byDist[dist];
+            const r      = ringR[dist];
+            const jitter = () => (Math.random() - 0.5) * jitters[dist] * 2;
+            group.forEach((n, i) => {
+                const angle = (i / Math.max(1, group.length)) * Math.PI * 2;
+                n.x = cx + (dist === 0 && group.length === 1 ? 0 : Math.cos(angle) * r) + jitter();
+                n.y = cy + (dist === 0 && group.length === 1 ? 0 : Math.sin(angle) * r) + jitter();
+            });
+        });
 
         _drawAll();
         _applyTransform();
