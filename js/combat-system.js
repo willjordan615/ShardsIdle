@@ -495,7 +495,9 @@ async function startCombat(forcedChallengeId) {
         }
 
         const combatResult = await response.json();
-        const combatDurationMs = Date.now() - combatStartTime;
+        const rawDurationMs = Date.now() - combatStartTime;
+        const speedMultiplier = window.combatSpeedMultiplier || 1.0;
+        const combatDurationMs = Math.round(rawDurationMs / speedMultiplier);
         currentState.lastCombatDurationMs = combatDurationMs;
         _notifyIdleUpdate(combatDurationMs);
 
