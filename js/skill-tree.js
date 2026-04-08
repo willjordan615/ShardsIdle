@@ -1,9 +1,8 @@
 /**
  * skill-tree.js — Force-directed skill web
  *
- * All player-learnable skills shown. Brightness encodes distance from the
- * character's owned cluster — owned skills are the light source, the graph
- * dims continuously outward. Edges follow the same falloff.
+ * Shows owned skills + 2 hops out. Brightness encodes distance from owned
+ * cluster. Owned skills glow gold; each hop dims. Edges follow the same falloff.
  *
  * Click a node: zoom to it, open detail panel on the right.
  * Pan: drag. Zoom: scroll wheel / pinch.
@@ -13,35 +12,35 @@
 
     // ── Constants ────────────────────────────────────────────────────────────
 
-    const NODE_R        = 22;
-    const MAX_DIST      = 5;
-    const PANEL_W       = 260;
+    const NODE_R       = 24;
+    const MIN_GAP      = NODE_R * 2 + 24;  // minimum center-to-center distance
+    const PANEL_W      = 268;
 
-    const DIST_OPACITY  = [1.0, 0.72, 0.48, 0.28, 0.14, 0.07];
+    const DIST_OPACITY = [1.0, 0.65, 0.32];
 
-    const GOLD          = '#d4af37';
-    const AMBER         = '#a07828';
-    const DIM           = '#4a3a1a';
+    const GOLD   = '#d4af37';
+    const AMBER  = '#a07828';
+    const DIM    = '#5a4520';
 
-    const EDGE_OWNED    = 'rgba(212,175,55,0.55)';
-    const EDGE_NEAR     = 'rgba(160,120,40,0.30)';
-    const EDGE_FAR      = 'rgba(60,50,30,0.15)';
+    const EDGE_OWNED = 'rgba(212,175,55,0.6)';
+    const EDGE_HOP1  = 'rgba(140,100,30,0.35)';
+    const EDGE_HOP2  = 'rgba(70,50,15,0.18)';
 
     // ── State ────────────────────────────────────────────────────────────────
 
-    let _skillsData   = null;
-    let _character    = null;
-    let _nodes        = [];
-    let _edges        = [];
-    let _svg          = null;
-    let _g            = null;
-    let _panel        = null;
-    let _pan          = { x: 0, y: 0 };
-    let _zoom         = 1;
-    let _dragging     = false;
-    let _lastMouse    = { x: 0, y: 0 };
-    let _selectedId   = null;
-    let _simHandle    = null;
+    let _skillsData = null;
+    let _character  = null;
+    let _nodes      = [];
+    let _edges      = [];
+    let _svg        = null;
+    let _g          = null;
+    let _panel      = null;
+    let _pan        = { x: 0, y: 0 };
+    let _zoom       = 1;
+    let _dragging   = false;
+    let _lastMouse  = { x: 0, y: 0 };
+    let _selectedId = null;
+    let _simHandle  = null;
 
     // ── Public entry point ───────────────────────────────────────────────────
 
@@ -84,79 +83,74 @@
 
     function _buildGraph() {
         const owned    = _ownedIds();
-        const wrap     = document.getElementById('skillTreeCanvasWrap');
-        const W        = (wrap?.clientWidth || 900) - PANEL_W;
-        const H        = wrap?.clientHeight || 700;
         const skillMap = new Map(_skillsData.map(s => [s.id, s]));
+        const wrap     = document.getElementById('skillTreeCanvasWrap');
+        const W        = (wrap?.clientWidth  || 900) - PANEL_W;
+        const H        =  wrap?.clientHeight || 700;
 
-        // BFS from owned nodes to assign distance
+        // Assign distances: 0 = owned, 1 = one hop, 2 = two hops
         const distMap = new Map();
-        const queue   = [];
+        owned.forEach(id => { if (skillMap.has(id)) distMap.set(id, 0); });
 
-        owned.forEach(id => {
-            if (skillMap.has(id)) { distMap.set(id, 0); queue.push(id); }
-        });
-
-        let qi = 0;
-        while (qi < queue.length) {
-            const id   = queue[qi++];
-            const dist = distMap.get(id);
-            if (dist >= MAX_DIST) continue;
-            const skill = skillMap.get(id);
-            if (!skill) continue;
-
+        [1, 2].forEach(hop => {
             _skillsData.forEach(s => {
-                if ((s.parentSkills || []).includes(id) && !distMap.has(s.id)) {
-                    distMap.set(s.id, dist + 1);
-                    queue.push(s.id);
+                if (distMap.has(s.id)) return;
+                const parents = s.parentSkills || [];
+                if (parents.some(p => distMap.get(p) === hop - 1)) {
+                    distMap.set(s.id, hop);
                 }
             });
-            (skill.parentSkills || []).forEach(pid => {
-                if (skillMap.has(pid) && !distMap.has(pid)) {
-                    distMap.set(pid, dist + 1);
-                    queue.push(pid);
-                }
-            });
-        }
-
-        const visible = new Set(distMap.keys());
-
-        // Initial positions by distance ring
-        const cx = W / 2, cy = H / 2;
-        _nodes = [];
-        const byDist = {};
-        distMap.forEach((dist, id) => {
-            if (!byDist[dist]) byDist[dist] = [];
-            byDist[dist].push(id);
         });
 
-        Object.entries(byDist).forEach(([dist, ids]) => {
-            const d = parseInt(dist);
-            const r = d === 0 ? 0 : 300 + d * 280;
-            const jitter = () => (Math.random() - 0.5) * 120;
+        // Also pull in parents of owned skills that aren't owned (so the web shows roots)
+        owned.forEach(id => {
+            const skill = skillMap.get(id);
+            if (!skill) return;
+            (skill.parentSkills || []).forEach(pid => {
+                if (!distMap.has(pid) && skillMap.has(pid)) distMap.set(pid, 1);
+            });
+        });
+
+        // Initial positions: owned cluster in center, hops in rings
+        const cx = W / 2, cy = H / 2;
+        const byDist = { 0: [], 1: [], 2: [] };
+        distMap.forEach((dist, id) => {
+            if (byDist[dist]) byDist[dist].push(id);
+        });
+
+        _nodes = [];
+        const ringR   = [0, 220, 460];
+        const jitters = [0, 40, 70];
+
+        [0, 1, 2].forEach(dist => {
+            const ids  = byDist[dist];
+            const r    = ringR[dist];
+            const j    = jitters[dist];
+            const jitter = () => (Math.random() - 0.5) * j * 2;
             ids.forEach((id, i) => {
-                const angle = (i / ids.length) * Math.PI * 2;
-                const skill = skillMap.get(id);
-                const rec   = _skillRecord(id);
+                const angle = (i / Math.max(1, ids.length)) * Math.PI * 2;
                 _nodes.push({
-                    id, skill, rec,
-                    dist: d,
-                    owned: owned.has(id),
-                    x: cx + Math.cos(angle) * r + jitter(),
-                    y: cy + Math.sin(angle) * r + jitter(),
+                    id,
+                    skill:  skillMap.get(id),
+                    rec:    _skillRecord(id),
+                    dist,
+                    owned:  owned.has(id),
+                    x: cx + (dist === 0 && ids.length === 1 ? 0 : Math.cos(angle) * r) + jitter(),
+                    y: cy + (dist === 0 && ids.length === 1 ? 0 : Math.sin(angle) * r) + jitter(),
                     vx: 0, vy: 0,
                 });
             });
         });
 
+        // Edges between visible nodes
+        const visible = new Set(distMap.keys());
         _edges = [];
         _nodes.forEach(node => {
-            (node.skill.parentSkills || []).forEach(pid => {
+            (node.skill?.parentSkills || []).forEach(pid => {
                 if (!visible.has(pid)) return;
                 const pNode = _nodes.find(n => n.id === pid);
                 if (!pNode) return;
-                const edgeDist = Math.min(node.dist, pNode.dist);
-                _edges.push({ from: pNode, to: node, dist: edgeDist });
+                _edges.push({ from: pNode, to: node, dist: Math.min(node.dist, pNode.dist) });
             });
         });
     }
@@ -170,26 +164,33 @@
             modal.id = 'skillTreeModal';
             modal.style.cssText = `
                 display:none; position:fixed; inset:0;
-                background:rgba(0,0,0,0.94);
+                background:rgba(4,3,1,0.96);
                 z-index:1000; overflow:hidden;
                 width:100vw; height:100vh; box-sizing:border-box;
             `;
             modal.innerHTML = `
-                <div id="skillTreeHeader" style="
-                    position:absolute; top:0; left:0; right:0;
+                <div style="
+                    position:absolute; top:0; left:0; right:0; height:48px;
                     display:flex; align-items:center; justify-content:space-between;
                     padding:0 1.25rem;
-                    background:var(--window-base,#0a0806);
-                    border-bottom:1px solid rgba(212,175,55,0.15);
-                    z-index:2; height:48px; box-sizing:border-box;">
+                    background:var(--window-base,#080604);
+                    border-bottom:1px solid rgba(212,175,55,0.12);
+                    z-index:2; box-sizing:border-box;">
                     <div style="display:flex; align-items:center; gap:1rem;">
                         <span style="font-family:var(--font-display); color:${GOLD}; font-size:0.95rem; letter-spacing:0.06em;">Skill Web</span>
                         <span id="skillTreeCharName" style="color:#6a5a30; font-size:0.8rem;"></span>
                     </div>
-                    <button onclick="closeModal('skillTreeModal')"
-                        style="background:none; border:1px solid rgba(212,175,55,0.2); color:#6a5a30;
-                               padding:0.25rem 0.65rem; border-radius:3px; cursor:pointer;
-                               font-size:0.8rem; font-family:inherit;">✕ Close</button>
+                    <div style="display:flex; align-items:center; gap:1.5rem;">
+                        <div style="display:flex; align-items:center; gap:1rem; font-size:0.72rem; color:#5a4a20;">
+                            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${GOLD};margin-right:5px;vertical-align:middle;"></span>Owned</span>
+                            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${AMBER};margin-right:5px;vertical-align:middle;opacity:0.65;"></span>Reachable</span>
+                            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${DIM};margin-right:5px;vertical-align:middle;opacity:0.32;"></span>Beyond</span>
+                        </div>
+                        <button onclick="closeModal('skillTreeModal')"
+                            style="background:none; border:1px solid rgba(212,175,55,0.18); color:#6a5a30;
+                                   padding:0.25rem 0.65rem; border-radius:3px; cursor:pointer;
+                                   font-size:0.8rem; font-family:inherit;">✕ Close</button>
+                    </div>
                 </div>
                 <div style="position:absolute; top:48px; left:0; right:0; bottom:24px; display:flex;">
                     <div id="skillTreeCanvasWrap" style="flex:1; overflow:hidden; cursor:grab; position:relative;">
@@ -197,9 +198,9 @@
                     </div>
                     <div id="skillTreePanel" style="
                         width:${PANEL_W}px; flex-shrink:0;
-                        border-left:1px solid rgba(212,175,55,0.1);
-                        background:var(--window-base,#0a0806);
-                        padding:1.2rem 1rem; overflow-y:auto;
+                        border-left:1px solid rgba(212,175,55,0.08);
+                        background:var(--window-base,#060503);
+                        padding:1.25rem 1rem; overflow-y:auto;
                         font-family:var(--font-body);
                         color:var(--text-primary,#e8e0d0);">
                         <div style="color:#3a3020; font-size:0.78rem; font-style:italic; margin-top:2rem; text-align:center;">
@@ -208,14 +209,14 @@
                     </div>
                 </div>
                 <div style="position:absolute; bottom:0; left:0; right:${PANEL_W}px; height:24px;
-                    text-align:center; font-size:0.7rem; color:#2a2010;
-                    line-height:24px; font-family:var(--font-body);">Drag to pan · Scroll to zoom</div>
+                    text-align:center; font-size:0.68rem; color:#2a1e08; line-height:24px;
+                    font-family:var(--font-body);">Drag to pan · Scroll to zoom</div>
             `;
             document.body.appendChild(modal);
         }
 
         _pan = { x: 0, y: 0 };
-        _zoom = 0.9;
+        _zoom = 1;
         _selectedId = null;
         document.getElementById('skillTreeCharName').textContent = _character?.name || '';
         modal.style.display = 'block';
@@ -252,66 +253,58 @@
     function _runSimulation(wrap) {
         if (_simHandle) cancelAnimationFrame(_simHandle);
         let alpha = 1;
-        const W = wrap.clientWidth - PANEL_W;
-        const H = wrap.clientHeight;
+        const W = (wrap.clientWidth - PANEL_W) / 2;
+        const H = wrap.clientHeight / 2;
 
         function tick() {
-            if (alpha < 0.004) return;
-            alpha *= 0.97;
-            const k = Math.sqrt((W * H) / Math.max(1, _nodes.length)) * 6;
+            if (alpha < 0.003) return;
+            alpha *= 0.965;
 
             _nodes.forEach(n => { n.fx = 0; n.fy = 0; });
 
-            // Collision — nodes never touch
+            // Collision + repulsion combined — guarantees minimum gap
             for (let i = 0; i < _nodes.length; i++) {
                 for (let j = i + 1; j < _nodes.length; j++) {
                     const a = _nodes[i], b = _nodes[j];
-                    const dx = b.x - a.x, dy = b.y - a.y;
-                    const dist = Math.sqrt(dx * dx + dy * dy) || 0.1;
-                    const minDist = NODE_R * 2 + 16;
-                    if (dist < minDist) {
-                        const push = (minDist - dist) / dist * 0.5;
+                    const dx = b.x - a.x || 0.01;
+                    const dy = b.y - a.y || 0.01;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    // Repulsion
+                    const rep = (18000 * alpha) / (dist * dist);
+                    const rx = rep * dx / dist;
+                    const ry = rep * dy / dist;
+                    a.fx -= rx; a.fy -= ry;
+                    b.fx += rx; b.fy += ry;
+                    // Hard collision push
+                    if (dist < MIN_GAP) {
+                        const push = (MIN_GAP - dist) / dist * 0.6;
                         a.fx -= push * dx; a.fy -= push * dy;
                         b.fx += push * dx; b.fy += push * dy;
                     }
                 }
             }
 
-            // Repulsion between all nodes
-            for (let i = 0; i < _nodes.length; i++) {
-                for (let j = i + 1; j < _nodes.length; j++) {
-                    const a = _nodes[i], b = _nodes[j];
-                    const dx = b.x - a.x, dy = b.y - a.y;
-                    const dist = Math.sqrt(dx * dx + dy * dy) || 0.1;
-                    const force = (k * k) / (dist * dist) * alpha;
-                    const fx = force * dx / dist;
-                    const fy = force * dy / dist;
-                    a.fx -= fx; a.fy -= fy;
-                    b.fx += fx; b.fy += fy;
-                }
-            }
-
-            // Spring attraction along edges
+            // Edge springs
             _edges.forEach(e => {
-                const dx   = e.to.x - e.from.x;
-                const dy   = e.to.y - e.from.y;
-                const dist = Math.sqrt(dx * dx + dy * dy) || 0.1;
-                const ideal = 200 + e.dist * 60;
-                const force  = (dist - ideal) / dist * 0.3 * alpha;
-                e.from.fx += force * dx; e.from.fy += force * dy;
-                e.to.fx   -= force * dx; e.to.fy   -= force * dy;
+                const dx    = e.to.x - e.from.x;
+                const dy    = e.to.y - e.from.y;
+                const dist  = Math.sqrt(dx * dx + dy * dy) || 0.1;
+                const ideal = 180 + e.dist * 80;
+                const f     = (dist - ideal) / dist * 0.25 * alpha;
+                e.from.fx += f * dx; e.from.fy += f * dy;
+                e.to.fx   -= f * dx; e.to.fy   -= f * dy;
             });
 
-            // Gentle gravity to center
+            // Gentle center pull — just enough to keep graph from drifting
             _nodes.forEach(n => {
-                n.fx -= n.x * 0.002 * alpha;
-                n.fy -= n.y * 0.002 * alpha;
+                n.fx -= n.x * 0.003 * alpha;
+                n.fy -= n.y * 0.003 * alpha;
             });
 
-            // Integrate + dampen
+            // Integrate
             _nodes.forEach(n => {
-                n.vx = (n.vx + n.fx) * 0.82;
-                n.vy = (n.vy + n.fy) * 0.82;
+                n.vx = (n.vx + n.fx) * 0.78;
+                n.vy = (n.vy + n.fy) * 0.78;
                 n.x += n.vx;
                 n.y += n.vy;
             });
@@ -319,34 +312,24 @@
             _drawAll();
             _simHandle = requestAnimationFrame(tick);
         }
-
         tick();
     }
 
     // ── Drawing ───────────────────────────────────────────────────────────────
 
     function _nodeColor(dist) {
-        if (dist === 0) return GOLD;
-        if (dist === 1) return '#c09030';
-        if (dist === 2) return AMBER;
-        if (dist === 3) return '#6a4a18';
-        return DIM;
+        return dist === 0 ? GOLD : dist === 1 ? AMBER : DIM;
     }
 
     function _edgeColor(dist) {
-        if (dist === 0) return EDGE_OWNED;
-        if (dist <= 2)  return EDGE_NEAR;
-        return EDGE_FAR;
-    }
-
-    function _nodeOpacity(dist) {
-        return DIST_OPACITY[Math.min(dist, MAX_DIST)] ?? 0.07;
+        return dist === 0 ? EDGE_OWNED : dist === 1 ? EDGE_HOP1 : EDGE_HOP2;
     }
 
     function _drawAll() {
         if (!_g) return;
         _g.innerHTML = '';
 
+        // Edges behind nodes
         _edges.forEach(e => {
             const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
             line.setAttribute('x1', e.from.x); line.setAttribute('y1', e.from.y);
@@ -355,84 +338,81 @@
             line.setAttribute('stroke-width', e.dist === 0 ? 1.5 : 1);
             line.setAttribute('fill', 'none');
             line.dataset.edge = '1';
-            line.dataset.from = e.from.id;
-            line.dataset.to   = e.to.id;
             _g.appendChild(line);
         });
 
-        _nodes.forEach(node => _drawNode(node));
+        _nodes.forEach(n => _drawNode(n));
     }
 
     function _drawNode(node) {
-        const opacity = _nodeOpacity(node.dist);
         const color   = _nodeColor(node.dist);
+        const opacity = DIST_OPACITY[node.dist] ?? 0.15;
         const owned   = _ownedIds();
 
-        const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        group.setAttribute('transform', `translate(${node.x},${node.y})`);
-        group.dataset.skillId = node.id;
-        group.style.cursor    = 'pointer';
-        group.style.opacity   = opacity;
+        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        g.setAttribute('transform', `translate(${node.x},${node.y})`);
+        g.dataset.skillId = node.id;
+        g.style.cursor    = 'pointer';
+        g.style.opacity   = opacity;
 
+        // Background circle
         const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         circle.setAttribute('r', NODE_R);
-        circle.setAttribute('fill', node.dist === 0 ? 'rgba(212,175,55,0.12)' : 'rgba(15,10,4,0.7)');
+        circle.setAttribute('fill', node.dist === 0 ? 'rgba(212,175,55,0.10)' : 'rgba(10,7,2,0.75)');
         circle.setAttribute('stroke', color);
         circle.setAttribute('stroke-width', node.id === _selectedId ? 2.5 : 1);
-        group.appendChild(circle);
+        g.appendChild(circle);
 
-        // Partial parent ring — shows you're partway there
-        const parents = node.skill.parentSkills || [];
-        if (parents.length > 0 && node.dist > 0) {
-            const ownedParentCount = parents.filter(p => owned.has(p)).length;
-            if (ownedParentCount > 0 && ownedParentCount < parents.length) {
-                const frac = ownedParentCount / parents.length;
-                const r2   = NODE_R + 4;
+        // Partial arc — one of two parents owned
+        const parents = node.skill?.parentSkills || [];
+        if (node.dist > 0 && parents.length > 0) {
+            const ownedCount = parents.filter(p => owned.has(p)).length;
+            if (ownedCount > 0 && ownedCount < parents.length) {
+                const r2   = NODE_R + 5;
                 const circ = 2 * Math.PI * r2;
-                const ring = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                ring.setAttribute('r', r2);
-                ring.setAttribute('fill', 'none');
-                ring.setAttribute('stroke', AMBER);
-                ring.setAttribute('stroke-width', '1.5');
-                ring.setAttribute('stroke-dasharray', `${circ * frac} ${circ}`);
-                ring.setAttribute('stroke-opacity', '0.65');
-                ring.setAttribute('transform', 'rotate(-90)');
-                group.appendChild(ring);
+                const frac = ownedCount / parents.length;
+                const arc  = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                arc.setAttribute('r', r2);
+                arc.setAttribute('fill', 'none');
+                arc.setAttribute('stroke', AMBER);
+                arc.setAttribute('stroke-width', '2');
+                arc.setAttribute('stroke-dasharray', `${circ * frac} ${circ}`);
+                arc.setAttribute('stroke-opacity', '0.7');
+                arc.setAttribute('transform', 'rotate(-90)');
+                g.appendChild(arc);
             }
         }
 
-        const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        label.setAttribute('text-anchor', 'middle');
-        label.setAttribute('dominant-baseline', 'central');
-        label.setAttribute('fill', color);
-        label.setAttribute('font-size', '9');
-        label.setAttribute('font-family', 'var(--font-body, sans-serif)');
-        label.setAttribute('font-weight', node.dist === 0 ? '600' : '400');
-        label.style.pointerEvents = 'none';
-        label.style.userSelect    = 'none';
-        const name = node.skill.name;
-        label.textContent = name.length > 11 ? name.slice(0, 10) + '…' : name;
-        group.appendChild(label);
+        // Label
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('dominant-baseline', 'central');
+        text.setAttribute('fill', color);
+        text.setAttribute('font-size', node.dist === 0 ? '10' : '9');
+        text.setAttribute('font-family', 'var(--font-body, sans-serif)');
+        text.setAttribute('font-weight', node.dist === 0 ? '600' : '400');
+        text.style.pointerEvents = 'none';
+        text.style.userSelect    = 'none';
+        const name = node.skill?.name || node.id;
+        text.textContent = name.length > 12 ? name.slice(0, 11) + '…' : name;
+        g.appendChild(text);
 
+        // Level badge
         if (node.dist === 0 && node.rec && (node.rec.skillLevel || 0) >= 1) {
             const badge = document.createElementNS('http://www.w3.org/2000/svg', 'text');
             badge.setAttribute('x', NODE_R - 1);
-            badge.setAttribute('y', -(NODE_R - 1));
+            badge.setAttribute('y', -(NODE_R - 2));
             badge.setAttribute('text-anchor', 'end');
             badge.setAttribute('fill', '#8b7355');
             badge.setAttribute('font-size', '7');
             badge.setAttribute('font-family', 'var(--font-body, sans-serif)');
             badge.style.pointerEvents = 'none';
             badge.textContent = `L${node.rec.skillLevel}`;
-            group.appendChild(badge);
+            g.appendChild(badge);
         }
 
-        group.addEventListener('click', (e) => {
-            e.stopPropagation();
-            _selectNode(node);
-        });
-
-        _g.appendChild(group);
+        g.addEventListener('click', (e) => { e.stopPropagation(); _selectNode(node); });
+        _g.appendChild(g);
     }
 
     // ── Selection ─────────────────────────────────────────────────────────────
@@ -444,10 +424,10 @@
         const wrap = document.getElementById('skillTreeCanvasWrap');
         if (wrap) {
             const W = wrap.clientWidth, H = wrap.clientHeight;
-            const targetZoom = Math.max(_zoom, 1.8);
-            _zoom  = targetZoom;
-            _pan.x = W / 2 - node.x * targetZoom;
-            _pan.y = H / 2 - node.y * targetZoom;
+            const z = Math.max(_zoom, 2.0);
+            _zoom  = z;
+            _pan.x = W / 2 - node.x * z;
+            _pan.y = H / 2 - node.y * z;
             _applyTransform();
         }
 
@@ -461,54 +441,45 @@
         const { skill, rec, dist } = node;
         const owned = _ownedIds();
 
-        const categoryLabel = (skill.category || '').replace(/_/g, ' ').toLowerCase();
-        const costStr = skill.costType && skill.costAmount != null
-            ? `${skill.costAmount} ${skill.costType}` : null;
-        const parents = (skill.parentSkills || []).map(pid => {
+        const cat      = (skill?.category || '').replace(/_/g, ' ').toLowerCase();
+        const costStr  = skill?.costType && skill?.costAmount != null ? `${skill.costAmount} ${skill.costType}` : null;
+        const parents  = (skill?.parentSkills || []).map(pid => {
             const ps = _skillsData.find(s => s.id === pid);
-            return { id: pid, name: ps?.name || pid, owned: owned.has(pid) };
+            return { name: ps?.name || pid, owned: owned.has(pid) };
         });
-        const scalingStr = skill.scalingFactors
+        const scaling  = skill?.scalingFactors
             ? Object.entries(skill.scalingFactors).map(([k, v]) => `${k} ×${v}`).join(', ')
             : null;
 
-        const statusColor = dist === 0 ? GOLD : dist === 1 ? '#c09030' : AMBER;
-        const statusText  = dist === 0 ? 'Owned'
-            : dist === 1 ? 'One step away'
-            : `${dist} steps away`;
+        const statusColor = dist === 0 ? GOLD : dist === 1 ? AMBER : DIM;
+        const statusText  = dist === 0 ? 'Owned' : dist === 1 ? 'One step away' : 'Two steps away';
 
-        let html = `
-            <div style="border-bottom:1px solid rgba(212,175,55,0.12); padding-bottom:0.75rem; margin-bottom:0.75rem;">
-                <div style="font-family:var(--font-display); color:${GOLD}; font-size:0.95rem; margin-bottom:0.25rem;">${skill.name}</div>
-                <div style="font-size:0.72rem; color:${statusColor}; letter-spacing:0.06em; text-transform:uppercase;">${statusText}</div>
+        _panel.innerHTML = `
+            <div style="border-bottom:1px solid rgba(212,175,55,0.1); padding-bottom:0.8rem; margin-bottom:0.8rem;">
+                <div style="font-family:var(--font-display); color:${GOLD}; font-size:0.95rem; margin-bottom:0.3rem;">${skill?.name || node.id}</div>
+                <div style="font-size:0.7rem; color:${statusColor}; letter-spacing:0.07em; text-transform:uppercase;">${statusText}</div>
             </div>
-            <div style="font-size:0.78rem; color:#a09060; line-height:1.6; margin-bottom:0.75rem; font-style:italic;">${skill.description || ''}</div>
-            <div style="font-size:0.72rem; color:#6a5a30; letter-spacing:0.04em; text-transform:uppercase; margin-bottom:0.4rem;">Details</div>
-            <div style="font-size:0.78rem; color:#8a7040; line-height:1.9;">
-                <div>Category: <span style="color:#a09060;">${categoryLabel}</span></div>
-                ${costStr   ? `<div>Cost: <span style="color:#a09060;">${costStr}</span></div>`     : ''}
-                ${scalingStr ? `<div>Scales: <span style="color:#a09060;">${scalingStr}</span></div>` : ''}
-                ${rec && rec.skillLevel >= 1 ? `<div>Level: <span style="color:${GOLD};">${rec.skillLevel}</span></div>` : ''}
-                ${rec && rec.skillLevel >= 1 ? `<div>XP: <span style="color:#a09060;">${Math.floor(rec.skillXP || 0)}</span></div>` : ''}
+            <div style="font-size:0.78rem; color:#9a8850; line-height:1.65; margin-bottom:0.9rem; font-style:italic;">${skill?.description || ''}</div>
+            <div style="font-size:0.7rem; color:#5a4a20; letter-spacing:0.05em; text-transform:uppercase; margin-bottom:0.45rem;">Details</div>
+            <div style="font-size:0.78rem; color:#7a6830; line-height:2.0;">
+                <div>Category: <span style="color:#9a8040;">${cat}</span></div>
+                ${costStr  ? `<div>Cost: <span style="color:#9a8040;">${costStr}</span></div>` : ''}
+                ${scaling  ? `<div>Scales: <span style="color:#9a8040;">${scaling}</span></div>` : ''}
+                ${rec && (rec.skillLevel || 0) >= 1 ? `<div>Level: <span style="color:${GOLD};">${rec.skillLevel}</span></div>` : ''}
+                ${rec && (rec.skillLevel || 0) >= 1 ? `<div>XP: <span style="color:#9a8040;">${Math.floor(rec.skillXP || 0)}</span></div>` : ''}
             </div>
+            ${parents.length ? `
+            <div style="margin-top:1rem;">
+                <div style="font-size:0.7rem; color:#5a4a20; letter-spacing:0.05em; text-transform:uppercase; margin-bottom:0.5rem;">Requires</div>
+                ${parents.map(p => `
+                    <div style="font-size:0.78rem; color:${p.owned ? GOLD : '#4a3818'};
+                         display:flex; align-items:center; gap:0.45rem; margin-bottom:0.35rem;">
+                        <span style="width:6px;height:6px;border-radius:50%;flex-shrink:0;
+                            background:${p.owned ? GOLD : '#3a2a0e'};display:inline-block;"></span>
+                        ${p.name}
+                    </div>`).join('')}
+            </div>` : ''}
         `;
-
-        if (parents.length > 0) {
-            html += `
-                <div style="margin-top:1rem;">
-                    <div style="font-size:0.72rem; color:#6a5a30; letter-spacing:0.04em; text-transform:uppercase; margin-bottom:0.5rem;">Requires</div>
-                    ${parents.map(p => `
-                        <div style="font-size:0.78rem; color:${p.owned ? GOLD : '#4a3a18'};
-                             display:flex; align-items:center; gap:0.4rem; margin-bottom:0.3rem;">
-                            <span style="display:inline-block; width:6px; height:6px; border-radius:50%;
-                                background:${p.owned ? GOLD : '#3a2a10'}; flex-shrink:0;"></span>
-                            ${p.name}
-                        </div>`).join('')}
-                </div>
-            `;
-        }
-
-        _panel.innerHTML = html;
     }
 
     // ── Pan / zoom ────────────────────────────────────────────────────────────
@@ -518,7 +489,7 @@
             if (e.target === _svg || e.target === _g) {
                 _selectedId = null;
                 _drawAll();
-                if (_panel) _panel.innerHTML = '<div style="color:#3a3020; font-size:0.78rem; font-style:italic; margin-top:2rem; text-align:center;">Select a skill to inspect</div>';
+                if (_panel) _panel.innerHTML = '<div style="color:#3a3020;font-size:0.78rem;font-style:italic;margin-top:2rem;text-align:center;">Select a skill to inspect</div>';
             }
         });
 
@@ -545,7 +516,7 @@
 
         wrap.addEventListener('wheel', (e) => {
             e.preventDefault();
-            _zoom = Math.min(4, Math.max(0.15, _zoom * (e.deltaY < 0 ? 1.1 : 0.9)));
+            _zoom = Math.min(5, Math.max(0.1, _zoom * (e.deltaY < 0 ? 1.1 : 0.9)));
             _applyTransform();
         }, { passive: false });
 
