@@ -222,8 +222,8 @@
             const totalDesc  = children.reduce((s, id) => s + (allDescendants.get(id) || 0) + 1, 0);
             const totalAngle = Math.min(Math.PI * 1.85, children.length * 0.55);
 
-            // Spread children in full arc around parent
-            const baseAngle = Math.atan2(parent.y, parent.x);
+            // Spread children evenly in full arc around parent (no forced outward direction)
+            const baseAngle = -Math.PI / 2;  // start from top, let layout spread naturally
 
             let angleUsed = -totalAngle / 2;
             children.forEach(id => {
@@ -241,7 +241,7 @@
                 _nodes.push(node);
                 placed.set(id, node);
 
-                _edges.push({ from: parent, to: node, dist: 0 });
+                _edges.push({ from: parent, to: node, dist: 0, immediate: true });
             });
         });
 
@@ -253,7 +253,7 @@
                     const from = placed.get(pid);
                     const to   = placed.get(id);
                     if (from && to && !_edges.find(e => e.from.id === from.id && e.to.id === to.id)) {
-                        _edges.push({ from, to, dist: 0 });
+                        _edges.push({ from, to, dist: 0, immediate: true });
                     }
                 }
             });
@@ -277,7 +277,7 @@
             const sibIdx   = siblings.length; // index of this new node
             const sibCount = (directChildren.get(primaryParent) || 1);
             const totalAngle = Math.min(Math.PI * 1.2, sibCount * 0.45);
-            const baseAngle  = Math.atan2(parent.y - cy, parent.x - cx);
+            const baseAngle  = -Math.PI / 2;
             const angle      = baseAngle - totalAngle / 2 + (sibIdx / Math.max(1, sibCount)) * totalAngle;
 
             const r = _nodeHalfW(skillMap.get(id)?.name || id);
@@ -287,7 +287,7 @@
             const node = { id, skill, rec: _skillRecord(id), dist: 2, x, y, r };
             _nodes.push(node);
             placed.set(id, node);
-            _edges.push({ from: parent, to: node, dist: 1 });
+            _edges.push({ from: parent, to: node, dist: 1, immediate: true });
         });
 
         // Also draw edges for hop-1 nodes that share a parent with owned nodes
@@ -296,7 +296,7 @@
                 if (placed.has(pid)) {
                     const from = placed.get(pid);
                     if (!_edges.find(e => e.from.id === from.id && e.to.id === node.id)) {
-                        _edges.push({ from, to: node, dist: Math.min(from.dist, node.dist) });
+                        _edges.push({ from, to: node, dist: Math.min(from.dist, node.dist), immediate: false });
                     }
                 }
             });
@@ -424,10 +424,11 @@
         if (!_g) return;
         _g.innerHTML = '';
 
-        // Edges first — quadratic bezier curves bulging outward from center
+        // Edges first — immediate edges always shown, non-immediate only when in lineage
         _edges.forEach(e => {
             const edgeInLineage = _lineageIds.has(e.from.id) && _lineageIds.has(e.to.id);
             const hasSel = _selectedId !== null;
+            if (!e.immediate && !edgeInLineage) return;  // hide non-immediate unless selected
             // Attach edge to nearest rect edge rather than center
             const dx = e.to.x - e.from.x, dy = e.to.y - e.from.y;
             const len = Math.sqrt(dx*dx + dy*dy) || 1;
