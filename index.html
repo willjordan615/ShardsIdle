@@ -1654,11 +1654,41 @@ function mapOpenModal(c) {
   if (locked) {
     loreEl.innerHTML = '<em>Your knowledge of this place has not yet surfaced from the deep.</em>';
   } else if (full) {
-    loreEl.innerHTML = `
-      <div style="margin-bottom:8px;">${full.description || c.lore}</div>
-      <div style="font-size:11px;color:#6a5020;margin-bottom:4px;">Recommended Level: <span style="color:#c8a84b;">${full.recommendedLevel}</span></div>
-      <div style="font-size:11px;color:#6a5020;">Party: <span style="color:#c8a84b;">${full.minPartySize}–${full.maxPartySize} members</span></div>
+    const completions = (typeof currentState !== 'undefined' && currentState.challengeCompletions) || {};
+    const record = completions[full.id] || {};
+    const count = record.completions || 0;
+    const secretCount = record.secretCompletions || 0;
+    const loreEntries = full.lore || [];
+    const unlockedLore = loreEntries.filter(e =>
+      e.requiresSecret ? secretCount >= (e.unlocksAfter || 1) : count >= e.unlocksAfter
+    );
+    const lockedLoreCount = loreEntries.length - unlockedLore.length;
+
+    let loreHtml = `
+      <div style="margin-bottom:10px;color:#8a7040;font-style:italic;">${full.description || c.lore}</div>
+      <div style="display:flex;gap:16px;font-size:11px;color:#6a5020;margin-bottom:${loreEntries.length ? '12px' : '0'};">
+        <span>Recommended Level: <span style="color:#c8a84b;">${full.recommendedLevel}</span></span>
+        <span>Party: <span style="color:#c8a84b;">${full.minPartySize}–${full.maxPartySize}</span></span>
+      </div>
     `;
+
+    if (loreEntries.length > 0) {
+      loreHtml += `<div style="border-top:1px solid rgba(139,115,85,0.2);padding-top:10px;">`;
+      if (unlockedLore.length > 0) {
+        loreHtml += unlockedLore.map(e => `
+          <div style="color:#a09070;font-size:0.78rem;font-style:italic;margin-bottom:8px;line-height:1.6;padding-left:10px;border-left:2px solid rgba(200,168,75,0.3);">
+            "${e.text}"
+          </div>`).join('');
+      }
+      if (lockedLoreCount > 0) {
+        loreHtml += `<div style="color:#3a3020;font-size:0.7rem;letter-spacing:0.05em;margin-top:4px;">
+          ${'🔒 '.repeat(lockedLoreCount).trim()} &nbsp;${lockedLoreCount} entr${lockedLoreCount === 1 ? 'y' : 'ies'} undiscovered
+        </div>`;
+      }
+      loreHtml += `</div>`;
+    }
+
+    loreEl.innerHTML = loreHtml;
   } else {
     loreEl.innerHTML = `<em>${c.lore}</em>`;
   }
@@ -1843,6 +1873,9 @@ window.initMapScreen = async function (characterId) {
     const char = await getCharacter(characterId);
     const lvl = char?.level || 1;
     document.getElementById('mapLevelDisplay').textContent = lvl;
+    if (typeof currentState !== 'undefined') {
+      currentState.challengeCompletions = char?.combatStats?.challengeCompletions || {};
+    }
     mapBuildNodes(lvl);
     mapInitPanZoom();
   } catch (e) {
