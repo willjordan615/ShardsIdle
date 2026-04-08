@@ -13,10 +13,10 @@
     // ── Constants ────────────────────────────────────────────────────────────
 
     const PANEL_W    = 268;
-    const BASE_R     = 18;      // minimum node radius
-    const CHILD_SCALE = 2.2;   // radius += sqrt(children) * CHILD_SCALE
-    const HOP1_DIST  = 160;    // px from parent center to hop-1 child center
-    const HOP2_DIST  = 130;    // px from hop-1 center to hop-2 child center
+    const BASE_R     = 22;      // minimum node radius
+    const CHILD_SCALE = 3.0;   // radius += sqrt(children) * CHILD_SCALE
+    const HOP1_DIST  = 320;    // px from parent center to hop-1 child center
+    const HOP2_DIST  = 260;    // px from hop-1 center to hop-2 child center
     const MIN_SEP    = 8;      // minimum gap between node edges
 
     const GOLD   = '#d4af37';
@@ -382,15 +382,21 @@
         if (!_g) return;
         _g.innerHTML = '';
 
-        // Edges first
+        // Edges first — quadratic bezier curves bulging outward from center
         _edges.forEach(e => {
-            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            line.setAttribute('x1', e.from.x); line.setAttribute('y1', e.from.y);
-            line.setAttribute('x2', e.to.x);   line.setAttribute('y2', e.to.y);
-            line.setAttribute('stroke', _edgeColor(e.dist));
-            line.setAttribute('stroke-width', e.dist === 0 ? 1.5 : 1);
-            line.setAttribute('fill', 'none');
-            _g.appendChild(line);
+            const mx = (e.from.x + e.to.x) / 2;
+            const my = (e.from.y + e.to.y) / 2;
+            // Control point: midpoint pushed outward from origin by 20%
+            const mag = Math.sqrt(mx * mx + my * my) || 1;
+            const bulge = 0.18;
+            const cx = mx + (mx / mag) * Math.sqrt((e.to.x - e.from.x) ** 2 + (e.to.y - e.from.y) ** 2) * bulge;
+            const cy = my + (my / mag) * Math.sqrt((e.to.x - e.from.x) ** 2 + (e.to.y - e.from.y) ** 2) * bulge;
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.setAttribute('d', `M${e.from.x},${e.from.y} Q${cx},${cy} ${e.to.x},${e.to.y}`);
+            path.setAttribute('stroke', _edgeColor(e.dist));
+            path.setAttribute('stroke-width', e.dist === 0 ? 1.5 : 1);
+            path.setAttribute('fill', 'none');
+            _g.appendChild(path);
         });
 
         _nodes.forEach(n => _drawNode(n));
