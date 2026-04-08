@@ -16,8 +16,8 @@
     const NODE_H     = 28;      // node height
     const NODE_PAD   = 10;     // horizontal padding inside node
     const NODE_RX    = 6;      // corner radius
-    const HOP1_DIST  = 320;    // px from parent center to hop-1 child center
-    const HOP2_DIST  = 260;    // px from hop-1 center to hop-2 child center
+    const HOP1_DIST  = 520;    // px from parent center to hop-1 child center
+    const HOP2_DIST  = 420;    // px from hop-1 center to hop-2 child center
     const MIN_SEP    = 8;      // minimum gap between node edges
 
     const GOLD   = '#d4af37';
@@ -47,7 +47,7 @@
         DEFAULT:        '#8a7a5a',
     };
 
-    const DIST_OPACITY = [1.0, 0.65, 0.30];
+    const DIST_OPACITY = [1.0, 0.80, 0.18];
 
     // Highlight color for selected lineage
     const HIGHLIGHT     = '#40c060';
@@ -187,7 +187,7 @@
             if (ownedCount === 1) {
                 x = cx; y = cy;
             } else {
-                const clusterR = Math.max(60, ownedCount * 18);
+                const clusterR = Math.max(80, ownedCount * 30);
                 const angle    = (i / ownedCount) * Math.PI * 2;
                 x = cx + Math.cos(angle) * clusterR;
                 y = cy + Math.sin(angle) * clusterR;
@@ -414,9 +414,9 @@
     }
 
     function _edgeColor(dist) {
-        if (dist === 0) return 'rgba(212,175,55,0.5)';
-        if (dist === 1) return 'rgba(120,100,60,0.25)';
-        return 'rgba(60,50,30,0.12)';
+        if (dist === 0) return 'rgba(212,175,55,0.75)';
+        if (dist === 1) return 'rgba(120,100,60,0.22)';
+        return 'rgba(50,40,20,0.08)';
     }
 
     function _drawAll() {
@@ -443,7 +443,7 @@
             const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
             path.setAttribute('d', `M${x1},${y1} Q${cx},${cy} ${x2},${y2}`);
             path.setAttribute('stroke', edgeInLineage ? 'rgba(40,180,80,0.8)' : _edgeColor(e.dist));
-            path.setAttribute('stroke-width', edgeInLineage ? 2 : e.dist === 0 ? 1.5 : 1);
+            path.setAttribute('stroke-width', edgeInLineage ? 2.5 : e.dist === 0 ? 2 : 0.7);
             path.setAttribute('opacity', hasSel ? (edgeInLineage ? 1 : 0.06) : 1);
             path.setAttribute('fill', 'none');
             _g.appendChild(path);
@@ -456,7 +456,11 @@
         const inLineage  = _lineageIds.has(node.id);
         const hasSel     = _selectedId !== null;
         const color      = inLineage ? HIGHLIGHT : _nodeColor(node);
-        const baseOpacity = DIST_OPACITY[node.dist] ?? 0.15;
+        // Hop-1 nodes where player owns at least one parent get boosted opacity
+        const owned      = _ownedIds();
+        const ownedParentCount = (node.skill?.parentSkills || []).filter(p => owned.has(p)).length;
+        let baseOpacity = DIST_OPACITY[node.dist] ?? 0.15;
+        if (node.dist === 1 && ownedParentCount > 0) baseOpacity = 0.88;
         const opacity    = hasSel ? (inLineage ? 1.0 : 0.08) : baseOpacity;
         const owned      = _ownedIds();
         const name       = node.skill?.name || node.id;
@@ -478,7 +482,7 @@
         rect.setAttribute('rx', NODE_RX);
         rect.setAttribute('fill', inLineage ? 'rgba(40,180,80,0.12)' : node.dist === 0 ? 'rgba(212,175,55,0.10)' : 'rgba(10,7,2,0.85)');
         rect.setAttribute('stroke', color);
-        rect.setAttribute('stroke-width', node.id === _selectedId ? 2.5 : inLineage ? 1.5 : 0.8);
+        rect.setAttribute('stroke-width', node.id === _selectedId ? 2.5 : inLineage ? 1.5 : node.dist === 0 ? 1.5 : 0.7);
         g.appendChild(rect);
 
         // Partial parent progress bar along bottom edge
