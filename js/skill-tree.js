@@ -21,6 +21,8 @@
     const MIN_SEP    = 8;      // minimum gap between node edges
 
     const GOLD   = '#d4af37';
+    const AMBER  = '#a07828';
+    const DIM    = '#5a4520';
 
     // Category color map
     const CAT_COLOR = {
