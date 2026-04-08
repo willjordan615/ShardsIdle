@@ -196,7 +196,7 @@
             let angleUsed = -totalAngle / 2;
             children.forEach(id => {
                 const skill   = skillMap.get(id);
-                const r       = _nodeRadius(directChildren.get(id) || 0);
+                const r       = _nodeHalfW(skillMap.get(id)?.name || id);
                 const share   = ((allDescendants.get(id) || 0) + 1) / Math.max(1, totalDesc);
                 const myAngle = share * totalAngle;
                 const angle   = baseAngle + angleUsed + myAngle / 2;
@@ -248,7 +248,7 @@
             const baseAngle  = Math.atan2(parent.y - cy, parent.x - cx);
             const angle      = baseAngle - totalAngle / 2 + (sibIdx / Math.max(1, sibCount)) * totalAngle;
 
-            const r = _nodeRadius(directChildren.get(id) || 0);
+            const r = _nodeHalfW(skillMap.get(id)?.name || id);
             const x = parent.x + Math.cos(angle) * (HOP2_DIST + parent.r + r);
             const y = parent.y + Math.sin(angle) * (HOP2_DIST + parent.r + r);
 
