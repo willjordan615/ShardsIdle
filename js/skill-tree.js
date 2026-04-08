@@ -291,19 +291,54 @@
     // ── Lineage ───────────────────────────────────────────────────────────────
 
     function _computeLineage(id) {
-        const ids = new Set([id]);
-        const walkUp = (sid) => {
-            (_skillMap.get(sid)?.parentSkills || []).forEach(pid => {
-                if (!ids.has(pid)) { ids.add(pid); walkUp(pid); }
-            });
-        };
-        const walkDown = (sid) => {
-            (_childrenOf.get(sid) || []).forEach(cid => {
-                if (!ids.has(cid)) { ids.add(cid); walkDown(cid); }
-            });
-        };
-        walkUp(id); walkDown(id);
+        const ids    = new Set([id]);
+        const owned  = _ownedIds();
+
+        // Direct parents only (one level up, any hub)
+        (_skillMap.get(id)?.parentSkills || []).forEach(pid => ids.add(pid));
+
+        // Direct children; if child is owned, also add its children
+        (_childrenOf.get(id) || []).forEach(cid => {
+            ids.add(cid);
+            if (owned.has(cid)) {
+                (_childrenOf.get(cid) || []).forEach(gcid => ids.add(gcid));
+            }
+        });
+
         return ids;
+    }
+
+    // Nodes that need to be drawn for lineage but aren't in the open hub's child list
+    function _lineageExtraNodes() {
+        if (!_selectedId) return [];
+        const owned    = _ownedIds();
+        const inChild  = new Set([..._childNodes.map(n => n.id), _openHubId]);
+        const extras   = [];
+        _lineageIds.forEach(id => {
+            if (inChild.has(id)) return;
+            const skill = _skillMap.get(id);
+            if (!skill) return;
+            // Find position — use hub position if it's a hub, otherwise place near its child
+            const hub = _hubs.find(h => h.id === id);
+            if (hub) { extras.push(hub); return; }
+            // Place near the selected node as a ghost
+            const sel = _childNodes.find(n => n.id === _selectedId);
+            if (!sel) return;
+            const idx   = extras.length;
+            const angle = (idx / 4) * Math.PI * 2;
+            extras.push({
+                id, skill, rec: _skillRecord(id),
+                owned: owned.has(id),
+                depth: 0,
+                x: sel.x + Math.cos(angle) * 200,
+                y: sel.y + Math.sin(angle) * 200,
+                hw: _hw(skill.name, false),
+                hh: NODE_H / 2,
+                isHub: false,
+                ghost: true,
+            });
+        });
+        return extras;
     }
 
     // ── Modal ─────────────────────────────────────────────────────────────────
@@ -399,6 +434,27 @@
                 const opacity   = hasSel ? (inLineage ? 1.0 : 0.07) : (node.owned ? 1.0 : _distOpacity(node, owned));
                 _drawNode(node, inLineage, opacity, owned);
             });
+
+            // Draw extra lineage nodes (cross-hub parents/children not in current subtree)
+            if (hasSel) {
+                const extras = _lineageExtraNodes();
+                extras.forEach(node => {
+                    if (_hubs.find(h => h.id === node.id)) return; // hubs drawn separately
+                    _drawNode(node, true, 1.0, owned);
+                });
+                // Draw edges to extra nodes
+                const allVisible = new Map([..._childNodes.map(n => [n.id, n]), ...extras.map(n => [n.id, n])]);
+                extras.forEach(node => {
+                    (node.skill?.parentSkills || []).forEach(pid => {
+                        const pNode = allVisible.get(pid);
+                        if (pNode) _drawEdge(pNode, node, 'rgba(60,200,100,0.5)', 1.2);
+                    });
+                    (_childrenOf.get(node.id) || []).forEach(cid => {
+                        const cNode = allVisible.get(cid);
+                        if (cNode && _lineageIds.has(cid)) _drawEdge(node, cNode, 'rgba(60,200,100,0.5)', 1.2);
+                    });
+                });
+            }
         }
 
         // Draw hubs (always on top)
