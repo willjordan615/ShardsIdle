@@ -370,6 +370,43 @@
         modal.style.display = 'block';
     }
 
+    // ── Separation pass ──────────────────────────────────────────────────────────
+
+    function _separateNodes() {
+        const MIN_X_GAP = 24;  // minimum horizontal gap between node edges
+        const MIN_Y_GAP = 18;  // minimum vertical gap between node edges
+        const PASSES    = 80;  // iterations — more = cleaner but slower
+
+        for (let pass = 0; pass < PASSES; pass++) {
+            let moved = false;
+            for (let i = 0; i < _nodes.length; i++) {
+                for (let j = i + 1; j < _nodes.length; j++) {
+                    const a = _nodes[i], b = _nodes[j];
+                    const ax = a.r, ay = NODE_H / 2;  // half extents
+                    const bx = b.r, by = NODE_H / 2;
+
+                    const dx = b.x - a.x;
+                    const dy = b.y - a.y;
+                    const overlapX = (ax + bx + MIN_X_GAP) - Math.abs(dx);
+                    const overlapY = (ay + by + MIN_Y_GAP) - Math.abs(dy);
+
+                    if (overlapX > 0 && overlapY > 0) {
+                        // Push apart along the axis of least overlap
+                        moved = true;
+                        if (overlapX < overlapY) {
+                            const push = (overlapX / 2 + 1) * Math.sign(dx || 1);
+                            a.x -= push; b.x += push;
+                        } else {
+                            const push = (overlapY / 2 + 1) * Math.sign(dy || 1);
+                            a.y -= push; b.y += push;
+                        }
+                    }
+                }
+            }
+            if (!moved) break;
+        }
+    }
+
     // ── Canvas init ───────────────────────────────────────────────────────────
 
     function _initCanvas() {
@@ -392,6 +429,7 @@
         _pan.y = H / 2;
 
         _buildLayout(cx - W / 2, cy - H / 2);  // layout coords relative to pan origin
+        _separateNodes();  // push overlapping nodes apart
 
         _drawAll();
         _applyTransform();
