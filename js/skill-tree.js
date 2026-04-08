@@ -1,46 +1,48 @@
 /**
- * skill-tree.js — Force-directed skill web
+ * skill-tree.js — Radial bubble skill web
  *
- * Shows owned skills + 2 hops out. Brightness encodes distance from owned
- * cluster. Owned skills glow gold; each hop dims. Edges follow the same falloff.
+ * Owned skills at center. Children arranged in arcs around their parents.
+ * Node radius scales with direct child count. Arc space scales with total
+ * descendants. Two hops visible; brightness encodes distance from owned.
  *
- * Click a node: zoom to it, open detail panel on the right.
- * Pan: drag. Zoom: scroll wheel / pinch.
+ * Click: zoom + detail panel. Pan: drag. Zoom: scroll.
  */
 
 (function () {
 
     // ── Constants ────────────────────────────────────────────────────────────
 
-    const NODE_R       = 24;
-    const MIN_GAP      = NODE_R * 2 + 24;  // minimum center-to-center distance
-    const PANEL_W      = 268;
-
-    const DIST_OPACITY = [1.0, 0.65, 0.32];
+    const PANEL_W    = 268;
+    const BASE_R     = 18;      // minimum node radius
+    const CHILD_SCALE = 2.2;   // radius += sqrt(children) * CHILD_SCALE
+    const HOP1_DIST  = 160;    // px from parent center to hop-1 child center
+    const HOP2_DIST  = 130;    // px from hop-1 center to hop-2 child center
+    const MIN_SEP    = 8;      // minimum gap between node edges
 
     const GOLD   = '#d4af37';
     const AMBER  = '#a07828';
     const DIM    = '#5a4520';
 
-    const EDGE_OWNED = 'rgba(212,175,55,0.6)';
-    const EDGE_HOP1  = 'rgba(140,100,30,0.35)';
-    const EDGE_HOP2  = 'rgba(70,50,15,0.18)';
+    const DIST_OPACITY = [1.0, 0.7, 0.35];
+
+    const EDGE_OWNED = 'rgba(212,175,55,0.55)';
+    const EDGE_HOP1  = 'rgba(140,100,30,0.3)';
+    const EDGE_HOP2  = 'rgba(70,50,15,0.15)';
 
     // ── State ────────────────────────────────────────────────────────────────
 
-    let _skillsData = null;
-    let _character  = null;
-    let _nodes      = [];
-    let _edges      = [];
-    let _svg        = null;
-    let _g          = null;
-    let _panel      = null;
-    let _pan        = { x: 0, y: 0 };
-    let _zoom       = 1;
-    let _dragging   = false;
-    let _lastMouse  = { x: 0, y: 0 };
-    let _selectedId = null;
-    let _simHandle  = null;
+    let _skillsData  = null;
+    let _character   = null;
+    let _nodes       = [];   // { id, skill, rec, dist, x, y, r }
+    let _edges       = [];   // { from, to, dist }
+    let _svg         = null;
+    let _g           = null;
+    let _panel       = null;
+    let _pan         = { x: 0, y: 0 };
+    let _zoom        = 1;
+    let _dragging    = false;
+    let _lastMouse   = { x: 0, y: 0 };
+    let _selectedId  = null;
 
     // ── Public entry point ───────────────────────────────────────────────────
 
@@ -63,11 +65,10 @@
             return;
         }
 
-        _buildGraph();
         requestAnimationFrame(() => _initCanvas());
     };
 
-    // ── Graph construction ───────────────────────────────────────────────────
+    // ── Helpers ───────────────────────────────────────────────────────────────
 
     function _ownedIds() {
         const ids = new Set();
@@ -81,25 +82,53 @@
         return (_character.skills || []).find(s => s.skillID === id) || null;
     }
 
-    function _buildGraph() {
+    function _nodeRadius(directChildren) {
+        return BASE_R + Math.sqrt(directChildren) * CHILD_SCALE;
+    }
+
+    // ── Graph layout ──────────────────────────────────────────────────────────
+
+    function _buildLayout(cx, cy) {
         const owned    = _ownedIds();
         const skillMap = new Map(_skillsData.map(s => [s.id, s]));
 
-        // Assign distances: 0 = owned, 1 = one hop, 2 = two hops
+        // Precompute direct children and total descendants for all skills
+        const directChildren = new Map();  // id → count
+        const allDescendants = new Map();  // id → count
+
+        _skillsData.forEach(s => directChildren.set(s.id, 0));
+        _skillsData.forEach(s => {
+            (s.parentSkills || []).forEach(pid => {
+                if (directChildren.has(pid)) directChildren.set(pid, directChildren.get(pid) + 1);
+            });
+        });
+
+        function countDescendants(id, visited = new Set()) {
+            if (visited.has(id)) return 0;
+            visited.add(id);
+            let count = 0;
+            _skillsData.forEach(s => {
+                if ((s.parentSkills || []).includes(id)) {
+                    count += 1 + countDescendants(s.id, visited);
+                }
+            });
+            return count;
+        }
+
+        _skillsData.forEach(s => allDescendants.set(s.id, countDescendants(s.id)));
+
+        // Assign distances: 0=owned, 1=hop1, 2=hop2
         const distMap = new Map();
         owned.forEach(id => { if (skillMap.has(id)) distMap.set(id, 0); });
-
         [1, 2].forEach(hop => {
             _skillsData.forEach(s => {
                 if (distMap.has(s.id)) return;
-                const parents = s.parentSkills || [];
-                if (parents.some(p => distMap.get(p) === hop - 1)) {
+                if ((s.parentSkills || []).some(p => distMap.get(p) === hop - 1)) {
                     distMap.set(s.id, hop);
                 }
             });
         });
-
-        // Also pull in parents of owned skills that aren't owned (so the web shows roots)
+        // Pull in parents of owned that aren't owned (roots)
         owned.forEach(id => {
             const skill = skillMap.get(id);
             if (!skill) return;
@@ -108,42 +137,141 @@
             });
         });
 
-        // Build node list without positions — positions assigned in _initCanvas
-        const byDist = { 0: [], 1: [], 2: [] };
-        distMap.forEach((dist, id) => {
-            if (byDist[dist]) byDist[dist].push(id);
+        const visible = new Set(distMap.keys());
+
+        // Place owned skills in a tight cluster at center
+        _nodes = [];
+        _edges = [];
+        const placed = new Map(); // id → node
+
+        const ownedList = [...owned].filter(id => skillMap.has(id));
+        const ownedCount = ownedList.length;
+
+        ownedList.forEach((id, i) => {
+            const skill = skillMap.get(id);
+            const r     = _nodeRadius(directChildren.get(id) || 0);
+            let x, y;
+            if (ownedCount === 1) {
+                x = cx; y = cy;
+            } else {
+                const clusterR = Math.max(60, ownedCount * 18);
+                const angle    = (i / ownedCount) * Math.PI * 2;
+                x = cx + Math.cos(angle) * clusterR;
+                y = cy + Math.sin(angle) * clusterR;
+            }
+            const node = { id, skill, rec: _skillRecord(id), dist: 0, x, y, r };
+            _nodes.push(node);
+            placed.set(id, node);
         });
 
-        _nodes = [];
-        [0, 1, 2].forEach(dist => {
-            byDist[dist].forEach(id => {
-                _nodes.push({
-                    id,
-                    skill:  skillMap.get(id),
-                    rec:    _skillRecord(id),
-                    dist,
-                    owned:  owned.has(id),
-                    x: 0, y: 0, vx: 0, vy: 0,
-                });
+        // Place hop-1 children around their parents
+        // Group hop-1 nodes by which owned parent they connect to
+        const hop1ByParent = new Map();
+        distMap.forEach((dist, id) => {
+            if (dist !== 1) return;
+            const skill = skillMap.get(id);
+            if (!skill) return;
+            const knownParents = (skill.parentSkills || []).filter(p => placed.has(p));
+            const primaryParent = knownParents[0] || null;
+            if (!primaryParent) return;
+            if (!hop1ByParent.has(primaryParent)) hop1ByParent.set(primaryParent, []);
+            hop1ByParent.get(primaryParent).push(id);
+        });
+
+        hop1ByParent.forEach((children, parentId) => {
+            const parent = placed.get(parentId);
+            if (!parent) return;
+
+            // Sort children by descendant count descending so spacious ones get center angles
+            children.sort((a, b) => (allDescendants.get(b) || 0) - (allDescendants.get(a) || 0));
+
+            const totalDesc  = children.reduce((s, id) => s + (allDescendants.get(id) || 0) + 1, 0);
+            const totalAngle = Math.min(Math.PI * 1.6, children.length * 0.5);
+
+            // Base angle: point away from canvas center
+            const baseAngle = Math.atan2(parent.y - cy, parent.x - cx);
+
+            let angleUsed = -totalAngle / 2;
+            children.forEach(id => {
+                const skill   = skillMap.get(id);
+                const r       = _nodeRadius(directChildren.get(id) || 0);
+                const share   = ((allDescendants.get(id) || 0) + 1) / Math.max(1, totalDesc);
+                const myAngle = share * totalAngle;
+                const angle   = baseAngle + angleUsed + myAngle / 2;
+                angleUsed    += myAngle;
+
+                const x = parent.x + Math.cos(angle) * (HOP1_DIST + parent.r + r);
+                const y = parent.y + Math.sin(angle) * (HOP1_DIST + parent.r + r);
+
+                const node = { id, skill, rec: _skillRecord(id), dist: 1, x, y, r };
+                _nodes.push(node);
+                placed.set(id, node);
+
+                _edges.push({ from: parent, to: node, dist: 0 });
             });
         });
 
-        // Edges between visible nodes
-        const visible = new Set(distMap.keys());
-        _edges = [];
-        _nodes.forEach(node => {
+        // Add edges between owned nodes
+        ownedList.forEach(id => {
+            const skill = skillMap.get(id);
+            (skill?.parentSkills || []).forEach(pid => {
+                if (placed.has(pid) && placed.get(pid).dist === 0) {
+                    const from = placed.get(pid);
+                    const to   = placed.get(id);
+                    if (from && to && !_edges.find(e => e.from.id === from.id && e.to.id === to.id)) {
+                        _edges.push({ from, to, dist: 0 });
+                    }
+                }
+            });
+        });
+
+        // Place hop-2 children around hop-1 parents
+        distMap.forEach((dist, id) => {
+            if (dist !== 2) return;
+            const skill = skillMap.get(id);
+            if (!skill) return;
+            const knownParents = (skill.parentSkills || []).filter(p => placed.has(p));
+            if (!knownParents.length) return;
+            const primaryParent = knownParents[0];
+            const parent = placed.get(primaryParent);
+            if (!parent) return;
+
+            // Find siblings to distribute angle
+            const siblings = _nodes.filter(n =>
+                n.dist === 2 && (n.skill?.parentSkills || []).includes(primaryParent)
+            );
+            const sibIdx   = siblings.length; // index of this new node
+            const sibCount = (directChildren.get(primaryParent) || 1);
+            const totalAngle = Math.min(Math.PI * 1.2, sibCount * 0.45);
+            const baseAngle  = Math.atan2(parent.y - cy, parent.x - cx);
+            const angle      = baseAngle - totalAngle / 2 + (sibIdx / Math.max(1, sibCount)) * totalAngle;
+
+            const r = _nodeRadius(directChildren.get(id) || 0);
+            const x = parent.x + Math.cos(angle) * (HOP2_DIST + parent.r + r);
+            const y = parent.y + Math.sin(angle) * (HOP2_DIST + parent.r + r);
+
+            const node = { id, skill, rec: _skillRecord(id), dist: 2, x, y, r };
+            _nodes.push(node);
+            placed.set(id, node);
+            _edges.push({ from: parent, to: node, dist: 1 });
+        });
+
+        // Also draw edges for hop-1 nodes that share a parent with owned nodes
+        _nodes.filter(n => n.dist === 1).forEach(node => {
             (node.skill?.parentSkills || []).forEach(pid => {
-                if (!visible.has(pid)) return;
-                const pNode = _nodes.find(n => n.id === pid);
-                if (!pNode) return;
-                _edges.push({ from: pNode, to: node, dist: Math.min(node.dist, pNode.dist) });
+                if (placed.has(pid)) {
+                    const from = placed.get(pid);
+                    if (!_edges.find(e => e.from.id === from.id && e.to.id === node.id)) {
+                        _edges.push({ from, to: node, dist: Math.min(from.dist, node.dist) });
+                    }
+                }
             });
         });
     }
 
-    // ── Modal ────────────────────────────────────────────────────────────────
+    // ── Modal ─────────────────────────────────────────────────────────────────
 
-    function _renderModal(loading = false) {
+    function _renderModal() {
         let modal = document.getElementById('skillTreeModal');
         if (!modal) {
             modal = document.createElement('div');
@@ -169,8 +297,8 @@
                     <div style="display:flex; align-items:center; gap:1.5rem;">
                         <div style="display:flex; align-items:center; gap:1rem; font-size:0.72rem; color:#5a4a20;">
                             <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${GOLD};margin-right:5px;vertical-align:middle;"></span>Owned</span>
-                            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${AMBER};margin-right:5px;vertical-align:middle;opacity:0.65;"></span>Reachable</span>
-                            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${DIM};margin-right:5px;vertical-align:middle;opacity:0.32;"></span>Beyond</span>
+                            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${AMBER};margin-right:5px;vertical-align:middle;opacity:0.7;"></span>Reachable</span>
+                            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${DIM};margin-right:5px;vertical-align:middle;opacity:0.35;"></span>Beyond</span>
                         </div>
                         <button onclick="closeModal('skillTreeModal')"
                             style="background:none; border:1px solid rgba(212,175,55,0.18); color:#6a5a30;
@@ -211,6 +339,7 @@
     // ── Canvas init ───────────────────────────────────────────────────────────
 
     function _initCanvas() {
+        _renderModal();
         const wrap = document.getElementById('skillTreeCanvasWrap');
         if (!wrap) return;
 
@@ -220,103 +349,23 @@
         _g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         _svg.appendChild(_g);
 
-        const W = wrap.clientWidth, H = wrap.clientHeight;
+        const W  = wrap.clientWidth;
+        const H  = wrap.clientHeight;
+        const cx = (W - PANEL_W) / 2;
+        const cy = H / 2;
+
         _pan.x = W / 2;
         _pan.y = H / 2;
 
-        // Assign initial positions now that dimensions are known
-        const cx = (W - PANEL_W) / 2;
-        const cy = H / 2;
-        const ringR   = [0, 220, 460];
-        const jitters = [0, 40, 70];
-        const byDist  = { 0: [], 1: [], 2: [] };
-        _nodes.forEach(n => { if (byDist[n.dist]) byDist[n.dist].push(n); });
-        [0, 1, 2].forEach(dist => {
-            const group  = byDist[dist];
-            const r      = ringR[dist];
-            const jitter = () => (Math.random() - 0.5) * jitters[dist] * 2;
-            group.forEach((n, i) => {
-                const angle = (i / Math.max(1, group.length)) * Math.PI * 2;
-                n.x = cx + (dist === 0 && group.length === 1 ? 0 : Math.cos(angle) * r) + jitter();
-                n.y = cy + (dist === 0 && group.length === 1 ? 0 : Math.sin(angle) * r) + jitter();
-            });
-        });
+        _buildLayout(cx - W / 2, cy - H / 2);  // layout coords relative to pan origin
 
         _drawAll();
         _applyTransform();
         _bindEvents(wrap);
-        _runSimulation(wrap);
     }
 
     function _applyTransform() {
         if (_g) _g.setAttribute('transform', `translate(${_pan.x},${_pan.y}) scale(${_zoom})`);
-    }
-
-    // ── Force simulation ──────────────────────────────────────────────────────
-
-    function _runSimulation(wrap) {
-        if (_simHandle) cancelAnimationFrame(_simHandle);
-        let alpha = 1;
-        const W = (wrap.clientWidth - PANEL_W) / 2;
-        const H = wrap.clientHeight / 2;
-
-        function tick() {
-            if (alpha < 0.003) return;
-            alpha *= 0.965;
-
-            _nodes.forEach(n => { n.fx = 0; n.fy = 0; });
-
-            // Collision + repulsion combined — guarantees minimum gap
-            for (let i = 0; i < _nodes.length; i++) {
-                for (let j = i + 1; j < _nodes.length; j++) {
-                    const a = _nodes[i], b = _nodes[j];
-                    const dx = b.x - a.x || 0.01;
-                    const dy = b.y - a.y || 0.01;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    // Repulsion
-                    const rep = (18000 * alpha) / (dist * dist);
-                    const rx = rep * dx / dist;
-                    const ry = rep * dy / dist;
-                    a.fx -= rx; a.fy -= ry;
-                    b.fx += rx; b.fy += ry;
-                    // Hard collision push
-                    if (dist < MIN_GAP) {
-                        const push = (MIN_GAP - dist) / dist * 0.6;
-                        a.fx -= push * dx; a.fy -= push * dy;
-                        b.fx += push * dx; b.fy += push * dy;
-                    }
-                }
-            }
-
-            // Edge springs
-            _edges.forEach(e => {
-                const dx    = e.to.x - e.from.x;
-                const dy    = e.to.y - e.from.y;
-                const dist  = Math.sqrt(dx * dx + dy * dy) || 0.1;
-                const ideal = 180 + e.dist * 80;
-                const f     = (dist - ideal) / dist * 0.25 * alpha;
-                e.from.fx += f * dx; e.from.fy += f * dy;
-                e.to.fx   -= f * dx; e.to.fy   -= f * dy;
-            });
-
-            // Gentle center pull — just enough to keep graph from drifting
-            _nodes.forEach(n => {
-                n.fx -= n.x * 0.003 * alpha;
-                n.fy -= n.y * 0.003 * alpha;
-            });
-
-            // Integrate
-            _nodes.forEach(n => {
-                n.vx = (n.vx + n.fx) * 0.78;
-                n.vy = (n.vy + n.fy) * 0.78;
-                n.x += n.vx;
-                n.y += n.vy;
-            });
-
-            _drawAll();
-            _simHandle = requestAnimationFrame(tick);
-        }
-        tick();
     }
 
     // ── Drawing ───────────────────────────────────────────────────────────────
@@ -333,7 +382,7 @@
         if (!_g) return;
         _g.innerHTML = '';
 
-        // Edges behind nodes
+        // Edges first
         _edges.forEach(e => {
             const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
             line.setAttribute('x1', e.from.x); line.setAttribute('y1', e.from.y);
@@ -341,7 +390,6 @@
             line.setAttribute('stroke', _edgeColor(e.dist));
             line.setAttribute('stroke-width', e.dist === 0 ? 1.5 : 1);
             line.setAttribute('fill', 'none');
-            line.dataset.edge = '1';
             _g.appendChild(line);
         });
 
@@ -359,20 +407,19 @@
         g.style.cursor    = 'pointer';
         g.style.opacity   = opacity;
 
-        // Background circle
         const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        circle.setAttribute('r', NODE_R);
-        circle.setAttribute('fill', node.dist === 0 ? 'rgba(212,175,55,0.10)' : 'rgba(10,7,2,0.75)');
+        circle.setAttribute('r', node.r);
+        circle.setAttribute('fill', node.dist === 0 ? 'rgba(212,175,55,0.10)' : 'rgba(10,7,2,0.8)');
         circle.setAttribute('stroke', color);
         circle.setAttribute('stroke-width', node.id === _selectedId ? 2.5 : 1);
         g.appendChild(circle);
 
-        // Partial arc — one of two parents owned
+        // Partial arc for one-parent-owned
         const parents = node.skill?.parentSkills || [];
-        if (node.dist > 0 && parents.length > 0) {
+        if (node.dist > 0 && parents.length > 1) {
             const ownedCount = parents.filter(p => owned.has(p)).length;
             if (ownedCount > 0 && ownedCount < parents.length) {
-                const r2   = NODE_R + 5;
+                const r2   = node.r + 5;
                 const circ = 2 * Math.PI * r2;
                 const frac = ownedCount / parents.length;
                 const arc  = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -392,20 +439,21 @@
         text.setAttribute('text-anchor', 'middle');
         text.setAttribute('dominant-baseline', 'central');
         text.setAttribute('fill', color);
-        text.setAttribute('font-size', node.dist === 0 ? '10' : '9');
+        text.setAttribute('font-size', Math.max(8, Math.min(11, node.r * 0.55)));
         text.setAttribute('font-family', 'var(--font-body, sans-serif)');
         text.setAttribute('font-weight', node.dist === 0 ? '600' : '400');
         text.style.pointerEvents = 'none';
         text.style.userSelect    = 'none';
         const name = node.skill?.name || node.id;
-        text.textContent = name.length > 12 ? name.slice(0, 11) + '…' : name;
+        const maxChars = Math.floor(node.r / 4.5);
+        text.textContent = name.length > maxChars ? name.slice(0, maxChars - 1) + '…' : name;
         g.appendChild(text);
 
         // Level badge
         if (node.dist === 0 && node.rec && (node.rec.skillLevel || 0) >= 1) {
             const badge = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            badge.setAttribute('x', NODE_R - 1);
-            badge.setAttribute('y', -(NODE_R - 2));
+            badge.setAttribute('x', node.r - 1);
+            badge.setAttribute('y', -(node.r - 2));
             badge.setAttribute('text-anchor', 'end');
             badge.setAttribute('fill', '#8b7355');
             badge.setAttribute('font-size', '7');
