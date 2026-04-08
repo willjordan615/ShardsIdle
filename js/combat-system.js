@@ -483,6 +483,7 @@ async function startCombat(forcedChallengeId) {
 
         console.log('[COMBAT] Starting combat:', requestBody.challengeID);
 
+        const combatStartTime = Date.now();
         const response = await authFetch(`${BACKEND_URL}/api/combat/start`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -494,6 +495,9 @@ async function startCombat(forcedChallengeId) {
         }
 
         const combatResult = await response.json();
+        const combatDurationMs = Date.now() - combatStartTime;
+        currentState.lastCombatDurationMs = combatDurationMs;
+        _notifyIdleUpdate(combatDurationMs);
 
         console.log('[COMBAT] Server response received. Result:', combatResult.result);
 
@@ -654,6 +658,19 @@ function _notifyIdleStart() {
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ characterId: primaryId, challengeId, partyIds, generatedBotSnapshots }),
     }).catch(e => console.warn('[IDLE] Failed to stamp idle session:', e.message));
+}
+
+// Called after the first combat result returns — updates the session with a real measured duration.
+function _notifyIdleUpdate(combatDurationMs) {
+    const challengeId = currentState.selectedChallenge?.id;
+    const partyIds    = (currentState.currentParty || []).map(m => m.characterID || m.id).filter(Boolean);
+    const primaryId   = partyIds.find(id => !id.startsWith('bot_') && !id.startsWith('import_'));
+    if (!primaryId || !challengeId) return;
+    authFetch(`${BACKEND_URL}/api/combat/idle/start`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ characterId: primaryId, challengeId, partyIds, combatDurationMs }),
+    }).catch(e => console.warn('[IDLE] Failed to update idle duration:', e.message));
 }
 
 function _notifyIdleStop() {

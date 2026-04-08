@@ -256,10 +256,11 @@ async function initializeCharacterSnapshotsTable() {
 
     // Migration: add offline idle session tracking columns
     for (const [col, def] of [
-        ['idleChallengeId',    'TEXT DEFAULT NULL'],
-        ['idlePartyIds',       'TEXT DEFAULT NULL'],
-        ['idleStartedAt',      'INTEGER DEFAULT NULL'],
-        ['idleGeneratedBots',  'TEXT DEFAULT NULL'],
+        ['idleChallengeId',       'TEXT DEFAULT NULL'],
+        ['idlePartyIds',          'TEXT DEFAULT NULL'],
+        ['idleStartedAt',         'INTEGER DEFAULT NULL'],
+        ['idleGeneratedBots',     'TEXT DEFAULT NULL'],
+        ['idleCombatDurationMs',  'INTEGER DEFAULT NULL'],
     ]) {
         await new Promise((resolve) => {
             db.run(`ALTER TABLE characters ADD COLUMN ${col} ${def}`, (err) => {
@@ -274,11 +275,13 @@ async function initializeCharacterSnapshotsTable() {
 
 // ── Idle session helpers ──────────────────────────────────────────────────────
 
-function setIdleSession(characterId, challengeId, partyIds, generatedBotSnapshots) {
+function setIdleSession(characterId, challengeId, partyIds, generatedBotSnapshots, combatDurationMs) {
     return new Promise((resolve, reject) => {
+        const durationValue = (combatDurationMs != null && combatDurationMs > 0) ? combatDurationMs : null;
         db.run(
-            `UPDATE characters SET idleChallengeId = ?, idlePartyIds = ?, idleStartedAt = ?, idleGeneratedBots = ? WHERE id = ?`,
-            [challengeId, JSON.stringify(partyIds), Date.now(), JSON.stringify(generatedBotSnapshots || []), characterId],
+            `UPDATE characters SET idleChallengeId = ?, idlePartyIds = ?, idleStartedAt = ?, idleGeneratedBots = ?,
+             idleCombatDurationMs = COALESCE(?, idleCombatDurationMs) WHERE id = ?`,
+            [challengeId, JSON.stringify(partyIds), Date.now(), JSON.stringify(generatedBotSnapshots || []), durationValue, characterId],
             (err) => { if (err) reject(err); else resolve(); }
         );
     });
@@ -287,7 +290,7 @@ function setIdleSession(characterId, challengeId, partyIds, generatedBotSnapshot
 function getIdleSession(characterId) {
     return new Promise((resolve, reject) => {
         db.get(
-            `SELECT idleChallengeId, idlePartyIds, idleStartedAt, idleGeneratedBots FROM characters WHERE id = ?`,
+            `SELECT idleChallengeId, idlePartyIds, idleStartedAt, idleGeneratedBots, idleCombatDurationMs FROM characters WHERE id = ?`,
             [characterId],
             (err, row) => {
                 if (err) return reject(err);
@@ -297,6 +300,7 @@ function getIdleSession(characterId) {
                     partyIds:              JSON.parse(row.idlePartyIds || '[]'),
                     startedAt:             row.idleStartedAt,
                     generatedBotSnapshots: JSON.parse(row.idleGeneratedBots || '[]'),
+                    combatDurationMs:      row.idleCombatDurationMs || null,
                 });
             }
         );

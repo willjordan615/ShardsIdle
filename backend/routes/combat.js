@@ -532,12 +532,12 @@ router.post('/admin/prune-logs', async (req, res) => {
 
 // POST /idle/start — persist idle session when the loop activates
 router.post('/idle/start', requireAuth, async (req, res) => {
-    const { characterId, challengeId, partyIds, generatedBotSnapshots } = req.body;
+    const { characterId, challengeId, partyIds, generatedBotSnapshots, combatDurationMs } = req.body;
     if (!characterId || !challengeId || !Array.isArray(partyIds)) {
         return res.status(400).json({ error: 'characterId, challengeId, and partyIds are required' });
     }
     try {
-        await db.setIdleSession(characterId, challengeId, partyIds, generatedBotSnapshots || []);
+        await db.setIdleSession(characterId, challengeId, partyIds, generatedBotSnapshots || [], combatDurationMs || null);
         res.json({ ok: true });
     } catch (err) {
         console.error('[IDLE] Failed to set idle session:', err);
@@ -571,12 +571,11 @@ router.post('/idle/collect', requireAuth, async (req, res) => {
         // Always clear the session first — so a crash doesn't trap the player
         await db.clearIdleSession(characterId);
 
-        const { challengeId, partyIds, startedAt } = session;
+        const { challengeId, partyIds, startedAt, combatDurationMs } = session;
         const elapsedMs   = Date.now() - startedAt;
         const cappedMs    = Math.min(elapsedMs, 24 * 60 * 60 * 1000); // 24hr cap
-        const AVG_CYCLE   = 120 * 1000; // 2 minute default cycle
-        const MIN_CYCLE   = 60  * 1000; // 1 minute floor
-        const cycleMs     = Math.max(MIN_CYCLE, AVG_CYCLE);
+        const MIN_CYCLE   = 45  * 1000; // 45 second floor
+        const cycleMs     = Math.max(MIN_CYCLE, combatDurationMs || MIN_CYCLE);
         const combatCount = Math.max(1, Math.floor(cappedMs / cycleMs));
 
         const engine = initializeCombatEngine();
