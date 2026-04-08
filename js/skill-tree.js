@@ -492,10 +492,23 @@
         // Draw hubs (always on top)
         _hubs.forEach(hub => {
             const isOpen   = hub.id === _openHubId;
-            const isDimmed = _openHubId && !isOpen;
+            const isParent = _lineageRel.get(hub.id) === 'parent';
+            const isDimmed = _openHubId && !isOpen && !isParent;
             const opacity  = isDimmed ? 0.25 : 1.0;
-            _drawHub(hub, isOpen, opacity, owned);
+            _drawHub(hub, isOpen, opacity, owned, isParent);
         });
+
+        // Draw solid gold edges from parent hubs to selected skill
+        if (_selectedId && hasSel) {
+            const selNode = _childNodes.find(n => n.id === _selectedId);
+            if (selNode) {
+                _hubs.forEach(hub => {
+                    if (_lineageRel.get(hub.id) === 'parent') {
+                        _drawEdge(hub, selNode, 'rgba(212,175,55,0.75)', 2, false);
+                    }
+                });
+            }
+        }
     }
 
     function _distOpacity(node, owned) {
@@ -530,7 +543,7 @@
         _g.appendChild(path);
     }
 
-    function _drawHub(hub, isOpen, opacity, owned) {
+    function _drawHub(hub, isOpen, opacity, owned, isParent=false) {
         const color = hub.owned ? OWNED_COLOR : HUB_COLOR;
         const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         g.setAttribute('transform', `translate(${hub.x},${hub.y})`);
@@ -546,8 +559,8 @@
         rect.setAttribute('height',  HUB_H);
         rect.setAttribute('rx',      HUB_RX);
         rect.setAttribute('fill',    isOpen ? 'rgba(122,154,204,0.18)' : hub.owned ? 'rgba(212,175,55,0.12)' : 'rgba(12,10,6,0.9)');
-        rect.setAttribute('stroke',  isOpen ? '#aac0e0' : color);
-        rect.setAttribute('stroke-width', isOpen ? 2 : 1.2);
+        rect.setAttribute('stroke',  isParent ? GOLD : isOpen ? '#aac0e0' : color);
+        rect.setAttribute('stroke-width', isParent ? 2 : isOpen ? 2 : 1.2);
         g.appendChild(rect);
 
         // Desc count badge
@@ -678,13 +691,16 @@
     // ── Interactions ──────────────────────────────────────────────────────────
 
     function _openHub(hub) {
-        _openHubId  = hub.id;
-        _selectedId = null;
-        _lineageRel = new Map();
+        _openHubId = hub.id;
+        // Preserve selection — don't clear _selectedId or _lineageRel
         _layoutChildren(hub.id);
 
         const hubNameEl = document.getElementById('skillTreeHubName');
         if (hubNameEl) hubNameEl.textContent = `— ${hub.skill.name}`;
+
+        // If there's an active selection, recompute lineage in case new hub
+        // exposes nodes that are parents/children of the selected skill
+        if (_selectedId) _lineageRel = _computeLineage(_selectedId);
 
         // Pan to hub
         const wrap = document.getElementById('skillTreeCanvasWrap');
@@ -696,7 +712,11 @@
         }
 
         _drawAll();
-        if (_panel) _panel.innerHTML = `<div style="color:#3a3020;font-size:0.78rem;font-style:italic;margin-top:2rem;text-align:center;">Select a skill to inspect</div>`;
+
+        // If no active selection, reset panel
+        if (!_selectedId && _panel) {
+            _panel.innerHTML = `<div style="color:#3a3020;font-size:0.78rem;font-style:italic;margin-top:2rem;text-align:center;">Select a skill to inspect</div>`;
+        }
     }
 
     function _selectSkill(node) {
