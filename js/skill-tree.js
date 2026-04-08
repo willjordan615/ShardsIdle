@@ -462,7 +462,6 @@
         let baseOpacity = DIST_OPACITY[node.dist] ?? 0.15;
         if (node.dist === 1 && ownedParentCount > 0) baseOpacity = 0.88;
         const opacity    = hasSel ? (inLineage ? 1.0 : 0.08) : baseOpacity;
-        const owned      = _ownedIds();
         const name       = node.skill?.name || node.id;
         const hw         = node.r;
         const hh         = NODE_H / 2;
