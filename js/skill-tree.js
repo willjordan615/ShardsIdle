@@ -13,8 +13,9 @@
     // ── Constants ────────────────────────────────────────────────────────────
 
     const PANEL_W    = 268;
-    const BASE_R     = 22;      // minimum node radius
-    const CHILD_SCALE = 3.0;   // radius += sqrt(children) * CHILD_SCALE
+    const NODE_H     = 28;      // node height
+    const NODE_PAD   = 10;     // horizontal padding inside node
+    const NODE_RX    = 6;      // corner radius
     const HOP1_DIST  = 320;    // px from parent center to hop-1 child center
     const HOP2_DIST  = 260;    // px from hop-1 center to hop-2 child center
     const MIN_SEP    = 8;      // minimum gap between node edges
@@ -82,8 +83,9 @@
         return (_character.skills || []).find(s => s.skillID === id) || null;
     }
 
-    function _nodeRadius(directChildren) {
-        return BASE_R + Math.sqrt(directChildren) * CHILD_SCALE;
+    // Returns half-width of node (used for edge attachment and spacing)
+    function _nodeHalfW(name) {
+        return Math.max(36, name.length * 4.2 + NODE_PAD);
     }
 
     // ── Graph layout ──────────────────────────────────────────────────────────
@@ -149,7 +151,7 @@
 
         ownedList.forEach((id, i) => {
             const skill = skillMap.get(id);
-            const r     = _nodeRadius(directChildren.get(id) || 0);
+            const r     = _nodeHalfW(skillMap.get(id)?.name || id);
             let x, y;
             if (ownedCount === 1) {
                 x = cx; y = cy;
@@ -384,15 +386,21 @@
 
         // Edges first — quadratic bezier curves bulging outward from center
         _edges.forEach(e => {
-            const mx = (e.from.x + e.to.x) / 2;
-            const my = (e.from.y + e.to.y) / 2;
-            // Control point: midpoint pushed outward from origin by 20%
-            const mag = Math.sqrt(mx * mx + my * my) || 1;
-            const bulge = 0.18;
-            const cx = mx + (mx / mag) * Math.sqrt((e.to.x - e.from.x) ** 2 + (e.to.y - e.from.y) ** 2) * bulge;
-            const cy = my + (my / mag) * Math.sqrt((e.to.x - e.from.x) ** 2 + (e.to.y - e.from.y) ** 2) * bulge;
+            // Attach edge to nearest rect edge rather than center
+            const dx = e.to.x - e.from.x, dy = e.to.y - e.from.y;
+            const len = Math.sqrt(dx*dx + dy*dy) || 1;
+            const x1 = e.from.x + (dx/len) * e.from.r;
+            const y1 = e.from.y + (dy/len) * (NODE_H/2);
+            const x2 = e.to.x   - (dx/len) * e.to.r;
+            const y2 = e.to.y   - (dy/len) * (NODE_H/2);
+            const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+            const mag = Math.sqrt(mx*mx + my*my) || 1;
+            const bulge = 0.15;
+            const edgeLen = Math.sqrt((x2-x1)**2 + (y2-y1)**2);
+            const cx = mx + (mx/mag) * edgeLen * bulge;
+            const cy = my + (my/mag) * edgeLen * bulge;
             const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            path.setAttribute('d', `M${e.from.x},${e.from.y} Q${cx},${cy} ${e.to.x},${e.to.y}`);
+            path.setAttribute('d', `M${x1},${y1} Q${cx},${cy} ${x2},${y2}`);
             path.setAttribute('stroke', _edgeColor(e.dist));
             path.setAttribute('stroke-width', e.dist === 0 ? 1.5 : 1);
             path.setAttribute('fill', 'none');
@@ -406,6 +414,9 @@
         const color   = _nodeColor(node.dist);
         const opacity = DIST_OPACITY[node.dist] ?? 0.15;
         const owned   = _ownedIds();
+        const name    = node.skill?.name || node.id;
+        const hw      = node.r;  // half-width
+        const hh      = NODE_H / 2;
 
         const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         g.setAttribute('transform', `translate(${node.x},${node.y})`);
@@ -413,53 +424,54 @@
         g.style.cursor    = 'pointer';
         g.style.opacity   = opacity;
 
-        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        circle.setAttribute('r', node.r);
-        circle.setAttribute('fill', node.dist === 0 ? 'rgba(212,175,55,0.10)' : 'rgba(10,7,2,0.8)');
-        circle.setAttribute('stroke', color);
-        circle.setAttribute('stroke-width', node.id === _selectedId ? 2.5 : 1);
-        g.appendChild(circle);
+        // Rounded rect
+        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        rect.setAttribute('x', -hw);
+        rect.setAttribute('y', -hh);
+        rect.setAttribute('width', hw * 2);
+        rect.setAttribute('height', NODE_H);
+        rect.setAttribute('rx', NODE_RX);
+        rect.setAttribute('fill', node.dist === 0 ? 'rgba(212,175,55,0.10)' : 'rgba(10,7,2,0.85)');
+        rect.setAttribute('stroke', color);
+        rect.setAttribute('stroke-width', node.id === _selectedId ? 2 : 0.8);
+        g.appendChild(rect);
 
-        // Partial arc for one-parent-owned
+        // Partial parent progress bar along bottom edge
         const parents = node.skill?.parentSkills || [];
         if (node.dist > 0 && parents.length > 1) {
             const ownedCount = parents.filter(p => owned.has(p)).length;
             if (ownedCount > 0 && ownedCount < parents.length) {
-                const r2   = node.r + 5;
-                const circ = 2 * Math.PI * r2;
                 const frac = ownedCount / parents.length;
-                const arc  = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                arc.setAttribute('r', r2);
-                arc.setAttribute('fill', 'none');
-                arc.setAttribute('stroke', AMBER);
-                arc.setAttribute('stroke-width', '2');
-                arc.setAttribute('stroke-dasharray', `${circ * frac} ${circ}`);
-                arc.setAttribute('stroke-opacity', '0.7');
-                arc.setAttribute('transform', 'rotate(-90)');
-                g.appendChild(arc);
+                const bar = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                bar.setAttribute('x', -hw + NODE_RX);
+                bar.setAttribute('y', hh - 3);
+                bar.setAttribute('width', (hw * 2 - NODE_RX * 2) * frac);
+                bar.setAttribute('height', 2);
+                bar.setAttribute('rx', 1);
+                bar.setAttribute('fill', AMBER);
+                bar.setAttribute('fill-opacity', '0.7');
+                g.appendChild(bar);
             }
         }
 
-        // Label
+        // Label — full name, font scales slightly with node size
         const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         text.setAttribute('text-anchor', 'middle');
         text.setAttribute('dominant-baseline', 'central');
         text.setAttribute('fill', color);
-        text.setAttribute('font-size', Math.max(8, Math.min(11, node.r * 0.55)));
+        text.setAttribute('font-size', node.dist === 0 ? '10' : '9');
         text.setAttribute('font-family', 'var(--font-body, sans-serif)');
         text.setAttribute('font-weight', node.dist === 0 ? '600' : '400');
         text.style.pointerEvents = 'none';
         text.style.userSelect    = 'none';
-        const name = node.skill?.name || node.id;
-        const maxChars = Math.floor(node.r / 4.5);
-        text.textContent = name.length > maxChars ? name.slice(0, maxChars - 1) + '…' : name;
+        text.textContent = name;
         g.appendChild(text);
 
-        // Level badge
+        // Level badge top-right
         if (node.dist === 0 && node.rec && (node.rec.skillLevel || 0) >= 1) {
             const badge = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            badge.setAttribute('x', node.r - 1);
-            badge.setAttribute('y', -(node.r - 2));
+            badge.setAttribute('x', hw - 3);
+            badge.setAttribute('y', -hh + 8);
             badge.setAttribute('text-anchor', 'end');
             badge.setAttribute('fill', '#8b7355');
             badge.setAttribute('font-size', '7');
