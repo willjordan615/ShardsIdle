@@ -65,6 +65,7 @@
     let _pan         = { x: 0, y: 0 };
     let _zoom        = 1;
     let _dragging    = false;
+    let _dragMoved   = false;  // true if mouse moved enough to count as a pan
     let _lastMouse   = { x: 0, y: 0 };
     let _selectedId  = null;
     let _lineageIds  = new Set();  // ids in selected node's full lineage
@@ -442,7 +443,7 @@
             const cy = my + (my/mag) * edgeLen * bulge;
             const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
             path.setAttribute('d', `M${x1},${y1} Q${cx},${cy} ${x2},${y2}`);
-            path.setAttribute('stroke', edgeInLineage ? 'rgba(40,180,80,0.8)' : _edgeColor(e.dist));
+            path.setAttribute('stroke', edgeInLineage ? 'rgba(60,200,100,0.6)' : _edgeColor(e.dist));
             path.setAttribute('stroke-width', edgeInLineage ? 2.5 : e.dist === 0 ? 2 : 0.7);
             path.setAttribute('opacity', hasSel ? (edgeInLineage ? 1 : 0.06) : 1);
             path.setAttribute('fill', 'none');
@@ -455,7 +456,8 @@
     function _drawNode(node) {
         const inLineage  = _lineageIds.has(node.id);
         const hasSel     = _selectedId !== null;
-        const color      = inLineage ? HIGHLIGHT : _nodeColor(node);
+        const color      = _nodeColor(node);  // always category color
+        const highlightStroke = inLineage ? '#40c060' : null;
         // Hop-1 nodes where player owns at least one parent get boosted opacity
         const owned      = _ownedIds();
         const ownedParentCount = (node.skill?.parentSkills || []).filter(p => owned.has(p)).length;
@@ -479,8 +481,9 @@
         rect.setAttribute('width', hw * 2);
         rect.setAttribute('height', NODE_H);
         rect.setAttribute('rx', NODE_RX);
-        rect.setAttribute('fill', inLineage ? 'rgba(40,180,80,0.12)' : node.dist === 0 ? 'rgba(212,175,55,0.10)' : 'rgba(10,7,2,0.85)');
-        rect.setAttribute('stroke', color);
+        const baseFill = node.dist === 0 ? 'rgba(212,175,55,0.10)' : 'rgba(10,7,2,0.85)';
+        rect.setAttribute('fill', inLineage ? 'rgba(40,180,80,0.18)' : baseFill);
+        rect.setAttribute('stroke', highlightStroke || color);
         rect.setAttribute('stroke-width', node.id === _selectedId ? 2.5 : inLineage ? 1.5 : node.dist === 0 ? 1.5 : 0.7);
         g.appendChild(rect);
 
@@ -506,7 +509,7 @@
         const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         text.setAttribute('text-anchor', 'middle');
         text.setAttribute('dominant-baseline', 'central');
-        text.setAttribute('fill', inLineage ? HIGHLIGHT : color);
+        text.setAttribute('fill', color);
         text.setAttribute('font-size', node.dist === 0 ? '10' : '9');
         text.setAttribute('font-family', 'var(--font-body, sans-serif)');
         text.setAttribute('font-weight', node.dist === 0 ? '600' : '400');
@@ -529,7 +532,7 @@
             g.appendChild(badge);
         }
 
-        g.addEventListener('click', (e) => { e.stopPropagation(); _selectNode(node); });
+        g.addEventListener('click', (e) => { e.stopPropagation(); if (!_dragMoved) _selectNode(node); });
         _g.appendChild(g);
     }
 
@@ -635,6 +638,7 @@
 
     function _bindEvents(wrap) {
         _svg.addEventListener('click', (e) => {
+            if (_dragMoved) return;
             if (e.target === _svg || e.target === _g) {
                 _selectedId = null;
                 _lineageIds = new Set();
@@ -646,6 +650,7 @@
         wrap.addEventListener('mousedown', (e) => {
             if (e.button !== 0) return;
             _dragging  = true;
+            _dragMoved = false;
             _lastMouse = { x: e.clientX, y: e.clientY };
             wrap.style.cursor = 'grabbing';
         });
@@ -658,8 +663,11 @@
 
         window.addEventListener('mousemove', (e) => {
             if (!_dragging) return;
-            _pan.x += e.clientX - _lastMouse.x;
-            _pan.y += e.clientY - _lastMouse.y;
+            const dx = e.clientX - _lastMouse.x;
+            const dy = e.clientY - _lastMouse.y;
+            if (Math.abs(dx) > 3 || Math.abs(dy) > 3) _dragMoved = true;
+            _pan.x += dx;
+            _pan.y += dy;
             _lastMouse = { x: e.clientX, y: e.clientY };
             _applyTransform();
         });
