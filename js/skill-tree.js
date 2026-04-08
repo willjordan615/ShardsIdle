@@ -21,14 +21,35 @@
     const MIN_SEP    = 8;      // minimum gap between node edges
 
     const GOLD   = '#d4af37';
-    const AMBER  = '#a07828';
-    const DIM    = '#5a4520';
 
-    const DIST_OPACITY = [1.0, 0.7, 0.35];
+    // Category color map
+    const CAT_COLOR = {
+        DAMAGE_SINGLE:  '#e05540',
+        DAMAGE_MAGIC:   '#e05540',
+        DAMAGE_AOE:     '#d4722a',
+        DAMAGE_PROC:    '#c45a20',
+        HEALING:        '#4a90d4',
+        HEALING_AOE:    '#3a78bc',
+        HEALING_PROC:   '#3a78bc',
+        RESTORATION:    '#5aacd4',
+        BUFF:           '#9a6ed4',
+        CONTROL:        '#3abcac',
+        CONTROL_PROC:   '#2a9a8a',
+        DEFENSE:        '#6a8aac',
+        DEFENSE_PROC:   '#5a7a9c',
+        UTILITY:        '#8a8a7a',
+        UTILITY_PROC:   '#7a7a6a',
+        WEAPON_skill:   '#c4a030',
+        NO_RESOURCES:   '#707060',
+        PROGRESSION:    '#a0c040',
+        DEFAULT:        '#8a7a5a',
+    };
 
-    const EDGE_OWNED = 'rgba(212,175,55,0.55)';
-    const EDGE_HOP1  = 'rgba(140,100,30,0.3)';
-    const EDGE_HOP2  = 'rgba(70,50,15,0.15)';
+    const DIST_OPACITY = [1.0, 0.65, 0.30];
+
+    // Highlight color for selected lineage
+    const HIGHLIGHT     = '#40c060';
+    const HIGHLIGHT_DIM = 'rgba(20,20,20,0.85)';
 
     // ── State ────────────────────────────────────────────────────────────────
 
@@ -44,6 +65,7 @@
     let _dragging    = false;
     let _lastMouse   = { x: 0, y: 0 };
     let _selectedId  = null;
+    let _lineageIds  = new Set();  // ids in selected node's full lineage
 
     // ── Public entry point ───────────────────────────────────────────────────
 
@@ -188,10 +210,10 @@
             children.sort((a, b) => (allDescendants.get(b) || 0) - (allDescendants.get(a) || 0));
 
             const totalDesc  = children.reduce((s, id) => s + (allDescendants.get(id) || 0) + 1, 0);
-            const totalAngle = Math.min(Math.PI * 1.6, children.length * 0.5);
+            const totalAngle = Math.min(Math.PI * 1.85, children.length * 0.55);
 
-            // Base angle: point away from canvas center
-            const baseAngle = Math.atan2(parent.y - cy, parent.x - cx);
+            // Spread children in full arc around parent
+            const baseAngle = Math.atan2(parent.y, parent.x);
 
             let angleUsed = -totalAngle / 2;
             children.forEach(id => {
@@ -372,12 +394,20 @@
 
     // ── Drawing ───────────────────────────────────────────────────────────────
 
-    function _nodeColor(dist) {
-        return dist === 0 ? GOLD : dist === 1 ? AMBER : DIM;
+    function _categoryColor(skill) {
+        if (!skill) return CAT_COLOR.DEFAULT;
+        return CAT_COLOR[skill.category] || CAT_COLOR.DEFAULT;
+    }
+
+    function _nodeColor(node) {
+        if (node.dist === 0) return GOLD;
+        return _categoryColor(node.skill);
     }
 
     function _edgeColor(dist) {
-        return dist === 0 ? EDGE_OWNED : dist === 1 ? EDGE_HOP1 : EDGE_HOP2;
+        if (dist === 0) return 'rgba(212,175,55,0.5)';
+        if (dist === 1) return 'rgba(120,100,60,0.25)';
+        return 'rgba(60,50,30,0.12)';
     }
 
     function _drawAll() {
@@ -386,6 +416,8 @@
 
         // Edges first — quadratic bezier curves bulging outward from center
         _edges.forEach(e => {
+            const edgeInLineage = _lineageIds.has(e.from.id) && _lineageIds.has(e.to.id);
+            const hasSel = _selectedId !== null;
             // Attach edge to nearest rect edge rather than center
             const dx = e.to.x - e.from.x, dy = e.to.y - e.from.y;
             const len = Math.sqrt(dx*dx + dy*dy) || 1;
@@ -401,8 +433,9 @@
             const cy = my + (my/mag) * edgeLen * bulge;
             const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
             path.setAttribute('d', `M${x1},${y1} Q${cx},${cy} ${x2},${y2}`);
-            path.setAttribute('stroke', _edgeColor(e.dist));
-            path.setAttribute('stroke-width', e.dist === 0 ? 1.5 : 1);
+            path.setAttribute('stroke', edgeInLineage ? 'rgba(40,180,80,0.8)' : _edgeColor(e.dist));
+            path.setAttribute('stroke-width', edgeInLineage ? 2 : e.dist === 0 ? 1.5 : 1);
+            path.setAttribute('opacity', hasSel ? (edgeInLineage ? 1 : 0.06) : 1);
             path.setAttribute('fill', 'none');
             _g.appendChild(path);
         });
@@ -411,12 +444,15 @@
     }
 
     function _drawNode(node) {
-        const color   = _nodeColor(node.dist);
-        const opacity = DIST_OPACITY[node.dist] ?? 0.15;
-        const owned   = _ownedIds();
-        const name    = node.skill?.name || node.id;
-        const hw      = node.r;  // half-width
-        const hh      = NODE_H / 2;
+        const inLineage  = _lineageIds.has(node.id);
+        const hasSel     = _selectedId !== null;
+        const color      = inLineage ? HIGHLIGHT : _nodeColor(node);
+        const baseOpacity = DIST_OPACITY[node.dist] ?? 0.15;
+        const opacity    = hasSel ? (inLineage ? 1.0 : 0.08) : baseOpacity;
+        const owned      = _ownedIds();
+        const name       = node.skill?.name || node.id;
+        const hw         = node.r;
+        const hh         = NODE_H / 2;
 
         const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         g.setAttribute('transform', `translate(${node.x},${node.y})`);
@@ -431,9 +467,9 @@
         rect.setAttribute('width', hw * 2);
         rect.setAttribute('height', NODE_H);
         rect.setAttribute('rx', NODE_RX);
-        rect.setAttribute('fill', node.dist === 0 ? 'rgba(212,175,55,0.10)' : 'rgba(10,7,2,0.85)');
+        rect.setAttribute('fill', inLineage ? 'rgba(40,180,80,0.12)' : node.dist === 0 ? 'rgba(212,175,55,0.10)' : 'rgba(10,7,2,0.85)');
         rect.setAttribute('stroke', color);
-        rect.setAttribute('stroke-width', node.id === _selectedId ? 2 : 0.8);
+        rect.setAttribute('stroke-width', node.id === _selectedId ? 2.5 : inLineage ? 1.5 : 0.8);
         g.appendChild(rect);
 
         // Partial parent progress bar along bottom edge
@@ -458,7 +494,7 @@
         const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         text.setAttribute('text-anchor', 'middle');
         text.setAttribute('dominant-baseline', 'central');
-        text.setAttribute('fill', color);
+        text.setAttribute('fill', inLineage ? HIGHLIGHT : color);
         text.setAttribute('font-size', node.dist === 0 ? '10' : '9');
         text.setAttribute('font-family', 'var(--font-body, sans-serif)');
         text.setAttribute('font-weight', node.dist === 0 ? '600' : '400');
@@ -485,10 +521,41 @@
         _g.appendChild(g);
     }
 
+    // ── Lineage computation ──────────────────────────────────────────────────────
+
+    function _computeLineage(id) {
+        const ids = new Set([id]);
+        const skillMap = new Map(_skillsData.map(s => [s.id, s]));
+
+        // Walk ancestors (parents, grandparents...)
+        const walkUp = (sid) => {
+            const skill = skillMap.get(sid);
+            if (!skill) return;
+            (skill.parentSkills || []).forEach(pid => {
+                if (!ids.has(pid)) { ids.add(pid); walkUp(pid); }
+            });
+        };
+
+        // Walk descendants (children, grandchildren...)
+        const walkDown = (sid) => {
+            _skillsData.forEach(s => {
+                if ((s.parentSkills || []).includes(sid) && !ids.has(s.id)) {
+                    ids.add(s.id);
+                    walkDown(s.id);
+                }
+            });
+        };
+
+        walkUp(id);
+        walkDown(id);
+        return ids;
+    }
+
     // ── Selection ─────────────────────────────────────────────────────────────
 
     function _selectNode(node) {
         _selectedId = node.id;
+        _lineageIds = _computeLineage(node.id);
         _drawAll();
 
         const wrap = document.getElementById('skillTreeCanvasWrap');
@@ -558,6 +625,7 @@
         _svg.addEventListener('click', (e) => {
             if (e.target === _svg || e.target === _g) {
                 _selectedId = null;
+                _lineageIds = new Set();
                 _drawAll();
                 if (_panel) _panel.innerHTML = '<div style="color:#3a3020;font-size:0.78rem;font-style:italic;margin-top:2rem;text-align:center;">Select a skill to inspect</div>';
             }
