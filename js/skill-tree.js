@@ -55,7 +55,7 @@
     let _childEdges   = [];      // edges for open hub
     let _openHubId    = null;    // currently expanded hub
     let _selectedId   = null;    // selected skill id
-    let _lineageIds   = new Set();
+    let _lineageRel   = new Map();  // id → relationship type
     let _svg          = null;
     let _g            = null;
     let _panel        = null;
@@ -290,31 +290,43 @@
 
     // ── Lineage ───────────────────────────────────────────────────────────────
 
+    // Returns map of id → relationship ('selected'|'parent'|'child_owned'|'child_unowned')
     function _computeLineage(id) {
-        const ids    = new Set([id]);
-        const owned  = _ownedIds();
+        const owned   = _ownedIds();
+        const rel     = new Map([[id, 'selected']]);
 
-        // Direct parents only (one level up, any hub)
-        (_skillMap.get(id)?.parentSkills || []).forEach(pid => ids.add(pid));
+        // Direct parents
+        (_skillMap.get(id)?.parentSkills || []).forEach(pid => {
+            if (!rel.has(pid)) rel.set(pid, 'parent');
+        });
 
-        // Direct children; if child is owned, also add its children
+        // Direct children
         (_childrenOf.get(id) || []).forEach(cid => {
-            ids.add(cid);
+            const type = owned.has(cid) ? 'child_owned' : 'child_unowned';
+            if (!rel.has(cid)) rel.set(cid, type);
+            // If child is owned, show its children too
             if (owned.has(cid)) {
-                (_childrenOf.get(cid) || []).forEach(gcid => ids.add(gcid));
+                (_childrenOf.get(cid) || []).forEach(gcid => {
+                    if (!rel.has(gcid)) rel.set(gcid, owned.has(gcid) ? 'child_owned' : 'child_unowned');
+                });
             }
         });
 
-        return ids;
+        return rel;
+    }
+
+    function _lineageIds() {
+        return new Set(_lineageRel.keys());
     }
 
     // Nodes that need to be drawn for lineage but aren't in the open hub's child list
     function _lineageExtraNodes() {
         if (!_selectedId) return [];
+        const _lineageIds = new Set(_lineageRel.keys());
         const owned    = _ownedIds();
         const inChild  = new Set([..._childNodes.map(n => n.id), _openHubId]);
         const extras   = [];
-        _lineageIds.forEach(id => {
+        new Set(_lineageRel.keys()).forEach(id => {
             if (inChild.has(id)) return;
             const skill = _skillMap.get(id);
             if (!skill) return;
@@ -377,7 +389,7 @@
         _zoom = 1;
         _openHubId = null;
         _selectedId = null;
-        _lineageIds = new Set();
+        _lineageRel = new Map();
         _childNodes = [];
         _childEdges = [];
         document.getElementById('skillTreeCharName').textContent = _character?.name || '';
@@ -421,16 +433,36 @@
         // Draw child edges (behind everything)
         if (_openHubId) {
             _childEdges.forEach(e => {
-                const inLineage = _lineageIds.has(e.from.id) && _lineageIds.has(e.to.id);
-                if (hasSel && !inLineage) return;
-                _drawEdge(e.from, e.to, inLineage ? 'rgba(60,200,100,0.7)' : 'rgba(180,150,60,0.25)', inLineage ? 2 : 0.8);
+                const toRel   = _lineageRel.get(e.to.id);
+                const fromRel = _lineageRel.get(e.from.id);
+                if (hasSel && !toRel && !fromRel) return;
+                if (!hasSel) {
+                    _drawEdge(e.from, e.to, 'rgba(180,150,60,0.2)', 0.8, false);
+                    return;
+                }
+                // Parent edge: from parent to selected
+                if (fromRel === 'parent' && e.to.id === _selectedId) {
+                    _drawEdge(e.from, e.to, 'rgba(212,175,55,0.85)', 2, false);
+                }
+                // Child owned edge: from selected to owned child
+                else if (e.from.id === _selectedId && toRel === 'child_owned') {
+                    _drawEdge(e.from, e.to, 'rgba(212,175,55,0.7)', 1.5, true);
+                }
+                // Child unowned edge
+                else if (e.from.id === _selectedId && toRel === 'child_unowned') {
+                    _drawEdge(e.from, e.to, 'rgba(160,130,50,0.4)', 1, true);
+                }
+                // Grandchild edges (owned child → its children)
+                else if (fromRel === 'child_owned' && toRel) {
+                    _drawEdge(e.from, e.to, toRel === 'child_owned' ? 'rgba(212,175,55,0.5)' : 'rgba(140,110,40,0.3)', 1, true);
+                }
             });
         }
 
         // Draw child nodes
         if (_openHubId) {
             _childNodes.forEach(node => {
-                const inLineage = _lineageIds.has(node.id);
+                const inLineage = _lineageRel.has(node.id);
                 const opacity   = hasSel ? (inLineage ? 1.0 : 0.07) : (node.owned ? 1.0 : _distOpacity(node, owned));
                 _drawNode(node, inLineage, opacity, owned);
             });
@@ -451,7 +483,7 @@
                     });
                     (_childrenOf.get(node.id) || []).forEach(cid => {
                         const cNode = allVisible.get(cid);
-                        if (cNode && _lineageIds.has(cid)) _drawEdge(node, cNode, 'rgba(60,200,100,0.5)', 1.2);
+                        if (cNode && _lineageRel.has(cid)) _drawEdge(node, cNode, 'rgba(60,200,100,0.5)', 1.2);
                     });
                 });
             }
@@ -477,7 +509,7 @@
         return 0.12;
     }
 
-    function _drawEdge(from, to, stroke, width) {
+    function _drawEdge(from, to, stroke, width, dashed=false) {
         const dx  = to.x - from.x, dy = to.y - from.y;
         const len = Math.sqrt(dx*dx + dy*dy) || 1;
         const x1  = from.x + (dx/len) * from.hw;
@@ -494,6 +526,7 @@
         path.setAttribute('stroke', stroke);
         path.setAttribute('stroke-width', width);
         path.setAttribute('fill', 'none');
+        if (dashed) path.setAttribute('stroke-dasharray', '5 4');
         _g.appendChild(path);
     }
 
@@ -548,7 +581,12 @@
     }
 
     function _drawNode(node, inLineage, opacity, owned) {
-        const color = inLineage ? HIGHLIGHT : node.owned ? OWNED_COLOR : _catColor(node.skill);
+        const rel   = _lineageRel.get(node.id);
+        const color = rel === 'selected'      ? HIGHLIGHT
+                    : rel === 'parent'         ? GOLD
+                    : rel === 'child_owned'    ? GOLD
+                    : rel === 'child_unowned'  ? _catColor(node.skill)
+                    : node.owned ? OWNED_COLOR : _catColor(node.skill);
         const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         g.setAttribute('transform', `translate(${node.x},${node.y})`);
         g.dataset.skillId = node.id;
@@ -561,9 +599,12 @@
         rect.setAttribute('width',   node.hw * 2);
         rect.setAttribute('height',  NODE_H);
         rect.setAttribute('rx',      NODE_RX);
-        rect.setAttribute('fill',    inLineage ? 'rgba(40,180,80,0.12)' : node.owned ? 'rgba(212,175,55,0.08)' : 'rgba(10,7,2,0.88)');
+        const selFill = rel === 'selected' ? 'rgba(212,175,55,0.15)'
+                       : rel === 'parent'  ? 'rgba(212,175,55,0.08)'
+                       : node.owned ? 'rgba(212,175,55,0.06)' : 'rgba(10,7,2,0.88)';
+        rect.setAttribute('fill',    selFill);
         rect.setAttribute('stroke',  color);
-        rect.setAttribute('stroke-width', node.id === _selectedId ? 2.5 : node.owned ? 1.2 : 0.7);
+        rect.setAttribute('stroke-width', rel === 'selected' ? 2.5 : rel === 'parent' ? 1.8 : rel === 'child_owned' ? 1.5 : node.owned ? 1.2 : 0.7);
         g.appendChild(rect);
 
         // Partial parent bar
@@ -595,7 +636,7 @@
         const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         text.setAttribute('text-anchor', 'middle');
         text.setAttribute('dominant-baseline', 'central');
-        text.setAttribute('fill', inLineage ? HIGHLIGHT : color);
+        text.setAttribute('fill', color);
         text.setAttribute('font-size', node.owned ? '10' : '9');
         text.setAttribute('font-family', 'var(--font-body,sans-serif)');
         text.setAttribute('font-weight', node.owned ? '600' : '400');
@@ -639,7 +680,7 @@
     function _openHub(hub) {
         _openHubId  = hub.id;
         _selectedId = null;
-        _lineageIds = new Set();
+        _lineageRel = new Map();
         _layoutChildren(hub.id);
 
         const hubNameEl = document.getElementById('skillTreeHubName');
@@ -660,7 +701,7 @@
 
     function _selectSkill(node) {
         _selectedId = node.id;
-        _lineageIds = _computeLineage(node.id);
+        _lineageRel = _computeLineage(node.id);
         _drawAll();
 
         const wrap = document.getElementById('skillTreeCanvasWrap');
@@ -677,7 +718,7 @@
     function _collapse() {
         _openHubId  = null;
         _selectedId = null;
-        _lineageIds = new Set();
+        _lineageRel = new Map();
         _childNodes = [];
         _childEdges = [];
         const hubNameEl = document.getElementById('skillTreeHubName');
@@ -737,7 +778,7 @@
             if (_dragMoved) return;
             if (e.target === _svg || e.target === _g) {
                 if (_selectedId) {
-                    _selectedId = null; _lineageIds = new Set(); _drawAll();
+                    _selectedId = null; _lineageRel = new Map(); _drawAll();
                 } else if (_openHubId) {
                     _collapse();
                 }
