@@ -127,19 +127,26 @@
             });
         });
 
-        function countDescendants(id, visited = new Set()) {
-            if (visited.has(id)) return 0;
-            visited.add(id);
-            let count = 0;
-            _skillsData.forEach(s => {
-                if ((s.parentSkills || []).includes(id)) {
-                    count += 1 + countDescendants(s.id, visited);
-                }
+        // Build children map first for O(n) descendant counting
+        const childrenOf = new Map();
+        _skillsData.forEach(s => childrenOf.set(s.id, []));
+        _skillsData.forEach(s => {
+            (s.parentSkills || []).forEach(pid => {
+                if (childrenOf.has(pid)) childrenOf.get(pid).push(s.id);
             });
+        });
+
+        function countDescendants(id) {
+            if (allDescendants.has(id)) return allDescendants.get(id);
+            let count = 0;
+            (childrenOf.get(id) || []).forEach(cid => {
+                count += 1 + countDescendants(cid);
+            });
+            allDescendants.set(id, count);
             return count;
         }
 
-        _skillsData.forEach(s => allDescendants.set(s.id, countDescendants(s.id)));
+        _skillsData.forEach(s => countDescendants(s.id));
 
         // Assign distances: 0=owned, 1=hop1, 2=hop2
         const distMap = new Map();
