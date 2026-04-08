@@ -132,8 +132,8 @@
 
         Object.entries(byDist).forEach(([dist, ids]) => {
             const d = parseInt(dist);
-            const r = d === 0 ? 0 : 140 + d * 120;
-            const jitter = () => (Math.random() - 0.5) * 50;
+            const r = d === 0 ? 0 : 300 + d * 280;
+            const jitter = () => (Math.random() - 0.5) * 120;
             ids.forEach((id, i) => {
                 const angle = (i / ids.length) * Math.PI * 2;
                 const skill = skillMap.get(id);
@@ -258,9 +258,24 @@
         function tick() {
             if (alpha < 0.004) return;
             alpha *= 0.97;
-            const k = Math.sqrt((W * H) / Math.max(1, _nodes.length)) * 1.4;
+            const k = Math.sqrt((W * H) / Math.max(1, _nodes.length)) * 6;
 
             _nodes.forEach(n => { n.fx = 0; n.fy = 0; });
+
+            // Collision — nodes never touch
+            for (let i = 0; i < _nodes.length; i++) {
+                for (let j = i + 1; j < _nodes.length; j++) {
+                    const a = _nodes[i], b = _nodes[j];
+                    const dx = b.x - a.x, dy = b.y - a.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy) || 0.1;
+                    const minDist = NODE_R * 2 + 16;
+                    if (dist < minDist) {
+                        const push = (minDist - dist) / dist * 0.5;
+                        a.fx -= push * dx; a.fy -= push * dy;
+                        b.fx += push * dx; b.fy += push * dy;
+                    }
+                }
+            }
 
             // Repulsion between all nodes
             for (let i = 0; i < _nodes.length; i++) {
@@ -281,7 +296,7 @@
                 const dx   = e.to.x - e.from.x;
                 const dy   = e.to.y - e.from.y;
                 const dist = Math.sqrt(dx * dx + dy * dy) || 0.1;
-                const ideal = 80 + e.dist * 20;
+                const ideal = 200 + e.dist * 60;
                 const force  = (dist - ideal) / dist * 0.3 * alpha;
                 e.from.fx += force * dx; e.from.fy += force * dy;
                 e.to.fx   -= force * dx; e.to.fy   -= force * dy;
@@ -289,8 +304,8 @@
 
             // Gentle gravity to center
             _nodes.forEach(n => {
-                n.fx -= n.x * 0.008 * alpha;
-                n.fy -= n.y * 0.008 * alpha;
+                n.fx -= n.x * 0.002 * alpha;
+                n.fy -= n.y * 0.002 * alpha;
             });
 
             // Integrate + dampen
