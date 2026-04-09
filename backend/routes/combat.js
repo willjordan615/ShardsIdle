@@ -692,8 +692,8 @@ router.post('/idle/collect', requireAuth, async (req, res) => {
                     const character = liveChars[pid];
                     if (!character) continue;
 
-                    // XP
-                    const xpGained = result.rewards?.experienceGained?.[pid] || 0;
+                    // XP — offline rate is 50% of live
+                    const xpGained = (result.rewards?.experienceGained?.[pid] || 0) * 0.5;
                     if (xpGained > 0) {
                         character.experience = (character.experience || 0) + xpGained;
                         let xpThreshold = getXPToNextLevel(character.level);
@@ -706,8 +706,9 @@ router.post('/idle/collect', requireAuth, async (req, res) => {
                     }
 
                     // Skill merge (same logic as live combat route)
+                    // Offline rate: halve skill XP before merging
                     const incomingMap = new Map(
-                        (participant.skills || []).map(s => [s.skillID, s])
+                        (participant.skills || []).map(s => [s.skillID, { ...s, skillXP: (s.skillXP || 0) * 0.5 }])
                     );
                     const finalSkills = [];
                     const seen = new Set();
