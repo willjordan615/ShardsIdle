@@ -9,6 +9,14 @@
     <link rel="stylesheet" href="css/map.css">
     <style>
         /* Codex — only styles not covered by styles.css */
+        @keyframes codex-nudge {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+            50%       { box-shadow: 0 0 0 6px rgba(212, 175, 55, 0.55); }
+        }
+        #fieldCodexBtn.onboarding-highlight {
+            animation: codex-nudge 1.4s ease-in-out infinite;
+            border-color: var(--gold-bright, #d4af37);
+        }
         .codex-tab { font-family: var(--font-body); }
         .codex-stat-bar {
             border-left: 3px solid currentColor;
@@ -75,7 +83,7 @@
         <div id="headerTopBar">
             <div id="authUserDisplay" style="font-size:0.8rem; display:flex; align-items:center;"></div>
             <div id="serverStatusIndicator" title="Server status"><span id="serverStatusDot" class="server-dot"></span><span id="serverStatusLabel" class="server-label">Connecting...</span></div>
-            <button onclick="openCodexModal()" class="settings-btn secondary" title="Field Codex">Field Codex</button>
+            <button id="fieldCodexBtn" onclick="openCodexModal()" class="settings-btn secondary" title="Field Codex">Field Codex</button>
             <button id="settingsOpenBtn" class="settings-btn secondary" title="Settings">⚙ Settings</button>
         </div>
         <header>

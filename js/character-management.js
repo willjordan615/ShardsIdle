@@ -1094,7 +1094,16 @@ async function showCharacterDetail(characterId, opts = {}) {
             if (typeof updateChallengeStatusBanner === 'function') updateChallengeStatusBanner();
             if (localStorage.getItem('si_guide_pending') && !localStorage.getItem('si_guide_dismissed')) {
                 localStorage.removeItem('si_guide_pending');
-                if (typeof openCodexModal === 'function') openCodexModal('guide');
+                const codexBtn = document.getElementById('fieldCodexBtn');
+                if (codexBtn) {
+                    codexBtn.classList.add('onboarding-highlight');
+                    const clearHighlight = () => {
+                        codexBtn.classList.remove('onboarding-highlight');
+                        codexBtn.removeEventListener('click', clearHighlight);
+                    };
+                    codexBtn.addEventListener('click', clearHighlight);
+                    setTimeout(clearHighlight, 30000);
+                }
             }
 
             if (hasXPHistory && xpBarEl) {
