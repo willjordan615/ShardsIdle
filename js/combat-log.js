@@ -620,10 +620,38 @@ async function displayCombatLog(combatData) {
                             <span style="color:#5a4a30;">/ threshold ${action.threshold}</span>
                         </div>`;
                     } else if (action.checkType === 'skill') {
-                        const skillLabel = action.skillID || 'a specific skill';
-                        const actionHint = !success ? `<div style="font-size:0.75rem;color:#6a8a6a;margin-top:4px;">Equipping <em>${skillLabel}</em> would allow this check.</div>` : '';
+                        const rawLabel = action.skillID || 'a specific skill';
+                        const tagMatch = rawLabel.match(/^\[tag:(.+)\]$/);
+                        const skillLabel = tagMatch
+                            ? `a skill with the <em>${tagMatch[1]}</em> tag`
+                            : `<em>${rawLabel}</em>`;
+
+                        let actionHint = '';
+                        if (!success && tagMatch) {
+                            // Find a matching skill the character owns but doesn't have equipped
+                            const tag = tagMatch[1];
+                            const equippedIds = new Set(
+                                (window.currentState?.currentParty || [])
+                                    .flatMap(m => (m.skills || []).slice(0, 2).map(s => s.skillID))
+                            );
+                            const ownedSkills = window.gameData?.skills || [];
+                            const match = ownedSkills.find(s =>
+                                (s.tags || []).includes(tag) &&
+                                (window.currentState?.currentParty || []).some(m =>
+                                    (m.skills || []).some(ms => ms.skillID === s.id && (ms.skillLevel || 0) >= 1)
+                                ) && !equippedIds.has(s.id)
+                            );
+                            if (match) {
+                                actionHint = `<div style="font-size:0.75rem;color:#6a8a6a;margin-top:4px;">You have <em>${match.name}</em> — equip it to pass this check.</div>`;
+                            } else {
+                                actionHint = `<div style="font-size:0.75rem;color:#5a4a30;margin-top:4px;">No <em>${tag}</em> skills in your repertoire yet.</div>`;
+                            }
+                        } else if (!success) {
+                            actionHint = `<div style="font-size:0.75rem;color:#6a8a6a;margin-top:4px;">Equip ${skillLabel} to pass this check.</div>`;
+                        }
+
                         checkDetail = `<div style="font-size:0.8rem;color:#8a7a50;margin:6px 0;">
-                            Requires <span style="color:#c0a060;">${skillLabel}</span> to be equipped
+                            Requires ${skillLabel} to be equipped
                             ${actionHint}
                         </div>`;
                     } else if (action.checkType === 'item') {
