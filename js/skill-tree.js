@@ -386,13 +386,14 @@
             const panel = document.getElementById('skillTreePanel');
             const tab   = document.getElementById('skillTreePanelTab');
             if (panel) {
-                panel.style.width    = window._skillTreePanelOpen ? '${PANEL_W}px' : '0';
+                panel.style.width    = window._skillTreePanelOpen ? '268px' : '0';
                 panel.style.padding  = window._skillTreePanelOpen ? '1.25rem 1rem' : '0';
                 panel.style.overflow = window._skillTreePanelOpen ? 'auto' : 'hidden';
             }
+            // ◀ = panel is closed (click to open), ▶ = panel is open (click to close)
             if (tab) tab.textContent = window._skillTreePanelOpen ? '▶' : '◀';
         };
-        // Apply initial state
+        // Apply initial collapsed state on mobile
         if (isMobile) window._skillTreeTogglePanel();
     }
 
@@ -492,6 +493,12 @@
                         _drawEdge(hub, selNode, GOLD, OP_EDGE_PARENT, false);
                 });
             }
+        }
+
+        // Move selected node's group to end of SVG so it renders on top
+        if (_selectedId) {
+            const selGroup = _g.querySelector(`g[data-skill-id="${_selectedId}"]`);
+            if (selGroup) _g.appendChild(selGroup);
         }
     }
 
@@ -623,7 +630,13 @@
             g.appendChild(badge);
         }
 
-        g.addEventListener('click', e => { e.stopPropagation(); if (!_dragMoved) _selectSkill(node); });
+        g.addEventListener('click', e => {
+            e.stopPropagation();
+            if (_dragMoved) return;
+            // Bring to front
+            if (_g && g.parentNode === _g) _g.appendChild(g);
+            _selectSkill(node);
+        });
         _g.appendChild(g);
     }
 
