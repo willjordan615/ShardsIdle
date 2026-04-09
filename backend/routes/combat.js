@@ -791,7 +791,7 @@ router.post('/idle/collect', requireAuth, async (req, res) => {
                         // Add to summary loot list (aggregate by itemID)
                         const existing = summary.lootGained.find(l => l.itemID === loot.itemID && l.rarity === loot.rarity);
                         if (existing) existing.count++;
-                        else summary.lootGained.push({ itemID: loot.itemID, name: itemDef?.name || loot.itemID, rarity: loot.rarity || 'common', count: 1, autosold: !!loot._autosold });
+                        else summary.lootGained.push({ itemID: loot.itemID, name: itemDef?.name || loot.itemID, rarity: loot.rarity || 'common', count: 1, autosold: !!loot._autosold, isQuestItem: !!isQuestItem });
                     });
                 }
             }

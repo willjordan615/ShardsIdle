@@ -159,7 +159,7 @@ function _renderOfflineSummary(summary, primaryChar) {
             const color    = rarityColor[l.rarity] || '#aaa';
             const soldNote = l.autosold ? ` <span style="color:var(--text-muted); font-size:0.78rem;">(auto-sold)</span>` : '';
             const qty      = l.count > 1 ? ` <span style="color:var(--text-muted);">×${l.count}</span>` : '';
-            return `<div class="os-loot-row">
+            return `<div class="os-loot-row os-loot-row--hidden" data-rarity="${l.rarity || 'common'}" data-quest="${!!l.isQuestItem}">
                 <span style="color:${color};">${l.name}</span>${qty}${soldNote}
             </div>`;
         }).join('')
@@ -444,5 +444,25 @@ async function _animateOfflineBars(container) {
     const discSection = container.querySelector('.os-discoveries');
     if (discSection) {
         _osSpawnParticles(container, 22, 'var(--gold)', 80, 1000);
+    }
+
+    // Loot reveal — staggered by rarity
+    await new Promise(r => setTimeout(r, 180));
+    const rarityDelay    = { legendary: 320, rare: 220, uncommon: 120, common: 70 };
+    const rarityParticles = { legendary: [20, '#ffaa00', 70, 900], rare: [12, '#00d4ff', 45, 700] };
+    const lootRows = container.querySelectorAll('.os-loot-row--hidden');
+    for (const row of lootRows) {
+        const rarity = row.dataset.rarity || 'common';
+        const delay  = rarityDelay[rarity] ?? 70;
+        row.classList.remove('os-loot-row--hidden');
+        row.classList.add('os-loot-row--reveal');
+        const isQuest = row.dataset.quest === 'true';
+        if (!isQuest && rarityParticles[rarity]) {
+            const [count, color, spread, life] = rarityParticles[rarity];
+            _osSpawnParticles(container, count, color, spread, life);
+            row.classList.add('os-loot-row--shake');
+            setTimeout(() => row.classList.remove('os-loot-row--shake'), 500);
+        }
+        await new Promise(r => setTimeout(r, delay));
     }
 }

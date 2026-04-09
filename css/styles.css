@@ -4050,6 +4050,29 @@ body:has(#combatlog.active) #headerTopBar {
     border-bottom: none;
 }
 
+.os-loot-row--hidden {
+    opacity: 0;
+    transform: translateY(6px);
+}
+
+.os-loot-row--reveal {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+@keyframes os-loot-shake {
+    0%, 100% { transform: translateX(0); }
+    20%       { transform: translateX(-4px); }
+    40%       { transform: translateX(4px); }
+    60%       { transform: translateX(-3px); }
+    80%       { transform: translateX(3px); }
+}
+
+.os-loot-row--shake {
+    animation: os-loot-shake 0.45s ease;
+}
+
 /* ── Actions ─────────────────────────────────────────────── */
 
 .os-actions {

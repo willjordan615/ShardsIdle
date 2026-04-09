@@ -2647,15 +2647,19 @@ _applyLootTagFlavour(item, tagDef) {
         statusDelayMult = statusResult.skillDelayMultiplier || 1.0;
     }
 
-    const finalDelay = Math.round(skill.delay * delayMultiplier * statusDelayMult);
+    // Ambition reduces skill delay — opportunistic, faster to act
+    const ambitionDelayMult = 1 - Math.min(0.25, (actor.stats?.ambition || 0) * 0.0008);
+    const finalDelay = Math.round(skill.delay * delayMultiplier * statusDelayMult * ambitionDelayMult);
     const statusDelayNote = statusDelayMult !== 1.0 ? `, status=${statusDelayMult.toFixed(2)}x` : '';
     //console.log(`[DELAY] ${actor.name} ${skill.name}: base=${skill.delay}ms, weapon=${weapon?.delay || 'none'}${statusDelayNote}, final=${finalDelay}ms`);
 
     // Consume resources
     if (skill.costType === 'stamina') {
-        const cost = skill.costPercent
+        // Endurance reduces stamina costs — sustained fighters spend less per skill
+        const enduranceCostMult = 1 - Math.min(0.25, (actor.stats?.endurance || 0) * 0.0008);
+        const cost = Math.floor((skill.costPercent
             ? Math.floor(actor.maxStamina * skill.costPercent)
-            : skill.costAmount;
+            : skill.costAmount) * enduranceCostMult);
         actor.currentStamina = Math.max(0, actor.currentStamina - cost);
     } else if (skill.costType === 'mana') {
         actor.currentMana = Math.max(0, actor.currentMana - skill.costAmount);
@@ -3065,10 +3069,20 @@ _applyLootTagFlavour(item, tagDef) {
     }
 
     // ===== STEP 4: Apply Weapon Variance (physical skills only) =====
+    // Conviction raises the damage ceiling — committed strikes hit harder at their peak.
+    // Harmony compresses variance toward the mean — consistent, reliable output.
     if (!isHealingSkill && !isMagicSkill && weaponTotalDamage > 0 && weaponType) {
       const profile = this.weaponVarianceProfiles[weaponType] || this.weaponVarianceProfiles['default'];
       if (profile) {
-        const [minVar, maxVar] = profile;
+        let [minVar, maxVar] = profile;
+        const conviction = actor.stats?.conviction || 0;
+        const harmony    = actor.stats?.harmony    || 0;
+        // Conviction: raise ceiling up to +0.30 at 300 conviction
+        maxVar += Math.min(0.30, conviction * 0.001);
+        // Harmony: compress range toward 1.0 — up to 30% compression at 300 harmony
+        const harmonyCompress = Math.min(0.30, harmony * 0.001);
+        minVar = minVar + (1.0 - minVar) * harmonyCompress;
+        maxVar = maxVar - (maxVar - 1.0) * harmonyCompress;
         const varianceMultiplier = minVar + (Math.random() * (maxVar - minVar));
         totalDamage *= varianceMultiplier;
         for (const t of Object.keys(finalDamageBreakdown)) {
