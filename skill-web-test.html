@@ -195,7 +195,7 @@ function resetDefaults() {
 // ── Load data ─────────────────────────────────────────────────────────────────
 async function loadSkills() {
     try {
-        const res = await fetch('./backend/data/skills.json');
+        const res = await fetch('/api/data/skills');
         const raw = await res.json();
         allSkills = raw.filter(s =>
             !s.id.startsWith('proc_') &&
