@@ -345,8 +345,22 @@
                     <div id="skillTreeCanvasWrap" style="flex:1;overflow:hidden;cursor:grab;position:relative;">
                         <svg id="skillTreeSVG" style="display:block;width:100%;height:100%;"></svg>
                     </div>
-                    <div id="skillTreePanel" style="width:${PANEL_W}px;flex-shrink:0;border-left:1px solid rgba(212,175,55,0.08);background:var(--window-base,#060503);padding:1.25rem 1rem;overflow-y:auto;font-family:var(--font-body);color:var(--text-primary,#e8e0d0);">
-                        <div style="color:#3a3020;font-size:0.78rem;font-style:italic;margin-top:2rem;text-align:center;">Select a skill to inspect</div>
+                    <div id="skillTreePanelWrap" style="position:relative;flex-shrink:0;display:flex;">
+                        <button id="skillTreePanelTab" onclick="window._skillTreeTogglePanel()" style="
+                            position:absolute;left:-22px;top:50%;transform:translateY(-50%);
+                            width:22px;height:48px;
+                            background:var(--window-base,#080604);
+                            border:1px solid rgba(212,175,55,0.15);
+                            border-right:none;
+                            color:#6a5a30;font-size:10px;
+                            cursor:pointer;
+                            border-radius:4px 0 0 4px;
+                            display:flex;align-items:center;justify-content:center;
+                            z-index:10;
+                        ">◀</button>
+                        <div id="skillTreePanel" style="width:${PANEL_W}px;border-left:1px solid rgba(212,175,55,0.08);background:var(--window-base,#060503);padding:1.25rem 1rem;overflow-y:auto;font-family:var(--font-body);color:var(--text-primary,#e8e0d0);transition:width 0.2s;box-sizing:border-box;">
+                            <div style="color:#3a3020;font-size:0.78rem;font-style:italic;margin-top:2rem;text-align:center;">Select a skill to inspect</div>
+                        </div>
                     </div>
                 </div>
                 <div style="position:absolute;bottom:0;left:0;right:${PANEL_W}px;height:24px;text-align:center;font-size:0.68rem;color:#2a1e08;line-height:24px;font-family:var(--font-body);">Drag to pan · Scroll to zoom</div>
@@ -363,6 +377,23 @@
         document.getElementById('skillTreeCharName').textContent = _character?.name || '';
         document.getElementById('skillTreeHubName').textContent = '';
         modal.style.display = 'block';
+
+        // Collapse panel by default on mobile
+        const isMobile = window.innerWidth < 600;
+        window._skillTreePanelOpen = !isMobile;
+        window._skillTreeTogglePanel = function() {
+            window._skillTreePanelOpen = !window._skillTreePanelOpen;
+            const panel = document.getElementById('skillTreePanel');
+            const tab   = document.getElementById('skillTreePanelTab');
+            if (panel) {
+                panel.style.width    = window._skillTreePanelOpen ? '${PANEL_W}px' : '0';
+                panel.style.padding  = window._skillTreePanelOpen ? '1.25rem 1rem' : '0';
+                panel.style.overflow = window._skillTreePanelOpen ? 'auto' : 'hidden';
+            }
+            if (tab) tab.textContent = window._skillTreePanelOpen ? '▶' : '◀';
+        };
+        // Apply initial state
+        if (isMobile) window._skillTreeTogglePanel();
     }
 
     // ── Canvas ────────────────────────────────────────────────────────────────
@@ -629,6 +660,10 @@
         _selectedId = node.id;
         _lineageRel = _computeLineage(node.id);
         _drawAll();
+        // Auto-open panel on mobile when skill selected
+        if (!window._skillTreePanelOpen && typeof window._skillTreeTogglePanel === 'function') {
+            window._skillTreeTogglePanel();
+        }
         const wrap = document.getElementById('skillTreeCanvasWrap');
         if (wrap) {
             const z = Math.max(_zoom, 1.4);
