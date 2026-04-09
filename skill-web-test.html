@@ -73,26 +73,26 @@ button.reset-btn:hover { border-color: #d4af37; color: #d4af37; }
     <h3>Hub nodes</h3>
     <div class="control-row"><label>Color</label><input type="color" id="c-hub" value="#7a9acc" oninput="redraw()"></div>
     <div class="control-row"><label>Owned color</label><input type="color" id="c-hub-owned" value="#d4af37" oninput="redraw()"></div>
-    <div class="control-row"><label>Size</label><input type="range" id="hub-spread" min="100" max="600" value="340" oninput="relayout()"><span id="hub-spread-v">340</span></div>
-    <div class="control-row"><label>Font size</label><input type="range" id="hub-font" min="8" max="18" value="11" oninput="redraw()"><span id="hub-font-v">11</span></div>
+    <div class="control-row"><label>Size</label><input type="range" id="hub-spread" min="100" max="600" value="343" oninput="relayout()"><span id="hub-spread-v">340</span></div>
+    <div class="control-row"><label>Font size</label><input type="range" id="hub-font" min="8" max="18" value="18" oninput="redraw()"><span id="hub-font-v">11</span></div>
 
     <h3>Child nodes</h3>
-    <div class="control-row"><label>Ring 1 radius</label><input type="range" id="child-r1" min="80" max="400" value="180" oninput="relayout()"><span id="child-r1-v">180</span></div>
-    <div class="control-row"><label>Ring gap</label><input type="range" id="child-gap" min="40" max="300" value="120" oninput="relayout()"><span id="child-gap-v">120</span></div>
+    <div class="control-row"><label>Ring 1 radius</label><input type="range" id="child-r1" min="80" max="400" value="258" oninput="relayout()"><span id="child-r1-v">180</span></div>
+    <div class="control-row"><label>Ring gap</label><input type="range" id="child-gap" min="40" max="300" value="300" oninput="relayout()"><span id="child-gap-v">120</span></div>
     <div class="control-row"><label>Font size</label><input type="range" id="child-font" min="7" max="14" value="9" oninput="redraw()"><span id="child-font-v">9</span></div>
-    <div class="control-row"><label>Node height</label><input type="range" id="node-h" min="16" max="40" value="26" oninput="relayout()"><span id="node-h-v">26</span></div>
+    <div class="control-row"><label>Node height</label><input type="range" id="node-h" min="16" max="40" value="20" oninput="relayout()"><span id="node-h-v">26</span></div>
 
     <h3>Opacity</h3>
-    <div class="control-row"><label>Dimmed hubs</label><input type="range" id="op-hub-dim" min="0" max="1" step="0.05" value="0.25" oninput="redraw()"><span id="op-hub-dim-v">0.25</span></div>
-    <div class="control-row"><label>Owned skills</label><input type="range" id="op-owned" min="0" max="1" step="0.05" value="1.0" oninput="redraw()"><span id="op-owned-v">1.0</span></div>
+    <div class="control-row"><label>Dimmed hubs</label><input type="range" id="op-hub-dim" min="0" max="1" step="0.05" value="0.05" oninput="redraw()"><span id="op-hub-dim-v">0.25</span></div>
+    <div class="control-row"><label>Owned skills</label><input type="range" id="op-owned" min="0" max="1" step="0.05" value="1" oninput="redraw()"><span id="op-owned-v">1.0</span></div>
     <div class="control-row"><label>1 parent owned</label><input type="range" id="op-near" min="0" max="1" step="0.05" value="0.75" oninput="redraw()"><span id="op-near-v">0.75</span></div>
     <div class="control-row"><label>Depth 2</label><input type="range" id="op-d2" min="0" max="1" step="0.05" value="0.45" oninput="redraw()"><span id="op-d2-v">0.45</span></div>
     <div class="control-row"><label>Depth 3+</label><input type="range" id="op-d3" min="0" max="1" step="0.05" value="0.2" oninput="redraw()"><span id="op-d3-v">0.2</span></div>
 
     <h3>Edges</h3>
-    <div class="control-row"><label>Depth falloff</label><input type="range" id="edge-depth-falloff" min="0" max="1" step="0.05" value="0.6" oninput="redraw()"><span id="edge-depth-falloff-v">0.6</span></div>
+    <div class="control-row"><label>Depth falloff</label><input type="range" id="edge-depth-falloff" min="0" max="1" step="0.05" value="0" oninput="redraw()"><span id="edge-depth-falloff-v">0.6</span></div>
     <div class="control-row"><label>Parent edge color</label><input type="color" id="c-edge-parent" value="#d4af37" oninput="redraw()"></div>
-    <div class="control-row"><label>Parent opacity</label><input type="range" id="op-edge-parent" min="0" max="1" step="0.05" value="0.85" oninput="redraw()"><span id="op-edge-parent-v">0.85</span></div>
+    <div class="control-row"><label>Parent opacity</label><input type="range" id="op-edge-parent" min="0" max="1" step="0.05" value="0.7" oninput="redraw()"><span id="op-edge-parent-v">0.85</span></div>
     <div class="control-row"><label>Child owned color</label><input type="color" id="c-edge-child-owned" value="#d4af37" oninput="redraw()"></div>
     <div class="control-row"><label>Child owned opacity</label><input type="range" id="op-edge-child-owned" min="0" max="1" step="0.05" value="0.7" oninput="redraw()"><span id="op-edge-child-owned-v">0.7</span></div>
     <div class="control-row"><label>Child unowned color</label><input type="color" id="c-edge-child-un" value="#a07828" oninput="redraw()"></div>
@@ -103,7 +103,7 @@ button.reset-btn:hover { border-color: #d4af37; color: #d4af37; }
     <h3>Selection highlight</h3>
     <div class="control-row"><label>Selected fill</label><input type="color" id="c-sel-fill" value="#d4af37" oninput="redraw()"></div>
     <div class="control-row"><label>Highlight color</label><input type="color" id="c-highlight" value="#40c060" oninput="redraw()"></div>
-    <div class="control-row"><label>Dim unrelated</label><input type="range" id="op-unrelated" min="0" max="0.5" step="0.02" value="0.07" oninput="redraw()"><span id="op-unrelated-v">0.07</span></div>
+    <div class="control-row"><label>Dim unrelated</label><input type="range" id="op-unrelated" min="0" max="0.5" step="0.02" value="0.02" oninput="redraw()"><span id="op-unrelated-v">0.07</span></div>
 
     <button class="reset-btn" onclick="resetDefaults()">Reset to defaults</button>
     <button class="reset-btn" onclick="exportLayout()" style="margin-top:6px;border-color:#4a8a4a;color:#4a8a4a;">⬇ Export layout</button>
@@ -179,11 +179,11 @@ document.querySelectorAll('input').forEach(el => el.addEventListener('input', sy
 
 function resetDefaults() {
     const defaults = {
-        'hub-spread':340,'hub-font':11,'child-r1':180,'child-gap':120,
-        'child-font':9,'node-h':26,'op-hub-dim':0.25,'op-owned':1.0,
-        'op-near':0.75,'op-d2':0.45,'op-d3':0.2,'op-edge-parent':0.85,
+        'hub-spread':343,'hub-font':18,'child-r1':258,'child-gap':300,
+        'child-font':9,'node-h':20,'op-hub-dim':0.05,'op-owned':1.0,
+        'op-near':0.75,'op-d2':0.45,'op-d3':0.2,'op-edge-parent':0.7,
         'op-edge-child-owned':0.7,'op-edge-child-un':0.4,'op-edge-def':0.2,
-        'edge-curve':0.12,'op-unrelated':0.07,
+        'edge-curve':0.12,'op-unrelated':0.02,'edge-depth-falloff':0,
         'c-hub':'#7a9acc','c-hub-owned':'#d4af37','c-edge-parent':'#d4af37',
         'c-edge-child-owned':'#d4af37','c-edge-child-un':'#a07828',
         'c-sel-fill':'#d4af37','c-highlight':'#40c060',
@@ -253,7 +253,7 @@ function applyPreset() {
 // ── Layout ────────────────────────────────────────────────────────────────────
 function hw(name, isHub) {
     const pad = isHub ? 18 : 12;
-    return Math.max(isHub ? 50 : 36, name.length * 4.4 + pad);
+    return Math.max(isHub ? 44 : 30, name.length * 3.6 + pad);
 }
 
 function layoutHubs() {
@@ -326,12 +326,17 @@ function layoutChildren(hubId) {
         // For each parent group, fan children around parent's angle
         byParent.forEach((siblings, parentId) => {
             const parentAngle = angleOf.get(parentId) ?? 0;
-            const totalDesc = siblings.reduce((s, id) => s + (descCount.get(id) || 0) + 1, 0);
-            // Fan arc — wider for more descendants, capped
-            const fanArc = Math.min(Math.PI * 1.6, siblings.length * 0.55);
+
+            // Separate leaves (no children) from branching nodes
+            const branching = siblings.filter(id => (childrenOf.get(id) || []).length > 0);
+            const leaves    = siblings.filter(id => (childrenOf.get(id) || []).length === 0);
+
+            // Place branching nodes first, fanned around parent angle
+            const totalDesc = branching.reduce((s, id) => s + (descCount.get(id) || 0) + 1, 0) || 1;
+            const fanArc = Math.min(Math.PI * 1.4, branching.length * 0.6);
             let used = -fanArc / 2;
 
-            siblings.forEach(id => {
+            branching.forEach(id => {
                 const skill = skillMap.get(id);
                 if (!skill) return;
                 const share = ((descCount.get(id) || 0) + 1) / Math.max(1, totalDesc);
@@ -339,16 +344,33 @@ function layoutChildren(hubId) {
                 const angle = parentAngle + used + myArc / 2;
                 used += myArc;
                 angleOf.set(id, angle);
-
                 const node = {
-                    id, skill,
-                    owned: ownedIds.has(id),
-                    depth,
+                    id, skill, owned: ownedIds.has(id), depth,
                     x: hub.x + Math.cos(angle) * r,
                     y: hub.y + Math.sin(angle) * r,
-                    hw: hw(skill.name, false),
-                    hh: NODE_H / 2,
-                    isHub: false,
+                    hw: hw(skill.name, false), hh: NODE_H / 2, isHub: false,
+                };
+                childNodes.push(node);
+                placed.set(id, node);
+            });
+
+            // Place leaves clustered together, pushed further out and offset from parent
+            // Group them at parentAngle + offset so they're visually separate
+            const leafR = r + gap * 0.5;  // slightly further out than next ring
+            const leafOffset = Math.PI * 0.3;  // angular offset from parent to group leaves
+            const leafArc = Math.min(Math.PI * 0.8, leaves.length * 0.35);
+            const leafBaseAngle = parentAngle + leafOffset;
+
+            leaves.forEach((id, li) => {
+                const skill = skillMap.get(id);
+                if (!skill) return;
+                const angle = leafBaseAngle - leafArc / 2 + (li / Math.max(1, leaves.length - 1)) * leafArc;
+                angleOf.set(id, angle);
+                const node = {
+                    id, skill, owned: ownedIds.has(id), depth,
+                    x: hub.x + Math.cos(angle) * leafR,
+                    y: hub.y + Math.sin(angle) * leafR,
+                    hw: hw(skill.name, false), hh: NODE_H / 2, isHub: false,
                 };
                 childNodes.push(node);
                 placed.set(id, node);
