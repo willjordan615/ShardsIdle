@@ -305,24 +305,54 @@ function layoutChildren(hubId) {
     childNodes = [];
     const placed = new Map([[hubId, hub]]);
 
+    // Assign angles based on parent position rather than even distribution
+    // Each node gets an angle derived from its primary parent's angle
+    // Siblings of the same parent are fanned out proportionally to their descendant count
+    const angleOf = new Map([[hubId, Math.atan2(hub.y, hub.x)]]); // hub angle from canvas center
+
     byDepth.forEach((ids, depth) => {
         const r = r1 + (depth - 1) * gap;
-        ids.forEach((id, i) => {
+
+        // Group by primary parent
+        const byParent = new Map();
+        ids.forEach(id => {
             const skill = skillMap.get(id);
-            if (!skill) return;
-            const angle = (i / ids.length) * Math.PI * 2 - Math.PI / 2;
-            const node = {
-                id, skill,
-                owned: ownedIds.has(id),
-                depth,
-                x: hub.x + Math.cos(angle) * r,
-                y: hub.y + Math.sin(angle) * r,
-                hw: hw(skill.name, false),
-                hh: NODE_H / 2,
-                isHub: false,
-            };
-            childNodes.push(node);
-            placed.set(id, node);
+            const parents = (skill?.parentSkills || []).filter(p => placed.has(p));
+            const primaryParent = parents[0] || hubId;
+            if (!byParent.has(primaryParent)) byParent.set(primaryParent, []);
+            byParent.get(primaryParent).push(id);
+        });
+
+        // For each parent group, fan children around parent's angle
+        byParent.forEach((siblings, parentId) => {
+            const parentAngle = angleOf.get(parentId) ?? 0;
+            const totalDesc = siblings.reduce((s, id) => s + (descCount.get(id) || 0) + 1, 0);
+            // Fan arc — wider for more descendants, capped
+            const fanArc = Math.min(Math.PI * 1.6, siblings.length * 0.55);
+            let used = -fanArc / 2;
+
+            siblings.forEach(id => {
+                const skill = skillMap.get(id);
+                if (!skill) return;
+                const share = ((descCount.get(id) || 0) + 1) / Math.max(1, totalDesc);
+                const myArc = share * fanArc;
+                const angle = parentAngle + used + myArc / 2;
+                used += myArc;
+                angleOf.set(id, angle);
+
+                const node = {
+                    id, skill,
+                    owned: ownedIds.has(id),
+                    depth,
+                    x: hub.x + Math.cos(angle) * r,
+                    y: hub.y + Math.sin(angle) * r,
+                    hw: hw(skill.name, false),
+                    hh: NODE_H / 2,
+                    isHub: false,
+                };
+                childNodes.push(node);
+                placed.set(id, node);
+            });
         });
     });
 
