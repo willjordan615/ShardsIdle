@@ -2032,6 +2032,7 @@ function _showOpportunityOverlay({ checkName, actor, success, color, checkDetail
         </div>
     `;
 
+    overlay.style.pointerEvents = 'auto';
     document.body.appendChild(overlay);
 
     // Fade in
@@ -2039,9 +2040,25 @@ function _showOpportunityOverlay({ checkName, actor, success, color, checkDetail
         requestAnimationFrame(() => { overlay.style.opacity = '1'; });
     });
 
-    // Auto-dismiss after 4s
-    setTimeout(() => {
+    let hovered = false;
+    let dismissed = false;
+
+    function dismiss() {
+        if (dismissed) return;
+        dismissed = true;
         overlay.style.opacity = '0';
         setTimeout(() => overlay.remove(), 400);
-    }, 4000);
+    }
+
+    overlay.addEventListener('mouseenter', () => { hovered = true; });
+    overlay.addEventListener('mouseleave', () => { hovered = false; scheduleDissmiss(); });
+    overlay.addEventListener('touchstart', () => { hovered = true; }, { passive: true });
+    overlay.addEventListener('touchend', () => { hovered = false; scheduleDissmiss(); });
+
+    function scheduleDissmiss() {
+        setTimeout(() => { if (!hovered) dismiss(); }, 1200);
+    }
+
+    // Auto-dismiss after 4s if not hovered
+    setTimeout(() => { if (!hovered) dismiss(); else { /* will dismiss on mouseleave */ } }, 4000);
 }
