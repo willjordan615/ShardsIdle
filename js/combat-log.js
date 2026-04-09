@@ -601,20 +601,57 @@ async function displayCombatLog(combatData) {
 
                 // 3. If there's a pre-combat opportunity, show it in the banner
                 if (preCombatTurns.length > 0) {
-                    await sleep(600); // let banner fade in finish
+                    await sleep(600);
                     const pc = preCombatTurns[0];
-                    const icon = pc.result?.success ? '✅' : '❌';
-                    const skillName = pc.action?.name || pc.action?.skillID || 'Skill check';
+                    const success = pc.result?.success;
+                    const icon = success ? '✦' : '✧';
+                    const color = success ? '#4cd964' : '#d4484a';
+                    const action = pc.action || {};
+                    const checkName = action.name || 'Opportunity';
+                    const actor = pc.actorName || 'Party';
                     const narrative = pc.result?.message || '';
-                    const color = pc.result?.success ? '#4cd964' : '#d4484a';
+
+                    // Build check line — stat checks show value vs threshold
+                    let checkLine = '';
+                    if (action.checkStat && action.statValue != null && action.threshold != null) {
+                        const statLabel = action.checkStat.charAt(0).toUpperCase() + action.checkStat.slice(1);
+                        const secLabel = action.secondaryStat ? ` + ${action.secondaryStat}` : '';
+                        checkLine = `<div style="font-size:0.75rem;color:#8a7a50;margin:4px 0 2px;">
+                            ${statLabel}${secLabel}: <span style="color:${color};font-weight:600;">${action.statValue}</span>
+                            <span style="color:#5a4a30;"> vs threshold </span>
+                            <span style="color:#8a7a50;">${action.threshold}</span>
+                            <span style="color:${color};margin-left:6px;">${success ? '— passed' : '— failed'}</span>
+                        </div>`;
+                    } else if (action.checkType === 'skill') {
+                        const skillLabel = action.skillID || 'skill';
+                        checkLine = `<div style="font-size:0.75rem;color:#8a7a50;margin:4px 0 2px;">
+                            Requires: <span style="color:#a09060;">${skillLabel}</span>
+                            <span style="color:${color};margin-left:6px;">${success ? '— possessed' : '— not available'}</span>
+                        </div>`;
+                    } else if (action.checkType === 'item') {
+                        checkLine = `<div style="font-size:0.75rem;color:#8a7a50;margin:4px 0 2px;">
+                            Item check <span style="color:${color};margin-left:6px;">${success ? '— item present' : '— item not found'}</span>
+                        </div>`;
+                    }
+
                     const preCombatEl = document.createElement('div');
                     preCombatEl.className = 'pre-combat-reveal';
-                    preCombatEl.style.cssText = `color:${color};`;
-                    preCombatEl.innerHTML = `<strong>${icon} ${skillName}</strong> — ${narrative}`;
+                    preCombatEl.style.cssText = `
+                        border-left: 2px solid ${color};
+                        padding: 8px 12px;
+                        margin: 6px 0;
+                        background: rgba(0,0,0,0.3);
+                    `;
+                    preCombatEl.innerHTML = `
+                        <div style="font-size:0.72rem;color:#6a5a30;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:3px;">${checkName}</div>
+                        <div style="font-size:0.85rem;color:${color};font-weight:600;">${icon} ${actor}</div>
+                        ${checkLine}
+                        <div style="font-size:0.78rem;color:#9a8860;margin-top:5px;font-style:italic;">${narrative}</div>
+                    `;
                     stageBannerPre.appendChild(preCombatEl);
-                    await sleep(1800); // read the result
+                    await sleep(2400);
                 } else {
-                    await sleep(1200); // brief pause on title alone
+                    await sleep(1200);
                 }
 
                 // 4. Seed hpMaxes and flash-reveal enemies

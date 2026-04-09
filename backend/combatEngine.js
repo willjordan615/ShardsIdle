@@ -418,14 +418,18 @@ class CombatEngine {
       action: {
         type: isFallback ? 'pre_combat_fallback' : 'pre_combat_skill',
         skillID: checkType === 'item_and_stat' ? `[item:${op.requiredItemID}+stat:${op.checkStat}]` : op.requiredSkillTag ? `[tag:${op.requiredSkillTag}]` : op.requiredSkillIDs ? op.requiredSkillIDs.join('/') : (op.requiredSkillID || null),
-        // The actual skill ID the best actor used — for XP awarding in the frontend
         resolvedSkillID: checkType === 'skill' && bestActor
           ? (() => {
               const pool = this.getAugmentedSkillPool(bestActor);
               return requiredSkills.find(id => pool.has(id)) || null;
             })()
           : null,
-        name: op.name
+        name: op.name,
+        checkType,
+        checkStat: op.checkStat || null,
+        secondaryStat: op.secondaryStat || null,
+        threshold: op.difficultyThreshold || null,
+        statValue: bestStatValue > 0 ? Math.round(bestStatValue) : null,
       },
       roll: { hitChance: highestChance, rolled, hit: isSuccess },
       result: { message: effect.narrative, success: isSuccess, delay: 1000 }

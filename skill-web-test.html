@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Skill Web — Test Harness</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #0a0806; color: #e8e0d0; font-family: sans-serif; display: flex; height: 100vh; overflow: hidden; }
+
+#canvas-wrap { flex: 1; position: relative; overflow: hidden; cursor: grab; }
+#canvas-wrap.dragging { cursor: grabbing; }
+svg { display: block; width: 100%; height: 100%; }
+
+#controls {
+    width: 300px; flex-shrink: 0;
+    background: #0f0d08;
+    border-left: 1px solid #2a2010;
+    padding: 12px;
+    overflow-y: auto;
+    font-size: 12px;
+}
+
+#controls h2 { color: #d4af37; font-size: 13px; margin-bottom: 12px; letter-spacing: 0.05em; }
+#controls h3 { color: #8a7040; font-size: 11px; margin: 14px 0 6px; text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid #1a1508; padding-bottom: 4px; }
+
+.control-row { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
+.control-row label { flex: 1; color: #8a7a50; font-size: 11px; }
+.control-row input[type=range] { flex: 1.5; accent-color: #d4af37; }
+.control-row input[type=color] { width: 36px; height: 22px; border: 1px solid #2a2010; background: none; cursor: pointer; }
+.control-row span { width: 34px; text-align: right; color: #6a5a30; font-size: 10px; font-variant-numeric: tabular-nums; }
+
+#status { color: #4a8a4a; font-size: 11px; margin-bottom: 10px; }
+#info-panel { margin-top: 12px; padding-top: 12px; border-top: 1px solid #1a1508; }
+#info-panel .skill-name { color: #d4af37; font-size: 13px; margin-bottom: 4px; }
+#info-panel .skill-status { font-size: 10px; color: #8a7040; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+#info-panel .skill-desc { color: #8a7850; font-size: 11px; line-height: 1.6; font-style: italic; }
+#info-panel .skill-parents { margin-top: 8px; font-size: 11px; color: #6a5a30; }
+#info-panel .skill-parents span { color: #a09050; }
+
+button.reset-btn {
+    width: 100%; margin-top: 10px; padding: 6px;
+    background: none; border: 1px solid #2a2010; color: #6a5a30;
+    cursor: pointer; font-size: 11px; border-radius: 3px;
+}
+button.reset-btn:hover { border-color: #d4af37; color: #d4af37; }
+
+#fake-char { margin-bottom: 8px; }
+#fake-char label { color: #8a7040; font-size: 11px; display: block; margin-bottom: 4px; }
+#fake-char select { width: 100%; background: #0f0d08; border: 1px solid #2a2010; color: #c0a060; padding: 4px; font-size: 11px; }
+</style>
+</head>
+<body>
+
+<div id="canvas-wrap">
+    <svg id="svg"></svg>
+</div>
+
+<div id="controls">
+    <h2>Skill Web Controls</h2>
+    <div id="status">Loading skills...</div>
+
+    <div id="fake-char">
+        <label>Simulated owned skills</label>
+        <select id="char-preset" onchange="applyPreset()">
+            <option value="none">New character (roots only)</option>
+            <option value="warrior">Warrior-ish (basic_attack, shout, block)</option>
+            <option value="mage">Mage-ish (channel, attunement, focus)</option>
+            <option value="rogue">Rogue-ish (footwork, misdirect, aim)</option>
+            <option value="healer">Healer-ish (first_aid, rest, sense)</option>
+        </select>
+    </div>
+
+    <h3>Hub nodes</h3>
+    <div class="control-row"><label>Color</label><input type="color" id="c-hub" value="#7a9acc" oninput="redraw()"></div>
+    <div class="control-row"><label>Owned color</label><input type="color" id="c-hub-owned" value="#d4af37" oninput="redraw()"></div>
+    <div class="control-row"><label>Size</label><input type="range" id="hub-spread" min="100" max="600" value="340" oninput="relayout()"><span id="hub-spread-v">340</span></div>
+    <div class="control-row"><label>Font size</label><input type="range" id="hub-font" min="8" max="18" value="11" oninput="redraw()"><span id="hub-font-v">11</span></div>
+
+    <h3>Child nodes</h3>
+    <div class="control-row"><label>Ring 1 radius</label><input type="range" id="child-r1" min="80" max="400" value="180" oninput="relayout()"><span id="child-r1-v">180</span></div>
+    <div class="control-row"><label>Ring gap</label><input type="range" id="child-gap" min="40" max="300" value="120" oninput="relayout()"><span id="child-gap-v">120</span></div>
+    <div class="control-row"><label>Font size</label><input type="range" id="child-font" min="7" max="14" value="9" oninput="redraw()"><span id="child-font-v">9</span></div>
+    <div class="control-row"><label>Node height</label><input type="range" id="node-h" min="16" max="40" value="26" oninput="relayout()"><span id="node-h-v">26</span></div>
+
+    <h3>Opacity</h3>
+    <div class="control-row"><label>Dimmed hubs</label><input type="range" id="op-hub-dim" min="0" max="1" step="0.05" value="0.25" oninput="redraw()"><span id="op-hub-dim-v">0.25</span></div>
+    <div class="control-row"><label>Owned skills</label><input type="range" id="op-owned" min="0" max="1" step="0.05" value="1.0" oninput="redraw()"><span id="op-owned-v">1.0</span></div>
+    <div class="control-row"><label>1 parent owned</label><input type="range" id="op-near" min="0" max="1" step="0.05" value="0.75" oninput="redraw()"><span id="op-near-v">0.75</span></div>
+    <div class="control-row"><label>Depth 2</label><input type="range" id="op-d2" min="0" max="1" step="0.05" value="0.45" oninput="redraw()"><span id="op-d2-v">0.45</span></div>
+    <div class="control-row"><label>Depth 3+</label><input type="range" id="op-d3" min="0" max="1" step="0.05" value="0.2" oninput="redraw()"><span id="op-d3-v">0.2</span></div>
+
+    <h3>Edges</h3>
+    <div class="control-row"><label>Parent edge color</label><input type="color" id="c-edge-parent" value="#d4af37" oninput="redraw()"></div>
+    <div class="control-row"><label>Parent opacity</label><input type="range" id="op-edge-parent" min="0" max="1" step="0.05" value="0.85" oninput="redraw()"><span id="op-edge-parent-v">0.85</span></div>
+    <div class="control-row"><label>Child owned color</label><input type="color" id="c-edge-child-owned" value="#d4af37" oninput="redraw()"></div>
+    <div class="control-row"><label>Child owned opacity</label><input type="range" id="op-edge-child-owned" min="0" max="1" step="0.05" value="0.7" oninput="redraw()"><span id="op-edge-child-owned-v">0.7</span></div>
+    <div class="control-row"><label>Child unowned color</label><input type="color" id="c-edge-child-un" value="#a07828" oninput="redraw()"></div>
+    <div class="control-row"><label>Child unowned opacity</label><input type="range" id="op-edge-child-un" min="0" max="1" step="0.05" value="0.4" oninput="redraw()"><span id="op-edge-child-un-v">0.4</span></div>
+    <div class="control-row"><label>Default edge opacity</label><input type="range" id="op-edge-def" min="0" max="1" step="0.05" value="0.2" oninput="redraw()"><span id="op-edge-def-v">0.2</span></div>
+    <div class="control-row"><label>Edge curve</label><input type="range" id="edge-curve" min="0" max="0.4" step="0.02" value="0.12" oninput="redraw()"><span id="edge-curve-v">0.12</span></div>
+
+    <h3>Selection highlight</h3>
+    <div class="control-row"><label>Selected fill</label><input type="color" id="c-sel-fill" value="#d4af37" oninput="redraw()"></div>
+    <div class="control-row"><label>Highlight color</label><input type="color" id="c-highlight" value="#40c060" oninput="redraw()"></div>
+    <div class="control-row"><label>Dim unrelated</label><input type="range" id="op-unrelated" min="0" max="0.5" step="0.02" value="0.07" oninput="redraw()"><span id="op-unrelated-v">0.07</span></div>
+
+    <button class="reset-btn" onclick="resetDefaults()">Reset to defaults</button>
+
+    <div id="info-panel" style="display:none">
+        <div class="skill-name" id="ip-name"></div>
+        <div class="skill-status" id="ip-status"></div>
+        <div class="skill-desc" id="ip-desc"></div>
+        <div class="skill-parents" id="ip-parents"></div>
+    </div>
+</div>
+
+<script>
+// ── State ─────────────────────────────────────────────────────────────────────
+let allSkills = [];
+let skillMap = new Map();
+let childrenOf = new Map();
+let descCount = new Map();
+let starters = [];
+let ownedIds = new Set();
+let hubs = [];
+let childNodes = [];
+let childEdges = [];
+let openHubId = null;
+let selectedId = null;
+let lineageRel = new Map();
+
+let pan = { x: 0, y: 0 };
+let zoom = 1;
+let dragging = false;
+let dragMoved = false;
+let lastMouse = { x: 0, y: 0 };
+
+const svg = document.getElementById('svg');
+const wrap = document.getElementById('canvas-wrap');
+let g = null;
+
+// ── Category colors ───────────────────────────────────────────────────────────
+const CAT_COLOR = {
+    DAMAGE_SINGLE:'#e05540',DAMAGE_MAGIC:'#e05540',DAMAGE_AOE:'#d4722a',DAMAGE_PROC:'#c45a20',
+    HEALING:'#4a90d4',HEALING_AOE:'#3a78bc',HEALING_PROC:'#3a78bc',RESTORATION:'#5aacd4',
+    BUFF:'#9a6ed4',CONTROL:'#3abcac',CONTROL_PROC:'#2a9a8a',DEFENSE:'#6a8aac',
+    DEFENSE_PROC:'#5a7a9c',UTILITY:'#8a8a7a',UTILITY_PROC:'#7a7a6a',
+    WEAPON_SKILL:'#c4a030',NO_RESOURCES:'#707060',PROGRESSION:'#a0c040',DEFAULT:'#8a7a5a',
+};
+
+function catColor(skill) { return CAT_COLOR[skill?.category] || CAT_COLOR.DEFAULT; }
+
+// ── Controls ──────────────────────────────────────────────────────────────────
+function v(id) { return document.getElementById(id).value; }
+function vf(id) { return parseFloat(v(id)); }
+
+function syncLabels() {
+    const pairs = [
+        ['hub-spread','hub-spread-v'],['hub-font','hub-font-v'],
+        ['child-r1','child-r1-v'],['child-gap','child-gap-v'],
+        ['child-font','child-font-v'],['node-h','node-h-v'],
+        ['op-hub-dim','op-hub-dim-v'],['op-owned','op-owned-v'],
+        ['op-near','op-near-v'],['op-d2','op-d2-v'],['op-d3','op-d3-v'],
+        ['op-edge-parent','op-edge-parent-v'],['op-edge-child-owned','op-edge-child-owned-v'],
+        ['op-edge-child-un','op-edge-child-un-v'],['op-edge-def','op-edge-def-v'],
+        ['edge-curve','edge-curve-v'],['op-unrelated','op-unrelated-v'],
+    ];
+    pairs.forEach(([id, vid]) => {
+        const el = document.getElementById(vid);
+        if (el) el.textContent = document.getElementById(id).value;
+    });
+}
+
+document.querySelectorAll('input').forEach(el => el.addEventListener('input', syncLabels));
+
+function resetDefaults() {
+    const defaults = {
+        'hub-spread':340,'hub-font':11,'child-r1':180,'child-gap':120,
+        'child-font':9,'node-h':26,'op-hub-dim':0.25,'op-owned':1.0,
+        'op-near':0.75,'op-d2':0.45,'op-d3':0.2,'op-edge-parent':0.85,
+        'op-edge-child-owned':0.7,'op-edge-child-un':0.4,'op-edge-def':0.2,
+        'edge-curve':0.12,'op-unrelated':0.07,
+        'c-hub':'#7a9acc','c-hub-owned':'#d4af37','c-edge-parent':'#d4af37',
+        'c-edge-child-owned':'#d4af37','c-edge-child-un':'#a07828',
+        'c-sel-fill':'#d4af37','c-highlight':'#40c060',
+    };
+    Object.entries(defaults).forEach(([id, val]) => {
+        const el = document.getElementById(id);
+        if (el) el.value = val;
+    });
+    syncLabels();
+    relayout();
+}
+
+// ── Load data ─────────────────────────────────────────────────────────────────
+async function loadSkills() {
+    try {
+        const res = await fetch('./backend/data/skills.json');
+        const raw = await res.json();
+        allSkills = raw.filter(s =>
+            !s.id.startsWith('proc_') &&
+            !s.category?.endsWith('_PROC') &&
+            !s.category?.startsWith('CONSUMABLE')
+        );
+        skillMap = new Map(allSkills.map(s => [s.id, s]));
+        childrenOf = new Map(allSkills.map(s => [s.id, []]));
+        allSkills.forEach(s => {
+            (s.parentSkills || []).forEach(pid => {
+                if (childrenOf.has(pid)) childrenOf.get(pid).push(s.id);
+            });
+        });
+        starters = allSkills.filter(s => s.isStarterSkill);
+
+        // Memoized descendant count
+        function countDesc(id, visited = new Set()) {
+            if (descCount.has(id)) return descCount.get(id);
+            if (visited.has(id)) return 0;
+            visited.add(id);
+            const total = (childrenOf.get(id) || []).reduce((n, c) => n + 1 + countDesc(c, new Set(visited)), 0);
+            descCount.set(id, total);
+            return total;
+        }
+        allSkills.forEach(s => countDesc(s.id));
+
+        document.getElementById('status').textContent = `${allSkills.length} skills loaded`;
+        applyPreset();
+    } catch(e) {
+        document.getElementById('status').textContent = 'Error: ' + e.message;
+        document.getElementById('status').style.color = '#e05540';
+    }
+}
+
+// ── Presets ───────────────────────────────────────────────────────────────────
+const PRESETS = {
+    none: [],
+    warrior: ['basic_attack','shout','block','strong_attack','battle_cry','shield_bash','blood_letting'],
+    mage: ['channel','attunement','focus','arcane_bolt','fireball','lightning','inner_fire'],
+    rogue: ['footwork','misdirect','aim','shadow_strike','lunge','poison_lunge','evasion'],
+    healer: ['first_aid','rest','sense','mend','major_mend','rejuvenate','second_wind'],
+};
+
+function applyPreset() {
+    const key = document.getElementById('char-preset').value;
+    const base = starters.map(s => s.id); // everyone owns all starters
+    ownedIds = new Set([...base, ...(PRESETS[key] || [])]);
+    relayout();
+}
+
+// ── Layout ────────────────────────────────────────────────────────────────────
+function hw(name, isHub) {
+    const pad = isHub ? 18 : 12;
+    return Math.max(isHub ? 50 : 36, name.length * 4.4 + pad);
+}
+
+function layoutHubs() {
+    const W = wrap.clientWidth, H = wrap.clientHeight;
+    const cx = 0, cy = 0;
+    const spread = vf('hub-spread');
+    starters.sort((a,b) => (descCount.get(b.id)||0) - (descCount.get(a.id)||0));
+    hubs = starters.map((s, i) => {
+        const angle = (i / starters.length) * Math.PI * 2 - Math.PI / 2;
+        const NODE_H = vf('node-h');
+        return {
+            id: s.id, skill: s,
+            owned: ownedIds.has(s.id),
+            desc: descCount.get(s.id) || 0,
+            x: cx + Math.cos(angle) * spread,
+            y: cy + Math.sin(angle) * spread,
+            hw: hw(s.name, true),
+            hh: (NODE_H * 1.4) / 2,
+            isHub: true,
+        };
+    });
+}
+
+function layoutChildren(hubId) {
+    const hub = hubs.find(h => h.id === hubId);
+    if (!hub) return;
+    const NODE_H = vf('node-h');
+    const r1 = vf('child-r1');
+    const gap = vf('child-gap');
+
+    const depthInHub = new Map([[hubId, 0]]);
+    const queue = [hubId];
+    let qi = 0;
+    while (qi < queue.length) {
+        const id = queue[qi++];
+        const d = depthInHub.get(id);
+        (childrenOf.get(id) || []).forEach(cid => {
+            if (!depthInHub.has(cid)) { depthInHub.set(cid, d+1); queue.push(cid); }
+        });
+    }
+
+    const byDepth = new Map();
+    depthInHub.forEach((d, id) => {
+        if (id === hubId) return;
+        if (!byDepth.has(d)) byDepth.set(d, []);
+        byDepth.get(d).push(id);
+    });
+
+    childNodes = [];
+    const placed = new Map([[hubId, hub]]);
+
+    byDepth.forEach((ids, depth) => {
+        const r = r1 + (depth - 1) * gap;
+        ids.forEach((id, i) => {
+            const skill = skillMap.get(id);
+            if (!skill) return;
+            const angle = (i / ids.length) * Math.PI * 2 - Math.PI / 2;
+            const node = {
+                id, skill,
+                owned: ownedIds.has(id),
+                depth,
+                x: hub.x + Math.cos(angle) * r,
+                y: hub.y + Math.sin(angle) * r,
+                hw: hw(skill.name, false),
+                hh: NODE_H / 2,
+                isHub: false,
+            };
+            childNodes.push(node);
+            placed.set(id, node);
+        });
+    });
+
+    separate(childNodes, NODE_H);
+
+    childEdges = [];
+    childNodes.forEach(node => {
+        (node.skill.parentSkills || []).forEach(pid => {
+            const pNode = placed.get(pid);
+            if (pNode) childEdges.push({ from: pNode, to: node });
+        });
+    });
+}
+
+function separate(nodes, NODE_H) {
+    const MIN_X = 16, MIN_Y = 10, PASSES = 60;
+    for (let pass = 0; pass < PASSES; pass++) {
+        let moved = false;
+        for (let i = 0; i < nodes.length; i++) {
+            for (let j = i+1; j < nodes.length; j++) {
+                const a = nodes[i], b = nodes[j];
+                const dx = b.x - a.x, dy = b.y - a.y;
+                const ox = (a.hw + b.hw + MIN_X) - Math.abs(dx);
+                const oy = (a.hh + b.hh + MIN_Y) - Math.abs(dy);
+                if (ox > 0 && oy > 0) {
+                    moved = true;
+                    if (ox < oy) { const p = (ox/2+1)*Math.sign(dx||1); a.x-=p; b.x+=p; }
+                    else { const p = (oy/2+1)*Math.sign(dy||1); a.y-=p; b.y+=p; }
+                }
+            }
+        }
+        if (!moved) break;
+    }
+}
+
+// ── Lineage ───────────────────────────────────────────────────────────────────
+function computeLineage(id) {
+    const rel = new Map([[id, 'selected']]);
+    (skillMap.get(id)?.parentSkills || []).forEach(pid => { if (!rel.has(pid)) rel.set(pid, 'parent'); });
+    (childrenOf.get(id) || []).forEach(cid => {
+        const type = ownedIds.has(cid) ? 'child_owned' : 'child_unowned';
+        if (!rel.has(cid)) rel.set(cid, type);
+        if (ownedIds.has(cid)) {
+            (childrenOf.get(cid) || []).forEach(gcid => {
+                if (!rel.has(gcid)) rel.set(gcid, ownedIds.has(gcid) ? 'child_owned' : 'child_unowned');
+            });
+        }
+    });
+    return rel;
+}
+
+// ── Draw ──────────────────────────────────────────────────────────────────────
+function relayout() {
+    syncLabels();
+    layoutHubs();
+    if (openHubId) layoutChildren(openHubId);
+    redraw();
+}
+
+function redraw() {
+    syncLabels();
+    if (!g) return;
+    g.innerHTML = '';
+
+    const NODE_H    = vf('node-h');
+    const hubColor  = v('c-hub');
+    const hubOwned  = v('c-hub-owned');
+    const hubDimOp  = vf('op-hub-dim');
+    const ownedOp   = vf('op-owned');
+    const nearOp    = vf('op-near');
+    const d2Op      = vf('op-d2');
+    const d3Op      = vf('op-d3');
+    const edgePCol  = v('c-edge-parent');
+    const edgePOp   = vf('op-edge-parent');
+    const edgeCOCol = v('c-edge-child-owned');
+    const edgeCOOp  = vf('op-edge-child-owned');
+    const edgeCUCol = v('c-edge-child-un');
+    const edgeCUOp  = vf('op-edge-child-un');
+    const edgeDefOp = vf('op-edge-def');
+    const curve     = vf('edge-curve');
+    const unrelOp   = vf('op-unrelated');
+    const selFill   = v('c-sel-fill');
+    const highlight = v('c-highlight');
+    const hubFontSz = vf('hub-font');
+    const childFontSz = vf('child-font');
+    const hasSel    = selectedId !== null;
+
+    function nodeOpacity(node) {
+        if (node.owned) return ownedOp;
+        const parents = node.skill?.parentSkills || [];
+        const ownedParents = parents.filter(p => ownedIds.has(p)).length;
+        if (ownedParents > 0) return nearOp;
+        if (node.depth === 2) return d2Op;
+        return d3Op;
+    }
+
+    function drawEdge(from, to, stroke, opacity, dashed) {
+        const dx = to.x - from.x, dy = to.y - from.y;
+        const len = Math.sqrt(dx*dx+dy*dy)||1;
+        const x1 = from.x + (dx/len)*from.hw, y1 = from.y + (dy/len)*from.hh;
+        const x2 = to.x   - (dx/len)*to.hw,   y2 = to.y   - (dy/len)*to.hh;
+        const mx = (x1+x2)/2, my = (y1+y2)/2;
+        const mag = Math.sqrt(mx*mx+my*my)||1;
+        const el = Math.sqrt((x2-x1)**2+(y2-y1)**2);
+        const cx = mx + (mx/mag)*el*curve, cy = my + (my/mag)*el*curve;
+        const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+        path.setAttribute('d', `M${x1},${y1} Q${cx},${cy} ${x2},${y2}`);
+        path.setAttribute('stroke', stroke);
+        path.setAttribute('stroke-opacity', opacity);
+        path.setAttribute('stroke-width', hasSel ? (dashed ? 1.5 : 2) : 0.8);
+        path.setAttribute('fill','none');
+        if (dashed) path.setAttribute('stroke-dasharray','5 4');
+        g.appendChild(path);
+    }
+
+    // Child edges
+    if (openHubId) {
+        childEdges.forEach(e => {
+            const toRel = lineageRel.get(e.to.id);
+            const fromRel = lineageRel.get(e.from.id);
+            if (hasSel) {
+                if (!toRel && !fromRel) return;
+                if (fromRel === 'parent' && e.to.id === selectedId) drawEdge(e.from, e.to, edgePCol, edgePOp, false);
+                else if (e.from.id === selectedId && toRel === 'child_owned') drawEdge(e.from, e.to, edgeCOCol, edgeCOOp, true);
+                else if (e.from.id === selectedId && toRel === 'child_unowned') drawEdge(e.from, e.to, edgeCUCol, edgeCUOp, true);
+                else if (fromRel === 'child_owned' && toRel) drawEdge(e.from, e.to, toRel==='child_owned'?edgeCOCol:edgeCUCol, toRel==='child_owned'?edgeCOOp*0.7:edgeCUOp*0.7, true);
+            } else {
+                drawEdge(e.from, e.to, '#b09040', edgeDefOp, false);
+            }
+        });
+    }
+
+    // Child nodes
+    if (openHubId) {
+        childNodes.forEach(node => {
+            const rel = lineageRel.get(node.id);
+            const inLin = !!rel;
+            const opacity = hasSel ? (inLin ? 1.0 : unrelOp) : nodeOpacity(node);
+            const color = rel === 'selected' ? selFill
+                        : rel === 'parent' ? '#d4af37'
+                        : rel === 'child_owned' ? '#d4af37'
+                        : node.owned ? '#d4af37' : catColor(node.skill);
+
+            const gg = document.createElementNS('http://www.w3.org/2000/svg','g');
+            gg.setAttribute('transform',`translate(${node.x},${node.y})`);
+            gg.style.opacity = opacity;
+            gg.style.cursor = 'pointer';
+
+            const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+            rect.setAttribute('x',-node.hw); rect.setAttribute('y',-node.hh);
+            rect.setAttribute('width',node.hw*2); rect.setAttribute('height',NODE_H);
+            rect.setAttribute('rx',5);
+            rect.setAttribute('fill', rel==='selected' ? `${selFill}22` : node.owned ? '#d4af3715' : '#0a070288');
+            rect.setAttribute('stroke', rel==='selected'?highlight:color);
+            rect.setAttribute('stroke-width', node.id===selectedId?2.5:node.owned?1.2:0.7);
+            gg.appendChild(rect);
+
+            const text = document.createElementNS('http://www.w3.org/2000/svg','text');
+            text.setAttribute('text-anchor','middle');
+            text.setAttribute('dominant-baseline','central');
+            text.setAttribute('fill', rel==='selected'?highlight:color);
+            text.setAttribute('font-size', childFontSz);
+            text.setAttribute('font-family','sans-serif');
+            text.setAttribute('font-weight', node.owned?'600':'400');
+            text.style.pointerEvents='none';
+            text.textContent = node.skill?.name || node.id;
+            gg.appendChild(text);
+
+            gg.addEventListener('click', e => { e.stopPropagation(); if(!dragMoved) selectSkill(node); });
+            g.appendChild(gg);
+        });
+    }
+
+    // Hubs
+    hubs.forEach(hub => {
+        const isOpen = hub.id === openHubId;
+        const isParent = lineageRel.get(hub.id) === 'parent';
+        const isDimmed = openHubId && !isOpen && !isParent;
+        const opacity = isDimmed ? hubDimOp : 1.0;
+        const color = isParent ? '#d4af37' : hub.owned ? hubOwned : hubColor;
+        const HUB_H = NODE_H * 1.4;
+
+        const gg = document.createElementNS('http://www.w3.org/2000/svg','g');
+        gg.setAttribute('transform',`translate(${hub.x},${hub.y})`);
+        gg.style.opacity = opacity;
+        gg.style.cursor = 'pointer';
+
+        const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+        rect.setAttribute('x',-hub.hw); rect.setAttribute('y',-hub.hh);
+        rect.setAttribute('width',hub.hw*2); rect.setAttribute('height',HUB_H);
+        rect.setAttribute('rx',8);
+        rect.setAttribute('fill', isOpen?`${hubColor}22`:hub.owned?'#d4af3718':'#0f0d0888');
+        rect.setAttribute('stroke', isParent?'#d4af37':isOpen?'#aac0e0':color);
+        rect.setAttribute('stroke-width', isParent?2:isOpen?2:1.2);
+        gg.appendChild(rect);
+
+        const badge = document.createElementNS('http://www.w3.org/2000/svg','text');
+        badge.setAttribute('x',hub.hw-3); badge.setAttribute('y',-(hub.hh-8));
+        badge.setAttribute('text-anchor','end');
+        badge.setAttribute('fill','#5a7a5a');
+        badge.setAttribute('font-size','7');
+        badge.setAttribute('font-family','sans-serif');
+        badge.style.pointerEvents='none';
+        const ownedCt = countOwnedDesc(hub.id);
+        badge.textContent = ownedCt > 0 ? `${ownedCt}/${hub.desc}` : hub.desc;
+        gg.appendChild(badge);
+
+        const text = document.createElementNS('http://www.w3.org/2000/svg','text');
+        text.setAttribute('text-anchor','middle');
+        text.setAttribute('dominant-baseline','central');
+        text.setAttribute('fill', isParent?'#d4af37':isOpen?'#aac0e0':color);
+        text.setAttribute('font-size', hubFontSz);
+        text.setAttribute('font-family','sans-serif');
+        text.setAttribute('font-weight','600');
+        text.style.pointerEvents='none';
+        text.textContent = hub.skill.name;
+        gg.appendChild(text);
+
+        // Parent hub → selected edge
+        if (isParent && selectedId) {
+            const selNode = childNodes.find(n => n.id === selectedId);
+            if (selNode) drawEdge(hub, selNode, edgePCol, edgePOp, false);
+        }
+
+        gg.addEventListener('click', e => { e.stopPropagation(); if(!dragMoved) openHub(hub); });
+        g.appendChild(gg);
+    });
+}
+
+function countOwnedDesc(hubId) {
+    let count = 0;
+    const visit = (id, seen=new Set()) => {
+        if(seen.has(id))return; seen.add(id);
+        (childrenOf.get(id)||[]).forEach(cid=>{ if(ownedIds.has(cid))count++; visit(cid,seen); });
+    };
+    visit(hubId);
+    return count;
+}
+
+// ── Interactions ──────────────────────────────────────────────────────────────
+function openHub(hub) {
+    openHubId = hub.id;
+    if (selectedId) lineageRel = computeLineage(selectedId);
+    layoutChildren(hub.id);
+    zoom = 0.7;
+    pan.x = wrap.clientWidth/2 - hub.x*zoom;
+    pan.y = wrap.clientHeight/2 - hub.y*zoom;
+    applyTransform();
+    redraw();
+    document.getElementById('info-panel').style.display = 'none';
+}
+
+function selectSkill(node) {
+    selectedId = node.id;
+    lineageRel = computeLineage(node.id);
+    const z = Math.max(zoom, 1.4);
+    zoom = z;
+    pan.x = wrap.clientWidth/2 - node.x*z;
+    pan.y = wrap.clientHeight/2 - node.y*z;
+    applyTransform();
+    redraw();
+    showInfo(node);
+}
+
+function showInfo(node) {
+    const panel = document.getElementById('info-panel');
+    panel.style.display = 'block';
+    document.getElementById('ip-name').textContent = node.skill?.name || node.id;
+    document.getElementById('ip-status').textContent = node.owned ? 'Learned' : `Depth ${node.depth}`;
+    document.getElementById('ip-desc').textContent = node.skill?.description || '';
+    const parents = (node.skill?.parentSkills || []).map(pid => {
+        const ps = skillMap.get(pid);
+        return `<span style="color:${ownedIds.has(pid)?'#d4af37':'#6a5a30'}">${ps?.name||pid}</span>`;
+    });
+    document.getElementById('ip-parents').innerHTML = parents.length ? 'Requires: ' + parents.join(', ') : '';
+}
+
+function applyTransform() {
+    if (g) g.setAttribute('transform',`translate(${pan.x},${pan.y}) scale(${zoom})`);
+}
+
+// ── Pan/zoom events ───────────────────────────────────────────────────────────
+svg.addEventListener('click', e => {
+    if (dragMoved) return;
+    if (e.target === svg || e.target === g) {
+        if (selectedId) { selectedId=null; lineageRel=new Map(); redraw(); document.getElementById('info-panel').style.display='none'; }
+        else if (openHubId) { openHubId=null; childNodes=[]; childEdges=[]; redraw(); }
+    }
+});
+
+wrap.addEventListener('mousedown', e => {
+    if(e.button!==0)return;
+    dragging=true; dragMoved=false;
+    lastMouse={x:e.clientX,y:e.clientY};
+    wrap.classList.add('dragging');
+});
+window.addEventListener('mouseup', () => { dragging=false; wrap.classList.remove('dragging'); });
+window.addEventListener('mousemove', e => {
+    if(!dragging)return;
+    const dx=e.clientX-lastMouse.x, dy=e.clientY-lastMouse.y;
+    if(Math.abs(dx)>3||Math.abs(dy)>3) dragMoved=true;
+    pan.x+=dx; pan.y+=dy;
+    lastMouse={x:e.clientX,y:e.clientY};
+    applyTransform();
+});
+wrap.addEventListener('wheel', e => {
+    e.preventDefault();
+    zoom=Math.min(5,Math.max(0.08,zoom*(e.deltaY<0?1.1:0.9)));
+    applyTransform();
+},{passive:false});
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+function init() {
+    svg.innerHTML = '';
+    g = document.createElementNS('http://www.w3.org/2000/svg','g');
+    svg.appendChild(g);
+    pan.x = wrap.clientWidth/2;
+    pan.y = wrap.clientHeight/2;
+    applyTransform();
+    syncLabels();
+    loadSkills();
+}
+
+init();
+</script>
+</body>
+</html>
