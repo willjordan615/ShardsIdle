@@ -1,128 +1,82 @@
 /**
- * skill-tree.js — Hub-and-spoke skill web
+ * skill-tree.js — Character skill discovery tree modal
  *
- * Default view: 16 starter skills as hub nodes, sized by descendant count.
- * Click a hub: its full subtree expands around it, other hubs dim.
- * Click a child: detail panel, lineage highlight within the open hub.
- * Click background: collapse to hub view.
+ * Shows the player's personal skill web: skills they own, skills within reach
+ * (one parent known), and children requiring both parents (shown partially).
+ * Skills where the character has zero parents are invisible — discovery by play.
+ *
+ * Node states:
+ *   owned        — skillLevel >= 1, or intrinsic. Gold, solid.
+ *   discovering  — skillLevel === 0, both parents known. Dim gold, XP ring.
+ *   reachable    — one parent known, one unknown (shown as ???). Silver, dashed border.
+ *
+ * Pan: drag. Zoom: scroll wheel / pinch.
  */
 
 (function () {
 
     // ── Constants ────────────────────────────────────────────────────────────
 
-    const PANEL_W     = 268;
-    const NODE_H      = 26;
-    const NODE_PAD    = 14;
-    const NODE_RX     = 5;
-    const HUB_H       = 36;
-    const HUB_PAD     = 18;
-    const HUB_RX      = 8;
+    const NODE_W        = 155;
+    const NODE_H        = 58;
+    const COL_GAP       = 210;  // horizontal spacing between depth columns
+    const ROW_GAP       = 72;   // vertical spacing between nodes in a column
+    const DEPTH_COLS    = 7;    // depths 1–7
 
-    // Hub layout — hubs spread on a grid/ring in canvas center
-    const HUB_SPREAD  = 340;   // radius of hub arrangement circle
-
-    // Child layout
-    const CHILD_RING_BASE = 180;  // base radius from hub center to first child ring
-    const CHILD_RING_GAP  = 120;  // additional radius per depth level
-
-    // Colors
-    const GOLD        = '#d4af37';
-    const HUB_COLOR   = '#7a9acc';   // starter/hub color
-    const OWNED_COLOR = '#d4af37';
-    const HIGHLIGHT   = '#40c060';
-    const AMBER       = '#a07828';
-    const DIM         = '#3a3020';
-
-    const CAT_COLOR = {
-        DAMAGE_SINGLE: '#e05540', DAMAGE_MAGIC:  '#e05540',
-        DAMAGE_AOE:    '#d4722a', DAMAGE_PROC:   '#c45a20',
-        HEALING:       '#4a90d4', HEALING_AOE:   '#3a78bc', HEALING_PROC: '#3a78bc',
-        RESTORATION:   '#5aacd4', BUFF:          '#9a6ed4',
-        CONTROL:       '#3abcac', CONTROL_PROC:  '#2a9a8a',
-        DEFENSE:       '#6a8aac', DEFENSE_PROC:  '#5a7a9c',
-        UTILITY:       '#8a8a7a', UTILITY_PROC:  '#7a7a6a',
-        WEAPON_SKILL:  '#c4a030', NO_RESOURCES:  '#707060',
-        PROGRESSION:   '#a0c040', DEFAULT:       '#8a7a5a',
-    };
+    const COLOR_OWNED       = '#d4af37';
+    const COLOR_OWNED_TEXT  = '#070a18';
+    const COLOR_DISC        = '#8b7355';
+    const COLOR_DISC_TEXT   = '#e8e0d0';
+    const COLOR_REACH       = '#3a4a6a';
+    const COLOR_REACH_TEXT  = '#7a9acc';
+    const COLOR_EDGE_OWNED  = 'rgba(212,175,55,0.55)';
+    const COLOR_EDGE_DISC   = 'rgba(139,115,85,0.35)';
+    const COLOR_EDGE_REACH  = 'rgba(58,74,106,0.3)';
+    const UNLOCK_XP         = 120;
 
     // ── State ────────────────────────────────────────────────────────────────
 
-    let _skillsData   = null;
-    let _character    = null;
-    let _hubs         = [];      // hub node objects
-    let _childNodes   = [];      // child node objects for open hub
-    let _childEdges   = [];      // edges for open hub
-    let _openHubId    = null;    // currently expanded hub
-    let _selectedId   = null;    // selected skill id
-    let _lineageRel   = new Map();  // id → relationship type
+    let _skillsData   = null;   // full skills.json array
+    let _character    = null;   // current character
+    let _nodes        = [];     // computed display nodes
+    let _edges        = [];     // computed display edges
     let _svg          = null;
-    let _g            = null;
-    let _panel        = null;
+    let _g            = null;   // transform group inside SVG
+    let _tooltip      = null;
     let _pan          = { x: 0, y: 0 };
     let _zoom         = 1;
     let _dragging     = false;
-    let _dragMoved    = false;
+    let _selectedNode = null;   // currently clicked node id
     let _lastMouse    = { x: 0, y: 0 };
-
-    // Precomputed
-    let _skillMap     = null;
-    let _childrenOf   = null;
-    let _descCount    = null;
-    let _depthInHub   = null;   // map of skillId → depth within open hub
+    let _canvasW      = 0;
+    let _canvasH      = 0;
 
     // ── Public entry point ───────────────────────────────────────────────────
 
     window.openSkillTree = async function () {
-        _skillsData = (window.gameData?.skills || []).filter(s =>
-            !s.id.startsWith('proc_') &&
-            !s.category?.endsWith('_PROC') &&
-            !s.category?.startsWith('CONSUMABLE')
-        );
-
+        _skillsData = (window.gameData?.skills) || [];
         const charId = currentState?.detailCharacterId;
         if (!charId) return;
 
-        _renderModal();
+        // Show modal immediately with loading state
+        _renderModal(true);
 
         _character = await getCharacter(charId);
-        if (!_character) return;
+        if (!_character) {
+            const wrap = document.getElementById('skillTreeCanvasWrap');
+            if (wrap) wrap.innerHTML = '<div style="color:#8b7355;padding:2rem;text-align:center;font-family:Lato,sans-serif;">Could not load character data.</div>';
+            return;
+        }
 
-        _precompute();
-        requestAnimationFrame(() => _initCanvas());
+        _buildGraph();
+        requestAnimationFrame(() => _initSVG());
     };
 
-    // ── Precompute ────────────────────────────────────────────────────────────
-
-    function _precompute() {
-        _skillMap   = new Map(_skillsData.map(s => [s.id, s]));
-        _childrenOf = new Map(_skillsData.map(s => [s.id, []]));
-        _skillsData.forEach(s => {
-            (s.parentSkills || []).forEach(pid => {
-                if (_childrenOf.has(pid)) _childrenOf.get(pid).push(s.id);
-            });
-        });
-
-        // Memoized descendant count
-        _descCount = new Map();
-        function countDesc(id, visited = new Set()) {
-            if (_descCount.has(id)) return _descCount.get(id);
-            if (visited.has(id)) return 0;
-            visited.add(id);
-            const total = (_childrenOf.get(id) || []).reduce((n, c) => n + 1 + countDesc(c, new Set(visited)), 0);
-            _descCount.set(id, total);
-            return total;
-        }
-        _skillsData.forEach(s => countDesc(s.id));
-    }
-
-    // ── Helpers ───────────────────────────────────────────────────────────────
+    // ── Graph construction ───────────────────────────────────────────────────
 
     function _ownedIds() {
         const ids = new Set();
-        (_character.skills || []).forEach(s => {
-            if ((s.skillLevel || 0) >= 1 || s.intrinsic) ids.add(s.skillID);
-        });
+        (_character.skills || []).forEach(s => ids.add(s.skillID));
         return ids;
     }
 
@@ -130,289 +84,263 @@
         return (_character.skills || []).find(s => s.skillID === id) || null;
     }
 
-    function _hw(name, isHub) {
-        const pad = isHub ? HUB_PAD : NODE_PAD;
-        return Math.max(isHub ? 50 : 36, name.length * 4.4 + pad);
-    }
+    function _buildGraph() {
+        const owned = _ownedIds();
 
-    function _catColor(skill) {
-        return CAT_COLOR[skill?.category] || CAT_COLOR.DEFAULT;
-    }
+        // Which skills to show and in what state
+        // owned: in owned set
+        // discovering: both parents in owned set, skill itself in owned at level 0
+        // reachable: exactly one parent in owned set (character doesn't own the child yet)
+        // hidden: zero parents known → not shown
 
-    // ── Hub layout ────────────────────────────────────────────────────────────
+        const visible = new Map(); // skillId → state object
 
-    function _layoutHubs(cx, cy) {
-        const starters = _skillsData.filter(s => s.isStarterSkill);
-        const owned    = _ownedIds();
+        _skillsData.forEach(skill => {
+            const parents = skill.parentSkills || [];
 
-        // Sort by descendant count desc for visual weight
-        starters.sort((a, b) => (_descCount.get(b.id) || 0) - (_descCount.get(a.id) || 0));
-
-        _hubs = starters.map((s, i) => {
-            const angle  = (i / starters.length) * Math.PI * 2 - Math.PI / 2;
-            const desc   = _descCount.get(s.id) || 0;
-            // Hub radius scales with descendants — bigger hub = more tree beneath it
-            const hubR   = Math.max(HUB_SPREAD * 0.5, HUB_SPREAD * 0.7 + (desc / 128) * HUB_SPREAD * 0.4);
-            return {
-                id:    s.id,
-                skill: s,
-                rec:   _skillRecord(s.id),
-                owned: owned.has(s.id),
-                desc,
-                x:     cx + Math.cos(angle) * HUB_SPREAD,
-                y:     cy + Math.sin(angle) * HUB_SPREAD,
-                hw:    _hw(s.name, true),
-                hh:    HUB_H / 2,
-                isHub: true,
-            };
-        });
-    }
-
-    // ── Child layout for open hub ─────────────────────────────────────────────
-
-    function _layoutChildren(hubId) {
-        const hub    = _hubs.find(h => h.id === hubId);
-        if (!hub) return;
-        const owned  = _ownedIds();
-
-        // BFS from hub to collect all descendants with depth
-        _depthInHub = new Map([[hubId, 0]]);
-        const queue = [hubId];
-        let qi = 0;
-        while (qi < queue.length) {
-            const id = queue[qi++];
-            const d  = _depthInHub.get(id);
-            (_childrenOf.get(id) || []).forEach(cid => {
-                if (!_depthInHub.has(cid)) {
-                    _depthInHub.set(cid, d + 1);
-                    queue.push(cid);
+            if (!parents.length) {
+                // Root skill — only show if owned
+                if (owned.has(skill.id)) {
+                    visible.set(skill.id, { skill, state: 'owned', knownParents: [] });
                 }
-            });
-        }
-
-        // Group by depth
-        const byDepth = new Map();
-        _depthInHub.forEach((d, id) => {
-            if (id === hubId) return;
-            if (!byDepth.has(d)) byDepth.set(d, []);
-            byDepth.get(d).push(id);
-        });
-
-        // Place children in rings around hub
-        _childNodes = [];
-        const placed = new Map([[hubId, hub]]);
-
-        byDepth.forEach((ids, depth) => {
-            const r = CHILD_RING_BASE + (depth - 1) * CHILD_RING_GAP;
-
-            // Sort by angle of primary parent to keep related skills together
-            ids.sort((a, b) => {
-                const aParents = (_skillMap.get(a)?.parentSkills || []);
-                const bParents = (_skillMap.get(b)?.parentSkills || []);
-                const aAngle   = _angleOfParent(aParents, placed, hub);
-                const bAngle   = _angleOfParent(bParents, placed, hub);
-                return aAngle - bAngle;
-            });
-
-            ids.forEach((id, i) => {
-                const skill  = _skillMap.get(id);
-                if (!skill) return;
-                const angle  = (i / ids.length) * Math.PI * 2 - Math.PI / 2;
-                const x      = hub.x + Math.cos(angle) * r;
-                const y      = hub.y + Math.sin(angle) * r;
-                const node   = {
-                    id, skill,
-                    rec:   _skillRecord(id),
-                    owned: owned.has(id),
-                    depth,
-                    x, y,
-                    hw:    _hw(skill.name, false),
-                    hh:    NODE_H / 2,
-                    isHub: false,
-                    sharedWithOtherHub: (skill.parentSkills || []).some(p =>
-                        _skillsData.find(s => s.isStarterSkill && s.id === p) && p !== hubId
-                    ),
-                };
-                _childNodes.push(node);
-                placed.set(id, node);
-            });
-        });
-
-        // Separate overlapping child nodes
-        _separateNodes(_childNodes);
-
-        // Build edges — parent→child within this hub's tree
-        _childEdges = [];
-        _childNodes.forEach(node => {
-            (node.skill.parentSkills || []).forEach(pid => {
-                const pNode = placed.get(pid);
-                if (!pNode) return;
-                _childEdges.push({ from: pNode, to: node });
-            });
-        });
-    }
-
-    function _angleOfParent(parentIds, placed, hub) {
-        for (const pid of parentIds) {
-            const p = placed.get(pid);
-            if (p) return Math.atan2(p.y - hub.y, p.x - hub.x);
-        }
-        return 0;
-    }
-
-    // ── Separation pass ───────────────────────────────────────────────────────
-
-    function _separateNodes(nodes) {
-        const MIN_X = 18, MIN_Y = 12, PASSES = 80;
-        for (let pass = 0; pass < PASSES; pass++) {
-            let moved = false;
-            for (let i = 0; i < nodes.length; i++) {
-                for (let j = i + 1; j < nodes.length; j++) {
-                    const a = nodes[i], b = nodes[j];
-                    const dx = b.x - a.x, dy = b.y - a.y;
-                    const ox = (a.hw + b.hw + MIN_X) - Math.abs(dx);
-                    const oy = (a.hh + b.hh + MIN_Y) - Math.abs(dy);
-                    if (ox > 0 && oy > 0) {
-                        moved = true;
-                        if (ox < oy) {
-                            const p = (ox / 2 + 1) * Math.sign(dx || 1);
-                            a.x -= p; b.x += p;
-                        } else {
-                            const p = (oy / 2 + 1) * Math.sign(dy || 1);
-                            a.y -= p; b.y += p;
-                        }
-                    }
-                }
+                return;
             }
-            if (!moved) break;
-        }
-    }
 
-    // ── Lineage ───────────────────────────────────────────────────────────────
+            const knownParents = parents.filter(p => owned.has(p));
 
-    // Returns map of id → relationship ('selected'|'parent'|'child_owned'|'child_unowned')
-    function _computeLineage(id) {
-        const owned   = _ownedIds();
-        const rel     = new Map([[id, 'selected']]);
+            if (knownParents.length === 0) return; // invisible
 
-        // Direct parents
-        (_skillMap.get(id)?.parentSkills || []).forEach(pid => {
-            if (!rel.has(pid)) rel.set(pid, 'parent');
-        });
-
-        // Direct children
-        (_childrenOf.get(id) || []).forEach(cid => {
-            const type = owned.has(cid) ? 'child_owned' : 'child_unowned';
-            if (!rel.has(cid)) rel.set(cid, type);
-            // If child is owned, show its children too
-            if (owned.has(cid)) {
-                (_childrenOf.get(cid) || []).forEach(gcid => {
-                    if (!rel.has(gcid)) rel.set(gcid, owned.has(gcid) ? 'child_owned' : 'child_unowned');
+            if (owned.has(skill.id)) {
+                const rec = _skillRecord(skill.id);
+                const state = (rec && rec.skillLevel >= 1) ? 'owned' : 'discovering';
+                visible.set(skill.id, { skill, state, rec, knownParents });
+            } else if (knownParents.length >= 1) {
+                // Name revealed if any known parent is level 3+, or if player purchased reveal
+                const parentLevelRevealed = knownParents.some(pid => {
+                    const rec = _skillRecord(pid);
+                    return rec && rec.skillLevel >= 3;
                 });
+                const purchaseRevealed = (_character.revealedParents || []).includes(skill.id);
+                const nameRevealed = parentLevelRevealed || purchaseRevealed;
+                visible.set(skill.id, { skill, state: 'reachable', knownParents, nameRevealed, purchaseRevealed });
             }
         });
 
-        return rel;
-    }
+        // Assign depths
+        const depthCache = {};
+        function getDepth(id) {
+            if (depthCache[id] !== undefined) return depthCache[id];
+            const skill = _skillsData.find(s => s.id === id);
+            if (!skill) { depthCache[id] = 1; return 1; }
+            const parents = skill.parentSkills || [];
+            if (!parents.length) { depthCache[id] = 1; return 1; }
+            const d = Math.max(...parents.map(getDepth)) + 1;
+            depthCache[id] = d;
+            return d;
+        }
 
-    function _lineageIds() {
-        return new Set(_lineageRel.keys());
-    }
+        // Group by depth, sort within each column by skill name for consistency
+        const byDepth = {};
+        visible.forEach((node, id) => {
+            const d = getDepth(id);
+            node.depth = d;
+            if (!byDepth[d]) byDepth[d] = [];
+            byDepth[d].push({ id, node });
+        });
 
-    // Nodes that need to be drawn for lineage but aren't in the open hub's child list
-    function _lineageExtraNodes() {
-        if (!_selectedId) return [];
-        const _lineageIds = new Set(_lineageRel.keys());
-        const owned    = _ownedIds();
-        const inChild  = new Set([..._childNodes.map(n => n.id), _openHubId]);
-        const extras   = [];
-        new Set(_lineageRel.keys()).forEach(id => {
-            if (inChild.has(id)) return;
-            const skill = _skillMap.get(id);
-            if (!skill) return;
-            // Find position — use hub position if it's a hub, otherwise place near its child
-            const hub = _hubs.find(h => h.id === id);
-            if (hub) { extras.push(hub); return; }
-            // Place near the selected node as a ghost
-            const sel = _childNodes.find(n => n.id === _selectedId);
-            if (!sel) return;
-            const idx   = extras.length;
-            const angle = (idx / 4) * Math.PI * 2;
-            extras.push({
-                id, skill, rec: _skillRecord(id),
-                owned: owned.has(id),
-                depth: 0,
-                x: sel.x + Math.cos(angle) * 200,
-                y: sel.y + Math.sin(angle) * 200,
-                hw: _hw(skill.name, false),
-                hh: NODE_H / 2,
-                isHub: false,
-                ghost: true,
+        // Lay out positions
+        _nodes = [];
+        Object.keys(byDepth).sort((a, b) => a - b).forEach(depth => {
+            const col = byDepth[depth];
+            col.sort((a, b) => a.node.skill.name.localeCompare(b.node.skill.name));
+            col.forEach((item, rowIdx) => {
+                const x = (parseInt(depth) - 1) * COL_GAP + NODE_W / 2;
+                const y = rowIdx * ROW_GAP + NODE_H / 2;
+                item.node.x = x;
+                item.node.y = y;
+                item.node.id = item.id;
+                _nodes.push(item.node);
             });
         });
-        return extras;
+
+        // Build edges: for each visible non-root skill, draw edges from known parents
+        _edges = [];
+        visible.forEach((node, id) => {
+            const parents = node.skill.parentSkills || [];
+            parents.forEach(pid => {
+                if (!visible.has(pid)) return;
+                const pNode = visible.get(pid);
+                const childState = node.state;
+                const color = childState === 'owned'       ? COLOR_EDGE_OWNED
+                            : childState === 'discovering' ? COLOR_EDGE_DISC
+                            :                                COLOR_EDGE_REACH;
+                _edges.push({ from: pNode, to: node, color });
+            });
+        });
+
+        // Canvas size
+        const maxX = Math.max(..._nodes.map(n => n.x)) + NODE_W;
+        const maxY = Math.max(..._nodes.map(n => n.y)) + NODE_H;
+        _canvasW = maxX + 60;
+        _canvasH = maxY + 60;
     }
 
-    // ── Modal ─────────────────────────────────────────────────────────────────
+    // ── Modal render ─────────────────────────────────────────────────────────
 
-    function _renderModal() {
+    function _renderModal(loading = false) {
         let modal = document.getElementById('skillTreeModal');
         if (!modal) {
             modal = document.createElement('div');
             modal.id = 'skillTreeModal';
-            modal.style.cssText = `display:none;position:fixed;inset:0;background:rgba(4,3,1,0.96);z-index:1000;overflow:hidden;width:100vw;height:100vh;box-sizing:border-box;`;
+            modal.style.cssText = `
+                display:none; position:fixed; inset:0;
+                background:rgba(0,0,0,0.92);
+                z-index:1000;
+                backdrop-filter:blur(4px);
+                overflow:hidden;
+                width:100vw;
+                height:100vh;
+                box-sizing:border-box;
+            `;
             modal.innerHTML = `
-                <div style="position:absolute;top:0;left:0;right:0;height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 1.25rem;background:var(--window-base,#080604);border-bottom:1px solid rgba(212,175,55,0.12);z-index:2;box-sizing:border-box;">
-                    <div style="display:flex;align-items:center;gap:1rem;">
-                        <span style="font-family:var(--font-display);color:${GOLD};font-size:0.95rem;letter-spacing:0.06em;">Skill Web</span>
-                        <span id="skillTreeCharName" style="color:#6a5a30;font-size:0.8rem;"></span>
-                        <span id="skillTreeHubName" style="color:#5a8a5a;font-size:0.8rem;font-style:italic;"></span>
+                <div id="skillTreeHeader" style="
+                    position:absolute; top:0; left:0; right:0;
+                    display:flex; align-items:center; justify-content:space-between;
+                    padding:0.75rem 1.25rem;
+                    background:linear-gradient(135deg, var(--window-base) 0%, var(--window-deep) 100%);
+                    border-bottom:1px solid rgba(212,175,55,0.2);
+                    z-index:2; height:52px; box-sizing:border-box;
+                ">
+                    <div>
+                        <span style="font-family:var(--font-display); color:var(--gold); font-size:1rem; font-weight:600; letter-spacing:0.05em;">
+                            Skill Web
+                        </span>
+                        <span id="skillTreeCharName" style="color:#8b7355; font-size:0.82rem; margin-left:0.75rem;"></span>
                     </div>
-                    <div style="display:flex;align-items:center;gap:1.5rem;">
-                        <div style="font-size:0.72rem;color:#4a3a18;">Click a skill branch to explore it</div>
-                        <button onclick="closeModal('skillTreeModal')" style="background:none;border:1px solid rgba(212,175,55,0.18);color:#6a5a30;padding:0.25rem 0.65rem;border-radius:3px;cursor:pointer;font-size:0.8rem;font-family:inherit;">✕ Close</button>
+                    <div style="display:flex; align-items:center; gap:1rem;">
+                        <div style="display:flex; align-items:center; gap:1.2rem; font-size:0.75rem; color:#8b7355;">
+                            <span><span style="display:inline-block;width:10px;height:10px;background:#d4af37;border-radius:2px;margin-right:4px;vertical-align:middle;"></span>Owned</span>
+                            <span><span style="display:inline-block;width:10px;height:10px;background:#4a3a1a;border:1px solid #8b7355;border-radius:2px;margin-right:4px;vertical-align:middle;"></span>Discovering</span>
+                            <span><span style="display:inline-block;width:10px;height:10px;background:#1a2a4a;border:1px dashed #3a5a8a;border-radius:2px;margin-right:4px;vertical-align:middle;"></span>Within reach</span>
+                        </div>
+                        <button onclick="closeModal('skillTreeModal')"
+                            style="background:none;border:1px solid rgba(212,175,55,0.3);color:#8b7355;padding:0.3rem 0.7rem;border-radius:4px;cursor:pointer;font-size:0.82rem;font-family:inherit;">
+                            ✕ Close
+                        </button>
                     </div>
                 </div>
-                <div style="position:absolute;top:48px;left:0;right:0;bottom:24px;display:flex;">
-                    <div id="skillTreeCanvasWrap" style="flex:1;overflow:hidden;cursor:grab;position:relative;">
-                        <svg id="skillTreeSVG" style="display:block;width:100%;height:100%;"></svg>
-                    </div>
-                    <div id="skillTreePanel" style="width:${PANEL_W}px;flex-shrink:0;border-left:1px solid rgba(212,175,55,0.08);background:var(--window-base,#060503);padding:1.25rem 1rem;overflow-y:auto;font-family:var(--font-body);color:var(--text-primary,#e8e0d0);">
-                        <div style="color:#3a3020;font-size:0.78rem;font-style:italic;margin-top:2rem;text-align:center;">Select a skill to inspect</div>
-                    </div>
+                <div id="skillTreeCanvasWrap" style="
+                    position:absolute; top:52px; left:0; right:0; bottom:28px;
+                    overflow:hidden; cursor:grab;
+                ">
+                    <svg id="skillTreeSVG" style="display:block; width:100%; height:100%;"></svg>
+                    <div id="skillTreeTooltip" style="
+                        display:none; position:absolute;
+                        background:linear-gradient(135deg,var(--window-base),var(--window-deep));
+                        border:1px solid rgba(212,175,55,0.35);
+                        border-radius:6px; padding:0.6rem 0.8rem;
+                        font-family:var(--font-body); font-size:0.8rem;
+                        color:var(--text-primary); pointer-events:none;
+                        max-width:220px; z-index:10;
+                        box-shadow:0 4px 20px rgba(0,0,0,0.6);
+                    "></div>
                 </div>
-                <div style="position:absolute;bottom:0;left:0;right:${PANEL_W}px;height:24px;text-align:center;font-size:0.68rem;color:#2a1e08;line-height:24px;font-family:var(--font-body);">Drag to pan · Scroll to zoom · Click hub to explore · Click background to collapse</div>
+                <div style="
+                    position:absolute; bottom:0; left:0; right:0; height:28px;
+                    text-align:center; font-size:0.72rem; color:#3a3a5a;
+                    line-height:28px;
+                    font-family:var(--font-body);
+                ">Drag to pan · Scroll to zoom</div>
             `;
             document.body.appendChild(modal);
         }
-        _pan = { x: 0, y: 0 };
+
+        // Reset pan/zoom/selection each open
+        _pan  = { x: 40, y: 40 };
         _zoom = 1;
-        _openHubId = null;
-        _selectedId = null;
-        _lineageRel = new Map();
-        _childNodes = [];
-        _childEdges = [];
+        _selectedNode = null;
+
         document.getElementById('skillTreeCharName').textContent = _character?.name || '';
-        document.getElementById('skillTreeHubName').textContent = '';
+
         modal.style.display = 'block';
+
+        // Show loading indicator until data arrives
+        const wrap = document.getElementById('skillTreeCanvasWrap');
+        if (wrap && loading) {
+            wrap.innerHTML = `
+                <div style="
+                    display:flex; align-items:center; justify-content:center;
+                    height:100%; color:#8b7355;
+                    font-family:var(--font-body); font-size:0.9rem;
+                    letter-spacing:0.05em;
+                ">
+                    <span style="opacity:0.6;">Reading the paths…</span>
+                </div>`;
+            // Re-attach SVG and tooltip after clearing
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.id = 'skillTreeSVG';
+            svg.style.cssText = 'display:none; width:100%; height:100%;';
+            wrap.appendChild(svg);
+            const tip = document.createElement('div');
+            tip.id = 'skillTreeTooltip';
+            tip.style.cssText = `
+                display:none; position:absolute;
+                background:linear-gradient(135deg,var(--window-base),var(--window-deep));
+                border:1px solid rgba(212,175,55,0.35);
+                border-radius:6px; padding:0.6rem 0.8rem;
+                font-family:var(--font-body); font-size:0.8rem;
+                color:var(--text-primary); pointer-events:none;
+                max-width:220px; z-index:10;
+                box-shadow:0 4px 20px rgba(0,0,0,0.6);
+            `;
+            wrap.appendChild(tip);
+        }
     }
 
-    // ── Canvas ────────────────────────────────────────────────────────────────
+    // ── SVG setup ────────────────────────────────────────────────────────────
 
-    function _initCanvas() {
+    function _initSVG() {
         const wrap = document.getElementById('skillTreeCanvasWrap');
-        if (!wrap) return;
-        _svg   = document.getElementById('skillTreeSVG');
-        _panel = document.getElementById('skillTreePanel');
+
+        // Clear loading state, rebuild canvas
+        wrap.innerHTML = `
+            <svg id="skillTreeSVG" style="display:block; width:100%; height:100%;"></svg>
+            <div id="skillTreeTooltip" style="
+                display:none; position:absolute;
+                background:linear-gradient(135deg,var(--window-base),var(--window-deep));
+                border:1px solid rgba(212,175,55,0.35);
+                border-radius:6px; padding:0.6rem 0.8rem;
+                font-family:var(--font-body); font-size:0.8rem;
+                color:var(--text-primary); pointer-events:none;
+                max-width:220px; z-index:10;
+                box-shadow:0 4px 20px rgba(0,0,0,0.6);
+            "></div>`;
+
+        _svg  = document.getElementById('skillTreeSVG');
+        _tooltip = document.getElementById('skillTreeTooltip');
+
+        _svg.setAttribute('viewBox', `0 0 ${wrap.clientWidth} ${wrap.clientHeight}`);
         _svg.innerHTML = '';
+
+        // Defs: glow filter
+        const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+        defs.innerHTML = `
+            <filter id="stGlow" x="-30%" y="-30%" width="160%" height="160%">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"/>
+                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <filter id="stGlowGold" x="-30%" y="-30%" width="160%" height="160%">
+                <feGaussianBlur in="SourceAlpha" stdDeviation="4" result="blur"/>
+                <feFlood flood-color="#d4af37" flood-opacity="0.5" result="color"/>
+                <feComposite in="color" in2="blur" operator="in" result="glow"/>
+                <feMerge><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+        `;
+        _svg.appendChild(defs);
+
         _g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         _svg.appendChild(_g);
 
-        const W = wrap.clientWidth, H = wrap.clientHeight;
-        _pan.x = W / 2;
-        _pan.y = H / 2;
-
-        _layoutHubs(0, 0);
         _drawAll();
         _applyTransform();
         _bindEvents(wrap);
@@ -422,427 +350,385 @@
         if (_g) _g.setAttribute('transform', `translate(${_pan.x},${_pan.y}) scale(${_zoom})`);
     }
 
-    // ── Drawing ───────────────────────────────────────────────────────────────
-
     function _drawAll() {
-        if (!_g) return;
         _g.innerHTML = '';
-        const owned  = _ownedIds();
-        const hasSel = _selectedId !== null;
 
-        // Draw child edges (behind everything)
-        if (_openHubId) {
-            _childEdges.forEach(e => {
-                const toRel   = _lineageRel.get(e.to.id);
-                const fromRel = _lineageRel.get(e.from.id);
-                if (hasSel && !toRel && !fromRel) return;
-                if (!hasSel) {
-                    _drawEdge(e.from, e.to, 'rgba(180,150,60,0.2)', 0.8, false);
-                    return;
-                }
-                // Parent edge: from parent to selected
-                if (fromRel === 'parent' && e.to.id === _selectedId) {
-                    _drawEdge(e.from, e.to, 'rgba(212,175,55,0.85)', 2, false);
-                }
-                // Child owned edge: from selected to owned child
-                else if (e.from.id === _selectedId && toRel === 'child_owned') {
-                    _drawEdge(e.from, e.to, 'rgba(212,175,55,0.7)', 1.5, true);
-                }
-                // Child unowned edge
-                else if (e.from.id === _selectedId && toRel === 'child_unowned') {
-                    _drawEdge(e.from, e.to, 'rgba(160,130,50,0.4)', 1, true);
-                }
-                // Grandchild edges (owned child → its children)
-                else if (fromRel === 'child_owned' && toRel) {
-                    _drawEdge(e.from, e.to, toRel === 'child_owned' ? 'rgba(212,175,55,0.5)' : 'rgba(140,110,40,0.3)', 1, true);
-                }
-            });
-        }
-
-        // Draw child nodes
-        if (_openHubId) {
-            _childNodes.forEach(node => {
-                const inLineage = _lineageRel.has(node.id);
-                const opacity   = hasSel ? (inLineage ? 1.0 : 0.07) : (node.owned ? 1.0 : _distOpacity(node, owned));
-                _drawNode(node, inLineage, opacity, owned);
-            });
-
-            // Draw extra lineage nodes (cross-hub parents/children not in current subtree)
-            if (hasSel) {
-                const extras = _lineageExtraNodes();
-                extras.forEach(node => {
-                    if (_hubs.find(h => h.id === node.id)) return; // hubs drawn separately
-                    _drawNode(node, true, 1.0, owned);
-                });
-                // Draw edges to extra nodes
-                const allVisible = new Map([..._childNodes.map(n => [n.id, n]), ...extras.map(n => [n.id, n])]);
-                extras.forEach(node => {
-                    (node.skill?.parentSkills || []).forEach(pid => {
-                        const pNode = allVisible.get(pid);
-                        if (pNode) _drawEdge(pNode, node, 'rgba(60,200,100,0.5)', 1.2);
-                    });
-                    (_childrenOf.get(node.id) || []).forEach(cid => {
-                        const cNode = allVisible.get(cid);
-                        if (cNode && _lineageRel.has(cid)) _drawEdge(node, cNode, 'rgba(60,200,100,0.5)', 1.2);
-                    });
-                });
+        // Edges first (behind nodes)
+        _edges.forEach(edge => {
+            const x1 = edge.from.x + NODE_W / 2;
+            const y1 = edge.from.y;
+            const x2 = edge.to.x - NODE_W / 2;
+            const y2 = edge.to.y;
+            const cx1 = x1 + (x2 - x1) * 0.5;
+            const cy1 = y1;
+            const cx2 = x1 + (x2 - x1) * 0.5;
+            const cy2 = y2;
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.setAttribute('d', `M${x1},${y1} C${cx1},${cy1} ${cx2},${cy2} ${x2},${y2}`);
+            path.setAttribute('stroke', edge.color);
+            path.setAttribute('stroke-width', '1.5');
+            path.setAttribute('fill', 'none');
+            path.dataset.edge = '1';
+            path.dataset.from = edge.from.id;
+            path.dataset.to   = edge.to.id;
+            if (edge.color === COLOR_EDGE_REACH) {
+                path.setAttribute('stroke-dasharray', '4 4');
             }
-        }
-
-        // Draw hubs (always on top)
-        _hubs.forEach(hub => {
-            const isOpen   = hub.id === _openHubId;
-            const isParent = _lineageRel.get(hub.id) === 'parent';
-            const isDimmed = _openHubId && !isOpen && !isParent;
-            const opacity  = isDimmed ? 0.25 : 1.0;
-            _drawHub(hub, isOpen, opacity, owned, isParent);
+            _g.appendChild(path);
         });
 
-        // Draw solid gold edges from parent hubs to selected skill
-        if (_selectedId && hasSel) {
-            const selNode = _childNodes.find(n => n.id === _selectedId);
-            if (selNode) {
-                _hubs.forEach(hub => {
-                    if (_lineageRel.get(hub.id) === 'parent') {
-                        _drawEdge(hub, selNode, 'rgba(212,175,55,0.75)', 2, false);
-                    }
-                });
+        // Nodes
+        _nodes.forEach(node => _drawNode(node));
+    }
+
+    function _revealCost(depth) {
+        // 100 at depth 1, 1000 at depth 2, 10000 at depth 3, etc.
+        return Math.pow(10, depth);
+    }
+
+    async function _purchaseReveal(node) {
+        const cost = _revealCost(node.depth);
+        if ((_character.gold || 0) < cost) {
+            showError(`Not enough gold. Revealing this path costs ${cost}g.`);
+            return;
+        }
+        _character.gold -= cost;
+        if (!_character.revealedParents) _character.revealedParents = [];
+        _character.revealedParents.push(node.id);
+        await saveCharacterToServer(_character);
+        // Redraw
+        _buildGraph();
+        _drawAll();
+    }
+
+    function _drawNode(node) {
+        const { x, y, state, skill, rec } = node;
+        const nx = x - NODE_W / 2;
+        const ny = y - NODE_H / 2;
+
+        const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        group.setAttribute('transform', `translate(${nx},${ny})`);
+        group.dataset.skillId = node.id;
+        group.style.cursor = 'pointer';
+
+        // Background rect
+        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        rect.setAttribute('width', NODE_W);
+        rect.setAttribute('height', NODE_H);
+        rect.setAttribute('rx', '5');
+
+        if (state === 'owned') {
+            rect.setAttribute('class', 'st-node-owned');
+            rect.setAttribute('stroke', COLOR_OWNED);
+            rect.setAttribute('stroke-width', '1.5');
+            rect.setAttribute('filter', 'url(#stGlowGold)');
+        } else if (state === 'discovering') {
+            rect.setAttribute('class', 'st-node-discovering');
+            rect.setAttribute('stroke', COLOR_DISC);
+            rect.setAttribute('stroke-width', '1');
+            rect.setAttribute('stroke-dasharray', '3 2');
+        } else {
+            rect.setAttribute('class', 'st-node-reachable');
+            rect.setAttribute('stroke', '#2a3a5a');
+            rect.setAttribute('stroke-width', '1');
+            rect.setAttribute('stroke-dasharray', '4 3');
+        }
+        group.appendChild(rect);
+
+        // Name text
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', NODE_W / 2);
+        text.setAttribute('y', NODE_H / 2 + (state === 'discovering' ? -4 : 5));
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('dominant-baseline', 'middle');
+
+        text.setAttribute('fill', state === 'owned' ? COLOR_OWNED : state === 'discovering' ? COLOR_DISC_TEXT : COLOR_REACH_TEXT);
+
+        const displayName = (state === 'reachable' && !node.nameRevealed) ? '???' : skill.name;
+
+        text.textContent = _truncate(displayName, 14);
+        group.appendChild(text);
+
+        // XP bar for discovering state
+        if (state === 'discovering' && rec) {
+            const xp  = rec.skillXP || 0;
+            const pct = Math.min(1, xp / UNLOCK_XP);
+            const barW = NODE_W - 16;
+            const barY = NODE_H / 2 + 8;
+
+            const barBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            barBg.setAttribute('x', '8'); barBg.setAttribute('y', barY);
+            barBg.setAttribute('width', barW); barBg.setAttribute('height', '4');
+            barBg.setAttribute('rx', '2'); barBg.setAttribute('class', 'st-bar-bg');
+            group.appendChild(barBg);
+
+            const barFill = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            barFill.setAttribute('x', '8'); barFill.setAttribute('y', barY);
+            barFill.setAttribute('width', Math.max(2, barW * pct));
+            barFill.setAttribute('height', '4');
+            barFill.setAttribute('rx', '2'); barFill.setAttribute('fill', COLOR_DISC);
+            group.appendChild(barFill);
+        }
+
+        // Missing parent indicator for reachable — only when name revealed
+        if (state === 'reachable' && node.nameRevealed) {
+            const missing = (skill.parentSkills || []).filter(p => !_ownedIds().has(p));
+            if (missing.length > 0) {
+                const sub = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                sub.setAttribute('x', NODE_W / 2);
+                sub.setAttribute('y', NODE_H - 7);
+                sub.setAttribute('text-anchor', 'middle');
+                sub.setAttribute('class', 'st-sub');
+                sub.setAttribute('fill', '#3a5a7a');
+                sub.textContent = '+ needs ???';
+                group.appendChild(sub);
             }
         }
-    }
 
-    function _distOpacity(node, owned) {
-        // How many hops from an owned skill or hub root
-        const parents = node.skill?.parentSkills || [];
-        const ownedParents = parents.filter(p => owned.has(p) || _hubs.find(h => h.id === p));
-        if (node.owned) return 1.0;
-        if (ownedParents.length > 0) return 0.75;
-        if (node.depth === 2) return 0.45;
-        if (node.depth === 3) return 0.25;
-        return 0.12;
-    }
-
-    function _drawEdge(from, to, stroke, width, dashed=false) {
-        const dx  = to.x - from.x, dy = to.y - from.y;
-        const len = Math.sqrt(dx*dx + dy*dy) || 1;
-        const x1  = from.x + (dx/len) * from.hw;
-        const y1  = from.y + (dy/len) * from.hh;
-        const x2  = to.x   - (dx/len) * to.hw;
-        const y2  = to.y   - (dy/len) * to.hh;
-        const mx  = (x1+x2)/2, my = (y1+y2)/2;
-        const mag = Math.sqrt(mx*mx+my*my) || 1;
-        const el  = Math.sqrt((x2-x1)**2+(y2-y1)**2);
-        const cx  = mx + (mx/mag)*el*0.1;
-        const cy  = my + (my/mag)*el*0.1;
-        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        path.setAttribute('d', `M${x1},${y1} Q${cx},${cy} ${x2},${y2}`);
-        path.setAttribute('stroke', stroke);
-        path.setAttribute('stroke-width', width);
-        path.setAttribute('fill', 'none');
-        if (dashed) path.setAttribute('stroke-dasharray', '5 4');
-        _g.appendChild(path);
-    }
-
-    function _drawHub(hub, isOpen, opacity, owned, isParent=false) {
-        const color = hub.owned ? OWNED_COLOR : HUB_COLOR;
-        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        g.setAttribute('transform', `translate(${hub.x},${hub.y})`);
-        g.dataset.skillId = hub.id;
-        g.dataset.isHub   = '1';
-        g.style.cursor    = 'pointer';
-        g.style.opacity   = opacity;
-
-        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-        rect.setAttribute('x',      -hub.hw);
-        rect.setAttribute('y',      -hub.hh);
-        rect.setAttribute('width',   hub.hw * 2);
-        rect.setAttribute('height',  HUB_H);
-        rect.setAttribute('rx',      HUB_RX);
-        rect.setAttribute('fill',    isOpen ? 'rgba(122,154,204,0.18)' : hub.owned ? 'rgba(212,175,55,0.12)' : 'rgba(12,10,6,0.9)');
-        rect.setAttribute('stroke',  isParent ? GOLD : isOpen ? '#aac0e0' : color);
-        rect.setAttribute('stroke-width', isParent ? 2 : isOpen ? 2 : 1.2);
-        g.appendChild(rect);
-
-        // Desc count badge
-        const desc = _descCount.get(hub.id) || 0;
-        const owned_ct = _countOwnedDesc(hub.id, owned);
-        const badge = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        badge.setAttribute('x', hub.hw - 3);
-        badge.setAttribute('y', -(hub.hh - 8));
-        badge.setAttribute('text-anchor', 'end');
-        badge.setAttribute('fill', '#5a7a5a');
-        badge.setAttribute('font-size', '7');
-        badge.setAttribute('font-family', 'var(--font-body,sans-serif)');
-        badge.style.pointerEvents = 'none';
-        badge.textContent = owned_ct > 0 ? `${owned_ct}/${desc}` : desc;
-        g.appendChild(badge);
-
-        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        text.setAttribute('text-anchor', 'middle');
-        text.setAttribute('dominant-baseline', 'central');
-        text.setAttribute('fill', isOpen ? '#aac0e0' : color);
-        text.setAttribute('font-size', '11');
-        text.setAttribute('font-family', 'var(--font-body,sans-serif)');
-        text.setAttribute('font-weight', '600');
-        text.style.pointerEvents = 'none';
-        text.style.userSelect    = 'none';
-        text.textContent = hub.skill.name;
-        g.appendChild(text);
-
-        g.addEventListener('click', e => { e.stopPropagation(); if (!_dragMoved) _openHub(hub); });
-        _g.appendChild(g);
-    }
-
-    function _drawNode(node, inLineage, opacity, owned) {
-        const rel   = _lineageRel.get(node.id);
-        const color = rel === 'selected'      ? HIGHLIGHT
-                    : rel === 'parent'         ? GOLD
-                    : rel === 'child_owned'    ? GOLD
-                    : rel === 'child_unowned'  ? _catColor(node.skill)
-                    : node.owned ? OWNED_COLOR : _catColor(node.skill);
-        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        g.setAttribute('transform', `translate(${node.x},${node.y})`);
-        g.dataset.skillId = node.id;
-        g.style.cursor    = 'pointer';
-        g.style.opacity   = opacity;
-
-        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-        rect.setAttribute('x',      -node.hw);
-        rect.setAttribute('y',      -node.hh);
-        rect.setAttribute('width',   node.hw * 2);
-        rect.setAttribute('height',  NODE_H);
-        rect.setAttribute('rx',      NODE_RX);
-        const selFill = rel === 'selected' ? 'rgba(212,175,55,0.15)'
-                       : rel === 'parent'  ? 'rgba(212,175,55,0.08)'
-                       : node.owned ? 'rgba(212,175,55,0.06)' : 'rgba(10,7,2,0.88)';
-        rect.setAttribute('fill',    selFill);
-        rect.setAttribute('stroke',  color);
-        rect.setAttribute('stroke-width', rel === 'selected' ? 2.5 : rel === 'parent' ? 1.8 : rel === 'child_owned' ? 1.5 : node.owned ? 1.2 : 0.7);
-        g.appendChild(rect);
-
-        // Partial parent bar
-        const parents = node.skill?.parentSkills || [];
-        const ownedPCt = parents.filter(p => owned.has(p)).length;
-        if (ownedPCt > 0 && ownedPCt < parents.length) {
-            const bar = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-            bar.setAttribute('x', -node.hw + NODE_RX);
-            bar.setAttribute('y', node.hh - 3);
-            bar.setAttribute('width', (node.hw * 2 - NODE_RX * 2) * (ownedPCt / parents.length));
-            bar.setAttribute('height', 2);
-            bar.setAttribute('rx', 1);
-            bar.setAttribute('fill', GOLD);
-            bar.setAttribute('fill-opacity', '0.6');
-            g.appendChild(bar);
+        // Reveal parents button for reachable nodes where name is known but parents are hidden
+        if (state === 'reachable' && node.nameRevealed && !node.purchaseRevealed) {
+            const missing = (skill.parentSkills || []).filter(p => !_ownedIds().has(p));
+            if (missing.length > 0) {
+                const cost = _revealCost(node.depth);
+                const canAfford = (_character.gold || 0) >= cost;
+                const fo = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
+                fo.setAttribute('x', '4');
+                fo.setAttribute('y', String(NODE_H + 4));
+                fo.setAttribute('width', String(NODE_W - 8));
+                fo.setAttribute('height', '20');
+                const btn = document.createElement('button');
+                btn.textContent = `Reveal parents: ${cost}g`;
+                btn.style.cssText = [
+                    'width:100%', 'height:20px', 'font-size:9px', 'cursor:' + (canAfford ? 'pointer' : 'not-allowed'),
+                    'background:' + (canAfford ? '#1a2a1a' : '#1a1a1a'),
+                    'color:' + (canAfford ? '#4cd964' : '#555'),
+                    'border:1px solid ' + (canAfford ? '#2a4a2a' : '#333'),
+                    'border-radius:3px', 'padding:0', 'font-family:Lato,sans-serif', 'letter-spacing:0.03em',
+                    'white-space:nowrap', 'overflow:hidden', 'text-overflow:ellipsis',
+                ].join(';');
+                if (canAfford) {
+                    btn.addEventListener('click', (e) => { e.stopPropagation(); _purchaseReveal(node); });
+                } else {
+                    btn.setAttribute('disabled', 'true');
+                }
+                fo.appendChild(btn);
+                group.appendChild(fo);
+            }
         }
 
-        // Shared-hub indicator dot
-        if (node.sharedWithOtherHub) {
-            const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            dot.setAttribute('cx', node.hw - 5);
-            dot.setAttribute('cy', 0);
-            dot.setAttribute('r', 3);
-            dot.setAttribute('fill', AMBER);
-            dot.setAttribute('fill-opacity', '0.7');
-            g.appendChild(dot);
-        }
-
-        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        text.setAttribute('text-anchor', 'middle');
-        text.setAttribute('dominant-baseline', 'central');
-        text.setAttribute('fill', color);
-        text.setAttribute('font-size', node.owned ? '10' : '9');
-        text.setAttribute('font-family', 'var(--font-body,sans-serif)');
-        text.setAttribute('font-weight', node.owned ? '600' : '400');
-        text.style.pointerEvents = 'none';
-        text.style.userSelect    = 'none';
-        text.textContent = node.skill?.name || node.id;
-        g.appendChild(text);
-
-        if (node.owned && node.rec && (node.rec.skillLevel || 0) >= 1) {
+        // Level badge for owned
+        if (state === 'owned' && rec && rec.skillLevel >= 1) {
             const badge = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            badge.setAttribute('x', node.hw - 2);
-            badge.setAttribute('y', -(node.hh - 7));
+            badge.setAttribute('x', NODE_W - 5);
+            badge.setAttribute('y', 9);
             badge.setAttribute('text-anchor', 'end');
+            badge.setAttribute('class', 'st-badge');
             badge.setAttribute('fill', '#8b7355');
-            badge.setAttribute('font-size', '7');
-            badge.setAttribute('font-family', 'var(--font-body,sans-serif)');
-            badge.style.pointerEvents = 'none';
-            badge.textContent = `L${node.rec.skillLevel}`;
-            g.appendChild(badge);
+            badge.textContent = `Lv${rec.skillLevel}`;
+            group.appendChild(badge);
         }
 
-        g.addEventListener('click', e => { e.stopPropagation(); if (!_dragMoved) _selectSkill(node); });
-        _g.appendChild(g);
+        // Intrinsic badge
+        if (state === 'owned' && rec && rec.intrinsic) {
+            const badge = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            badge.setAttribute('x', '5');
+            badge.setAttribute('y', '9');
+            badge.setAttribute('class', 'st-badge');
+            badge.setAttribute('fill', '#c9a0ff');
+            badge.textContent = '★';
+            group.appendChild(badge);
+        }
+
+        // Hover + click events
+        group.addEventListener('mouseenter', (e) => _showTooltip(e, node));
+        group.addEventListener('mouseleave', () => { _tooltip.style.display = 'none'; });
+        group.addEventListener('mousemove', (e) => _moveTooltip(e));
+        group.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (_selectedNode === node.id) {
+                _selectedNode = null;
+            } else {
+                _selectedNode = node.id;
+            }
+            _applySelection();
+        });
+
+        _g.appendChild(group);
     }
 
-    function _countOwnedDesc(hubId, owned) {
-        let count = 0;
-        const visit = (id, seen = new Set()) => {
-            if (seen.has(id)) return; seen.add(id);
-            (_childrenOf.get(id) || []).forEach(cid => {
-                if (owned.has(cid)) count++;
-                visit(cid, seen);
-            });
-        };
-        visit(hubId);
-        return count;
+    // ── Selection highlight ───────────────────────────────────────────────────
+
+    function _applySelection() {
+        if (!_g) return;
+        const groups = _g.querySelectorAll('g[data-skill-id]');
+
+        if (!_selectedNode) {
+            // Clear — restore all to full opacity
+            groups.forEach(g => g.style.opacity = '1');
+            // Restore edge opacity
+            _g.querySelectorAll('path[data-edge]').forEach(p => p.style.opacity = '1');
+            return;
+        }
+
+        // Find the selected node
+        const selNode = _nodes.find(n => n.id === _selectedNode);
+        if (!selNode) return;
+
+        // Children of selected node that are reachable
+        const childIds = new Set(
+            _nodes
+                .filter(n => (n.skill.parentSkills || []).includes(_selectedNode) && n.state === 'reachable')
+                .map(n => n.id)
+        );
+        // Also highlight owned/discovering children
+        const ownedChildIds = new Set(
+            _nodes
+                .filter(n => (n.skill.parentSkills || []).includes(_selectedNode) && n.state !== 'reachable')
+                .map(n => n.id)
+        );
+
+        groups.forEach(g => {
+            const id = g.dataset.skillId;
+            if (id === _selectedNode || childIds.has(id) || ownedChildIds.has(id)) {
+                g.style.opacity = '1';
+            } else {
+                g.style.opacity = '0.2';
+            }
+        });
+
+        // Dim edges — only keep edges connected to selected or its children
+        _g.querySelectorAll('path[data-edge]').forEach(p => {
+            const from = p.dataset.from;
+            const to   = p.dataset.to;
+            const relevant = (from === _selectedNode && (childIds.has(to) || ownedChildIds.has(to)));
+            p.style.opacity = relevant ? '1' : '0.08';
+        });
     }
 
-    // ── Interactions ──────────────────────────────────────────────────────────
+    // ── Tooltip ───────────────────────────────────────────────────────────────
 
-    function _openHub(hub) {
-        _openHubId = hub.id;
-        // Preserve selection — don't clear _selectedId or _lineageRel
-        _layoutChildren(hub.id);
+    function _showTooltip(e, node) {
+        const { skill, state, rec, knownParents } = node;
+        const owned = _ownedIds();
+        const parents = skill.parentSkills || [];
 
-        const hubNameEl = document.getElementById('skillTreeHubName');
-        if (hubNameEl) hubNameEl.textContent = `— ${hub.skill.name}`;
+        let html = `<div style="color:var(--gold); font-family:var(--font-display); font-size:0.85rem; margin-bottom:4px;">${skill.name}</div>`;
 
-        // If there's an active selection, recompute lineage in case new hub
-        // exposes nodes that are parents/children of the selected skill
-        if (_selectedId) _lineageRel = _computeLineage(_selectedId);
+        if (state === 'owned') {
+            const level = rec?.skillLevel ?? '?';
+            const xp    = rec?.skillXP ?? 0;
+            const nextXp = level < 1 ? UNLOCK_XP : Math.round(100 * level * 1.2);
+            html += `<div style="color:#8b7355; font-size:0.75rem; margin-bottom:4px;">Level ${level}</div>`;
+            if (level >= 1) {
+                html += `<div style="color:#6a6a8a; font-size:0.72rem;">${Math.floor(xp)} / ${nextXp} XP to next level</div>`;
+            }
+            if (rec?.intrinsic) {
+                html += `<div style="color:#c9a0ff; font-size:0.72rem; margin-top:4px;">Racial intrinsic</div>`;
+            }
+        } else if (state === 'discovering') {
+            const xp  = rec?.skillXP ?? 0;
+            const pct = Math.min(100, Math.floor((xp / UNLOCK_XP) * 100));
+            html += `<div style="color:#8b7355; font-size:0.75rem; margin-bottom:4px;">Discovering — ${pct}%</div>`;
+            html += `<div style="color:#6a6a8a; font-size:0.72rem;">${Math.floor(xp)} / ${UNLOCK_XP} XP to unlock</div>`;
+        } else {
+            // Reachable
+            if (!node.nameRevealed) {
+                // Name not yet revealed — say nothing useful
+                html += `<div style="color:#3a4a6a; font-size:0.75rem; margin-bottom:4px;">Something stirs in the dark.</div>`;
+                html += `<div style="color:#4a4a6a; font-size:0.72rem; font-style:italic;">Develop your skills further to reveal this path.</div>`;
+            } else {
+                const missingCount = parents.filter(p => !owned.has(p)).length;
+                html += `<div style="color:#3a6a9a; font-size:0.75rem; margin-bottom:4px;">Within reach</div>`;
+                if (missingCount > 0) {
+                    html += `<div style="color:#6a6a8a; font-size:0.72rem;">Also needs: <span style="color:#7a9acc;">${'???'.repeat(missingCount)}</span></div>`;
+                }
+                if (skill.description) {
+                    html += `<div style="color:#6a6070; font-size:0.72rem; margin-top:6px; font-style:italic;">${skill.description}</div>`;
+                }
+            }
+        }
 
-        // Pan to hub
+        if (state !== 'reachable' && skill.description) {
+            html += `<div style="color:#6a6070; font-size:0.72rem; margin-top:6px; font-style:italic;">${skill.description}</div>`;
+        }
+
+        _tooltip.innerHTML = html;
+        _tooltip.style.display = 'block';
+        _moveTooltip(e);
+    }
+
+    function _moveTooltip(e) {
         const wrap = document.getElementById('skillTreeCanvasWrap');
-        if (wrap) {
-            _zoom  = 0.7;
-            _pan.x = wrap.clientWidth  / 2 - hub.x * _zoom;
-            _pan.y = wrap.clientHeight / 2 - hub.y * _zoom;
-            _applyTransform();
-        }
-
-        _drawAll();
-
-        // If no active selection, reset panel
-        if (!_selectedId && _panel) {
-            _panel.innerHTML = `<div style="color:#3a3020;font-size:0.78rem;font-style:italic;margin-top:2rem;text-align:center;">Select a skill to inspect</div>`;
-        }
-    }
-
-    function _selectSkill(node) {
-        _selectedId = node.id;
-        _lineageRel = _computeLineage(node.id);
-        _drawAll();
-
-        const wrap = document.getElementById('skillTreeCanvasWrap');
-        if (wrap) {
-            const z = Math.max(_zoom, 1.4);
-            _zoom  = z;
-            _pan.x = wrap.clientWidth  / 2 - node.x * z;
-            _pan.y = wrap.clientHeight / 2 - node.y * z;
-            _applyTransform();
-        }
-        _renderPanel(node);
-    }
-
-    function _collapse() {
-        _openHubId  = null;
-        _selectedId = null;
-        _lineageRel = new Map();
-        _childNodes = [];
-        _childEdges = [];
-        const hubNameEl = document.getElementById('skillTreeHubName');
-        if (hubNameEl) hubNameEl.textContent = '';
-        _drawAll();
-        if (_panel) _panel.innerHTML = `<div style="color:#3a3020;font-size:0.78rem;font-style:italic;margin-top:2rem;text-align:center;">Select a skill to inspect</div>`;
-    }
-
-    // ── Detail panel ──────────────────────────────────────────────────────────
-
-    function _renderPanel(node) {
-        if (!_panel) return;
-        const { skill, rec, owned } = node;
-        const ownedSet = _ownedIds();
-        const cat      = (skill?.category || '').replace(/_/g, ' ').toLowerCase();
-        const costStr  = skill?.costType && skill?.costAmount != null ? `${skill.costAmount} ${skill.costType}` : null;
-        const parents  = (skill?.parentSkills || []).map(pid => ({
-            name:  _skillMap.get(pid)?.name || pid,
-            owned: ownedSet.has(pid),
-        }));
-        const scaling  = skill?.scalingFactors
-            ? Object.entries(skill.scalingFactors).map(([k,v]) => `${k} ×${v}`).join(', ')
-            : null;
-        const statusColor = owned ? GOLD : AMBER;
-        const statusText  = owned ? 'Learned' : `Depth ${node.depth} — not yet learned`;
-
-        _panel.innerHTML = `
-            <div style="border-bottom:1px solid rgba(212,175,55,0.1);padding-bottom:0.8rem;margin-bottom:0.8rem;">
-                <div style="font-family:var(--font-display);color:${GOLD};font-size:0.95rem;margin-bottom:0.3rem;">${skill?.name || node.id}</div>
-                <div style="font-size:0.7rem;color:${statusColor};letter-spacing:0.07em;text-transform:uppercase;">${statusText}</div>
-            </div>
-            <div style="font-size:0.78rem;color:#9a8850;line-height:1.65;margin-bottom:0.9rem;font-style:italic;">${skill?.description || ''}</div>
-            <div style="font-size:0.7rem;color:#5a4a20;letter-spacing:0.05em;text-transform:uppercase;margin-bottom:0.45rem;">Details</div>
-            <div style="font-size:0.78rem;color:#7a6830;line-height:2.0;">
-                <div>Category: <span style="color:#9a8040;">${cat}</span></div>
-                ${costStr  ? `<div>Cost: <span style="color:#9a8040;">${costStr}</span></div>` : ''}
-                ${scaling  ? `<div>Scales: <span style="color:#9a8040;">${scaling}</span></div>` : ''}
-                ${rec && (rec.skillLevel||0) >= 1 ? `<div>Level: <span style="color:${GOLD};">${rec.skillLevel}</span></div>` : ''}
-                ${rec && (rec.skillLevel||0) >= 1 ? `<div>XP: <span style="color:#9a8040;">${Math.floor(rec.skillXP||0)}</span></div>` : ''}
-            </div>
-            ${parents.length ? `
-            <div style="margin-top:1rem;">
-                <div style="font-size:0.7rem;color:#5a4a20;letter-spacing:0.05em;text-transform:uppercase;margin-bottom:0.5rem;">Requires</div>
-                ${parents.map(p => `
-                    <div style="font-size:0.78rem;color:${p.owned ? GOLD : '#4a3818'};display:flex;align-items:center;gap:0.45rem;margin-bottom:0.35rem;">
-                        <span style="width:6px;height:6px;border-radius:50%;flex-shrink:0;background:${p.owned ? GOLD : '#3a2a0e'};display:inline-block;"></span>
-                        ${p.name}
-                    </div>`).join('')}
-            </div>` : ''}
-        `;
+        const rect = wrap.getBoundingClientRect();
+        let tx = e.clientX - rect.left + 14;
+        let ty = e.clientY - rect.top + 14;
+        const tw = _tooltip.offsetWidth || 200;
+        const th = _tooltip.offsetHeight || 80;
+        if (tx + tw > rect.width  - 8) tx = e.clientX - rect.left - tw - 14;
+        if (ty + th > rect.height - 8) ty = e.clientY - rect.top  - th - 14;
+        _tooltip.style.left = tx + 'px';
+        _tooltip.style.top  = ty + 'px';
     }
 
     // ── Pan / zoom ────────────────────────────────────────────────────────────
 
     function _bindEvents(wrap) {
-        _svg.addEventListener('click', e => {
-            if (_dragMoved) return;
+        // Click background to deselect
+        _svg.addEventListener('click', (e) => {
             if (e.target === _svg || e.target === _g) {
-                if (_selectedId) {
-                    _selectedId = null; _lineageRel = new Map(); _drawAll();
-                } else if (_openHubId) {
-                    _collapse();
-                }
+                _selectedNode = null;
+                _applySelection();
             }
         });
 
-        wrap.addEventListener('mousedown', e => {
+        wrap.addEventListener('mousedown', (e) => {
             if (e.button !== 0) return;
-            _dragging = true; _dragMoved = false;
+            _dragging = true;
             _lastMouse = { x: e.clientX, y: e.clientY };
             wrap.style.cursor = 'grabbing';
         });
         window.addEventListener('mouseup', () => {
             _dragging = false;
-            const w = document.getElementById('skillTreeCanvasWrap');
-            if (w) w.style.cursor = 'grab';
+            const wrap = document.getElementById('skillTreeCanvasWrap');
+            if (wrap) wrap.style.cursor = 'grab';
         });
-        window.addEventListener('mousemove', e => {
+        window.addEventListener('mousemove', (e) => {
             if (!_dragging) return;
-            const dx = e.clientX - _lastMouse.x, dy = e.clientY - _lastMouse.y;
-            if (Math.abs(dx) > 3 || Math.abs(dy) > 3) _dragMoved = true;
-            _pan.x += dx; _pan.y += dy;
+            const dx = e.clientX - _lastMouse.x;
+            const dy = e.clientY - _lastMouse.y;
+            _pan.x += dx;
+            _pan.y += dy;
             _lastMouse = { x: e.clientX, y: e.clientY };
             _applyTransform();
         });
-        wrap.addEventListener('wheel', e => {
+        wrap.addEventListener('wheel', (e) => {
             e.preventDefault();
-            _zoom = Math.min(5, Math.max(0.08, _zoom * (e.deltaY < 0 ? 1.1 : 0.9)));
+            const factor = e.deltaY < 0 ? 1.1 : 0.9;
+            _zoom = Math.min(3, Math.max(0.2, _zoom * factor));
             _applyTransform();
         }, { passive: false });
 
+        // Touch pan
         let lastTouch = null;
-        wrap.addEventListener('touchstart', e => {
+        wrap.addEventListener('touchstart', (e) => {
             if (e.touches.length === 1) lastTouch = { x: e.touches[0].clientX, y: e.touches[0].clientY };
         });
-        wrap.addEventListener('touchmove', e => {
+        wrap.addEventListener('touchmove', (e) => {
             if (e.touches.length === 1 && lastTouch) {
                 e.preventDefault();
-                _pan.x += e.touches[0].clientX - lastTouch.x;
-                _pan.y += e.touches[0].clientY - lastTouch.y;
+                const dx = e.touches[0].clientX - lastTouch.x;
+                const dy = e.touches[0].clientY - lastTouch.y;
+                _pan.x += dx; _pan.y += dy;
                 lastTouch = { x: e.touches[0].clientX, y: e.touches[0].clientY };
                 _applyTransform();
             }
         }, { passive: false });
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
+
+    function _truncate(str, max) {
+        return str.length > max ? str.slice(0, max - 1) + '…' : str;
     }
 
 })();
