@@ -24,6 +24,10 @@ function showScreen(screenName) {
     if (screenName === 'combatlog' && typeof _updateMediaControls === 'function') {
         _updateMediaControls();
     }
+
+    // Clear any stray tooltips on screen transition
+    if (typeof destroySkillTooltip === 'function') destroySkillTooltip();
+    if (typeof destroyGearTooltip  === 'function') destroyGearTooltip();
 }
 
 /**

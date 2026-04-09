@@ -211,6 +211,13 @@ document.addEventListener('touchstart', (e) => {
     }
 }, { passive: true });
 
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.gear-tooltip') && !e.target.closest('.skill-tooltip') && !e.target.closest('[data-gear-tooltip]')) {
+        destroyGearTooltip();
+        destroySkillTooltip();
+    }
+});
+
 document.addEventListener('scroll', () => {
     destroyGearTooltip();
     destroySkillTooltip();
@@ -285,47 +292,37 @@ function createSkillTooltip(skill) {
     tooltip.className = 'skill-tooltip';
     tooltip.style.cssText = `
         position: fixed;
-        background: #16213e;
-        border: 2px solid #4a9eff;
-        border-radius: 4px;
-        padding: 0.75rem;
         max-width: 350px;
         z-index: 10000;
-        color: #4a9eff;
-        font-family: 'Courier New', monospace;
-        font-size: 0.85rem;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
         pointer-events: none;
-        word-wrap: break-word;
-        white-space: normal;
     `;
 
-    let content = `<div style="font-weight: bold; margin-bottom: 0.5rem; font-size: 0.95rem;">${skill.name}</div>`;
-    content += `<div style="color: #aaa; font-size: 0.8rem; margin-bottom: 0.5rem;">${skill.category}</div>`;
+    let content = `<div class="stt-name">${skill.name}</div>`;
+    content += `<div class="stt-category">${skill.category}</div>`;
 
     if (skill.description) {
-        content += `<div style="color: #aaa; margin-bottom: 0.75rem; font-size: 0.85rem;">${skill.description}</div>`;
+        content += `<div class="stt-desc">${skill.description}</div>`;
     }
     if (skill.costType && skill.costType !== 'none') {
-        content += `<div style="color: #d4af37;"><strong>Cost:</strong> ${skill.costAmount} ${skill.costType}</div>`;
+        content += `<div class="stt-row"><strong>Cost:</strong> ${skill.costAmount} ${skill.costType}</div>`;
     }
     if (skill.basePower) {
-        content += `<div style="color: #ff6b6b;"><strong>Power:</strong> ${skill.basePower}x</div>`;
+        content += `<div class="stt-row stt-damage"><strong>Power:</strong> ${skill.basePower}x</div>`;
     }
     if (skill.baseHitChance) {
-        content += `<div style="color: #4eff7f;"><strong>Hit Chance:</strong> ${(skill.baseHitChance * 100).toFixed(0)}%</div>`;
+        content += `<div class="stt-row stt-positive"><strong>Hit Chance:</strong> ${(skill.baseHitChance * 100).toFixed(0)}%</div>`;
     }
     if (skill.critChance) {
-        content += `<div style="color: #ffd700;"><strong>Crit Chance:</strong> ${(skill.critChance * 100).toFixed(0)}%</div>`;
+        content += `<div class="stt-row stt-gold"><strong>Crit Chance:</strong> ${(skill.critChance * 100).toFixed(0)}%</div>`;
     }
     if (skill.delay) {
-        content += `<div style="color: #4a9eff;"><strong>Delay:</strong> ${skill.delay}ms</div>`;
+        content += `<div class="stt-row stt-info"><strong>Delay:</strong> ${skill.delay}ms</div>`;
     }
     if (skill.hitCount) {
         if (skill.hitCount.fixed) {
-            content += `<div style="color: #4eff7f;"><strong>Hits:</strong> ${skill.hitCount.fixed}</div>`;
+            content += `<div class="stt-row stt-positive"><strong>Hits:</strong> ${skill.hitCount.fixed}</div>`;
         } else {
-            content += `<div style="color: #4eff7f;"><strong>Hits:</strong> ${skill.hitCount.min}-${skill.hitCount.max}</div>`;
+            content += `<div class="stt-row stt-positive"><strong>Hits:</strong> ${skill.hitCount.min}-${skill.hitCount.max}</div>`;
         }
     }
     if (skill.scalingFactors) {
@@ -334,23 +331,23 @@ function createSkillTooltip(skill) {
             .map(([k, v]) => `${(v * 100).toFixed(0)}% ${k}`)
             .join(', ');
         if (scaling) {
-            content += `<div style="color: #d4af37; margin-top: 0.5rem;"><strong>Scaling:</strong> ${scaling}</div>`;
+            content += `<div class="stt-row stt-gold stt-scaling"><strong>Scaling:</strong> ${scaling}</div>`;
         }
     }
     let hasStatus = false;
     if (skill.effects && skill.effects.length > 0) {
-        content += `<div style="color: #ff9999; margin-top: 0.5rem;"><strong>Effects:</strong><br>`;
+        content += `<div class="stt-row stt-effects"><strong>Effects:</strong><br>`;
         skill.effects.forEach(effect => {
             let effectText = effect.type.toUpperCase();
             if (effect.damageType) effectText += ` (${effect.damageType})`;
             if (effect.debuff) {
                 const statusName = _resolveStatusName(effect.debuff);
-                effectText += ` — <strong style="color:#ffbbbb;">${statusName}</strong>`;
+                effectText += ` — <strong class="stt-debuff">${statusName}</strong>`;
                 hasStatus = true;
             }
             if (effect.buff) {
                 const statusName = _resolveStatusName(effect.buff);
-                effectText += ` — <strong style="color:#aaffbb;">${statusName}</strong>`;
+                effectText += ` — <strong class="stt-buff">${statusName}</strong>`;
                 hasStatus = true;
             }
             content += `• ${effectText}<br>`;
@@ -358,7 +355,7 @@ function createSkillTooltip(skill) {
         content += `</div>`;
     }
     if (hasStatus) {
-        content += `<div style="color: var(--text-muted); font-size: 0.72rem; margin-top: 0.6rem; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.4rem;">Status effects listed in Field Codex → Statuses</div>`;
+        content += `<div class="stt-footer">Status effects listed in Field Codex → Statuses</div>`;
     }
 
     tooltip.innerHTML = content;
@@ -413,54 +410,6 @@ function addSkillTooltip(element, skill, delay) {
 /**
  * Stat/Attribute definitions and effects
  */
-const STAT_DEFINITIONS = {
-    conviction: {
-        name: 'Conviction',
-        description: 'Raw force of will and physical power. The primary offensive stat for fighters, bruisers, and fire, arcane, and lightning mages.',
-        effects: [
-            '• Increases maximum HP and Stamina',
-            '• Raises hit chance on all attacks',
-            '• Amplifies damage for fighter and strength-based skills',
-            '• Scales fire, arcane, lightning, holy, and shadow magic',
-            '• A small contributor to critical strike chance',
-        ]
-    },
-    endurance: {
-        name: 'Endurance',
-        description: 'Durability and staying power. A survivability stat first — it contributes modestly to physical damage, but you do not stack it for offense.',
-        effects: [
-            '• Significantly increases maximum HP and Stamina',
-            '• Contributes a small bonus to physical attack damage',
-            '• The defining stat of bruiser-style skills (pummel, earthquake, shove)',
-            '• Does not affect hit chance, crit, or magic damage',
-        ]
-    },
-    ambition: {
-        name: 'Ambition',
-        description: 'Speed, cunning, and precision. The primary offensive stat for rogues and skirmishers, and for fire, arcane, and lightning mages. Also improves loot drop rates.',
-        effects: [
-            '• Primary driver of critical strike chance',
-            '• Amplifies damage for rogue and finesse-based skills',
-            '• Scales lightning, shadow, and arcane magic',
-            '• Raises Mana slightly',
-            '• Improves retreat success chance',
-            '• Increases item drop chance (ambition 150 = +30%, ambition 300 = +60%)',
-        ]
-    },
-    harmony: {
-        name: 'Harmony',
-        description: 'Attunement to magic and the natural world. The primary stat for ice, holy, and nature/poison mages — and the dominant stat for healers and supports. Also accelerates experience gain.',
-        effects: [
-            '• Significantly increases maximum Mana',
-            '• Scales ice and cold magic damage',
-            '• Scales holy magic damage',
-            '• Scales nature and poison magic damage',
-            '• Powers all healing and restoration skills',
-            '• Increases XP earned from combat (harmony 150 = +20%, harmony 300 = +40%)',
-            '• No effect on fire, arcane, lightning, or shadow damage',
-        ]
-    }
-};
 
 /**
  * Create and show a tooltip for a stat/attribute

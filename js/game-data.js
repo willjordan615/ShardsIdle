@@ -8,6 +8,60 @@
 
 // Empty string = use same origin. Works whether running locally (localhost:3001)
 // or deployed to any host, since the backend always serves the frontend.
+
+// ── Stat Definitions ────────────────────────────────────────────────────────
+const STAT_DEFINITIONS = {
+    conviction: {
+        name: 'Conviction',
+        description: 'Commitment and force. The primary offensive stat for fighters and strength-based builds.',
+        effects: [
+            '• Increases maximum HP and Stamina',
+            '• Raises hit chance on all attacks',
+            '• Amplifies damage for fighter and strength-based skills',
+            '• Scales fire, arcane, lightning, holy, and shadow magic',
+            '• Raises your damage ceiling — high Conviction characters hit harder at their peak',
+            '• Small contributor to critical strike chance',
+        ]
+    },
+    endurance: {
+        name: 'Endurance',
+        description: 'Durability and sustain. A survivability stat first — it contributes modestly to physical damage, but you do not stack it for offense.',
+        effects: [
+            '• Significantly increases maximum HP and Stamina',
+            '• Reduces the stamina cost of skills — high Endurance characters sustain expensive skills longer',
+            '• Drives stamina regeneration between actions',
+            '• Contributes a small bonus to physical attack damage',
+            '• The defining stat of bruiser-style skills (pummel, earthquake, shove)',
+            '• Does not affect hit chance, crit, or magic damage',
+        ]
+    },
+    ambition: {
+        name: 'Ambition',
+        description: 'Speed, cunning, and hunger. The primary offensive stat for rogues and skirmishers, and for lightning, shadow, and arcane mages.',
+        effects: [
+            '• Primary driver of critical strike chance',
+            '• Increases attack speed — Ambition characters act faster than their weapons suggest',
+            '• Amplifies damage for rogue and finesse-based skills',
+            '• Scales lightning, shadow, and arcane magic',
+            '• Improves retreat success chance',
+            '• Increases item drop chance (ambition 150 = +30%, ambition 300 = +60%)',
+        ]
+    },
+    harmony: {
+        name: 'Harmony',
+        description: 'Attunement and consistency. The primary stat for ice, holy, and nature/poison mages — and the dominant stat for healers and supports.',
+        effects: [
+            '• Significantly increases maximum Mana',
+            '• Powers all healing and restoration skills',
+            '• Scales ice, cold, holy, nature, and poison magic damage',
+            '• Compresses damage variance — high Harmony characters hit reliably rather than swinging wildly',
+            '• Drives mana regeneration between actions',
+            '• Increases XP earned from combat (harmony 150 = +20%, harmony 300 = +40%)',
+            '• No effect on fire, arcane, lightning, or shadow damage',
+        ]
+    }
+};
+
 const BACKEND_URL = '';
 
 // ── Auth state ────────────────────────────────────────────────────────────────

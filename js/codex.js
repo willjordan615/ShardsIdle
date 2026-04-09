@@ -133,20 +133,23 @@
                         <div style="margin:1rem 0;">
                             <div class="codex-stat-bar" style="color:#e07040;">
                                 <strong>Conviction</strong>
-                                Raw force of will and physical power. The primary offensive stat for fighters, bruisers, and fire, arcane, and lightning mages.
+                                Commitment and force. The primary offensive stat for fighters and strength-based builds.
                                 <ul style="margin:0.4rem 0 0 1rem; padding:0; font-size:0.81rem; color:var(--text-muted); list-style:none;">
                                     <li>Increases maximum HP and Stamina</li>
                                     <li>Raises hit chance on all attacks</li>
                                     <li>Amplifies damage for fighter and strength-based skills</li>
                                     <li>Scales fire, arcane, lightning, holy, and shadow magic</li>
+                                    <li>Raises your damage ceiling — high Conviction characters hit harder at their peak</li>
                                     <li>Small contributor to critical strike chance</li>
                                 </ul>
                             </div>
                             <div class="codex-stat-bar" style="color:#6090d0;">
                                 <strong>Endurance</strong>
-                                Durability and staying power. A survivability stat first — it contributes modestly to physical damage, but you do not stack it for offense.
+                                Durability and sustain. A survivability stat first — it contributes modestly to physical damage, but you do not stack it for offense.
                                 <ul style="margin:0.4rem 0 0 1rem; padding:0; font-size:0.81rem; color:var(--text-muted); list-style:none;">
                                     <li>Significantly increases maximum HP and Stamina</li>
+                                    <li>Reduces the stamina cost of skills — high Endurance characters sustain expensive skills longer</li>
+                                    <li>Drives stamina regeneration between actions</li>
                                     <li>Contributes a small bonus to physical attack damage</li>
                                     <li>The defining stat of bruiser-style skills</li>
                                     <li>Does not affect hit chance, crit, or magic damage</li>
@@ -154,23 +157,25 @@
                             </div>
                             <div class="codex-stat-bar" style="color:var(--gold);">
                                 <strong>Ambition</strong>
-                                Speed, cunning, and precision. The primary offensive stat for rogues and skirmishers, and for fire, arcane, and lightning mages. Also improves loot drop rates.
+                                Speed, cunning, and hunger. The primary offensive stat for rogues and skirmishers, and for lightning, shadow, and arcane mages.
                                 <ul style="margin:0.4rem 0 0 1rem; padding:0; font-size:0.81rem; color:var(--text-muted); list-style:none;">
                                     <li>Primary driver of critical strike chance</li>
+                                    <li>Increases attack speed — Ambition characters act faster than their weapons suggest</li>
                                     <li>Amplifies damage for rogue and finesse-based skills</li>
                                     <li>Scales lightning, shadow, and arcane magic</li>
-                                    <li>Raises Mana slightly</li>
                                     <li>Improves retreat success chance</li>
                                     <li>Increases item drop chance</li>
                                 </ul>
                             </div>
                             <div class="codex-stat-bar" style="color:#9060d0;">
                                 <strong>Harmony</strong>
-                                Attunement to magic and the natural world. The primary stat for ice, holy, and nature mages — and the dominant stat for healers and supports. Also accelerates experience gain.
+                                Attunement and consistency. The primary stat for ice, holy, and nature/poison mages — and the dominant stat for healers and supports.
                                 <ul style="margin:0.4rem 0 0 1rem; padding:0; font-size:0.81rem; color:var(--text-muted); list-style:none;">
                                     <li>Significantly increases maximum Mana</li>
-                                    <li>Scales ice, holy, nature, and poison magic damage</li>
                                     <li>Powers all healing and restoration skills</li>
+                                    <li>Scales ice, cold, holy, nature, and poison magic damage</li>
+                                    <li>Compresses damage variance — high Harmony characters hit reliably rather than swinging wildly</li>
+                                    <li>Drives mana regeneration between actions</li>
                                     <li>Increases XP earned from combat</li>
                                     <li>No effect on fire, arcane, lightning, or shadow damage</li>
                                 </ul>
