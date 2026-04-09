@@ -601,57 +601,40 @@ async function displayCombatLog(combatData) {
 
                 // 3. If there's a pre-combat opportunity, show it in the banner
                 if (preCombatTurns.length > 0) {
-                    await sleep(600);
                     const pc = preCombatTurns[0];
                     const success = pc.result?.success;
-                    const icon = success ? '✦' : '✧';
                     const color = success ? '#4cd964' : '#d4484a';
                     const action = pc.action || {};
                     const checkName = action.name || 'Opportunity';
                     const actor = pc.actorName || 'Party';
                     const narrative = pc.result?.message || '';
 
-                    // Build check line — stat checks show value vs threshold
-                    let checkLine = '';
+                    // Build check detail
+                    let checkDetail = '';
                     if (action.checkStat && action.statValue != null && action.threshold != null) {
                         const statLabel = action.checkStat.charAt(0).toUpperCase() + action.checkStat.slice(1);
-                        const secLabel = action.secondaryStat ? ` + ${action.secondaryStat}` : '';
-                        checkLine = `<div style="font-size:0.75rem;color:#8a7a50;margin:4px 0 2px;">
-                            ${statLabel}${secLabel}: <span style="color:${color};font-weight:600;">${action.statValue}</span>
-                            <span style="color:#5a4a30;"> vs threshold </span>
-                            <span style="color:#8a7a50;">${action.threshold}</span>
-                            <span style="color:${color};margin-left:6px;">${success ? '— passed' : '— failed'}</span>
+                        const secLabel = action.secondaryStat ? ` + ${action.secondaryStat.charAt(0).toUpperCase() + action.secondaryStat.slice(1)}` : '';
+                        checkDetail = `<div style="font-size:0.8rem;color:#8a7a50;margin:6px 0;">
+                            Checks <span style="color:#c0a060;">${statLabel}${secLabel}</span>
+                            — ${actor}'s value: <span style="color:${color};font-weight:600;">${action.statValue}</span>
+                            <span style="color:#5a4a30;">/ threshold ${action.threshold}</span>
                         </div>`;
                     } else if (action.checkType === 'skill') {
-                        const skillLabel = action.skillID || 'skill';
-                        checkLine = `<div style="font-size:0.75rem;color:#8a7a50;margin:4px 0 2px;">
-                            Requires: <span style="color:#a09060;">${skillLabel}</span>
-                            <span style="color:${color};margin-left:6px;">${success ? '— possessed' : '— not available'}</span>
+                        const skillLabel = action.skillID || 'a specific skill';
+                        const actionHint = !success ? `<div style="font-size:0.75rem;color:#6a8a6a;margin-top:4px;">Equipping <em>${skillLabel}</em> would allow this check.</div>` : '';
+                        checkDetail = `<div style="font-size:0.8rem;color:#8a7a50;margin:6px 0;">
+                            Requires <span style="color:#c0a060;">${skillLabel}</span> to be equipped
+                            ${actionHint}
                         </div>`;
                     } else if (action.checkType === 'item') {
-                        checkLine = `<div style="font-size:0.75rem;color:#8a7a50;margin:4px 0 2px;">
-                            Item check <span style="color:${color};margin-left:6px;">${success ? '— item present' : '— item not found'}</span>
-                        </div>`;
+                        checkDetail = `<div style="font-size:0.8rem;color:#8a7a50;margin:6px 0;">Requires a specific item.</div>`;
                     }
 
-                    const preCombatEl = document.createElement('div');
-                    preCombatEl.className = 'pre-combat-reveal';
-                    preCombatEl.style.cssText = `
-                        border-left: 2px solid ${color};
-                        padding: 8px 12px;
-                        margin: 6px 0;
-                        background: rgba(0,0,0,0.3);
-                    `;
-                    preCombatEl.innerHTML = `
-                        <div style="font-size:0.72rem;color:#6a5a30;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:3px;">${checkName}</div>
-                        <div style="font-size:0.85rem;color:${color};font-weight:600;">${icon} ${actor}</div>
-                        ${checkLine}
-                        <div style="font-size:0.78rem;color:#9a8860;margin-top:5px;font-style:italic;">${narrative}</div>
-                    `;
-                    stageBannerPre.appendChild(preCombatEl);
-                    await sleep(2400);
+                    // Show overlay on combat log screen
+                    _showOpportunityOverlay({ checkName, actor, success, color, checkDetail, narrative });
+                    await sleep(600);
                 } else {
-                    await sleep(1200);
+                    await sleep(600);
                 }
 
                 // 4. Seed hpMaxes and flash-reveal enemies
@@ -2011,4 +1994,54 @@ try {
     console.error('[REWARDS] Failed to apply rewards:', error);
     showSafeError('Failed to apply rewards: ' + error.message);
 }
+}
+
+// ── Pre-combat opportunity overlay ───────────────────────────────────────────
+
+function _showOpportunityOverlay({ checkName, actor, success, color, checkDetail, narrative }) {
+    // Remove any existing overlay
+    const existing = document.getElementById('opportunityOverlay');
+    if (existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'opportunityOverlay';
+    overlay.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -60%);
+        z-index: 900;
+        width: min(480px, 90vw);
+        background: linear-gradient(135deg, #0a0806, #0f0c06);
+        border: 1px solid ${color}44;
+        border-left: 3px solid ${color};
+        padding: 20px 24px;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.4s ease;
+    `;
+
+    overlay.innerHTML = `
+        <div style="font-size:0.68rem;color:#6a5a30;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;">${checkName}</div>
+        <div style="font-size:1rem;color:${color};font-weight:600;font-family:var(--font-display,serif);margin-bottom:2px;">
+            ${success ? '✦' : '✧'} ${actor}
+        </div>
+        ${checkDetail}
+        <div style="font-size:0.82rem;color:#9a8860;margin-top:8px;line-height:1.6;font-style:italic;border-top:1px solid rgba(255,255,255,0.06);padding-top:8px;">
+            ${narrative}
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    // Fade in
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => { overlay.style.opacity = '1'; });
+    });
+
+    // Auto-dismiss after 4s
+    setTimeout(() => {
+        overlay.style.opacity = '0';
+        setTimeout(() => overlay.remove(), 400);
+    }, 4000);
 }
