@@ -107,6 +107,7 @@ button.reset-btn:hover { border-color: #d4af37; color: #d4af37; }
 
     <button class="reset-btn" onclick="resetDefaults()">Reset to defaults</button>
     <button class="reset-btn" onclick="exportLayout()" style="margin-top:6px;border-color:#4a8a4a;color:#4a8a4a;">⬇ Export layout</button>
+    <button class="reset-btn" onclick="clearPositions()" style="margin-top:6px;border-color:#8a4a4a;color:#8a4a4a;">✕ Clear saved positions</button>
 
     <div id="info-panel" style="display:none">
         <div class="skill-name" id="ip-name"></div>
@@ -305,15 +306,24 @@ function layoutChildren(hubId) {
     childNodes = [];
     const placed = new Map([[hubId, hub]]);
 
-    // Assign angles based on parent position rather than even distribution
-    // Each node gets an angle derived from its primary parent's angle
-    // Siblings of the same parent are fanned out proportionally to their descendant count
-    const angleOf = new Map([[hubId, Math.atan2(hub.y, hub.x)]]); // hub angle from canvas center
+    // Sector-based layout:
+    // Each node owns an angular sector proportional to its total descendants.
+    // Children are placed within their parent's sector.
+    // Leaves are pushed to outer radius within their sector.
+    // This minimizes edge crossings by keeping subtrees in their own wedge.
 
+    const sectorOf = new Map(); // id → { start, end } angles
+    const angleOf  = new Map(); // id → center angle
+
+    // Hub owns full 360°, starting from top
+    sectorOf.set(hubId, { start: -Math.PI, end: Math.PI });
+    angleOf.set(hubId, 0);
+
+    // Assign sectors depth by depth
     byDepth.forEach((ids, depth) => {
         const r = r1 + (depth - 1) * gap;
 
-        // Group by primary parent
+        // Group by primary parent (first parent that's already placed)
         const byParent = new Map();
         ids.forEach(id => {
             const skill = skillMap.get(id);
@@ -323,58 +333,66 @@ function layoutChildren(hubId) {
             byParent.get(primaryParent).push(id);
         });
 
-        // For each parent group, fan children around parent's angle
         byParent.forEach((siblings, parentId) => {
-            const parentAngle = angleOf.get(parentId) ?? 0;
+            const parentSector = sectorOf.get(parentId) || { start: -Math.PI, end: Math.PI };
+            const parentAngle  = angleOf.get(parentId) ?? 0;
+            const sectorSpan   = parentSector.end - parentSector.start;
 
-            // Separate leaves (no children) from branching nodes
+            // Sort siblings: branching nodes first (they need more sector space), leaves last
             const branching = siblings.filter(id => (childrenOf.get(id) || []).length > 0);
             const leaves    = siblings.filter(id => (childrenOf.get(id) || []).length === 0);
+            const sorted    = [...branching, ...leaves];
 
-            // Place branching nodes first, fanned around parent angle
-            const totalDesc = branching.reduce((s, id) => s + (descCount.get(id) || 0) + 1, 0) || 1;
-            const fanArc = Math.min(Math.PI * 1.4, branching.length * 0.6);
-            let used = -fanArc / 2;
+            // Total weight = sum of descendants + 1 per node
+            const totalWeight = sorted.reduce((s, id) => s + (descCount.get(id) || 0) + 1, 0) || 1;
 
+            // Reserve a portion of the parent sector for each child, proportional to weight
+            // Leaves share a compact slice at the end
+            let cursor = parentSector.start;
+
+            // Branching nodes get proportional slices
             branching.forEach(id => {
-                const skill = skillMap.get(id);
-                if (!skill) return;
-                const share = ((descCount.get(id) || 0) + 1) / Math.max(1, totalDesc);
-                const myArc = share * fanArc;
-                const angle = parentAngle + used + myArc / 2;
-                used += myArc;
+                const weight = (descCount.get(id) || 0) + 1;
+                const slice  = (weight / totalWeight) * sectorSpan;
+                const start  = cursor;
+                const end    = cursor + slice;
+                const angle  = (start + end) / 2;
+                cursor = end;
+
+                sectorOf.set(id, { start, end });
                 angleOf.set(id, angle);
+
                 const node = {
-                    id, skill, owned: ownedIds.has(id), depth,
+                    id, skill: skillMap.get(id), owned: ownedIds.has(id), depth,
                     x: hub.x + Math.cos(angle) * r,
                     y: hub.y + Math.sin(angle) * r,
-                    hw: hw(skill.name, false), hh: NODE_H / 2, isHub: false,
+                    hw: hw(skillMap.get(id)?.name || id, false), hh: NODE_H / 2, isHub: false,
                 };
                 childNodes.push(node);
                 placed.set(id, node);
             });
 
-            // Place leaves clustered together, pushed further out and offset from parent
-            // Group them at parentAngle + offset so they're visually separate
-            const leafR = r + gap * 0.5;  // slightly further out than next ring
-            const leafOffset = Math.PI * 0.3;  // angular offset from parent to group leaves
-            const leafArc = Math.min(Math.PI * 0.8, leaves.length * 0.35);
-            const leafBaseAngle = parentAngle + leafOffset;
+            // Leaves share remaining sector, placed at slightly larger radius to use space
+            if (leaves.length > 0) {
+                const leafSectorSpan = parentSector.end - cursor;
+                const leafR = r + Math.min(gap * 0.6, 80); // push out into empty space
+                leaves.forEach((id, li) => {
+                    const sliceStart = cursor + (li / leaves.length) * leafSectorSpan;
+                    const sliceEnd   = cursor + ((li+1) / leaves.length) * leafSectorSpan;
+                    const angle      = (sliceStart + sliceEnd) / 2;
+                    sectorOf.set(id, { start: sliceStart, end: sliceEnd });
+                    angleOf.set(id, angle);
 
-            leaves.forEach((id, li) => {
-                const skill = skillMap.get(id);
-                if (!skill) return;
-                const angle = leafBaseAngle - leafArc / 2 + (li / Math.max(1, leaves.length - 1)) * leafArc;
-                angleOf.set(id, angle);
-                const node = {
-                    id, skill, owned: ownedIds.has(id), depth,
-                    x: hub.x + Math.cos(angle) * leafR,
-                    y: hub.y + Math.sin(angle) * leafR,
-                    hw: hw(skill.name, false), hh: NODE_H / 2, isHub: false,
-                };
-                childNodes.push(node);
-                placed.set(id, node);
-            });
+                    const node = {
+                        id, skill: skillMap.get(id), owned: ownedIds.has(id), depth,
+                        x: hub.x + Math.cos(angle) * leafR,
+                        y: hub.y + Math.sin(angle) * leafR,
+                        hw: hw(skillMap.get(id)?.name || id, false), hh: NODE_H / 2, isHub: false,
+                    };
+                    childNodes.push(node);
+                    placed.set(id, node);
+                });
+            }
         });
     });
 
@@ -746,6 +764,7 @@ window.addEventListener('mousemove', e => {
         draggingNode.x += dx / zoom;
         draggingNode.y += dy / zoom;
         nodePositionOverrides.set(draggingNode.id, { x: draggingNode.x, y: draggingNode.y });
+        savePositions();
         dragMoved = true;
         redraw();
         return;
@@ -763,6 +782,27 @@ wrap.addEventListener('wheel', e => {
 },{passive:false});
 
 // ── Init ──────────────────────────────────────────────────────────────────────
+function savePositions() {
+    const obj = {};
+    nodePositionOverrides.forEach((pos, id) => { obj[id] = pos; });
+    try { localStorage.setItem('swt_positions', JSON.stringify(obj)); } catch(e) {}
+}
+
+function loadPositions() {
+    try {
+        const raw = localStorage.getItem('swt_positions');
+        if (!raw) return;
+        const obj = JSON.parse(raw);
+        Object.entries(obj).forEach(([id, pos]) => nodePositionOverrides.set(id, pos));
+    } catch(e) {}
+}
+
+function clearPositions() {
+    nodePositionOverrides.clear();
+    try { localStorage.removeItem('swt_positions'); } catch(e) {}
+    relayout();
+}
+
 function init() {
     svg.innerHTML = '';
     g = document.createElementNS('http://www.w3.org/2000/svg','g');
@@ -771,6 +811,7 @@ function init() {
     pan.y = wrap.clientHeight/2;
     applyTransform();
     syncLabels();
+    loadPositions();
     loadSkills();
 }
 
