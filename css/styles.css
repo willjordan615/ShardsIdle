@@ -1213,17 +1213,17 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
 /* Skill tooltip content classes — edit here to restyle all skill tooltips */
 .stt-name     { font-weight: bold; margin-bottom: 0.5rem; font-size: 0.95rem; color: var(--text-primary); }
 .stt-category { color: var(--text-muted); font-size: 0.8rem; margin-bottom: 0.5rem; }
-.stt-desc     { color: var(--text-muted); margin-bottom: 0.75rem; font-size: 0.85rem; }
-.stt-row      { margin-bottom: 0.2rem; }
+.stt-desc     { color: var(--text-secondary); margin-bottom: 0.75rem; font-size: 0.85rem; }
+.stt-row      { margin-bottom: 0.2rem; color: var(--text-primary); }
 .stt-scaling  { margin-top: 0.5rem; }
-.stt-effects  { margin-top: 0.5rem; }
-.stt-footer   { color: var(--text-muted); font-size: 0.72rem; margin-top: 0.6rem; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.4rem; }
+.stt-effects  { margin-top: 0.5rem; color: var(--text-secondary); }
+.stt-footer   { color: var(--text-muted); font-size: 0.72rem; margin-top: 0.6rem; border-top: 1px solid var(--gold-border); padding-top: 0.4rem; }
 .stt-gold     { color: var(--gold); }
-.stt-damage   { color: var(--red); }
-.stt-positive { color: var(--green); }
-.stt-info     { color: #4a9eff; }
-.stt-debuff   { color: #ffbbbb; }
-.stt-buff     { color: #aaffbb; }
+.stt-damage   { color: var(--color-damage); }
+.stt-positive { color: var(--color-heal); }
+.stt-info     { color: var(--text-secondary); }
+.stt-debuff   { color: var(--color-damage); }
+.stt-buff     { color: var(--color-heal); }
 
 /* ============================================================
    SECTION TITLE
