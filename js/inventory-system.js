@@ -3,6 +3,7 @@
 
 // ── Null-safe helpers ─────────────────────────────────────────────────────────
 function _safeStash(c)     { if (!c.consumableStash || typeof c.consumableStash !== 'object') c.consumableStash = {}; return c.consumableStash; }
+function _safeKeyring(c)   { if (!c.keyring || typeof c.keyring !== 'object') c.keyring = {}; return c.keyring; }
 function _safeBelt(c)      { if (!c.consumables    || typeof c.consumables    !== 'object') c.consumables    = {}; return c.consumables; }
 function _safeInventory(c) { if (!Array.isArray(c.inventory)) c.inventory = []; return c.inventory; }
 function _safeGold(c)      { if (c.gold       == null) c.gold       = 0; return c.gold; }
@@ -501,7 +502,28 @@ function _renderGearModal(character, activeSlot, sortKey) {
         rows = '<div class="inv-empty-msg">Nothing here.</div>';
     }
 
-    inner.innerHTML = header + tabs + sortBar + `<div class="inv-list">${rows}</div>`;
+    // ── Keyring section ───────────────────────────────────────────────────────
+    const keyring = _safeKeyring(character);
+    const keyEntries = Object.entries(keyring).filter(([, q]) => q > 0);
+    let keyringHtml = '';
+    if (keyEntries.length > 0) {
+        const keyRows = keyEntries.map(([itemId]) => {
+            const def = _itemDef(itemId);
+            if (!def) return '';
+            return `
+                <div class="inv-item">
+                    <div class="inv-item__info">
+                        <div class="inv-item__name" style="color:var(--gold);">${def.name}</div>
+                        ${def.description ? `<div class="inv-item__stats">${def.description}</div>` : ''}
+                    </div>
+                </div>`;
+        }).join('');
+        keyringHtml = `
+            <div class="inv-section-label" style="margin-top:var(--space-md); color:var(--gold-dim); font-size:0.72rem; letter-spacing:0.09em; text-transform:uppercase;">Keyring</div>
+            <div class="inv-list" style="margin-top:var(--space-xs);">${keyRows}</div>`;
+    }
+
+    inner.innerHTML = header + tabs + sortBar + `<div class="inv-list">${rows}</div>` + keyringHtml;
 }
 
 
@@ -628,7 +650,7 @@ function _renderBeltModal(character, activeSlot) {
     }
 
     // Stash rows
-    const stashEntries = Object.entries(stash).filter(([, q]) => q > 0);
+    const stashEntries = Object.entries(stash).filter(([id, q]) => q > 0 && !_isQuestItem(_itemDef(id)));
     if (stashEntries.length > 0) {
         rows += `<div class="inv-slot-header">Available</div>`;
         stashEntries.forEach(([itemId, qty]) => {

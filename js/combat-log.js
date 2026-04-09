@@ -1205,17 +1205,25 @@ function renderTurn(turn, logDisplay, hpMaxes, hpCurrent) {
         } else if (isSingleOffensive) {
             // Single target damage — use the main message
             const isCrit = turn.roll?.crit;
+            const _cu1 = turn.result.consumableUsed
+                ? `<div class="turn-consumable">Used: ${turn.result.consumableUsed.name} (${turn.result.consumableUsed.remaining} remaining)</div>`
+                : '';
             turnEl.innerHTML = `
                 <div class="turn-header">Turn ${turn.turnNumber}: ${turn.actorName}</div>
                 <div class="turn-message ${isCrit ? 'turn-crit' : ''}">${turn.result.message || ''}</div>
                 <div class="turn-damage">Damage: ${turn.result.damageDealt}</div>
+                ${_cu1}
             `;
             logDisplay.appendChild(turnEl);
         } else {
             // Non-offensive (buff, heal, restore) — single summary line
+            const _cu2 = turn.result.consumableUsed
+                ? `<div class="turn-consumable">Used: ${turn.result.consumableUsed.name} (${turn.result.consumableUsed.remaining} remaining)</div>`
+                : '';
             turnEl.innerHTML = `
                 <div class="turn-header">Turn ${turn.turnNumber}: ${turn.actorName}</div>
                 <div class="turn-message">${turn.result.message || `${turn.actorName} uses ${turn.action?.skillID || 'skill'}.`}</div>
+                ${_cu2}
             `;
             logDisplay.appendChild(turnEl);
         }
@@ -1244,10 +1252,14 @@ function renderTurn(turn, logDisplay, hpMaxes, hpCurrent) {
     if (isCrit) messageClass = 'turn-crit';
     if (!isHit) messageClass = 'turn-miss';
 
+    const _cu3 = turn.result?.consumableUsed
+        ? `<div class="turn-consumable">Used: ${turn.result.consumableUsed.name} (${turn.result.consumableUsed.remaining} remaining)</div>`
+        : '';
     turnEl.innerHTML = `
         <div class="turn-header">Turn ${turn.turnNumber}: ${turn.actorName}</div>
         <div class="turn-message ${messageClass}">${turn.result?.message || 'Action taken'}</div>
         ${isHit ? `<div class="turn-damage">Damage: ${turn.result.damageDealt}</div>` : ''}
+        ${_cu3}
     `;
     logDisplay.appendChild(turnEl);
     _scrollLogToBottom(logDisplay);

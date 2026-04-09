@@ -86,6 +86,7 @@ function createTables() {
                     skills TEXT NOT NULL DEFAULT '[]',
                     consumables TEXT NOT NULL DEFAULT '{}',
                     consumableStash TEXT NOT NULL DEFAULT '{}',
+                    keyring TEXT NOT NULL DEFAULT '{}',
                     beltOrder TEXT NOT NULL DEFAULT '[null,null,null,null]',
                     inventory TEXT NOT NULL DEFAULT '[]',
                     gold REAL NOT NULL DEFAULT 0,
@@ -236,6 +237,7 @@ async function initializeCharacterSnapshotsTable() {
     // Migration: add consumableStash, gold, arcaneDust, beltOrder columns
     for (const [col, def] of [
         ['consumableStash', "TEXT NOT NULL DEFAULT '{}'"],
+        ['keyring',         "TEXT NOT NULL DEFAULT '{}'"],
         ['gold',            'REAL NOT NULL DEFAULT 0'],
         ['arcaneDust',      'REAL NOT NULL DEFAULT 0'],
         ['beltOrder',       "TEXT NOT NULL DEFAULT '[null,null,null,null]'"],
@@ -435,18 +437,18 @@ function saveCharacter(character) {
             `INSERT INTO characters (
                 id, name, race, level, experience,
                 conviction, endurance, ambition, harmony,
-                equipment, skills, consumables, consumableStash, beltOrder, inventory,
+                equipment, skills, consumables, consumableStash, keyring, beltOrder, inventory,
                 gold, arcaneDust,
                 unlockedCombos, combatStats, partyStats,
                 ownerUserId, isPublic, shareCode, buildName, buildDescription,
                 importCount, lastSharedAt,
                 avatarId, avatarColor, avatarFrame, title, lastActiveAt,
                 createdAt, lastModified, lastSuccessfulChallengeId, aiProfile, roleTag
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(id) DO UPDATE SET
                 name = ?, race = ?, level = ?, experience = ?,
                 conviction = ?, endurance = ?, ambition = ?, harmony = ?,
-                equipment = ?, skills = ?, consumables = ?, consumableStash = ?, beltOrder = ?, inventory = ?,
+                equipment = ?, skills = ?, consumables = ?, consumableStash = ?, keyring = ?, beltOrder = ?, inventory = ?,
                 gold = ?, arcaneDust = ?,
                 unlockedCombos = ?, combatStats = ?, partyStats = ?,
                 ownerUserId = ?, isPublic = ?, shareCode = ?, buildName = ?, buildDescription = ?,
@@ -461,6 +463,7 @@ function saveCharacter(character) {
                 JSON.stringify(character.skills || []),
                 JSON.stringify(character.consumables || {}),
                 JSON.stringify(character.consumableStash || {}),
+                JSON.stringify(character.keyring || {}),
                 JSON.stringify(character.beltOrder || [null,null,null,null]),
                 JSON.stringify(character.inventory || []),
                 character.gold || 0,
@@ -486,6 +489,7 @@ function saveCharacter(character) {
                 JSON.stringify(character.skills || []),
                 JSON.stringify(character.consumables || {}),
                 JSON.stringify(character.consumableStash || {}),
+                JSON.stringify(character.keyring || {}),
                 JSON.stringify(character.beltOrder || [null,null,null,null]),
                 JSON.stringify(character.inventory || []),
                 character.gold || 0,
@@ -532,6 +536,7 @@ function getCharacter(characterId) {
                     skills: JSON.parse(row.skills || '[]'),
                     consumables: JSON.parse(row.consumables || '{}'),
                     consumableStash: JSON.parse(row.consumableStash || '{}'),
+                    keyring: JSON.parse(row.keyring || '{}'),
                     beltOrder: JSON.parse(row.beltOrder || '[null,null,null,null]'),
                     inventory: JSON.parse(row.inventory || '[]'),
                     gold: row.gold || 0,
@@ -586,6 +591,7 @@ function getAllCharacters() {
                     skills: JSON.parse(row.skills || '[]'),
                     consumables: JSON.parse(row.consumables || '{}'),
                     consumableStash: JSON.parse(row.consumableStash || '{}'),
+                    keyring: JSON.parse(row.keyring || '{}'),
                     beltOrder: JSON.parse(row.beltOrder || '[null,null,null,null]'),
                     inventory: JSON.parse(row.inventory || '[]'),
                     gold: row.gold || 0,

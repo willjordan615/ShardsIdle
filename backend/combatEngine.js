@@ -332,7 +332,8 @@ class CombatEngine {
       conditionMet = playerCharacters.some(p =>
         !p.defeated && (
           (p.consumables && p.consumables[itemID] > 0) ||
-          (p.consumableStash && p.consumableStash[itemID] > 0)
+          (p.consumableStash && p.consumableStash[itemID] > 0) ||
+          (p.keyring && p.keyring[itemID] > 0)
         )
       );
       highestChance = conditionMet ? 1.0 : 0.0;
@@ -341,7 +342,8 @@ class CombatEngine {
         const owner = playerCharacters.find(p =>
           !p.defeated && (
             (p.consumables && p.consumables[itemID] > 0) ||
-            (p.consumableStash && p.consumableStash[itemID] > 0)
+            (p.consumableStash && p.consumableStash[itemID] > 0) ||
+            (p.keyring && p.keyring[itemID] > 0)
           )
         );
         if (owner) {
@@ -362,7 +364,8 @@ class CombatEngine {
       const hasItem = playerCharacters.some(p =>
         !p.defeated && (
           (p.consumables && p.consumables[itemID] > 0) ||
-          (p.consumableStash && p.consumableStash[itemID] > 0)
+          (p.consumableStash && p.consumableStash[itemID] > 0) ||
+          (p.keyring && p.keyring[itemID] > 0)
         )
       );
       if (!hasItem) {
@@ -543,6 +546,7 @@ class CombatEngine {
         currentStamina: this.calculateMaxStamina(boostedStats, level, true),
         skills,
         consumables: snapshot.consumables || {},
+        keyring: snapshot.keyring || {},
         equipment,
         armorValue,    // flat damage reduction
         physEvasion,   // reduces physical hit chance against this character
@@ -2666,6 +2670,7 @@ _applyLootTagFlavour(item, tagDef) {
     }
 
     // Decrement consumable belt quantity if this skill came from a belt item
+    let consumableUsed = null;
     if (actor.type === 'player' && actor.consumables && typeof actor.consumables === 'object') {
         const consumables = actor.consumables;
         for (const [consumableId, qty] of Object.entries(consumables)) {
@@ -2675,8 +2680,10 @@ _applyLootTagFlavour(item, tagDef) {
             const itemSkillId = itemDef.skillID || itemDef.effect_skillid;
             if (itemSkillId === skill.id) {
                 const _isQuest3 = itemDef.slot_id1 === 'consumable' && !itemDef.type;
-                if (!_isQuest3) consumables[consumableId]--;
-                //console.log(`[CONSUMABLE] ${actor.name} used ${itemDef.name} (${consumables[consumableId]} remaining)`);
+                if (!_isQuest3) {
+                    consumables[consumableId]--;
+                    consumableUsed = { name: itemDef.name, remaining: consumables[consumableId] };
+                }
                 break;
             }
         }
@@ -2887,7 +2894,8 @@ _applyLootTagFlavour(item, tagDef) {
             damageDealt: totalDamage,
             targets: resolvedTargets,
             success: true, delay: finalDelay,
-            actorId: actor.id, actorStatuses: _statusSnapshot(actor)
+            actorId: actor.id, actorStatuses: _statusSnapshot(actor),
+            consumableUsed
         }
     };
   }

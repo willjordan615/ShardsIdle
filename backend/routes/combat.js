@@ -334,10 +334,11 @@ router.post('/start', requireAuth, async (req, res) => {
                     const isQuestItem  = itemDef?.slot_id1 === 'consumable' && !itemDef?.type;
                     if (isConsumable) {
                         if (isQuestItem) {
-                            // Quest items: player may only hold one; silently skip duplicates
-                            if (!character.consumableStash[loot.itemID]) {
-                                character.consumableStash[loot.itemID] = 1;
-                                console.log(`[LOOT] Quest item ${loot.itemID} added to stash for ${character.name}`);
+                            // Quest items go to the keyring — not the consumable stash
+                            if (!character.keyring) character.keyring = {};
+                            if (!character.keyring[loot.itemID]) {
+                                character.keyring[loot.itemID] = 1;
+                                console.log(`[LOOT] Quest item ${loot.itemID} added to keyring for ${character.name}`);
                             }
                         } else {
                             character.consumableStash[loot.itemID] = (character.consumableStash[loot.itemID] || 0) + 1;
@@ -611,8 +612,10 @@ router.post('/idle/collect', requireAuth, async (req, res) => {
                 stats:         char.stats,
                 skills:        char.skills,
                 equipment:     char.equipment,
-                consumables:   char.consumables || {},
-                aiProfile:     char.aiProfile || 'balanced',
+                consumables:      char.consumables || {},
+                consumableStash:  char.consumableStash || {},
+                keyring:          char.keyring || {},
+                aiProfile:        char.aiProfile || 'balanced',
             };
         }));
 
@@ -762,9 +765,9 @@ router.post('/idle/collect', requireAuth, async (req, res) => {
                         const isQuestItem = itemDef?.slot_id1 === 'consumable' && !itemDef?.type;
                         if (isConsumable) {
                             if (isQuestItem) {
-                                if (!primary.consumableStash[loot.itemID]) {
-                                    primary.consumableStash[loot.itemID] = 1;
-                                }
+                                // Quest items go to the keyring — not the consumable stash
+                                if (!primary.keyring) primary.keyring = {};
+                                if (!primary.keyring[loot.itemID]) primary.keyring[loot.itemID] = 1;
                             } else {
                                 primary.consumableStash[loot.itemID] = (primary.consumableStash[loot.itemID] || 0) + 1;
                             }
