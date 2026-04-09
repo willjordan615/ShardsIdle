@@ -77,17 +77,17 @@ button.reset-btn:hover { border-color: #d4af37; color: #d4af37; }
     <div class="control-row"><label>Font size</label><input type="range" id="hub-font" min="8" max="18" value="18" oninput="redraw()"><span id="hub-font-v">11</span></div>
 
     <h3>Child nodes</h3>
-    <div class="control-row"><label>Ring 1 radius</label><input type="range" id="child-r1" min="80" max="400" value="258" oninput="relayout()"><span id="child-r1-v">180</span></div>
-    <div class="control-row"><label>Ring gap</label><input type="range" id="child-gap" min="40" max="300" value="300" oninput="relayout()"><span id="child-gap-v">120</span></div>
-    <div class="control-row"><label>Font size</label><input type="range" id="child-font" min="7" max="14" value="9" oninput="redraw()"><span id="child-font-v">9</span></div>
-    <div class="control-row"><label>Node height</label><input type="range" id="node-h" min="16" max="40" value="20" oninput="relayout()"><span id="node-h-v">26</span></div>
+    <div class="control-row"><label>Ring 1 radius</label><input type="range" id="child-r1" min="80" max="400" value="220" oninput="relayout()"><span id="child-r1-v">180</span></div>
+    <div class="control-row"><label>Ring gap</label><input type="range" id="child-gap" min="40" max="300" value="240" oninput="relayout()"><span id="child-gap-v">120</span></div>
+    <div class="control-row"><label>Font size</label><input type="range" id="child-font" min="7" max="14" value="11" oninput="redraw()"><span id="child-font-v">9</span></div>
+    <div class="control-row"><label>Node height</label><input type="range" id="node-h" min="16" max="40" value="24" oninput="relayout()"><span id="node-h-v">26</span></div>
 
     <h3>Opacity</h3>
-    <div class="control-row"><label>Dimmed hubs</label><input type="range" id="op-hub-dim" min="0" max="1" step="0.05" value="0.05" oninput="redraw()"><span id="op-hub-dim-v">0.25</span></div>
+    <div class="control-row"><label>Dimmed hubs</label><input type="range" id="op-hub-dim" min="0" max="1" step="0.05" value="0.08" oninput="redraw()"><span id="op-hub-dim-v">0.25</span></div>
     <div class="control-row"><label>Owned skills</label><input type="range" id="op-owned" min="0" max="1" step="0.05" value="1" oninput="redraw()"><span id="op-owned-v">1.0</span></div>
-    <div class="control-row"><label>1 parent owned</label><input type="range" id="op-near" min="0" max="1" step="0.05" value="0.75" oninput="redraw()"><span id="op-near-v">0.75</span></div>
-    <div class="control-row"><label>Depth 2</label><input type="range" id="op-d2" min="0" max="1" step="0.05" value="0.45" oninput="redraw()"><span id="op-d2-v">0.45</span></div>
-    <div class="control-row"><label>Depth 3+</label><input type="range" id="op-d3" min="0" max="1" step="0.05" value="0.2" oninput="redraw()"><span id="op-d3-v">0.2</span></div>
+    <div class="control-row"><label>1 parent owned</label><input type="range" id="op-near" min="0" max="1" step="0.05" value="0.8" oninput="redraw()"><span id="op-near-v">0.75</span></div>
+    <div class="control-row"><label>Depth 2</label><input type="range" id="op-d2" min="0" max="1" step="0.05" value="0.5" oninput="redraw()"><span id="op-d2-v">0.45</span></div>
+    <div class="control-row"><label>Depth 3+</label><input type="range" id="op-d3" min="0" max="1" step="0.05" value="0.25" oninput="redraw()"><span id="op-d3-v">0.2</span></div>
 
     <h3>Edges</h3>
     <div class="control-row"><label>Depth falloff</label><input type="range" id="edge-depth-falloff" min="0" max="1" step="0.05" value="0" oninput="redraw()"><span id="edge-depth-falloff-v">0.6</span></div>
@@ -97,8 +97,8 @@ button.reset-btn:hover { border-color: #d4af37; color: #d4af37; }
     <div class="control-row"><label>Child owned opacity</label><input type="range" id="op-edge-child-owned" min="0" max="1" step="0.05" value="0.7" oninput="redraw()"><span id="op-edge-child-owned-v">0.7</span></div>
     <div class="control-row"><label>Child unowned color</label><input type="color" id="c-edge-child-un" value="#a07828" oninput="redraw()"></div>
     <div class="control-row"><label>Child unowned opacity</label><input type="range" id="op-edge-child-un" min="0" max="1" step="0.05" value="0.4" oninput="redraw()"><span id="op-edge-child-un-v">0.4</span></div>
-    <div class="control-row"><label>Default edge opacity</label><input type="range" id="op-edge-def" min="0" max="1" step="0.05" value="0.2" oninput="redraw()"><span id="op-edge-def-v">0.2</span></div>
-    <div class="control-row"><label>Edge curve</label><input type="range" id="edge-curve" min="0" max="0.4" step="0.02" value="0.12" oninput="redraw()"><span id="edge-curve-v">0.12</span></div>
+    <div class="control-row"><label>Default edge opacity</label><input type="range" id="op-edge-def" min="0" max="1" step="0.05" value="0.15" oninput="redraw()"><span id="op-edge-def-v">0.2</span></div>
+    <div class="control-row"><label>Edge curve</label><input type="range" id="edge-curve" min="0" max="0.4" step="0.02" value="0.18" oninput="redraw()"><span id="edge-curve-v">0.12</span></div>
 
     <h3>Selection highlight</h3>
     <div class="control-row"><label>Selected fill</label><input type="color" id="c-sel-fill" value="#d4af37" oninput="redraw()"></div>
@@ -390,22 +390,40 @@ function layoutChildren(hubId) {
 }
 
 function separate(nodes, NODE_H) {
-    const MIN_X = 16, MIN_Y = 10, PASSES = 60;
+    const REPULSE_DIST = 120;  // nodes within this distance push each other
+    const MIN_X = 20, MIN_Y = 14;
+    const PASSES = 120;
+
     for (let pass = 0; pass < PASSES; pass++) {
         let moved = false;
         for (let i = 0; i < nodes.length; i++) {
             for (let j = i+1; j < nodes.length; j++) {
                 const a = nodes[i], b = nodes[j];
-                const dx = b.x - a.x, dy = b.y - a.y;
+                const dx = b.x - a.x || 0.01;
+                const dy = b.y - a.y || 0.01;
+                const dist = Math.sqrt(dx*dx + dy*dy);
+
+                // Hard collision push
                 const ox = (a.hw + b.hw + MIN_X) - Math.abs(dx);
                 const oy = (a.hh + b.hh + MIN_Y) - Math.abs(dy);
                 if (ox > 0 && oy > 0) {
                     moved = true;
-                    if (ox < oy) { const p = (ox/2+1)*Math.sign(dx||1); a.x-=p; b.x+=p; }
-                    else { const p = (oy/2+1)*Math.sign(dy||1); a.y-=p; b.y+=p; }
+                    if (ox < oy) { const p = (ox/2+1)*Math.sign(dx); a.x-=p; b.x+=p; }
+                    else { const p = (oy/2+1)*Math.sign(dy); a.y-=p; b.y+=p; }
+                }
+                // Soft repulsion for nearby nodes
+                else if (dist < REPULSE_DIST) {
+                    const force = (REPULSE_DIST - dist) / REPULSE_DIST * 3;
+                    const fx = (dx/dist) * force;
+                    const fy = (dy/dist) * force;
+                    a.x -= fx; a.fy = (a.fy||0) - fy;
+                    b.x += fx; b.fy = (b.fy||0) + fy;
+                    moved = true;
                 }
             }
         }
+        // Apply y forces
+        nodes.forEach(n => { if (n.fy) { n.y += n.fy; n.fy = 0; } });
         if (!moved) break;
     }
 }
