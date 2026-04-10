@@ -3840,11 +3840,7 @@ body:has(#combatlog.active) #headerTopBar {
    ============================================================ */
 
 #offlineSummary {
-    min-height: 100vh;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    padding: 2rem 1rem 4rem;
+    padding: 2rem 1rem;
 }
 
 #offlineSummaryInner {
