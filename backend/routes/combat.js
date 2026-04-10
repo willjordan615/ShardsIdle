@@ -304,10 +304,16 @@ router.post('/start', requireAuth, async (req, res) => {
             // --- PATCH END ---
 
             // 3b. Apply post-combat consumable quantities from the engine result.
-            // The engine decrements actor.consumables in-place during combat — participant
-            // carries the final quantities. Without this, used consumables are never persisted.
+            // The engine decrements actor.consumables and actor.consumableStash in-place
+            // during combat — participant carries the final quantities.
             if (participant.consumables && typeof participant.consumables === 'object') {
                 character.consumables = { ...participant.consumables };
+            }
+            if (participant.consumableStash && typeof participant.consumableStash === 'object') {
+                character.consumableStash = { ...participant.consumableStash };
+            }
+            if (participant.keyring && typeof participant.keyring === 'object') {
+                character.keyring = { ...participant.keyring };
             }
 
             // Log only skills that weren't in the DB before this combat (genuinely new this run)
@@ -679,10 +685,13 @@ router.post('/idle/collect', requireAuth, async (req, res) => {
                 if (!live) return snap;
                 return {
                     ...snap,
-                    level:    live.level,
-                    skills:   live.skills,
-                    equipment: live.equipment,
-                    stats:    live.stats,
+                    level:            live.level,
+                    skills:           live.skills,
+                    equipment:        live.equipment,
+                    stats:            live.stats,
+                    consumables:      live.consumables      || {},
+                    consumableStash:  live.consumableStash  || {},
+                    keyring:          live.keyring          || {},
                 };
             });
 

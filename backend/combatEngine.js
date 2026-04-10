@@ -1014,6 +1014,8 @@ class CombatEngine {
           defeated: p.defeated,
           skills: p.skills,
           consumables: p.consumables,
+          consumableStash: p.consumableStash,
+          keyring: p.keyring,
           avatarId: partySnapshots[idx]?.avatarId || null,
           avatarColor: partySnapshots[idx]?.avatarColor || null
         })),
