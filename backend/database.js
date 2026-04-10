@@ -26,6 +26,7 @@ function createTables() {
                     username TEXT NOT NULL,
                     password_hash TEXT,
                     is_guest INTEGER NOT NULL DEFAULT 1,
+                    is_admin INTEGER NOT NULL DEFAULT 0,
                     created_at INTEGER NOT NULL,
                     last_active_at INTEGER NOT NULL
                 )
@@ -158,6 +159,7 @@ function createTables() {
                     // Migrations: add columns to existing databases (errors ignored — column exists on fresh installs)
                     db.run(`ALTER TABLE characters ADD COLUMN aiProfile TEXT DEFAULT 'balanced'`, () => {});
                     db.run(`ALTER TABLE characters ADD COLUMN roleTag TEXT DEFAULT NULL`, () => {});
+                    db.run(`ALTER TABLE users ADD COLUMN is_admin INTEGER NOT NULL DEFAULT 0`, () => {});
                     resolve();
                 }
             });
@@ -655,9 +657,19 @@ function getUserByUsername(username) {
 function getAllUsers() {
     return new Promise((resolve, reject) => {
         db.all(
-            `SELECT user_id, username, is_guest, created_at FROM users ORDER BY created_at DESC`,
+            `SELECT user_id, username, is_guest, is_admin, created_at FROM users ORDER BY created_at DESC`,
             [],
             (err, rows) => { if (err) reject(err); else resolve(rows || []); }
+        );
+    });
+}
+
+function setAdmin(userId, isAdmin) {
+    return new Promise((resolve, reject) => {
+        db.run(
+            `UPDATE users SET is_admin = ? WHERE user_id = ?`,
+            [isAdmin ? 1 : 0, userId],
+            function(err) { if (err) reject(err); else resolve(this.changes > 0); }
         );
     });
 }
@@ -892,6 +904,7 @@ module.exports = {
     deleteSession,
     transferCharactersToUser,
     getAllUsers,
+    setAdmin,
     reassignCharacter,
     reassignSnapshots,
     pruneExpiredSessions,

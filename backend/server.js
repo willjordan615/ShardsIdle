@@ -9,8 +9,19 @@ const { router: dataRoutes, loadGameData } = require('./routes/data');
 const characterRoutes = require('./routes/character');
 const adminRoutes = require('./routes/admin');
 const characterSnapshotsRoutes = require('./routes/character-snapshots');
-const { router: authRoutes } = require('./routes/auth');
+const { router: authRoutes, requireAuth } = require('./routes/auth');
 const { resetCombatEngine } = combatRoutes;
+
+// ── requireAdmin middleware ────────────────────────────────────────────────────
+// Chains requireAuth then checks req.isAdmin. Use on all admin data endpoints.
+function requireAdmin(req, res, next) {
+    requireAuth(req, res, () => {
+        if (!req.isAdmin) {
+            return res.status(403).json({ error: 'Forbidden: admin access required' });
+        }
+        next();
+    });
+}
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -41,7 +52,8 @@ app.get('/api/health', (req, res) => {
 });
 
 // ==========================================
-// NEW: Admin Editor Routes for JSON Files
+// Admin Editor Routes for JSON Files
+// All routes require a logged-in admin account.
 // ==========================================
 
 // Helper to get file path safely
@@ -50,8 +62,32 @@ const getDataFilePath = (filename) => {
     return path.join(__dirname, 'data', filename);
 };
 
+// ── Bootstrap: grant admin to your account ────────────────────────────────────
+// POST /api/auth/grant-admin  { username, secret }
+// The secret must match the ADMIN_BOOTSTRAP_SECRET environment variable.
+// Hit this once after deploy to elevate your account, then you're done.
+// If ADMIN_BOOTSTRAP_SECRET is unset the endpoint always returns 403.
+app.post('/api/auth/grant-admin', async (req, res) => {
+    const secret = process.env.ADMIN_BOOTSTRAP_SECRET;
+    if (!secret) return res.status(403).json({ error: 'Bootstrap not configured' });
+
+    const { username, secret: provided } = req.body;
+    if (!provided || provided !== secret) return res.status(403).json({ error: 'Invalid secret' });
+
+    try {
+        const user = await db.getUserByUsername(username);
+        if (!user) return res.status(404).json({ error: 'User not found' });
+        await db.setAdmin(user.user_id, true);
+        console.log(`[ADMIN] Granted admin to ${username}`);
+        res.json({ success: true, message: `${username} is now an admin.` });
+    } catch (err) {
+        console.error('[ADMIN] grant-admin error:', err);
+        res.status(500).json({ error: 'Failed to grant admin' });
+    }
+});
+
 // GET: Load Challenges
-app.get('/api/admin/data/challenges', (req, res) => {
+app.get('/api/admin/data/challenges', requireAdmin, (req, res) => {
     try {
         const filePath = getDataFilePath('challenges.json');
         console.log(`[EDITOR] Reading challenges from: ${filePath}`);
@@ -67,7 +103,7 @@ app.get('/api/admin/data/challenges', (req, res) => {
 });
 
 // POST: Save Challenges
-app.post('/api/admin/data/challenges', (req, res) => {
+app.post('/api/admin/data/challenges', requireAdmin, (req, res) => {
     try {
         const newData = req.body;
         const filePath = getDataFilePath('challenges.json');
@@ -87,7 +123,7 @@ app.post('/api/admin/data/challenges', (req, res) => {
 });
 
 // GET: Load Enemy Types
-app.get('/api/admin/data/enemies', (req, res) => {
+app.get('/api/admin/data/enemies', requireAdmin, (req, res) => {
     try {
         const filePath = getDataFilePath('enemy-types.json');
         console.log(`[EDITOR] Reading enemies from: ${filePath}`);
@@ -103,7 +139,7 @@ app.get('/api/admin/data/enemies', (req, res) => {
 });
 
 // POST: Save Enemy Types
-app.post('/api/admin/data/enemies', (req, res) => {
+app.post('/api/admin/data/enemies', requireAdmin, (req, res) => {
     try {
         const newData = req.body;
         const filePath = getDataFilePath('enemy-types.json');
@@ -121,7 +157,7 @@ app.post('/api/admin/data/enemies', (req, res) => {
     }
 });
 
-app.get('/api/admin/data/skills', (req, res) => {
+app.get('/api/admin/data/skills', requireAdmin, (req, res) => {
     try {
         const filePath = getDataFilePath('skills.json');
         const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
@@ -132,7 +168,7 @@ app.get('/api/admin/data/skills', (req, res) => {
     }
 });
 
-app.post('/api/admin/data/skills', (req, res) => {
+app.post('/api/admin/data/skills', requireAdmin, (req, res) => {
     try {
         const newData = req.body;
         const filePath = getDataFilePath('skills.json');

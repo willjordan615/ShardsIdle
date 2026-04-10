@@ -1,11 +1,21 @@
 // backend/routes/auth.js
-const express  = require('express');
-const router   = express.Router();
-const crypto   = require('crypto');
-const bcrypt   = require('bcryptjs');
-const db       = require('../database');
+const express     = require('express');
+const router      = express.Router();
+const crypto      = require('crypto');
+const bcrypt      = require('bcryptjs');
+const rateLimit   = require('express-rate-limit');
+const db          = require('../database');
 
 const BCRYPT_ROUNDS = 12;
+
+// Rate limiter for login — 10 attempts per 15 minutes per IP
+const loginRateLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 10,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: 'Too many login attempts. Please try again in 15 minutes.' },
+});
 
 // ── Sanitization ──────────────────────────────────────────────────────────────
 
@@ -50,7 +60,7 @@ function generateGuestName() {
 
 // ── Middleware ────────────────────────────────────────────────────────────────
 
-// Resolves token → user. Attaches req.userId and req.sessionToken.
+// Resolves token → user. Attaches req.userId, req.isAdmin, and req.sessionToken.
 // Returns 401 if token is missing or expired. Use on protected routes.
 async function requireAuth(req, res, next) {
     const header = req.headers['authorization'] || '';
@@ -66,6 +76,12 @@ async function requireAuth(req, res, next) {
 
         req.userId       = session.user_id;
         req.sessionToken = token;
+        req.isAdmin      = false;
+
+        // Attach admin flag — getUserById uses SELECT * so is_admin is included
+        const user = await db.getUserById(session.user_id);
+        if (user) req.isAdmin = !!user.is_admin;
+
         next();
     } catch (err) {
         console.error('[AUTH] requireAuth error:', err);
@@ -164,7 +180,7 @@ router.post('/register', requireAuth, async (req, res) => {
  * Characters previously owned by the guest session can optionally be migrated
  * by passing the old guest token as guestToken in the body.
  */
-router.post('/login', async (req, res) => {
+router.post('/login', loginRateLimiter, async (req, res) => {
     try {
         let { username, password, guestToken } = req.body;
 
