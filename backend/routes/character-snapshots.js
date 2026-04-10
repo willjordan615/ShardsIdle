@@ -360,8 +360,8 @@ router.get('/browse', optionalAuth, async (req, res) => {
                 characterName:       s.character_name,
                 level:               s.level,
                 race:                s.race,
-                skills:              JSON.parse(s.skills    || '[]'),
-                equipment:           JSON.parse(s.equipment || '{}'),
+                skills:              liveChar?.skills    || JSON.parse(s.skills    || '[]'),
+                equipment:           liveChar?.equipment || JSON.parse(s.equipment || '{}'),
                 combatStats:         liveCombatStats,
                 partyStats:          JSON.parse(s.party_stats || '{}'),
                 importCount:         s.import_count,
@@ -370,7 +370,7 @@ router.get('/browse', optionalAuth, async (req, res) => {
                 avatarId:            s.avatar_id,
                 title:               s.title,
                 lastActiveAt:        s.last_active_at,
-                aiProfile:           s.ai_profile || 'balanced',
+                aiProfile:           liveChar?.aiProfile || s.ai_profile || 'balanced',
                 roleTag:             liveChar?.roleTag || null,
             };
         }));

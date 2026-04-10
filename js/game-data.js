@@ -433,7 +433,8 @@ function getCharacterClass(character, skills) {
         const tags = {
             beast: 0, arcane: 0, holy: 0, shadow: 0, nature: 0,
             fire: 0, cold: 0, lightning: 0, poison: 0, water: 0,
-            slashing: 0, piercing: 0, bludgeoning: 0, healing: 0
+            slashing: 0, piercing: 0, bludgeoning: 0, healing: 0,
+            song: 0, spirit: 0
         };
 
         // Track skill scaling factors to check stat alignment
@@ -481,7 +482,21 @@ function getCharacterClass(character, skills) {
             warcry: false,
             attunement: false,
             prayer: false,
-            channel: false
+            channel: false,
+            // Bard skills
+            song_of_vigor: false,
+            battle_hymn: false,
+            soothing_verse: false,
+            grand_symphony: false,
+            siren_call: false,
+            haunting_refrain: false,
+            chorus: false,
+            // Shaman skills
+            totemic_aura: false,
+            spirit_link: false,
+            spirit_storm: false,
+            ancestral_shroud: false,
+            hex: false
         };
 
         // Track child skills for depth bonus
@@ -712,6 +727,35 @@ function getCharacterClass(character, skills) {
         if ((keySkills.stalk || keySkills.sense) && categories.utility > 0 && categories.damagePhysical < 2) {
             if (statRatios.ambition > 0.35) return 'Rogue';
             return 'Scout';
+        }
+
+        // Bard — any song-tagged skill is the definitive signal, instrument refines the title.
+        // Two skill slots means a bard often has just one song skill + a utility/heal.
+        const hasSongSkill = tags.song >= 1 || keySkills.chorus || keySkills.song_of_vigor ||
+            keySkills.battle_hymn || keySkills.soothing_verse || keySkills.grand_symphony ||
+            keySkills.siren_call || keySkills.haunting_refrain;
+        if (hasSongSkill) {
+            if (weaponType === 'flute') return keySkills.grand_symphony ? 'Virtuoso' : 'Bard';
+            if (weaponType === 'bell') return 'Choirmaster';
+            if (isInstrumentWeapon) return 'Bard';
+            if (keySkills.grand_symphony) return 'Grand Bard';
+            if (categories.healing > 0 && tags.song >= 2) return 'Battle Bard';
+            if (tags.song >= 2) return 'Bard';
+            // Single song skill without instrument — classify by what else they have
+            if (categories.healing >= 1) return 'Minstrel';
+            return 'Bard';
+        }
+
+        // Shaman - spirit skills are the signal; totem weapon refines
+        if (tags.spirit >= 2 || (keySkills.totemic_aura && keySkills.spirit_link) || keySkills.spirit_storm) {
+            if (weaponType === 'totem') {
+                if (keySkills.spirit_storm) return 'Storm Shaman';
+                if (categories.healing >= 2) return 'Healing Shaman';
+                return 'Shaman';
+            }
+            if (keySkills.hex || keySkills.ancestral_shroud) return 'Witch Doctor';
+            if (categories.healing >= 2) return 'Spirit Healer';
+            return 'Shaman';
         }
 
         // ─── STEP 2: TIER-BASED PRESTIGE TITLES (Endgame only) ─────────────
