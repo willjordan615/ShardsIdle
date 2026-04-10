@@ -713,7 +713,7 @@ function getCharacterClass(character, skills) {
         // Berserker - Bloodlust/frenzy + physical damage + high conviction
         if ((keySkills.bloodlust || keySkills.frenzy) && categories.damagePhysical > 0) {
             if (statRatios.conviction > 0.35) return 'Berserker';
-            return 'Rager';
+            return 'Brawler';
         }
 
         // Guardian/Warden - Fortify + defense skills
@@ -773,7 +773,7 @@ function getCharacterClass(character, skills) {
             if (dominantTag === 'holy') return 'Celestial Knight';
             if (dominantTag === 'shadow') return 'Shadow Master';
             if (dominantTag === 'fire') return 'Flame Warden';
-            if (dominantTag === 'lightning') return 'Thunder Caller';
+            if (dominantTag === 'lightning') return 'Thundercaller';
             if (damageTypes.physical > 2) return 'Blood Knight';
             if (damageTypes.poison > 2) return 'Venom Lord';
         }
@@ -784,17 +784,17 @@ function getCharacterClass(character, skills) {
         if (isInstrumentWeapon && totalDamage > 0) {
             if (categories.damageMagic > 0) {
                 if (dominantTag === 'nature') return 'Bard';
-                if (dominantTag === 'holy') return 'Choir Master';
+                if (dominantTag === 'holy') return 'Choirmaster';
                 if (dominantTag === 'shadow') return 'Dirge Singer';
                 if (dominantTag === 'fire') return 'Pyromancer';
                 if (dominantTag === 'cold') return 'Frost Singer';
-                if (dominantTag === 'lightning') return 'Thunder Caller';
+                if (dominantTag === 'lightning') return 'Thundercaller';
                 return 'Mage';
             }
             if (categories.healing > 0) {
                 if (dominantTag === 'nature') return 'Druid';
                 if (dominantTag === 'holy') return 'Priest';
-                return 'Healer';
+                return 'Mender';
             }
         }
 
@@ -816,8 +816,8 @@ function getCharacterClass(character, skills) {
                 return 'Battle Cleric';
             }
             if (dominantTag === 'nature') return 'Circle Warden';
-            if (categories.healing > totalDamage) return 'Combat Healer';
-            return 'Skirmisher';
+            if (categories.healing > totalDamage) return 'Field Medic';
+            return 'Vanguard';
         }
 
         // Paladin: Heavy armor + holy damage + healing or defense
@@ -864,8 +864,8 @@ function getCharacterClass(character, skills) {
                     if (dominantTag === 'holy') {
                         if (weaponType === 'scepter') return 'Priest';
                         if (weaponType === 'tome') return 'Divine Scholar';
-                        if (weaponType === 'bell') return 'Choir Master';
-                        return 'Holy Caster';
+                        if (weaponType === 'bell') return 'Choirmaster';
+                        return 'Invoker';
                     }
                     if (dominantTag === 'shadow') {
                         if (weaponType === 'wand') return 'Warlock';
@@ -896,7 +896,7 @@ function getCharacterClass(character, skills) {
                     return 'Spellblade';
                 }
 
-                return 'Sorcerer';
+                return 'Spellweaver';
             }
 
             // Physical Damage Dealers - Weapon Specific
@@ -906,7 +906,7 @@ function getCharacterClass(character, skills) {
                     if (damageTypes.physical > 2 && statRatios.ambition > 0.35) return 'Duelist';
                     if (hasShield && isHeavyArmor) return 'Knight';
                     if (statRatios.conviction > 0.35 && statsAlignWithScaling('conviction')) return 'Blademaster';
-                    if (statRatios.ambition > 0.35) return 'Swordsman';
+                    if (statRatios.ambition > 0.35) return 'Duelist';
                     return 'Warrior';
                 }
 
@@ -924,7 +924,7 @@ function getCharacterClass(character, skills) {
                     if (damageTypes.physical > 2 && statRatios.conviction > 0.4) return 'Berserker';
                     if (isHeavyArmor) return 'Marauder';
                     if (statRatios.conviction > 0.35) return 'Barbarian';
-                    return 'Axeman';
+                    return 'Ravager';
                 }
 
                 // Hammer/Mace users
@@ -946,9 +946,9 @@ function getCharacterClass(character, skills) {
 
                 // Generic physical
                 if (statRatios.conviction > 0.35 && statsAlignWithScaling('conviction')) return 'Warrior';
-                if (statRatios.ambition > 0.35) return 'Striker';
+                if (statRatios.ambition > 0.35) return 'Pugilist';
                 if (totalKills > 100) return 'Veteran';
-                return 'Fighter';
+                return 'Footsoldier';
             }
         }
 
@@ -960,16 +960,16 @@ function getCharacterClass(character, skills) {
                     if (totalHealing > 10000 || milestones.masterHealer) return 'High Priest';
                     if (weaponType === 'scepter') return 'Priest';
                     if (weaponType === 'tome') return 'Cleric';
-                    if (weaponType === 'bell') return 'Choir Master';
-                    return 'Healer';
+                    if (weaponType === 'bell') return 'Choirmaster';
+                    return 'Mender';
                 }
                 if (dominantTag === 'nature') {
                     if (weaponType === 'totem') return 'Druid';
                     if (weaponType === 'flute') return 'Bard';
                     return 'Circle Keeper';
                 }
-                if (categories.buff >= 2) return 'Support';
-                return 'Healer';
+                if (categories.buff >= 2) return 'Warden';
+                return 'Mender';
             }
 
             // Tank healer (heavy armor + healing)
@@ -980,8 +980,8 @@ function getCharacterClass(character, skills) {
 
         if (categories.buff >= 2 && totalDamage < 1) {
             if (keySkills.warcry || keySkills.shout) return 'Banneret';
-            if (statRatios.harmony > 0.35) return 'Channeler';
-            return 'Buffer';
+            if (statRatios.harmony > 0.35) return 'Harmonist';
+            return 'Tactician';
         }
 
         // ─── STEP 6: TANK CLASSES ───────────────────────────────────────────
@@ -1001,14 +1001,14 @@ function getCharacterClass(character, skills) {
         if (categories.control >= 2) {
             if (dominantTag === 'shadow') return 'Warlock';
             if (dominantTag === 'nature') return 'Druid';
-            if (statRatios.ambition > 0.35) return 'Manipulator';
-            return 'Controller';
+            if (statRatios.ambition > 0.35) return 'Saboteur';
+            return 'Hexblade';
         }
 
         if (categories.utility >= 2 && totalDamage < 1 && categories.healing < 1) {
             if (keySkills.stalk || keySkills.sense) return 'Scout';
             if (statRatios.harmony > 0.35) return 'Mystic';
-            return 'Specialist';
+            return 'Pathfinder';
         }
 
         // ─── STEP 8: ARMOR-BASED FALLBACKS ──────────────────────────────────
@@ -1023,7 +1023,7 @@ function getCharacterClass(character, skills) {
             if (dominantTag === 'arcane') return 'Mage';
             if (dominantTag === 'holy') return 'Priest';
             if (dominantTag === 'shadow') return 'Warlock';
-            return 'Caster';
+            return 'Arcanist';
         }
 
         if (isMediumArmor && totalDamage > 0) {
