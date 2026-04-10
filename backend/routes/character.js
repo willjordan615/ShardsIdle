@@ -4,6 +4,8 @@ const router  = express.Router();
 const db      = require('../database');
 const { requireAuth, optionalAuth } = require('./auth');
 
+const MAX_CHARACTERS_PER_ACCOUNT = 10;
+
 // ── Input sanitization ────────────────────────────────────────────────────────
 function sanitizeText(value, maxLength = 40) {
     if (typeof value !== 'string') return '';
@@ -135,6 +137,18 @@ router.post('/', requireAuth, async (req, res) => {
 
         if (!character.id || !character.name || !character.race) {
             return res.status(400).json({ success: false, error: 'Missing required fields: id, name, race' });
+        }
+
+        const rawDb = db.getDatabase();
+        const countRow = await new Promise((resolve, reject) => {
+            rawDb.get(
+                `SELECT COUNT(*) as count FROM characters WHERE ownerUserId = ?`,
+                [req.userId],
+                (err, row) => { if (err) reject(err); else resolve(row); }
+            );
+        });
+        if ((countRow?.count || 0) >= MAX_CHARACTERS_PER_ACCOUNT) {
+            return res.status(403).json({ success: false, error: `Character limit reached (${MAX_CHARACTERS_PER_ACCOUNT} max). Delete a character to create a new one.` });
         }
         if (!character.stats || typeof character.stats !== 'object') {
             return res.status(400).json({ success: false, error: 'Invalid stats object' });

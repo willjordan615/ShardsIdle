@@ -42,11 +42,10 @@ async function saveCharacter(character) {
             throw new Error(errorData.error || `Server error: ${response.status}`);
         }
         const data = await response.json();
-        return data.character;
+        return { character: data.character, error: null };
     } catch (error) {
         console.error('Error saving character:', error);
-        showError('Failed to save character: ' + error.message);
-        return null;
+        return { character: null, error: error.message };
     }
 }
 
@@ -769,9 +768,10 @@ async function createCharacter() {
     gameData.characters.push(character);
     
     // Save to server (POST for new character)
-    const saved = await saveCharacter(character);
+    const { character: saved, error: saveError } = await saveCharacter(character);
     if (!saved) {
-        messagesDiv.innerHTML = '<p style="color: #ff6b6b;">Failed to save character. Check console for details.</p>';
+        messagesDiv.innerHTML = `<p style="color: #ff6b6b;">${saveError || 'Failed to save character.'}</p>`;
+        gameData.characters.pop();
         _unlock(); return;
     }
     
