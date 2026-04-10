@@ -731,18 +731,53 @@ function getCharacterClass(character, skills) {
 
         // Bard — any song-tagged skill is the definitive signal, instrument refines the title.
         // Two skill slots means a bard often has just one song skill + a utility/heal.
+        // Weapon type and dominant elemental tag both refine — a bard pairing frost_nova with
+        // chorus is a Frost Singer, not just a Bard.
         const hasSongSkill = tags.song >= 1 || keySkills.chorus || keySkills.song_of_vigor ||
             keySkills.battle_hymn || keySkills.soothing_verse || keySkills.grand_symphony ||
             keySkills.siren_call || keySkills.haunting_refrain;
         if (hasSongSkill) {
-            if (weaponType === 'flute') return keySkills.grand_symphony ? 'Virtuoso' : 'Bard';
-            if (weaponType === 'bell') return 'Choirmaster';
-            if (isInstrumentWeapon) return 'Bard';
-            if (keySkills.grand_symphony) return 'Grand Bard';
-            if (categories.healing > 0 && tags.song >= 2) return 'Battle Bard';
-            if (tags.song >= 2) return 'Bard';
-            // Single song skill without instrument — classify by what else they have
-            if (categories.healing >= 1) return 'Minstrel';
+            const deepBard = keySkills.grand_symphony || tags.song >= 2;
+            const battleBard = keySkills.battle_hymn || (categories.damageMagic > 0 && tags.song >= 1);
+            const healBard = keySkills.soothing_verse || (categories.healing > 0 && tags.song >= 1);
+
+            // Elemental singer titles — when a non-arcane element dominates alongside song
+            const elementalSinger = dominantTag && !['arcane','physical','song'].includes(dominantTag) && categories.damageMagic > 0;
+            const singerTitle = elementalSinger ? {
+                fire:      'Flame Singer',
+                cold:      'Frost Singer',
+                lightning: 'Storm Singer',
+                poison:    'Plague Singer',
+                shadow:    'Dirge Singer',
+                holy:      'Choirmaster',
+                nature:    'Nature Singer',
+            }[dominantTag] || null : null;
+
+            if (weaponType === 'flute') {
+                if (singerTitle) return singerTitle;
+                if (deepBard) return 'Virtuoso';
+                if (battleBard) return 'Battle Bard';
+                if (healBard) return 'Minstrel';
+                return 'Bard';
+            }
+            if (weaponType === 'bell') {
+                if (singerTitle) return singerTitle;
+                if (deepBard) return 'Grand Bard';
+                if (healBard) return 'Choirmaster';
+                if (battleBard) return 'Battle Bard';
+                return 'Bard';
+            }
+            if (isInstrumentWeapon) {
+                if (singerTitle) return singerTitle;
+                if (deepBard) return 'Grand Bard';
+                return 'Bard';
+            }
+            // No instrument — classify by skill depth, pairing, and element
+            if (singerTitle) return singerTitle;
+            if (deepBard) return 'Grand Bard';
+            if (battleBard && healBard) return 'Battle Bard';
+            if (battleBard) return 'Battle Bard';
+            if (healBard) return 'Minstrel';
             return 'Bard';
         }
 
