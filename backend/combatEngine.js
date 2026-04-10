@@ -2708,10 +2708,16 @@ _applyLootTagFlavour(item, tagDef) {
     // ── Determine target list from effect definitions ──
     // AOE is driven by effect targets, not category name.
     // all_enemies → all alive enemies; all_allies → all alive players
-    const hasAOEEffect = skill.effects?.some(e =>
+    // A skill is an ally-AOE only if it has NO damage effect targeting all_enemies —
+    // mixed skills (e.g. damage→all_enemies + buff→all_allies) are offensive and target
+    // enemies. The ally-side effects are handled per-effect inside applySkillEffects.
+    const hasDamageAOE = skill.effects?.some(e =>
+        e.type === 'damage' && (e.targets === 'all_enemies' || e.targets === 'all_entities')
+    );
+    const hasAOEEffect = hasDamageAOE || skill.effects?.some(e =>
         e.targets === 'all_enemies' || e.targets === 'all_allies' || e.targets === 'all_entities'
     );
-    const isAllyAOE = skill.effects?.some(e => e.targets === 'all_allies');
+    const isAllyAOE = !hasDamageAOE && skill.effects?.some(e => e.targets === 'all_allies');
 
     let targetList;
     if (hasAOEEffect) {
