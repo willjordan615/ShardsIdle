@@ -782,7 +782,7 @@
         let lastTouch = null;
         wrap.addEventListener('touchstart', e => {
             if (e.touches.length === 1) lastTouch = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-        });
+        }, { passive: true });
         wrap.addEventListener('touchmove', e => {
             if (e.touches.length === 1 && lastTouch) {
                 e.preventDefault();

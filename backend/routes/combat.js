@@ -303,6 +303,13 @@ router.post('/start', requireAuth, async (req, res) => {
             character.skills = finalSkills;
             // --- PATCH END ---
 
+            // 3b. Apply post-combat consumable quantities from the engine result.
+            // The engine decrements actor.consumables in-place during combat — participant
+            // carries the final quantities. Without this, used consumables are never persisted.
+            if (participant.consumables && typeof participant.consumables === 'object') {
+                character.consumables = { ...participant.consumables };
+            }
+
             // Log only skills that weren't in the DB before this combat (genuinely new this run)
             const existingDBIds = new Set((character.skills || []).map(s => s.skillID));
             const trulyNew = finalSkills.filter(s => s.discovered && (s.skillLevel || 0) < 1 && !existingDBIds.has(s.skillID));
