@@ -2810,7 +2810,10 @@ _applyLootTagFlavour(item, tagDef) {
             //console.log(`[STATUS] ${target.name} woke up from damage!`);
         }
 
-        // Counter-ready (single-target hits only)
+        // Stealth breaks on the actor's first damaging hit
+        if (hitDamage > 0 && actor.statusEffects?.some(e => e.id === 'stealth' && e.duration > 0)) {
+            this.statusEngine.removeStatus(actor, 'stealth');
+        }        // Counter-ready (single-target hits only)
         if (hitDamage > 0 && !hasAOEEffect) {
             const counterStatus = target.statusEffects?.find(e => e.id === 'counter_ready' && e.duration > 0);
             if (counterStatus) {
