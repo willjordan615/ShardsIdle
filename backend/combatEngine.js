@@ -1186,7 +1186,7 @@ calculateRewards(players, challenge, segments = []) {
         const [minTier, maxTier] = tierRanges[Math.min(difficulty, 8)] || [0, 0];
         const basePool = this.gear.filter(g =>
             g.tier >= minTier && g.tier <= maxTier &&
-            g.slot_id1 && !g.consumable && !g.creatureOnly && g.tier >= 0
+            g.slot_id1 && g.slot_id1 !== 'consumable' && !g.consumable && !g.creatureOnly && g.tier >= 0
         );
         const challengeTags = challenge?.tags || [];
 
