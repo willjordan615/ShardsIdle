@@ -2748,13 +2748,16 @@ _applyLootTagFlavour(item, tagDef) {
 
     // ── Non-offensive skills: apply effects only, no hit roll, no damage, no procs ──
     if (!isOffensive) {
+        const hpBefore = targetList.map(t => t.currentHP);
         targetList.forEach(t => this.applySkillEffects(skill, actor, t, null, players.concat(enemies)));
+        const totalHealingDone = targetList.reduce((sum, t, i) => sum + Math.max(0, t.currentHP - hpBefore[i]), 0);
         const _snap = (c) => (c.statusEffects || []).filter(e => e.duration > 0).map(e => ({ id: e.id, duration: e.duration }));
         return {
             roll: { hit: true, crit: false, hitCount: 1 },
             result: {
                 message: `${actor.name} uses ${skill.name}.`,
                 damageDealt: 0,
+                healingDone: totalHealingDone,
                 targets: targetList.map(t => ({ targetId: t.id, hpAfter: t.currentHP, targetStatuses: _snap(t) })),
                 success: true, delay: finalDelay,
                 actorId: actor.id, actorStatuses: _snap(actor)
