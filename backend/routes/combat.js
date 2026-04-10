@@ -649,6 +649,7 @@ router.post('/idle/collect', requireAuth, async (req, res) => {
         const summary = {
             hadSession:   true,
             challengeId,
+            partyIds,
             elapsedMs:    cappedMs,
             combatCount,
             wins:         0,

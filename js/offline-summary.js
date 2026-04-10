@@ -55,6 +55,7 @@ function _renderOfflineSummary(summary, primaryChar) {
 
     // Stash for resume-loop path
     window._offlineSummaryChallengeId = summary.challengeId;
+    window._offlineSummaryPartyIds    = summary.partyIds || null;
     window._offlineSummaryPrimaryChar = primaryChar;
 
     const charName     = primaryChar?.name || 'Your character';
@@ -315,7 +316,29 @@ async function _dismissOfflineSummary(resumeLoop) {
     try {
         const char = await getCharacter(charId);
         if (!char) return;
-        window.currentState.currentParty     = [char];
+
+        // Rebuild the original party from stored IDs
+        const storedPartyIds = window._offlineSummaryPartyIds;
+        let party = [char];
+
+        if (Array.isArray(storedPartyIds) && storedPartyIds.length > 1) {
+            const savedImports = JSON.parse(localStorage.getItem('importedCharacters') || '[]');
+            const rebuilt = await Promise.all(storedPartyIds.map(async id => {
+                if (id === charId) return char;
+                if (id.startsWith('bot_') && !id.startsWith('bot_gen_')) {
+                    return window.gameData?.bots?.find(b => b.characterID === id) || null;
+                }
+                if (id.startsWith('import_')) {
+                    return savedImports.find(i => i.characterID === id) || null;
+                }
+                // bot_gen_ can't be reconstructed after session clear — omit
+                return null;
+            }));
+            const valid = rebuilt.filter(Boolean);
+            if (valid.length > 0) party = valid;
+        }
+
+        window.currentState.currentParty     = party;
         window.currentState.selectedChallenge = challenge;
         window.currentState.idleActive        = true;
         if (typeof startCombat === 'function') startCombat();
