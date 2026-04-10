@@ -3843,10 +3843,13 @@ body:has(#combatlog.active) #headerTopBar {
     position: fixed;
     inset: 0;
     overflow-y: auto;
+    padding: 2rem 1rem 4rem;
+}
+
+#offlineSummary.active {
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    padding: 2rem 1rem 4rem;
 }
 
 #offlineSummaryInner {
