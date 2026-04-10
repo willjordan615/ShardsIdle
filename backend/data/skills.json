@@ -11022,6 +11022,7 @@
     "category": "DAMAGE_AOE",
     "isChildSkill": true,
     "isStarterSkill": false,
+    "procChance": 0.08,
     "parentSkills": [
       "battle_hymn",
       "proc_chime"
