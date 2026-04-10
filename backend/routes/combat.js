@@ -749,6 +749,17 @@ router.post('/idle/collect', requireAuth, async (req, res) => {
                     }
                     character.skills = finalSkills;
 
+                    // Sync consumable state back to liveChars so next idle combat sees correct quantities
+                    if (participant.consumables && typeof participant.consumables === 'object') {
+                        character.consumables = { ...participant.consumables };
+                    }
+                    if (participant.consumableStash && typeof participant.consumableStash === 'object') {
+                        character.consumableStash = { ...participant.consumableStash };
+                    }
+                    if (participant.keyring && typeof participant.keyring === 'object') {
+                        character.keyring = { ...participant.keyring };
+                    }
+
                     // Combat stats
                     engine.updateCombatStats(character, result, challenge);
 

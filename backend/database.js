@@ -356,81 +356,6 @@ function getCombatLogs(characterID) {
     });
 }
 
-function updateCharacterProgression(characterID, level, experience) {
-    return new Promise((resolve, reject) => {
-        db.run(
-            `INSERT INTO character_progression (characterID, level, experience, createdAt, updatedAt) 
-             VALUES (?, ?, ?, ?, ?) 
-             ON CONFLICT(characterID) DO UPDATE SET 
-             level = ?, experience = ?, updatedAt = ?, lastCombatAt = ?`,
-            [characterID, level, experience, Date.now(), Date.now(), level, experience, Date.now(), Date.now()],
-            function(err) {
-                if (err) reject(err);
-                else resolve();
-            }
-        );
-    });
-}
-
-function updateSkillProgression(characterID, skillID, skillXP, skillLevel, usageCount) {
-    return new Promise((resolve, reject) => {
-        db.run(
-            `INSERT INTO skill_progression (characterID, skillID, skillXP, skillLevel, usageCount, lastUsedAt) 
-             VALUES (?, ?, ?, ?, ?, ?) 
-             ON CONFLICT(characterID, skillID) DO UPDATE SET 
-             skillXP = ?, skillLevel = ?, usageCount = ?, lastUsedAt = ?`,
-            [characterID, skillID, skillXP, skillLevel, usageCount, Date.now(), skillXP, skillLevel, usageCount, Date.now()],
-            function(err) {
-                if (err) reject(err);
-                else resolve();
-            }
-        );
-    });
-}
-
-function addItemToInventory(characterID, itemID, quantity = 1) {
-    return new Promise((resolve, reject) => {
-        db.run(
-            `INSERT INTO character_inventory (characterID, itemID, quantity, acquiredAt) 
-             VALUES (?, ?, ?, ?) 
-             ON CONFLICT(characterID, itemID) DO UPDATE SET quantity = quantity + ?`,
-            [characterID, itemID, quantity, Date.now(), quantity],
-            function(err) {
-                if (err) reject(err);
-                else resolve();
-            }
-        );
-    });
-}
-
-function consumeItem(characterID, itemID, quantity = 1) {
-    return new Promise((resolve, reject) => {
-        db.run(
-            `UPDATE character_inventory 
-             SET quantity = quantity - ? 
-             WHERE characterID = ? AND itemID = ? AND quantity >= ?`,
-            [quantity, characterID, itemID, quantity],
-            function(err) {
-                if (err) reject(err);
-                else resolve(this.changes > 0);
-            }
-        );
-    });
-}
-
-function getCharacterInventory(characterID) {
-    return new Promise((resolve, reject) => {
-        db.all(
-            `SELECT itemID, quantity FROM character_inventory WHERE characterID = ? AND quantity > 0`,
-            [characterID],
-            (err, rows) => {
-                if (err) reject(err);
-                else resolve(rows || []);
-            }
-        );
-    });
-}
-
 function saveCharacter(character) {
     return new Promise((resolve, reject) => {
         db.run(
@@ -945,11 +870,6 @@ module.exports = {
     getCombatLogs,
     pruneCombatLogs,
     scheduleCombatLogPruning,
-    updateCharacterProgression,
-    updateSkillProgression,
-    addItemToInventory,
-    consumeItem,
-    getCharacterInventory,
     saveCharacter,
     getCharacter,
     getAllCharacters,

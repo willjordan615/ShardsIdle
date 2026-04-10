@@ -2651,7 +2651,7 @@ _applyLootTagFlavour(item, tagDef) {
     // Status delay multiplier (slow, haste, freeze, knockback, evasion_boost, speed_boost etc.)
     let statusDelayMult = 1.0;
     if (actor.statusEffects && actor.statusEffects.length > 0) {
-        const statusResult = this.statusEngine.processStatusEffects(actor);
+        const statusResult = this.statusEngine.getStatusMultipliers(actor);
         statusDelayMult = statusResult.skillDelayMultiplier || 1.0;
     }
 
@@ -3140,7 +3140,7 @@ _applyLootTagFlavour(item, tagDef) {
     // ===== STEP 7: Apply Status Effect Multipliers =====
     // Check if target has status effects that modify incoming damage
     if (target.statusEffects && target.statusEffects.length > 0) {
-      const statusResults = this.statusEngine.processStatusEffects(target);
+      const statusResults = this.statusEngine.getStatusMultipliers(target);
       if (statusResults.incomingDamageMultiplier !== 1.0) {
         finalDamage *= statusResults.incomingDamageMultiplier;
       }
@@ -3378,7 +3378,7 @@ _applyLootTagFlavour(item, tagDef) {
     let staminaMultiplier = 1.0;
     let manaMultiplier = 1.0;
     if (combatant.statusEffects && combatant.statusEffects.length > 0) {
-        const statusResult = this.statusEngine.processStatusEffects(combatant);
+        const statusResult = this.statusEngine.getStatusMultipliers(combatant);
         staminaMultiplier = statusResult.staminaRegenMultiplier || 1.0;
         manaMultiplier   = statusResult.manaRegenMultiplier    || 1.0;
     }

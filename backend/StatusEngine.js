@@ -292,6 +292,36 @@ class StatusEngine {
     }
 
     /**
+     * Read-only multiplier probe — returns only the modifier fields from active statuses
+     * without computing or returning DoT damage, healing, mana drain, or sourceHeals.
+     * Use this instead of processStatusEffects when you only need multipliers (e.g.
+     * incomingDamageMultiplier in calculateDamage, regen multipliers in regenerateResources).
+     * @param {Object} target - Character/enemy with status effects
+     * @returns {Object} - { skillDelayMultiplier, incomingDamageMultiplier, staminaRegenMultiplier, manaRegenMultiplier }
+     */
+    getStatusMultipliers(target) {
+        const result = {
+            skillDelayMultiplier:      1.0,
+            incomingDamageMultiplier:  1.0,
+            staminaRegenMultiplier:    1.0,
+            manaRegenMultiplier:       1.0,
+        };
+
+        if (!target.statusEffects || target.statusEffects.length === 0) return result;
+
+        target.statusEffects.forEach(activeStatus => {
+            const effects = this.statusMap[activeStatus.id]?.effects;
+            if (!effects) return;
+            if (effects.skillDelayMultiplier)     result.skillDelayMultiplier     *= effects.skillDelayMultiplier;
+            if (effects.incomingDamageMultiplier) result.incomingDamageMultiplier *= effects.incomingDamageMultiplier;
+            if (effects.staminaRegenMultiplier)   result.staminaRegenMultiplier   *= effects.staminaRegenMultiplier;
+            if (effects.manaRegenMultiplier)      result.manaRegenMultiplier      *= effects.manaRegenMultiplier;
+        });
+
+        return result;
+    }
+
+    /**
      * Get a summary of all status effects on a target for debugging
      * @param {Object} target - Character/enemy
      * @returns {Object} - Debug info
