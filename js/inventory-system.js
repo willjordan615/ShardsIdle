@@ -393,7 +393,33 @@ function _renderGearModal(character, activeSlot, sortKey) {
                 <button class="inv-tab ${activeSlot === s ? 'inv-tab--active' : ''}"
                         onclick="_renderGearModal(window._currentModalChar, '${s}')">${SLOT_LABELS[s]}</button>
             `).join('')}
+            <button class="inv-tab ${activeSlot === 'keyring' ? 'inv-tab--active' : ''}"
+                    onclick="_renderGearModal(window._currentModalChar, 'keyring')">Keyring</button>
         </div>`;
+
+    // ── Keyring tab ───────────────────────────────────────────────────────────
+    if (activeSlot === 'keyring') {
+        const keyring = _safeKeyring(character);
+        const keyEntries = Object.entries(keyring).filter(([, q]) => q > 0);
+        let keyRows;
+        if (keyEntries.length === 0) {
+            keyRows = '<div class="inv-empty-msg">No quest items yet.</div>';
+        } else {
+            keyRows = keyEntries.map(([itemId]) => {
+                const def = _itemDef(itemId);
+                if (!def) return '';
+                return `
+                    <div class="inv-item">
+                        <div class="inv-item__info">
+                            <div class="inv-item__name" style="color:var(--gold);">${def.name}</div>
+                            ${def.description ? `<div class="inv-item__desc" style="margin-top:4px; color:var(--text-secondary); font-size:0.85rem; line-height:1.5;">${def.description}</div>` : ''}
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+        inner.innerHTML = header + tabs + `<div class="inv-list" style="margin-top:var(--space-sm);">${keyRows}</div>`;
+        return;
+    }
 
     // ── Sort bar ──────────────────────────────────────────────────────────────
     const SORT_OPTIONS = [
@@ -502,28 +528,7 @@ function _renderGearModal(character, activeSlot, sortKey) {
         rows = '<div class="inv-empty-msg">Nothing here.</div>';
     }
 
-    // ── Keyring section ───────────────────────────────────────────────────────
-    const keyring = _safeKeyring(character);
-    const keyEntries = Object.entries(keyring).filter(([, q]) => q > 0);
-    let keyringHtml = '';
-    if (keyEntries.length > 0) {
-        const keyRows = keyEntries.map(([itemId]) => {
-            const def = _itemDef(itemId);
-            if (!def) return '';
-            return `
-                <div class="inv-item">
-                    <div class="inv-item__info">
-                        <div class="inv-item__name" style="color:var(--gold);">${def.name}</div>
-                        ${def.description ? `<div class="inv-item__stats">${def.description}</div>` : ''}
-                    </div>
-                </div>`;
-        }).join('');
-        keyringHtml = `
-            <div class="inv-section-label" style="margin-top:var(--space-md); color:var(--gold-dim); font-size:0.72rem; letter-spacing:0.09em; text-transform:uppercase;">Keyring</div>
-            <div class="inv-list" style="margin-top:var(--space-xs);">${keyRows}</div>`;
-    }
-
-    inner.innerHTML = header + tabs + sortBar + `<div class="inv-list">${rows}</div>` + keyringHtml;
+    inner.innerHTML = header + tabs + sortBar + `<div class="inv-list">${rows}</div>`;
 }
 
 
