@@ -1578,10 +1578,11 @@ _applyLootTagFlavour(item, tagDef) {
         // Buff redundancy + active buff penalty — covers UTILITY (e.g. Shadow Step) too.
         // Penalise re-casting a buff already active heavily. Penalise stacking multiple
         // different buffs moderately — a character should use buffs, not chain them endlessly.
+        // Only count active BUFFS (type: 'buff'), not debuffs on the actor, for the stack penalty.
         if (cat === 'BUFF' || cat === 'DEFENSE' || cat === 'UTILITY') {
           const primaryBuff = skill.effects?.find(e => e.type === 'apply_buff')?.buff;
           if (primaryBuff && this._targetHasDebuff(actor, primaryBuff)) score *= 0.15;
-          const activeBuffCount = (actor.statusEffects || []).filter(e => e.duration > 0).length;
+          const activeBuffCount = (actor.statusEffects || []).filter(e => e.duration > 0 && e.type === 'buff').length;
           if (activeBuffCount >= 1) score *= 0.6;
           if (activeBuffCount >= 2) score *= 0.5;
         }
@@ -1711,9 +1712,11 @@ _applyLootTagFlavour(item, tagDef) {
           if (cat && cat.includes('DAMAGE')) score *= 1.1;
         }
 
-        // Turn 1 priority: if the actor has no active buffs, heavily favour casting one
-        if ((cat === 'BUFF' || cat === 'DEFENSE') && (context.stageTurnCount || 0) <= 1) {
-          const activeBuffCount = (actor.statusEffects || []).filter(e => e.duration > 0).length;
+        // Turn 1 priority: if the actor has no active buffs, heavily favour casting one.
+        // stageTurnCount starts at stageTurns.length (pre-combat turns) so "turn 1" in
+        // practice arrives at stageTurnCount 2+. Use <= 3 to reliably catch the opener.
+        if ((cat === 'BUFF' || cat === 'DEFENSE') && (context.stageTurnCount || 0) <= 3) {
+          const activeBuffCount = (actor.statusEffects || []).filter(e => e.duration > 0 && e.type === 'buff').length;
           if (activeBuffCount === 0) score *= 4.0;
         }
 
@@ -2054,9 +2057,10 @@ _applyLootTagFlavour(item, tagDef) {
     }
 
     // ── Buff timing curve — universal ────────────────────────────────────────
-    // Turn 1 priority: if the actor has no active buffs, heavily favour casting one
-    if ((cat === 'BUFF' || cat === 'DEFENSE') && (context.stageTurnCount || 0) <= 1) {
-      const activeBuffCount = (actor.statusEffects || []).filter(e => e.duration > 0).length;
+    // Turn 1 priority: if the actor has no active buffs, heavily favour casting one.
+    // stageTurnCount starts at stageTurns.length (pre-combat turns) so use <= 3.
+    if ((cat === 'BUFF' || cat === 'DEFENSE') && (context.stageTurnCount || 0) <= 3) {
+      const activeBuffCount = (actor.statusEffects || []).filter(e => e.duration > 0 && e.type === 'buff').length;
       if (activeBuffCount === 0) score *= 4.0;
     }
 
