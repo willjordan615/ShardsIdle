@@ -842,11 +842,12 @@ async function renderRoster(page) {
             const race = getRace(character.race);
             const characterClass = getCharacterClass(character, gameData.skills);
 
-            // Top 3 active (non-intrinsic) skills, highest level first
-            const skillNames = (character.skills || [])
-                .filter(s => !s.intrinsic)
-                .sort((a, b) => (b.skillLevel || 0) - (a.skillLevel || 0))
-                .slice(0, 3)
+            // Show equipped skills: first 2 non-intrinsic slots (by array position = equipped order)
+            // plus the intrinsic racial skill. Level sort was showing old high-level unequipped skills.
+            const nonIntrinsicSkills = (character.skills || []).filter(s => !s.intrinsic);
+            const intrinsicSkills    = (character.skills || []).filter(s => s.intrinsic);
+            const equippedSkills     = [...nonIntrinsicSkills.slice(0, 2), ...intrinsicSkills.slice(0, 1)];
+            const skillNames = equippedSkills
                 .map(s => {
                     const skill = gameData.skills.find(sk => sk.id === s.skillID);
                     return skill ? skill.name : null;

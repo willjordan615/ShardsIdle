@@ -126,10 +126,9 @@ function createBrowseCard(char) {
     const characterClass = (typeof getCharacterClass === 'function' && char.skills)
         ? getCharacterClass(char, window.gameData?.skills || [])
         : null;
-    const activeSkillNames = (char.skills || [])
-        .filter(s => !s.intrinsic)
-        .sort((a, b) => (b.skillLevel || 0) - (a.skillLevel || 0))
-        .slice(0, 2)
+    const _nonIntrinsic1 = (char.skills || []).filter(s => !s.intrinsic);
+    const _intrinsic1    = (char.skills || []).filter(s => s.intrinsic);
+    const activeSkillNames = [..._nonIntrinsic1.slice(0, 2), ..._intrinsic1.slice(0, 1)]
         .map(s => window.gameData?.skills?.find(sk => sk.id === s.skillID)?.name)
         .filter(Boolean);
 
@@ -525,10 +524,9 @@ async function loadPublicCompanions(page) {
             const charClass = (typeof getCharacterClass === 'function' && char.skills)
                 ? getCharacterClass(char, window.gameData?.skills || [])
                 : null;
-            const activeSkillNames = (char.skills || [])
-                .filter(s => !s.intrinsic)
-                .sort((a, b) => (b.skillLevel || 0) - (a.skillLevel || 0))
-                .slice(0, 2)
+            const _nonIntrinsic2 = (char.skills || []).filter(s => !s.intrinsic);
+            const _intrinsic2    = (char.skills || []).filter(s => s.intrinsic);
+            const activeSkillNames = [..._nonIntrinsic2.slice(0, 2), ..._intrinsic2.slice(0, 1)]
                 .map(s => window.gameData?.skills?.find(sk => sk.id === s.skillID)?.name)
                 .filter(Boolean);
 
