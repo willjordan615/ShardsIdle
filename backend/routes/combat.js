@@ -133,11 +133,14 @@ router.post('/start', requireAuth, async (req, res) => {
                         console.log(`[COMBAT] Hydrated import "${snapshot.characterName}" from ${importRec.original_character_id}`);
                         return {
                             ...snapshot,
-                            stats:       originalChar.stats,
-                            skills:      originalChar.skills,
-                            equipment:   originalChar.equipment,
-                            consumables: originalChar.consumables || [],
-                            level:       originalChar.level,
+                            stats:            originalChar.stats,
+                            skills:           originalChar.skills,
+                            equipment:        originalChar.equipment,
+                            consumables:      originalChar.consumables      || {},
+                            consumableStash:  originalChar.consumableStash  || {},
+                            keyring:          originalChar.keyring          || {},
+                            aiProfile:        originalChar.aiProfile        || 'balanced',
+                            level:            originalChar.level,
                         };
                     }
                 }
