@@ -2340,7 +2340,7 @@ _applyLootTagFlavour(item, tagDef) {
     // so child skills with proc parents (e.g. proc_chime + shove → dissonance) can fire
     const weaponSlots = ['mainHand', 'offHand'];
     for (const slot of weaponSlots) {
-        const weaponId = character.equipment?.[slot];
+        const weaponId = this._eqId(character.equipment?.[slot]);
         if (!weaponId) continue;
         const weaponDef = this.gear.find(g => g.id === weaponId);
         if (!weaponDef) continue;
