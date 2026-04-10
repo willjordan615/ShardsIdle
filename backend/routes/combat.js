@@ -600,7 +600,7 @@ router.post('/idle/collect', requireAuth, async (req, res) => {
                 }
                 const bots = JSON.parse(fs.readFileSync(path.join(dataDir, 'bots.json'), 'utf8'));
                 const bot = bots.find(b => b.characterID === id);
-                return bot ? { ...bot, characterID: bot.characterID, characterName: bot.name, isBot: true } : null;
+                return bot ? { ...bot, characterID: bot.characterID, characterName: bot.characterName, isBot: true } : null;
             }
             const char = await db.getCharacter(id);
             if (!char) return null;

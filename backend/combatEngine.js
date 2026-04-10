@@ -267,7 +267,9 @@ class CombatEngine {
         return requiredSkills.some(id => {
           if (!equippedPool.has(id)) return false;
           const skillRecord = p.skills?.find(s => s.skillID === id);
-          // Skills with a character record require skillLevel >= 1
+          // Intrinsic (racial) skills are always valid — they don't level up like trained skills
+          if (skillRecord?.intrinsic) return true;
+          // Discovered skills require skillLevel >= 1 to be usable
           // Consumable-belt skills have no record but are valid if equipped
           if (skillRecord) return (skillRecord.skillLevel || 0) >= 1;
           return true; // consumable-linked skill — belt presence is enough
