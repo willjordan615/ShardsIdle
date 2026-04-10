@@ -2496,7 +2496,8 @@ body:has(#combatlog.active) #headerTopBar {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--space-xl);
-    margin-bottom: var(--space-xl);
+    margin-bottom: var(--space-lg);
+    align-items: start;
 }
 .detail-col-stats  { /* left column */ }
 .detail-col-gear   { /* center column */ }
@@ -2560,7 +2561,7 @@ body:has(#combatlog.active) #headerTopBar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 2rem;
+    margin-top: 1rem;
     padding-top: 1.25rem;
     border-top: 1px solid rgba(139,115,85,0.2);
 }
