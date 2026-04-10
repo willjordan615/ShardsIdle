@@ -1541,7 +1541,12 @@ _applyLootTagFlavour(item, tagDef) {
           // else target stays as primaryTarget.id
         }
 
-        let score = skill.basePower ?? 1;
+        // Base score: damage skills use basePower, but support skills (BUFF, HEALING, DEFENSE,
+        // UTILITY, RESTORATION) use basePower: 0 intentionally — that's a damage scaling value,
+        // not a usefulness value. Start them at 1.0 so scoring multipliers can work properly.
+        const isSupport = cat === 'BUFF' || cat === 'HEALING' || cat === 'HEALING_AOE' ||
+            cat === 'DEFENSE' || cat === 'UTILITY' || cat === 'RESTORATION';
+        let score = isSupport ? 1.0 : (skill.basePower ?? 1);
 
         // Berserker skips all modifiers — raw power only
         if (profile === 'berserker') return { skill, target, score };
