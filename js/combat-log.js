@@ -1575,7 +1575,10 @@ try {
 
             let xpToAward = 0;
             const skillDef = allSkills.find(s => s.id === skillID);
-            
+
+            // Desperation / fallback skills never award XP regardless of whether they're in the skill array
+            if (skillDef?.category === 'NO_RESOURCES' || skillID === 'untrained_strike') return;
+
             // --- LOGIC BRANCH A: DISCOVERY PHASE (Level 0) ---
             if (skillRef.skillLevel < 1) {
                 if (turn.isChildSkillProc) {

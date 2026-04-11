@@ -728,10 +728,11 @@ router.post('/idle/collect', requireAuth, async (req, res) => {
                         if (pid === characterId) summary.xpGained[pid] = (summary.xpGained[pid] || 0) + xpGained;
                     }
 
-                    // Skill merge (same logic as live combat route)
-                    // Offline rate: halve skill XP before merging
+                    // Skill merge — offline rate is 50% of live XP gains.
+                    // Halve the XP *delta* gained this combat, not the absolute post-combat value.
+                    // Halving the absolute value compresses previously accumulated XP to zero.
                     const incomingMap = new Map(
-                        (participant.skills || []).map(s => [s.skillID, { ...s, skillXP: (s.skillXP || 0) * 0.5 }])
+                        (participant.skills || []).map(s => [s.skillID, s])
                     );
                     const finalSkills = [];
                     const seen = new Set();
@@ -739,17 +740,30 @@ router.post('/idle/collect', requireAuth, async (req, res) => {
                         const incoming = incomingMap.get(dbSkill.skillID);
                         if (incoming) {
                             const isDiscovery = (dbSkill.skillLevel || 0) < 1;
-                            finalSkills.push(isDiscovery
-                                ? { ...incoming, skillXP: dbSkill.skillXP, skillLevel: dbSkill.skillLevel, ...(dbSkill.intrinsic ? { intrinsic: true } : {}) }
-                                : { ...dbSkill, ...incoming, skillLevel: Math.max(dbSkill.skillLevel || 0, incoming.skillLevel || 0), ...(dbSkill.intrinsic ? { intrinsic: true } : {}) }
-                            );
+                            if (isDiscovery) {
+                                finalSkills.push({ ...incoming, skillXP: dbSkill.skillXP, skillLevel: dbSkill.skillLevel, ...(dbSkill.intrinsic ? { intrinsic: true } : {}) });
+                            } else {
+                                const dbLevel = dbSkill.skillLevel || 0;
+                                const inLevel = incoming.skillLevel || 0;
+                                let newXP;
+                                if (inLevel > dbLevel) {
+                                    // Skill leveled up during combat — post-level XP is the remainder; halve it
+                                    newXP = (incoming.skillXP || 0) * 0.5;
+                                } else {
+                                    // Same level — accumulate halved delta so existing XP is preserved
+                                    const xpDelta = Math.max(0, (incoming.skillXP || 0) - (dbSkill.skillXP || 0));
+                                    newXP = (dbSkill.skillXP || 0) + xpDelta * 0.5;
+                                }
+                                finalSkills.push({ ...dbSkill, ...incoming, skillLevel: Math.max(dbLevel, inLevel), skillXP: newXP, ...(dbSkill.intrinsic ? { intrinsic: true } : {}) });
+                            }
                         } else {
                             finalSkills.push(dbSkill);
                         }
                         seen.add(dbSkill.skillID);
                     }
                     for (const s of (participant.skills || [])) {
-                        if (!seen.has(s.skillID)) finalSkills.push(s);
+                        // Newly discovered this combat — full XP from this run is their starting point, halve it
+                        if (!seen.has(s.skillID)) finalSkills.push({ ...s, skillXP: (s.skillXP || 0) * 0.5 });
                     }
                     character.skills = finalSkills;
 
