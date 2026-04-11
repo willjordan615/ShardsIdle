@@ -269,6 +269,7 @@
   },
   {
     "id": "drowned_scavenger",
+    "modifierImmunities": ["underwater"],
     "name": "Drowned Scavenger",
     "description": "A former Tidebound Initiate whose mind broke under three centuries of pressure and isolation, now a swarming predator that drags intruders into the deep.",
     "stats": {
@@ -311,6 +312,7 @@
   },
   {
     "id": "tide_lasher",
+    "modifierImmunities": ["underwater"],
     "name": "Tide Lasher",
     "description": "The enforcers of the Tidebound Penitents, who wield hooked chains to drag isolated fighters out of formation and into the depths.",
     "stats": {
@@ -359,6 +361,7 @@
   },
   {
     "id": "deep_chanter",
+    "modifierImmunities": ["underwater"],
     "name": "Deep Chanter",
     "description": "A robed ward-keeper whose hymns reinforce the armor of allies and sap the will of intruders \u2014 never attacking directly, but turning every fight in the Penitents' favor.",
     "stats": {
@@ -410,6 +413,7 @@
   },
   {
     "id": "barnacle_guard",
+    "modifierImmunities": ["underwater"],
     "name": "Barnacle Guard",
     "description": "A massive Penitent warrior encased in living crustacean shell that has fused to their body over decades, an immovable wall that absorbs punishment while Chanters work behind them.",
     "stats": {
@@ -465,6 +469,7 @@
   },
   {
     "id": "archbishop_malacor",
+    "modifierImmunities": ["underwater"],
     "name": "Archbishop Malacor",
     "description": "The three-hundred-year-old leader of the Tidebound Penitents, who has meditated so long in communion with the trapped water spirit that the boundary between them has dissolved \u2014 neither fully human nor fully spirit.",
     "stats": {
@@ -5855,6 +5860,7 @@
   },
   {
     "id": "tidebound_tide_lasher",
+    "modifierImmunities": ["underwater"],
     "name": "Tide Lasher",
     "description": "Disciplined vanguard soldiers who maintain formation even in flooded terrain \u2014 they stack Bleed and Chilled in combination to drain both health and action economy.",
     "stats": {
