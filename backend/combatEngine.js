@@ -1097,38 +1097,37 @@ calculateRewards(players, challenge, segments = []) {
     // XP with diminishing returns for larger parties
     const partyScale = 1 / (1 + 0.5 * (players.length - 1));
 
-    // Difficulty scaling — steep penalty for overlevelled parties.
+    const recommendedLevel = challenge?.recommendedLevel || 1;
+
+    // Difficulty scaling computed per-player so that a high-level character
+    // paired with low-level bots still receives the full steep penalty for
+    // their own level — not a diluted average.
     // 0-5 over recommended: gentle reduction
     // 6-10 over: steep drop
     // 11-20 over: near zero
     // 20+ over: effectively nothing (1%)
-    const avgPartyLevel = players.reduce((sum, p) => sum + (p.level || 1), 0) / players.length;
-    const recommendedLevel = challenge?.recommendedLevel || 1;
-    const levelDelta = avgPartyLevel - recommendedLevel;
-    let difficultyScale;
-    if (levelDelta <= 0) {
-        // Under or at recommended level — bonus XP for punching up, capped at 2×
-        difficultyScale = Math.min(2.0, 1 / Math.max(0.5, 1 + levelDelta * 0.15));
-    } else if (levelDelta <= 5) {
-        // 1-5 over: gentle reduction (1.0 down to ~0.57)
-        difficultyScale = 1 / (1 + levelDelta * 0.12);
-    } else if (levelDelta <= 10) {
-        // 6-10 over: steep drop (~0.5 down to ~0.15)
-        const base = 1 / (1 + 5 * 0.12);
-        difficultyScale = base * Math.pow(0.6, levelDelta - 5);
-    } else if (levelDelta <= 20) {
-        // 11-20 over: near zero (~0.09 down to ~0.01)
-        const base = (1 / (1 + 5 * 0.12)) * Math.pow(0.6, 5);
-        difficultyScale = base * Math.pow(0.75, levelDelta - 10);
-    } else {
-        // 20+ over: effectively nothing
-        difficultyScale = 0.01;
-    }
+    const getDifficultyScale = (playerLevel) => {
+        const delta = (playerLevel || 1) - recommendedLevel;
+        if (delta <= 0) {
+            return Math.min(2.0, 1 / Math.max(0.5, 1 + delta * 0.15));
+        } else if (delta <= 5) {
+            return 1 / (1 + delta * 0.12);
+        } else if (delta <= 10) {
+            const base = 1 / (1 + 5 * 0.12);
+            return base * Math.pow(0.6, delta - 5);
+        } else if (delta <= 20) {
+            const base = (1 / (1 + 5 * 0.12)) * Math.pow(0.6, 5);
+            return base * Math.pow(0.75, delta - 10);
+        } else {
+            return 0.01;
+        }
+    };
 
     // Secret path bonus: 2x XP
     const secretXPMultiplier = secretCompleted ? 2.0 : 1.0;
 
     players.forEach(player => {
+        const difficultyScale = getDifficultyScale(player.level);
         const xpReward = Math.floor(baseXP * partyScale * difficultyScale * secretXPMultiplier * (1 + (player.stats?.harmony || 0) / 750));
         rewards.experienceGained[player.id] = xpReward;
     });
