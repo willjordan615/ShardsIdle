@@ -3358,11 +3358,17 @@ _applyLootTagFlavour(item, tagDef) {
             }
         } else if (effect.type === 'apply_buff' && effect.buff) {
             // sacred_ground: buffs applied to player combatants have their duration extended.
+            // Only multiplies when effect.duration is explicitly set — preserves StatusEngine's
+            // defaultDuration fallback for skills that don't define a duration on the effect.
             const sacredMod = actor.activeDungeonModifiers?.find(m => m.type === 'environmental' && m.id === 'sacred_ground');
             const sacredMultiplier = sacredMod?.buffDurationMultiplier ?? 1;
-            const _buffDuration = (target) => target?.type === 'player'
-                ? Math.round((effect.duration || 1) * sacredMultiplier)
-                : (effect.duration || 1);
+            const _buffDuration = (buffTarget) => {
+                if (effect.duration == null) return effect.duration; // preserve StatusEngine defaultDuration
+                if (buffTarget?.type !== 'player') return effect.duration;
+                const extended = Math.round(effect.duration * sacredMultiplier);
+                if (sacredMultiplier !== 1) console.warn(`[SACRED_GROUND] ${effect.buff} on ${buffTarget.name}: ${effect.duration} → ${extended} turns (x${sacredMultiplier})`);
+                return extended;
+            };
 
             let buffTarget = actor;
             if (effect.targets === 'single_ally' && target && target.type === 'player') buffTarget = target;
