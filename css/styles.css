@@ -1136,7 +1136,7 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
 /* ============================================================
    MODALS
    ============================================================ */
-[id$="Modal"]:not(#mapModal) {
+[id$="Modal"]:not(.map-modal) {
     display:none; position:fixed; inset:0;
     background:rgba(0,0,0,0.88);
     z-index:1000; overflow-y:auto;
@@ -1161,7 +1161,7 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
     color: var(--text-muted);
 }
 
-[id$="Modal"]:not(#mapModal) > div {
+[id$="Modal"]:not(.map-modal) > div {
     max-width:1200px; margin:2rem auto;
     background: linear-gradient(135deg, var(--window-base) 0%, var(--window-deep) 100%);
     border: 1px solid var(--gold-border);
@@ -1696,7 +1696,7 @@ input[type="checkbox"] { accent-color: var(--gold); width:1rem; height:1rem; }
     h2 { font-size:0.95rem; margin-bottom:0.75rem; }
     h3 { font-size:0.8rem; margin-bottom:0.5rem; }
     .combat-log { height:360px; }
-    [id$="Modal"]:not(#mapModal) > div { margin:0.75rem; padding:var(--space-lg); }
+    [id$="Modal"]:not(.map-modal) > div { margin:0.75rem; padding:var(--space-lg); }
 
 
 
