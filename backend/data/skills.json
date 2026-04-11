@@ -2737,7 +2737,7 @@
     "isStarterSkill": false,
     "parentSkills": [
       "first_aid",
-      "heal_major"
+      "heal_major2"
     ],
     "procChance": 0.05,
     "basePower": 0.52,
