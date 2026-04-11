@@ -418,7 +418,43 @@
         _bindEvents(wrap);
     }
 
+    function _clampPan() {
+        // Gather all active node positions (hubs always, child nodes when a hub is open)
+        const allNodes = _openHubId
+            ? [..._hubs, ..._childNodes]
+            : _hubs;
+        if (!allNodes.length) return;
+
+        const wrap = document.getElementById('skillTreeCanvasWrap');
+        if (!wrap) return;
+        const W = wrap.clientWidth, H = wrap.clientHeight;
+
+        // Compute bounding box in screen space
+        let minSX = Infinity, maxSX = -Infinity, minSY = Infinity, maxSY = -Infinity;
+        for (const n of allNodes) {
+            const sx = _pan.x + n.x * _zoom;
+            const sy = _pan.y + n.y * _zoom;
+            if (sx < minSX) minSX = sx;
+            if (sx > maxSX) maxSX = sx;
+            if (sy < minSY) minSY = sy;
+            if (sy > maxSY) maxSY = sy;
+        }
+
+        // Require at least MARGIN px of the node spread to remain inside the canvas
+        const MARGIN = 80;
+
+        // Clamp: if all nodes have scrolled past the right edge, pull back
+        if (minSX > W - MARGIN) _pan.x -= (minSX - (W - MARGIN));
+        // If all nodes have scrolled past the left edge
+        if (maxSX < MARGIN)     _pan.x += (MARGIN - maxSX);
+        // Bottom
+        if (minSY > H - MARGIN) _pan.y -= (minSY - (H - MARGIN));
+        // Top
+        if (maxSY < MARGIN)     _pan.y += (MARGIN - maxSY);
+    }
+
     function _applyTransform() {
+        _clampPan();
         if (_g) _g.setAttribute('transform', `translate(${_pan.x},${_pan.y}) scale(${_zoom})`);
     }
 
