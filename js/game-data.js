@@ -358,11 +358,22 @@ function getCharacterClass(character, skills) {
             : [];
 
         const charSkills = character.skills || [];
-        // Filter to learned, non-intrinsic skills for class determination (active combat skills)
-        // Intrinsics are racial bonuses, not build choices
+
+        // Equipped pool: first 2 non-intrinsic slots + all intrinsics — mirrors the combat engine.
+        // These are what the character actually uses in a fight and carry 3× weight below.
+        const equippedSet = new Set();
+        let slotsFilled = 0;
+        for (const s of charSkills) {
+            if (!s) continue;
+            if (s.intrinsic) { equippedSet.add(s.skillID); continue; }
+            if (slotsFilled < 2) { equippedSet.add(s.skillID); slotsFilled++; }
+        }
+        const SLOT_WEIGHT = 3; // equipped skills count this many times more than discovered-only skills
+
+        // All learned skills contribute to identity (deep investment is a real signal),
+        // but only equipped skills can trigger keySkills archetype checks.
         const activeSkills = charSkills.filter(s =>
             s &&
-            !s.intrinsic &&
             s.learned !== false &&
             (s.skillLevel || 0) >= 1
         );
@@ -525,6 +536,13 @@ function getCharacterClass(character, skills) {
                     childSkillCount++;
                 }
 
+                // Equipped skills carry SLOT_WEIGHT times more signal than discovered-only skills.
+                // This ensures what a character actually slots defines their class,
+                // while deep off-slot investment still contributes to elemental identity.
+                const isEquipped = equippedSet.has(skillEntry.skillID);
+                const catWeight   = isEquipped ? SLOT_WEIGHT : 1;
+                const levelWeight = (skillEntry.skillLevel || 1) * catWeight;
+
                 // Category Counting
                 if (category.includes('DAMAGE')) {
                     const hasPhysical = effects.some(e =>
@@ -535,24 +553,23 @@ function getCharacterClass(character, skills) {
                     ) || category.includes('MAGIC');
 
                     if (hasPhysical && hasMagic) {
-                        categories.damageMagic++;
-                        categories.damagePhysical++;
+                        categories.damageMagic    += catWeight;
+                        categories.damagePhysical += catWeight;
                     } else if (hasMagic) {
-                        categories.damageMagic++;
+                        categories.damageMagic    += catWeight;
                     } else {
-                        categories.damagePhysical++;
+                        categories.damagePhysical += catWeight;
                     }
                 }
 
-                if (category === 'HEALING' || category === 'HEALING_AOE') categories.healing++;
-                if (category === 'BUFF') categories.buff++;
-                if (category === 'DEFENSE') categories.defense++;
-                if (category === 'CONTROL') categories.control++;
-                if (category === 'UTILITY') categories.utility++;
-                if (category === 'RESTORATION') categories.restoration++;
+                if (category === 'HEALING' || category === 'HEALING_AOE') categories.healing     += catWeight;
+                if (category === 'BUFF')                                   categories.buff        += catWeight;
+                if (category === 'DEFENSE')                                categories.defense     += catWeight;
+                if (category === 'CONTROL')                                categories.control     += catWeight;
+                if (category === 'UTILITY')                                categories.utility     += catWeight;
+                if (category === 'RESTORATION')                            categories.restoration += catWeight;
 
-                // Tag Counting (from skill tags) — weighted by skill level to reflect investment depth
-                const levelWeight = skillEntry.skillLevel || 1;
+                // Tag counting — weighted by level × slot so both investment depth and active slotting matter
                 skillTags.forEach(tag => {
                     if (tag && typeof tag === 'string') {
                         const t = tag.toLowerCase();
@@ -560,7 +577,6 @@ function getCharacterClass(character, skills) {
                     }
                 });
 
-                // Tag Counting (from effect damage types) — also level-weighted
                 effects.forEach(effect => {
                     if (effect && effect.type === 'damage' && effect.damageType) {
                         const dt = effect.damageType.toLowerCase();
@@ -571,14 +587,15 @@ function getCharacterClass(character, skills) {
 
                 // Track scaling factors
                 if (skillScalingFactors.conviction) skillScaling.conviction += skillScalingFactors.conviction;
-                if (skillScalingFactors.endurance) skillScaling.endurance += skillScalingFactors.endurance;
-                if (skillScalingFactors.ambition) skillScaling.ambition += skillScalingFactors.ambition;
-                if (skillScalingFactors.harmony) skillScaling.harmony += skillScalingFactors.harmony;
+                if (skillScalingFactors.endurance)  skillScaling.endurance  += skillScalingFactors.endurance;
+                if (skillScalingFactors.ambition)   skillScaling.ambition   += skillScalingFactors.ambition;
+                if (skillScalingFactors.harmony)    skillScaling.harmony    += skillScalingFactors.harmony;
 
-                // Track key skills
-                const sid = skill.id.toLowerCase();
-                if (keySkills[sid] !== undefined) {
-                    keySkills[sid] = true;
+                // keySkills flags: only set when the skill is equipped — archetype checks
+                // (Assassin, Berserker, etc.) require the skill to actually be in play
+                if (isEquipped) {
+                    const sid = skill.id.toLowerCase();
+                    if (keySkills[sid] !== undefined) keySkills[sid] = true;
                 }
 
             } catch (skillErr) {
