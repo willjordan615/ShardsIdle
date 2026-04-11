@@ -1,0 +1,16 @@
+[
+  {
+    "id": "sudden_death",
+    "type": "sudden_death",
+    "description": "Escalating field damage after a turn threshold forces stalled fights to conclude. Healing effectiveness is also suppressed.",
+    "threshold": 100,
+    "baseDamage": 0.04,
+    "escalationRate": 0.02,
+    "escalationInterval": 10,
+    "healSuppression": {
+      "initialEffectiveness": 0.20,
+      "dropPerInterval": 0.08,
+      "interval": 10
+    }
+  }
+]

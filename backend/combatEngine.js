@@ -489,9 +489,24 @@ class CombatEngine {
       return rolls ? { ...base, ...rolls } : base;
   }
 
-  runCombat(partySnapshots, challenge) {
+  runCombat(partySnapshots, challenge, dungeonModifiers = []) {
     const combatID = 'combat_' + crypto.randomBytes(8).toString('hex');
     const startTime = Date.now();
+
+    // Resolve dungeon modifiers — auto-inject default sudden_death if no sudden_death type is present.
+    // This preserves existing behaviour for all calls that don't pass explicit modifiers.
+    const activeDungeonModifiers = Array.isArray(dungeonModifiers) ? [...dungeonModifiers] : [];
+    if (!activeDungeonModifiers.some(m => m.type === 'sudden_death')) {
+      activeDungeonModifiers.push({
+        type: 'sudden_death',
+        threshold: 100,
+        baseDamage: 0.04,
+        escalationRate: 0.02,
+        escalationInterval: 10,
+        healSuppression: { initialEffectiveness: 0.20, dropPerInterval: 0.08, interval: 10 }
+      });
+    }
+    const suddenDeathMod = activeDungeonModifiers.find(m => m.type === 'sudden_death') || null;
 
     const playerCharacters = partySnapshots.map((snapshot, idx) => {
       const stats = snapshot.stats || { conviction: 0, endurance: 0, ambition: 0, harmony: 0 };
@@ -556,6 +571,10 @@ class CombatEngine {
         aiProfile: snapshot.aiProfile || 'balanced'
       };
     });
+
+    // Attach active modifiers to each combatant so sub-methods (applySkillEffects, etc.)
+    // can read them without requiring extra parameters threaded through every call.
+    playerCharacters.forEach(c => { c.activeDungeonModifiers = activeDungeonModifiers; });
 
     const segments = [];
     let globalTurnCount = 0;
@@ -696,6 +715,7 @@ class CombatEngine {
       // ----------------------
 
       const enemies = this.initializeEnemies(stageEnemyDefs);
+      enemies.forEach(c => { c.activeDungeonModifiers = activeDungeonModifiers; });
       const initiative = this.calculateInitiative(playerCharacters, enemies, partySnapshots);
       const turnOrder = [...initiative].sort((a, b) => b.initiative - a.initiative);
 
@@ -728,8 +748,6 @@ class CombatEngine {
       // Reset lastUsedSkillId and buffCooldowns at the start of each stage
       playerCharacters.forEach(p => { p.lastUsedSkillId = null; p.buffCooldowns = {}; });
 
-      const SUDDEN_DEATH_START = 100;   // turn within a stage where escalation begins
-      const SUDDEN_DEATH_BASE  = 0.04;  // 4% max HP at turn 100, +2% per 10 turns after
       let stageTurnCount = stageTurns.length;
       const startStageHP = playerCharacters.map(p => ({ id: p.id, hp: p.currentHP }));
 
@@ -758,7 +776,7 @@ class CombatEngine {
 
           if (combatant.type === 'player') {
             const playerChar = playerCharacters.find(p => p.id === combatant.id);
-            const context = this._buildContext(stageIndex, allStages, playerCharacters, enemies, playerChar, stageTurnCount);
+            const context = this._buildContext(stageIndex, allStages, playerCharacters, enemies, playerChar, stageTurnCount, { suddenDeathThreshold: suddenDeathMod?.threshold ?? 100 });
             const action = this.selectAction(playerChar, playerCharacters, enemies, context, {
               isEnemy: false,
               focusChance: 1.0,
@@ -795,7 +813,7 @@ class CombatEngine {
             const enemy = enemies.find(e => e.id === combatant.id);
             if (!enemy || enemy.defeated || enemy.currentHP <= 0) continue;
             
-            const context = this._buildContext(stageIndex, allStages, playerCharacters, enemies, enemy, stageTurnCount);
+            const context = this._buildContext(stageIndex, allStages, playerCharacters, enemies, enemy, stageTurnCount, { suddenDeathThreshold: suddenDeathMod?.threshold ?? 100 });
             const enemyProfile = enemy.aiProfile || 'aggressive';
             const enemyFocusChance = { aggressive: 0.70, tactical: 0.65, berserker: 0.40, support: 0.55 }[enemyProfile] ?? 0.70;
             const action = this.selectAction(enemy, enemies, playerCharacters, context, {
@@ -900,15 +918,15 @@ class CombatEngine {
           }
         });
 
-        // ── Sudden death — escalating damage when fights drag on ──────────────
-        if (stageTurnCount > SUDDEN_DEATH_START) {
-          const overtime = stageTurnCount - SUDDEN_DEATH_START;
-          const pct = SUDDEN_DEATH_BASE + Math.floor(overtime / 10) * 0.02;
+        // ── Dungeon modifier: sudden_death — escalating field damage when fights drag on ──
+        if (suddenDeathMod && stageTurnCount > suddenDeathMod.threshold) {
+          const overtime = stageTurnCount - suddenDeathMod.threshold;
+          const escalationSteps = Math.floor(overtime / (suddenDeathMod.escalationInterval || 10));
+          const pct = (suddenDeathMod.baseDamage || 0.04) + escalationSteps * (suddenDeathMod.escalationRate || 0.02);
           const allCombatants = [...playerCharacters, ...enemies].filter(c => !c.defeated);
           if (allCombatants.length > 0) {
-            // Mark sudden death active on all combatants — reduces healing effectiveness
+            // Increment per-combatant turn counter — used by applySkillEffects to scale heal suppression
             allCombatants.forEach(c => {
-              c.suddenDeathActive = true;
               c.suddenDeathTurn = (c.suddenDeathTurn || 0) + 1;
             });
             console.warn(`[SUDDEN DEATH] Turn ${stageTurnCount}: dealing ${(pct*100).toFixed(0)}% max HP to all combatants`);
@@ -1841,7 +1859,7 @@ _applyLootTagFlavour(item, tagDef) {
   /**
    * Build the context object passed to both action selectors each turn.
    */
-  _buildContext(stageIndex, allStages, players, enemies, actor, stageTurnCount = 0) {
+  _buildContext(stageIndex, allStages, players, enemies, actor, stageTurnCount = 0, { suddenDeathThreshold = 100 } = {}) {
     const totalStages     = allStages.length;
     const stagesRemaining = Math.max(0, totalStages - stageIndex - 1);
     const aliveEnemies    = enemies.filter(e => !e.defeated);
@@ -1860,7 +1878,7 @@ _applyLootTagFlavour(item, tagDef) {
       stageTurnCount,
       lastUsedSkillId:  actor.lastUsedSkillId || null,
       lastHitDamagePct: actor.lastHitDamagePct || 0,
-      suddenDeathActive: stageTurnCount > 100,
+      suddenDeathActive: stageTurnCount > suddenDeathThreshold,
       // Budget ratios only meaningful for players persisting across stages.
       // Enemies respawn fresh each stage so conservation pressure doesn't apply.
       staminaBudgetRatio: actor.type === 'player'
@@ -3187,9 +3205,14 @@ _applyLootTagFlavour(item, tagDef) {
                 recipient = actor;
                 const harmonyScale = 1 + ((actor.stats?.harmony || 0) / 300);
                 let healAmount = Math.max(1, Math.floor((target?.maxHP || 1) * effect.magnitude * harmonyScale));
-                if (actor.suddenDeathActive) {
+                const sdModLifetap = actor.activeDungeonModifiers?.find(m => m.type === 'sudden_death');
+                if (sdModLifetap && (actor.suddenDeathTurn || 0) > 0) {
+                    const hs = sdModLifetap.healSuppression || {};
                     const sdOvertime = actor.suddenDeathTurn || 0;
-                    healAmount = Math.floor(healAmount * Math.max(0.0, 0.20 - Math.floor(sdOvertime / 10) * 0.08));
+                    const effectiveness = Math.max(0.0,
+                        (hs.initialEffectiveness ?? 0.20) - Math.floor(sdOvertime / (hs.interval ?? 10)) * (hs.dropPerInterval ?? 0.08)
+                    );
+                    healAmount = Math.floor(healAmount * effectiveness);
                 }
                 recipient.currentHP = Math.min(recipient.maxHP, recipient.currentHP + healAmount);
                 //console.log(`[LIFETAP] ${skill.name}: ${actor.name} leeches ${healAmount} HP (harmony scale ${harmonyScale.toFixed(2)})`);
@@ -3239,11 +3262,15 @@ _applyLootTagFlavour(item, tagDef) {
                 restoreAmount = Math.floor(maxPoolValue * effect.magnitude * scaleMultiplier);
             }
 
-            // Sudden death — healing drops sharply to ensure stalled fights end.
-            // Starts at 20%, drops 8% per 10 turns. Floor: 0% (no healing at all eventually).
-            if (poolType === 'hp' && actor.suddenDeathActive) {
-                const sdOvertime = (actor.suddenDeathTurn || 0);
-                const healEffectiveness = Math.max(0.0, 0.20 - Math.floor(sdOvertime / 10) * 0.08);
+            // Dungeon modifier: sudden_death — healing drops sharply to ensure stalled fights end.
+            // Parameters (initialEffectiveness, dropPerInterval, interval) come from the modifier config.
+            const sdModHeal = actor.activeDungeonModifiers?.find(m => m.type === 'sudden_death');
+            if (poolType === 'hp' && sdModHeal && (actor.suddenDeathTurn || 0) > 0) {
+                const hs = sdModHeal.healSuppression || {};
+                const sdOvertime = actor.suddenDeathTurn || 0;
+                const healEffectiveness = Math.max(0.0,
+                    (hs.initialEffectiveness ?? 0.20) - Math.floor(sdOvertime / (hs.interval ?? 10)) * (hs.dropPerInterval ?? 0.08)
+                );
                 restoreAmount = Math.floor(restoreAmount * healEffectiveness);
             }
 

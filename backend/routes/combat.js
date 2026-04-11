@@ -39,6 +39,19 @@ async function acquireCharacterLocks(characterIds) {
 }
 
 let combatEngine;
+let modifierDefs = [];
+
+/**
+ * Resolve a challenge's modifier list (array of string IDs) to full modifier objects.
+ * Unknown IDs are silently skipped. If the challenge has no modifiers field, returns [].
+ * The engine will auto-inject a default sudden_death modifier if no sudden_death type is present.
+ */
+function resolveModifiers(challenge) {
+    if (!Array.isArray(challenge.modifiers) || challenge.modifiers.length === 0) return [];
+    return challenge.modifiers
+        .map(id => modifierDefs.find(m => m.id === id))
+        .filter(Boolean);
+}
 
 function initializeCombatEngine() {
     if (!combatEngine) {
@@ -50,6 +63,9 @@ function initializeCombatEngine() {
             const gear       = JSON.parse(fs.readFileSync(path.join(dataDir, 'items.json'),         'utf8'));
             const statuses   = JSON.parse(fs.readFileSync(path.join(dataDir, 'statuses.json'),      'utf8'));
             const lootTags   = JSON.parse(fs.readFileSync(path.join(dataDir, 'loot-tags.json'),     'utf8'));
+            try {
+                modifierDefs = JSON.parse(fs.readFileSync(path.join(dataDir, 'modifiers.json'), 'utf8'));
+            } catch(e) { console.warn('[COMBAT] No modifiers.json or parse error — modifier resolution will use engine defaults.'); }
 
             const statusEngine = new StatusEngine(statuses);
             combatEngine = new CombatEngine(skills, enemyTypes, races, gear, statusEngine, lootTags);
@@ -163,7 +179,7 @@ router.post('/start', requireAuth, async (req, res) => {
                 challenge._lastSuccessfulChallengeId   = lastId;
             }
         }
-        const result = combatEngine.runCombat(hydratedSnapshots, challenge);
+        const result = combatEngine.runCombat(hydratedSnapshots, challenge, resolveModifiers(challenge));
 
         const isVictory = result.result === 'victory';
         const isDefeat  = result.result === 'defeat' || result.result === 'loss';
@@ -699,7 +715,7 @@ router.post('/idle/collect', requireAuth, async (req, res) => {
                 };
             });
 
-            const result = engine.runCombat(currentParty, challenge);
+            const result = engine.runCombat(currentParty, challenge, resolveModifiers(challenge));
             const isVictory = result.result === 'victory';
             const isDefeat  = result.result === 'defeat' || result.result === 'loss';
 
