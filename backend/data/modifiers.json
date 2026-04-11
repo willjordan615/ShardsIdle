@@ -12,5 +12,13 @@
       "dropPerInterval": 0.08,
       "interval": 10
     }
-  }
+  },
+  {
+  "id": "underwater",
+  "type": "environmental",
+  "description": "Combat takes place underwater. All combatants are slowed for the duration of the fight.",
+  "applyOnStart": [
+    { "statusId": "slow", "duration": 999, "magnitude": 1, "targets": "all" }
+  ]
+}
 ]

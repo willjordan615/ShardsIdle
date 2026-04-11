@@ -716,6 +716,27 @@ class CombatEngine {
 
       const enemies = this.initializeEnemies(stageEnemyDefs);
       enemies.forEach(c => { c.activeDungeonModifiers = activeDungeonModifiers; });
+
+      // ── Dungeon modifier applyOnStart — apply status effects at stage entry ──
+      // Enemies re-initialise each stage, so this runs per-stage for both sides.
+      // Players are never immune. Enemies may declare immunity via modifierImmunities
+      // in their enemy-types.json definition (already present on the object if set).
+      for (const mod of activeDungeonModifiers) {
+        if (!Array.isArray(mod.applyOnStart) || mod.applyOnStart.length === 0) continue;
+        for (const effect of mod.applyOnStart) {
+          const targets = effect.targets === 'all'
+            ? [...playerCharacters, ...enemies]
+            : effect.targets === 'players' ? [...playerCharacters]
+            : effect.targets === 'enemies'  ? [...enemies]
+            : [];
+          for (const combatant of targets) {
+            if (combatant.defeated) continue;
+            if (combatant.type !== 'player' && Array.isArray(combatant.modifierImmunities) && combatant.modifierImmunities.includes(mod.id)) continue;
+            this.statusEngine.applyStatus(combatant, effect.statusId, effect.duration, effect.magnitude);
+          }
+        }
+      }
+
       const initiative = this.calculateInitiative(playerCharacters, enemies, partySnapshots);
       const turnOrder = [...initiative].sort((a, b) => b.initiative - a.initiative);
 
