@@ -48,6 +48,7 @@ ShardsIdle/
 │   │   ├── bots.json               # Pre-built NPC party members (hardcoded)
 │   │   ├── companions.json         # Story companions (Elara, Krog, Hrolf, etc.)
 │   │   ├── loot-tags.json          # Item categorisation for drop logic
+│   │   ├── modifiers.json          # Dungeon modifier definitions (sudden_death, sacred_ground, etc.)
 │   │   └── tuning.json             # Runtime balance constants
 │   └── routes/
 │       ├── auth.js                 # Login/register/guest auth, sessions, rate limiting
@@ -117,7 +118,7 @@ Stat scale constant: `STAT_SCALE = 300`. Most stat modifiers use `stat / STAT_SC
 
 ### combatEngine.js — CombatEngine class
 
-**Main entry:** `runCombat(partySnapshots, challenge)` → `{ result, participants, log, rewards }`
+**Main entry:** `runCombat(partySnapshots, challenge, dungeonModifiers = [])` → `{ result, participants, log, rewards }`
 
 **Core flow:**
 1. `resolvePreCombatPhase()` — skill/stat/item opportunity checks with narrative outcomes
@@ -190,6 +191,113 @@ All of `skills`, `consumables`, `consumableStash`, `keyring` are post-combat sta
 
 ---
 
+### Dungeon Modifier System
+
+Modifiers are field-level effects that alter combat conditions for the duration of a challenge. Defined in `backend/data/modifiers.json`, referenced by ID in `challenges.json`, resolved to full objects server-side before being passed into `runCombat`.
+
+**`modifiers.json` schema:**
+```json
+{
+  "id": "sacred_ground",
+  "type": "environmental",          // "environmental" | "sudden_death"
+  "description": "...",
+  "buffDurationMultiplier": 1.5,    // modifier-specific config fields (vary by type)
+  "applyOnStart": [                 // effects applied at stage entry
+    {
+      "type": "apply_status",       // or "dot_pct", "regen_pct" (per-turn), or omit for backward-compat status apply
+      "statusId": "weaken",
+      "targets": "enemies",         // "players" | "enemies" | "all"
+      "duration": 999,
+      "magnitude": 2,
+      "targetTags": ["undead"],     // only apply to enemies with ANY of these tags
+      "immuneTags": ["sacred"]      // skip enemies with ANY of these tags
+    }
+  ],
+  "vignette": {
+    "color": "212, 175, 55",        // RGB string
+    "opacity": 0.18,
+    "persistent": true              // true = show at combat start; false = trigger at threshold
+  }
+}
+```
+
+**Resolution flow (`routes/combat.js`):**
+- `modifiers.json` is loaded once at startup inside `initializeCombatEngine()`
+- `resolveModifiers(challenge)` maps `challenge.modifiers` (array of ID strings) to full modifier objects
+- Both live and idle `runCombat` calls pass the resolved array as the third argument
+
+**Engine injection (`combatEngine.js` — top of `runCombat`):**
+- `activeDungeonModifiers` array is built from the passed modifiers
+- If no `sudden_death` type modifier is present, one is auto-injected with default parameters (threshold 100, baseDamage 0.04)
+- `suddenDeathMod` is extracted as a convenience reference
+- `activeDungeonModifiers` is attached to every player and enemy combatant object so sub-methods can read it without parameter threading:
+  ```js
+  playerCharacters.forEach(c => { c.activeDungeonModifiers = activeDungeonModifiers; });
+  enemies.forEach(c => { c.activeDungeonModifiers = activeDungeonModifiers; });
+  ```
+
+**`applyOnStart` handler (stage entry, `initializeEnemies` call site):**
+- Effects without a `type` field: treated as legacy status apply — calls `statusEngine.applyStatus` directly
+- `type: "apply_status"`: filters targets by `targetTags` (must have at least one) and `immuneTags` (skip if any match), then checks each enemy's `modifierImmunities` array — if the modifier `id` is listed, that enemy is skipped entirely. Players are never immune via this system.
+- `type: "regen_pct"` / `type: "dot_pct"`: skipped at stage entry; handled per-turn instead (see below)
+
+**Per-turn environmental effects (main turn loop):**
+- `regen_pct`: restores `magnitudePerTurn * maxHP` to each living target each turn
+- `dot_pct`: deals `magnitudePerTurn * maxHP` to each living target each turn, bypassing defenses. `corrupted_field` uses this targeting `"players"` only — enemies are never affected.
+
+**`initializeEnemies`:** Enemy combat objects include `tags` and `modifierImmunities` from the enemy-type definition. Both fields are required for immunity checks to work — they were silently absent before this system was added.
+
+**`sacred_ground` — buff duration extension (`applySkillEffects`):**
+- When `actor.activeDungeonModifiers` contains a modifier with `id === 'sacred_ground'`, any `apply_buff` effect targeting a player combatant has its duration multiplied by `buffDurationMultiplier` (default 1.5, stored in the modifier config)
+- Applies to both single-target and `all_allies` buff paths
+- Enemy buffs are unaffected (type check on the buff target)
+
+**Modifier-specific config fields (by type):**
+
+| Modifier | Key fields |
+|---|---|
+| `sudden_death` | `threshold`, `baseDamage`, `escalationRate`, `escalationInterval`, `healSuppression` |
+| `sacred_ground` | `buffDurationMultiplier`, `applyOnStart` |
+| `corrupted_field` | `applyOnStart` (dot_pct on players) |
+| `underwater` | `applyOnStart` (slow status on all) |
+
+**`modifierImmunities` on enemy types (`enemy-types.json`):**
+- Array of modifier IDs the enemy is immune to: `"modifierImmunities": ["underwater"]`
+- Enemies immune to a modifier skip all its `applyOnStart` status effects
+- Currently assigned: `drowned_scavenger`, `tide_lasher`, `barnacle_guard`, `deep_chanter`, `archbishop_malacor`, `tidebound_tide_lasher` are all immune to `underwater`
+
+**Challenges with modifiers assigned (`challenges.json`):**
+
+| Challenge ID | Modifiers |
+|---|---|
+| `challenge_tidebound_forward_basin` | `["underwater"]` |
+| `challenge_whispering_willow_shrine` | `["sacred_ground"]` |
+| `challenge_shrine_first_oath` | `["sacred_ground"]` |
+| `challenge_vault_of_the_unmade` | `["corrupted_field"]` |
+| `challenge_threshold_of_echoes` | `["corrupted_field"]` |
+| `challenge_spire_fractured_time` | `["corrupted_field"]` |
+
+All other challenges have no `modifiers` field and receive the default `sudden_death` auto-inject only.
+
+**Data API:** `modifiers.json` is exposed via `GET /api/data` as `gameData.modifiers` (loaded in `routes/data.js`).
+
+---
+
+### Vignette System (`js/combat-log.js`)
+
+Modifier vignettes are screen-edge box-shadow overlays applied during combat to signal active field conditions.
+
+- `_getActiveModifiers()` — resolves the active modifier list client-side: reads `window.currentState.selectedChallenge.modifiers` (ID array), looks up full defs from `window.gameData.modifiers`. Mirrors the server-side auto-inject: if no `sudden_death` type is present, the `sudden_death` def is appended. This ensures challenges that list only e.g. `["underwater"]` still get the red vignette when sudden death triggers.
+- `_getOrCreateVignetteEl(modId)` — creates or returns a `div#modifier-vignette-{modId}` element injected into the combat container
+- `_applyModifierVignette(mod)` — sets `box-shadow: inset 0 0 220px 80px rgba(color, opacity)` and makes the element visible
+- `_clearModifierVignettes()` — removes all vignette elements (called on combat init)
+
+**Persistent vignettes** (`persistent: true`): applied immediately when combat UI initialises — `underwater`, `sacred_ground`, `corrupted_field`
+
+**Threshold vignettes** (`persistent: false`): triggered when `turn.action.type === mod.type` is detected while replaying the log — `sudden_death` (triggers at turn 100)
+
+---
+
 ### routes/character-snapshots.js
 
 **Browse endpoint** (`GET /api/character/browse`): Returns `liveChar.skills` and `liveChar.equipment` (not snapshot values) so the card always reflects the character's current equipped build. Falls back to snapshot if live character unavailable.
@@ -200,7 +308,7 @@ All of `skills`, `consumables`, `consumableStash`, `keyring` are post-combat sta
 
 ### Global State (`game-data.js`)
 - `window.authState` — `{ token, userId, username, isGuest, isAdmin, ready }`
-- `window.gameData` — `{ challenges, skills, races, gear, statuses, bots, companions }`
+- `window.gameData` — `{ challenges, skills, races, gear, statuses, bots, companions, modifiers }`
 - `window.authFetch()` — Fetch wrapper that auto-injects Authorization header
 
 ### `getCharacterClass(character, skills)` — in `game-data.js`
@@ -272,6 +380,8 @@ skills.json → skills.json          (parentSkills, combo triggers)
 challenges.json → enemy-types.json
 challenges.json → items.json       (loot tables, opportunity item checks)
 challenges.json → skills.json      (opportunity skill checks)
+challenges.json → modifiers.json   (modifier ID references)
+modifiers.json → statuses.json     (applyOnStart statusId references)
 enemy-types.json → items.json      (weapon IDs)
 ```
 
