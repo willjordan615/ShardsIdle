@@ -393,8 +393,13 @@
             // ◀ = panel is closed (click to open), ▶ = panel is open (click to close)
             if (tab) tab.textContent = window._skillTreePanelOpen ? '▶' : '◀';
         };
-        // Apply initial collapsed state on mobile
-        if (isMobile) window._skillTreeTogglePanel();
+        // Apply initial CSS state without toggling the flag
+        if (isMobile) {
+            const panel = document.getElementById('skillTreePanel');
+            const tab   = document.getElementById('skillTreePanelTab');
+            if (panel) { panel.style.width = '0'; panel.style.padding = '0'; panel.style.overflow = 'hidden'; }
+            if (tab) tab.textContent = '◀';
+        }
     }
 
     // ── Canvas ────────────────────────────────────────────────────────────────
@@ -816,18 +821,64 @@
         }, { passive: false });
 
         let lastTouch = null;
+        let lastPinchDist = null;
+
+        function _pinchDist(touches) {
+            const dx = touches[0].clientX - touches[1].clientX;
+            const dy = touches[0].clientY - touches[1].clientY;
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+        function _pinchMid(touches) {
+            return {
+                x: (touches[0].clientX + touches[1].clientX) / 2,
+                y: (touches[0].clientY + touches[1].clientY) / 2,
+            };
+        }
+
         wrap.addEventListener('touchstart', e => {
-            if (e.touches.length === 1) lastTouch = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            if (e.touches.length === 1) {
+                lastTouch = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                lastPinchDist = null;
+            } else if (e.touches.length === 2) {
+                lastTouch = null;
+                lastPinchDist = _pinchDist(e.touches);
+            }
         }, { passive: true });
+
         wrap.addEventListener('touchmove', e => {
+            e.preventDefault();
             if (e.touches.length === 1 && lastTouch) {
-                e.preventDefault();
                 _pan.x += e.touches[0].clientX - lastTouch.x;
                 _pan.y += e.touches[0].clientY - lastTouch.y;
                 lastTouch = { x: e.touches[0].clientX, y: e.touches[0].clientY };
                 _applyTransform();
+            } else if (e.touches.length === 2 && lastPinchDist !== null) {
+                const newDist = _pinchDist(e.touches);
+                const scale  = newDist / lastPinchDist;
+                const mid    = _pinchMid(e.touches);
+                const rect   = wrap.getBoundingClientRect();
+                // Zoom toward the midpoint of the two fingers
+                const cx = mid.x - rect.left;
+                const cy = mid.y - rect.top;
+                const newZoom = Math.min(5, Math.max(0.08, _zoom * scale));
+                _pan.x = cx - (cx - _pan.x) * (newZoom / _zoom);
+                _pan.y = cy - (cy - _pan.y) * (newZoom / _zoom);
+                _zoom  = newZoom;
+                lastPinchDist = newDist;
+                _applyTransform();
             }
         }, { passive: false });
+
+        wrap.addEventListener('touchend', e => {
+            // Reset single-touch tracking when fingers lift
+            if (e.touches.length === 1) {
+                lastTouch = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                lastPinchDist = null;
+            } else if (e.touches.length === 0) {
+                lastTouch = null;
+                lastPinchDist = null;
+            }
+        }, { passive: true });
     }
 
 })();

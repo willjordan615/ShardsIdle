@@ -1062,15 +1062,6 @@ function _showCombatToast(seconds, startPaused, targetChallengeId) {
                 </button>
             </div>
         `;
-
-        document.getElementById('toastWatchBtn')?.addEventListener('click', () => {
-            toast.remove();
-            if (typeof showScreen === 'function') showScreen('combatlog');
-        });
-
-        document.getElementById('toastStopBtn')?.addEventListener('click', () => {
-            window.cancelAutoRestart();
-        });
     }
 
     function startToastInterval() {
@@ -1097,14 +1088,21 @@ function _showCombatToast(seconds, startPaused, targetChallengeId) {
     render();
     document.body.appendChild(toast);
 
+    // Attach listeners after the toast is in the DOM so getElementById resolves correctly
+    toast.querySelector('#toastWatchBtn')?.addEventListener('click', () => {
+        clearInterval(interval);
+        clearInterval(window.currentRestartInterval);
+        toast.remove();
+        if (typeof showScreen === 'function') showScreen('combatlog');
+        if (isUntilDismissed) window._fireNextCombat?.(targetChallengeId);
+    });
+
+    toast.querySelector('#toastStopBtn')?.addEventListener('click', () => {
+        window.cancelAutoRestart();
+    });
+
     if (!isUntilDismissed) {
         startToastInterval();
-    } else {
-        // Until Dismissed — fire immediately when dismissed via Watch or stop
-        document.getElementById('toastWatchBtn')?.addEventListener('click', () => {
-            clearInterval(window.currentRestartInterval);
-            window._fireNextCombat?.(targetChallengeId);
-        }, { once: true });
     }
 }
 
@@ -2042,6 +2040,9 @@ try {
 // ── Pre-combat opportunity overlay ───────────────────────────────────────────
 
 function _showOpportunityOverlay({ checkName, actor, success, color, checkDetail, narrative }) {
+    // Only show on the combat log screen
+    if (!document.getElementById('combatlog')?.classList.contains('active')) return;
+
     // Remove any existing overlay
     const existing = document.getElementById('opportunityOverlay');
     if (existing) existing.remove();
