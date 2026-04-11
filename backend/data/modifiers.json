@@ -19,6 +19,33 @@
     }
   },
   {
+    "id": "sacred_ground",
+    "type": "environmental",
+    "description": "Consecrated ground bolsters the living. Buffs applied to player combatants last longer. Undead and corrupted enemies are weakened by the holy resonance.",
+    "buffDurationMultiplier": 1.5,
+    "applyOnStart": [
+      { "type": "apply_status", "statusId": "weaken", "targets": "enemies", "duration": 999, "magnitude": 2, "targetTags": ["undead", "corrupted"], "immuneTags": ["sacred", "nature"] }
+    ],
+    "vignette": {
+      "color": "212, 175, 55",
+      "opacity": 0.18,
+      "persistent": true
+    }
+  },
+  {
+    "id": "corrupted_field",
+    "type": "environmental",
+    "description": "The field is saturated with corruption. All player combatants take damage each turn, bypassing defenses. Corrupted, undead, fraying, and inkbound enemies are at home here.",
+    "applyOnStart": [
+      { "type": "dot_pct", "targets": "players", "magnitudePerTurn": 0.02 }
+    ],
+    "vignette": {
+      "color": "50, 10, 70",
+      "opacity": 0.28,
+      "persistent": true
+    }
+  },
+  {
   "id": "underwater",
   "type": "environmental",
   "description": "Combat takes place underwater. All combatants are slowed for the duration of the fight.",

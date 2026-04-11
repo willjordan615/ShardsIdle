@@ -717,21 +717,34 @@ class CombatEngine {
       const enemies = this.initializeEnemies(stageEnemyDefs);
       enemies.forEach(c => { c.activeDungeonModifiers = activeDungeonModifiers; });
 
-      // ── Dungeon modifier applyOnStart — apply status effects at stage entry ──
-      // Enemies re-initialise each stage, so this runs per-stage for both sides.
-      // Players are never immune. Enemies may declare immunity via modifierImmunities
-      // in their enemy-types.json definition (already present on the object if set).
+      // ── Dungeon modifier applyOnStart — apply effects at stage entry ──────────
+      // Enemies re-initialise each stage so this runs per-stage for both sides.
+      // Per-turn effect types (regen_pct, dot_pct) are skipped here and handled
+      // each turn in the per-turn effects block below.
       for (const mod of activeDungeonModifiers) {
         if (!Array.isArray(mod.applyOnStart) || mod.applyOnStart.length === 0) continue;
         for (const effect of mod.applyOnStart) {
+          // Per-turn effects handled in the turn loop — skip at stage entry.
+          if (effect.type === 'regen_pct' || effect.type === 'dot_pct') continue;
+
           const targets = effect.targets === 'all'
             ? [...playerCharacters, ...enemies]
             : effect.targets === 'players' ? [...playerCharacters]
             : effect.targets === 'enemies'  ? [...enemies]
             : [];
+
           for (const combatant of targets) {
             if (combatant.defeated) continue;
-            if (combatant.type !== 'player' && Array.isArray(combatant.modifierImmunities) && combatant.modifierImmunities.includes(mod.id)) continue;
+            // Modifier-level immunity (explicit modifierImmunities list on enemy type)
+            if (combatant.type !== 'player' && combatant.modifierImmunities?.includes(mod.id)) continue;
+            // Effect-level targetTags: only apply to enemies that match at least one tag
+            if (combatant.type !== 'player' && Array.isArray(effect.targetTags) && effect.targetTags.length > 0) {
+              if (!effect.targetTags.some(tag => combatant.tags?.includes(tag))) continue;
+            }
+            // Effect-level immuneTags: skip enemies carrying any of these tags
+            if (combatant.type !== 'player' && Array.isArray(effect.immuneTags) && effect.immuneTags.length > 0) {
+              if (effect.immuneTags.some(tag => combatant.tags?.includes(tag))) continue;
+            }
             this.statusEngine.applyStatus(combatant, effect.statusId, effect.duration, effect.magnitude);
           }
         }
@@ -969,6 +982,32 @@ class CombatEngine {
                 delay: 800
               }
             });
+          }
+        }
+
+        // ── Dungeon modifier: per-turn environmental effects ──────────────────────
+        // regen_pct: restore a % of max HP to target combatants each turn.
+        // dot_pct:   deal a % of max HP as damage each turn, bypassing defenses.
+        // Both read their magnitude from the modifier config.
+        for (const mod of activeDungeonModifiers) {
+          if (!Array.isArray(mod.applyOnStart)) continue;
+          for (const effect of mod.applyOnStart) {
+            if (effect.type === 'regen_pct') {
+              const targets = effect.targets === 'players' ? playerCharacters
+                : effect.targets === 'enemies' ? enemies : [...playerCharacters, ...enemies];
+              targets.filter(c => !c.defeated).forEach(c => {
+                const amount = Math.max(1, Math.floor(c.maxHP * (effect.magnitudePerTurn || 0.02)));
+                c.currentHP = Math.min(c.maxHP, c.currentHP + amount);
+              });
+            } else if (effect.type === 'dot_pct') {
+              const targets = effect.targets === 'players' ? playerCharacters
+                : effect.targets === 'enemies' ? enemies : [...playerCharacters, ...enemies];
+              targets.filter(c => !c.defeated).forEach(c => {
+                const dmg = Math.max(1, Math.floor(c.maxHP * (effect.magnitudePerTurn || 0.02)));
+                c.currentHP = Math.max(0, c.currentHP - dmg);
+                if (c.currentHP <= 0) c.defeated = true;
+              });
+            }
           }
         }
 
@@ -3318,6 +3357,13 @@ _applyLootTagFlavour(item, tagDef) {
                 //console.log(`[EFFECT] ${skill.name}: ${effect.debuff} applied to ${debuffTarget.name}`);
             }
         } else if (effect.type === 'apply_buff' && effect.buff) {
+            // sacred_ground: buffs applied to player combatants have their duration extended.
+            const sacredMod = actor.activeDungeonModifiers?.find(m => m.type === 'environmental' && m.id === 'sacred_ground');
+            const sacredMultiplier = sacredMod?.buffDurationMultiplier ?? 1;
+            const _buffDuration = (target) => target?.type === 'player'
+                ? Math.round((effect.duration || 1) * sacredMultiplier)
+                : (effect.duration || 1);
+
             let buffTarget = actor;
             if (effect.targets === 'single_ally' && target && target.type === 'player') buffTarget = target;
             if (effect.targets === 'all_allies' && allPlayers) {
@@ -3325,14 +3371,14 @@ _applyLootTagFlavour(item, tagDef) {
                 // enemies have type 'enemy'; players have type 'player'.
                 const allies = allPlayers.filter(p => !p.defeated && p.type === actor.type);
                 allies.forEach(ally => {
-                    this.statusEngine.applyStatus(ally, effect.buff, effect.duration, effect.magnitude || 1);
+                    this.statusEngine.applyStatus(ally, effect.buff, _buffDuration(ally), effect.magnitude || 1);
                 });
                 //console.log(`[EFFECT] ${skill.name}: ${effect.buff} applied by ${actor.name} to all allies (${allies.map(a => a.name).join(', ')})`);
                 return;
             } else if (effect.targets === 'all_allies') {
                 //console.log(`[EFFECT] ${skill.name}: AOE buff ${effect.buff} (no allPlayers context — self only)`);
             }
-            this.statusEngine.applyStatus(buffTarget, effect.buff, effect.duration, effect.magnitude || 1);
+            this.statusEngine.applyStatus(buffTarget, effect.buff, _buffDuration(buffTarget), effect.magnitude || 1);
             //console.log(`[EFFECT] ${skill.name}: ${effect.buff} applied to ${buffTarget.name}`);
         } else if (effect.type === 'damage' && effect.damageType) {
             //console.log(`[EFFECT] ${skill.name}: Damage effect (${effect.damageType}) processed in calculateDamage()`);
@@ -3638,7 +3684,9 @@ _applyLootTagFlavour(item, tagDef) {
                 magEvasion:  enemyType.magEvasion  || 0,
                 resistances: {},
                 statusEffects: [],
-                equipment: equipment
+                equipment: equipment,
+                tags: enemyType.tags || [],
+                modifierImmunities: enemyType.modifierImmunities || [],
             });
         }
     });
