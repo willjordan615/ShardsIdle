@@ -373,9 +373,11 @@ function _applyModifierVignette(mod) {
     el.style.display   = 'block';
 }
 
-// Remove all active modifier vignette elements from the DOM.
+// Remove all active modifier vignette elements and the modifier tag line from the DOM.
 function _clearModifierVignettes() {
     document.querySelectorAll('[id^="modifier-vignette-"]').forEach(el => el.remove());
+    const tagLine = document.getElementById('modifierTagLine');
+    if (tagLine) tagLine.remove();
 }
 
 // --- MAIN DISPLAY FUNCTION ---
@@ -409,6 +411,23 @@ async function displayCombatLog(combatData) {
         resultDisplay.innerHTML = '';
         _clearModifierVignettes();
         _getActiveModifiers().filter(m => m.vignette?.persistent).forEach(_applyModifierVignette);
+
+        // Modifier tag line — shows explicitly-assigned field modifiers in the stage header area.
+        // Uses only the challenge's own modifiers array, not the auto-injected sudden_death default.
+        const _explicitModIds = window.currentState?.selectedChallenge?.modifiers || [];
+        const _modDefs        = window.gameData?.modifiers || [];
+        const _activeLabelMods = _explicitModIds.map(id => _modDefs.find(m => m.id === id)).filter(Boolean);
+        const _stageBannerEl  = document.getElementById('stageBanner');
+        if (_activeLabelMods.length > 0 && _stageBannerEl) {
+            const tagLine = document.createElement('div');
+            tagLine.id = 'modifierTagLine';
+            tagLine.style.cssText = 'text-align:center;font-size:0.7rem;color:var(--text-muted);letter-spacing:0.07em;text-transform:uppercase;padding:3px 0 0;';
+            tagLine.innerHTML = _activeLabelMods.map(m => {
+                const label = m.id.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+                return `<span title="${m.description || ''}" style="margin:0 8px;">◈ ${label}</span>`;
+            }).join('');
+            _stageBannerEl.insertAdjacentElement('afterend', tagLine);
+        }
 
         // Reset pause state for new combat; speed persists from localStorage
         window.combatPaused = false;
@@ -838,6 +857,9 @@ async function displayCombatLog(combatData) {
         // Show modal only on the combat log screen — toast handles all other screens
         const currentScreen = document.querySelector('.screen.active')?.id || '';
         const onCombatLog   = currentScreen === 'combatlog' || currentScreen === 'combat';
+
+        // Combat is over — clear field vignettes and modifier tag line
+        _clearModifierVignettes();
 
         // Show modal immediately with a loading state — rewards compute async
         if (modal) {
