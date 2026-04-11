@@ -336,6 +336,41 @@ function showSafeSuccess(msg) {
     }
 }
 
+// --- DUNGEON MODIFIER VIGNETTES ---
+// Resolve modifier definitions for the currently selected challenge.
+function _getActiveModifiers() {
+    const modIds  = window.currentState?.selectedChallenge?.modifiers || [];
+    const modDefs = window.gameData?.modifiers || [];
+    return modIds.map(id => modDefs.find(m => m.id === id)).filter(Boolean);
+}
+
+// Create or retrieve the vignette overlay element for a given modifier id.
+function _getOrCreateVignetteEl(modId) {
+    const elId = `modifier-vignette-${modId}`;
+    let el = document.getElementById(elId);
+    if (!el) {
+        el = document.createElement('div');
+        el.id = elId;
+        el.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:500;display:none;';
+        document.body.appendChild(el);
+    }
+    return el;
+}
+
+// Apply a modifier's vignette config as a screen-edge box-shadow overlay.
+function _applyModifierVignette(mod) {
+    if (!mod?.vignette) return;
+    const v  = mod.vignette;
+    const el = _getOrCreateVignetteEl(mod.id);
+    el.style.boxShadow = `inset 0 0 220px 80px rgba(${v.color}, ${v.opacity})`;
+    el.style.display   = 'block';
+}
+
+// Remove all active modifier vignette elements from the DOM.
+function _clearModifierVignettes() {
+    document.querySelectorAll('[id^="modifier-vignette-"]').forEach(el => el.remove());
+}
+
 // --- MAIN DISPLAY FUNCTION ---
 async function displayCombatLog(combatData) {
     try {
@@ -365,8 +400,8 @@ async function displayCombatLog(combatData) {
         enemyStatus.innerHTML   = '';
         logDisplay.innerHTML    = '';
         resultDisplay.innerHTML = '';
-        const suddenDeathBanner = document.getElementById('suddenDeathBanner');
-        if (suddenDeathBanner) suddenDeathBanner.style.display = 'none';
+        _clearModifierVignettes();
+        _getActiveModifiers().filter(m => m.vignette?.persistent).forEach(_applyModifierVignette);
 
         // Reset pause state for new combat; speed persists from localStorage
         window.combatPaused = false;
@@ -1135,9 +1170,9 @@ function renderTurn(turn, logDisplay, hpMaxes, hpCurrent) {
             <div class="turn-header" style="color:#e74c3c;">⚠ ${turn.actorName}</div>
             <div class="turn-message" style="color:#e74c3c;">${turn.result?.message}</div>
         `;
-        // Show the persistent warning banner
-        const banner = document.getElementById('suddenDeathBanner');
-        if (banner) banner.style.display = 'block';
+        // Apply the vignette for any non-persistent modifier whose type matches this turn action
+        const triggerMod = _getActiveModifiers().find(m => m.type === turn.action.type && m.vignette && !m.vignette.persistent);
+        if (triggerMod) _applyModifierVignette(triggerMod);
         logDisplay.appendChild(turnEl);
         _scrollLogToBottom(logDisplay);
         return;

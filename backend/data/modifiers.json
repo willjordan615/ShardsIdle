@@ -11,6 +11,11 @@
       "initialEffectiveness": 0.20,
       "dropPerInterval": 0.08,
       "interval": 10
+    },
+    "vignette": {
+      "color": "192, 57, 43",
+      "opacity": 0.35,
+      "persistent": false
     }
   },
   {
@@ -19,6 +24,11 @@
   "description": "Combat takes place underwater. All combatants are slowed for the duration of the fight.",
   "applyOnStart": [
     { "statusId": "slow", "duration": 999, "magnitude": 1, "targets": "all" }
-  ]
+  ],
+  "vignette": {
+    "color": "20, 80, 160",
+    "opacity": 0.22,
+    "persistent": true
+  }
 }
 ]

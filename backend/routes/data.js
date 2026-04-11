@@ -32,6 +32,11 @@ function loadGameData() {
         } catch(e) {
             gameData.tuning = {};
         }
+        try {
+            gameData.modifiers = JSON.parse(fs.readFileSync(path.join(dataDir, 'modifiers.json'), 'utf8'));
+        } catch(e) {
+            gameData.modifiers = [];
+        }
         
         console.log('Game data loaded successfully');
     } catch (error) {
