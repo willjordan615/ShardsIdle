@@ -341,7 +341,14 @@ function showSafeSuccess(msg) {
 function _getActiveModifiers() {
     const modIds  = window.currentState?.selectedChallenge?.modifiers || [];
     const modDefs = window.gameData?.modifiers || [];
-    return modIds.map(id => modDefs.find(m => m.id === id)).filter(Boolean);
+    const resolved = modIds.map(id => modDefs.find(m => m.id === id)).filter(Boolean);
+    // Mirror the engine's server-side default: auto-inject sudden_death if no sudden_death
+    // type is present. Challenges that don't explicitly list it still get the vignette.
+    if (!resolved.some(m => m.type === 'sudden_death')) {
+        const defaultSd = modDefs.find(m => m.id === 'sudden_death');
+        if (defaultSd) resolved.push(defaultSd);
+    }
+    return resolved;
 }
 
 // Create or retrieve the vignette overlay element for a given modifier id.
