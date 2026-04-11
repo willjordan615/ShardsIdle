@@ -551,20 +551,21 @@ function getCharacterClass(character, skills) {
                 if (category === 'UTILITY') categories.utility++;
                 if (category === 'RESTORATION') categories.restoration++;
 
-                // Tag Counting (from skill tags)
+                // Tag Counting (from skill tags) — weighted by skill level to reflect investment depth
+                const levelWeight = skillEntry.skillLevel || 1;
                 skillTags.forEach(tag => {
                     if (tag && typeof tag === 'string') {
                         const t = tag.toLowerCase();
-                        if (tags[t] !== undefined) tags[t]++;
+                        if (tags[t] !== undefined) tags[t] += levelWeight;
                     }
                 });
 
-                // Tag Counting (from effect damage types)
+                // Tag Counting (from effect damage types) — also level-weighted
                 effects.forEach(effect => {
                     if (effect && effect.type === 'damage' && effect.damageType) {
                         const dt = effect.damageType.toLowerCase();
-                        if (damageTypes[dt] !== undefined) damageTypes[dt]++;
-                        if (tags[dt] !== undefined) tags[dt]++;
+                        if (damageTypes[dt] !== undefined) damageTypes[dt] += levelWeight;
+                        if (tags[dt] !== undefined) tags[dt] += levelWeight;
                     }
                 });
 
@@ -760,8 +761,8 @@ function getCharacterClass(character, skills) {
             return withElement('Circle Warden');
         }
 
-        // Paladin - Holy smite + holy light + defense/heavy armor
-        if (keySkills.smite && keySkills.holy_light && (categories.defense > 0 || isHeavyArmor)) {
+        // Paladin - Holy smite + holy light — skills alone are the signal; armor/weapon refine the title
+        if (keySkills.smite && keySkills.holy_light) {
             if (hasShield) return withElement('Shield Paladin');
             if (isHeavyArmor) return withElement('Paladin');
             return withElement('Crusader');
@@ -850,45 +851,30 @@ function getCharacterClass(character, skills) {
             return withElement('Shaman');
         }
 
-        // ─── STEP 2: TIER-BASED PRESTIGE TITLES (Endgame only) ─────────────
-        if (weaponTier >= 7) {
-            if (dominantTag === 'holy' && isHeavyArmor) return withElement('Ascended Paladin');
-            if (dominantTag === 'shadow' && isLightArmor) return 'Void Walker';
-            if (dominantTag === 'fire' && isMeleeWeapon) return 'Phoenix Knight';
-            if (dominantTag === 'lightning' && isCasterOrInstrument) return 'Storm Lord';
-            if (categories.healing > 3 && isLightArmor) return withElement('Arch Priest');
+        // ─── STEP 2: TIER-BASED PRESTIGE TITLES ─────────────────────────────
+        // Weapon tier refines an already-established skill identity — it never
+        // replaces it. Every path requires matching skill investment so that a
+        // high-tier weapon alone (with thin skills) falls through to steps 3-7.
+        if (weaponTier >= 7 && totalSkills >= 3) {
+            if (dominantTag === 'holy' && categories.healing > 0 && isHeavyArmor) return withElement('Ascended Paladin');
+            if (dominantTag === 'shadow' && categories.damageMagic > 0 && isLightArmor) return 'Void Walker';
+            if (dominantTag === 'fire' && categories.damagePhysical > 0 && isMeleeWeapon) return 'Phoenix Knight';
+            if (dominantTag === 'lightning' && categories.damageMagic > 0 && isCasterOrInstrument) return 'Storm Lord';
+            if (categories.healing > 3) return withElement('Arch Priest');
             if (categories.damageMagic > 4) return withElement('Archmage');
             if (categories.damagePhysical > 4 && isHeavyArmor) return withElement('Warlord');
         }
 
-        if (weaponTier >= 5) {
-            if (dominantTag === 'holy') return 'Celestial Knight';
-            if (dominantTag === 'shadow') return 'Shadow Master';
-            if (dominantTag === 'fire') return 'Flame Warden';
-            if (dominantTag === 'lightning') return 'Thundercaller';
-            if (damageTypes.physical > 2) return 'Blood Knight';
-            if (damageTypes.poison > 2) return 'Venom Lord';
+        if (weaponTier >= 5 && totalSkills >= 2) {
+            if (dominantTag === 'holy' && categories.healing > 0) return 'Celestial Knight';
+            if (dominantTag === 'shadow' && categories.damageMagic > 0) return 'Shadow Master';
+            if (dominantTag === 'fire' && categories.damageMagic > 0) return 'Flame Warden';
+            if (dominantTag === 'lightning' && categories.damageMagic > 0) return 'Thundercaller';
+            if (damageTypes.physical > 2 && categories.damagePhysical > 0) return 'Blood Knight';
+            if (damageTypes.poison > 2 && categories.damageMagic > 0) return 'Venom Lord';
         }
 
-        // ─── STEP 3: HYBRID ARCHETYPES (Weapon + Skill Synergy) ────────────
-
-        // Instrument Users (Flute/Bell/Totem) - Musical/Caster hybrids
-        if (isInstrumentWeapon && totalDamage > 0) {
-            if (categories.damageMagic > 0) {
-                if (dominantTag === 'nature') return withElement('Bard');
-                if (dominantTag === 'holy') return 'Choirmaster';
-                if (dominantTag === 'shadow') return 'Dirge Singer';
-                if (dominantTag === 'fire') return withElement('Pyromancer');
-                if (dominantTag === 'cold') return 'Frost Singer';
-                if (dominantTag === 'lightning') return 'Thundercaller';
-                return withElement('Mage');
-            }
-            if (categories.healing > 0) {
-                if (dominantTag === 'nature') return withElement('Druid');
-                if (dominantTag === 'holy') return withElement('Priest');
-                return withElement('Mender');
-            }
-        }
+        // ─── STEP 3: HYBRID ARCHETYPES (Skill-first, weapon refines) ────────
 
         // Spellblade: Magic damage + melee weapon
         if (categories.damageMagic > 0 && isMeleeWeapon) {
@@ -907,6 +893,7 @@ function getCharacterClass(character, skills) {
                 if (isHeavyArmor) return withElement('War Priest');
                 return withElement('Battle Cleric');
             }
+            if (dominantTag === 'holy' && isInstrumentWeapon) return 'Choirmaster';
             if (dominantTag === 'nature') return withElement('Circle Warden');
             if (categories.healing > totalDamage) return withElement('Field Medic');
             return withElement('Vanguard');
@@ -1047,27 +1034,25 @@ function getCharacterClass(character, skills) {
         // ─── STEP 5: SUPPORT CLASSES ────────────────────────────────────────
 
         if (categories.healing >= 2 || (categories.healing >= 1 && categories.buff >= 1)) {
-            if (isLightArmor) {
-                if (dominantTag === 'holy') {
-                    if (totalHealing > 10000 || milestones.masterHealer) return withElement('High Priest');
-                    if (weaponType === 'scepter') return withElement('Priest');
-                    if (weaponType === 'tome') return withElement('Cleric');
-                    if (weaponType === 'bell') return 'Choirmaster';
-                    return withElement('Mender');
-                }
-                if (dominantTag === 'nature') {
-                    if (weaponType === 'totem') return withElement('Druid');
-                    if (weaponType === 'flute') return withElement('Bard');
-                    return withElement('Circle Keeper');
-                }
-                if (categories.buff >= 2) return withElement('Warden');
+            // Tag is the primary signal; weapon refines the title; armor is the last tiebreaker
+            if (dominantTag === 'holy') {
+                if (totalHealing > 10000 || milestones.masterHealer) return withElement('High Priest');
+                if (weaponType === 'scepter') return withElement('Priest');
+                if (weaponType === 'tome') return withElement('Cleric');
+                if (weaponType === 'bell') return 'Choirmaster';
+                if (isInstrumentWeapon) return 'Choirmaster';
+                if (isHeavyArmor) return withElement('War Priest');
                 return withElement('Mender');
             }
-
-            // Tank healer (heavy armor + healing)
-            if (isHeavyArmor && categories.healing > 0) {
-                return withElement('War Priest');
+            if (dominantTag === 'nature') {
+                if (weaponType === 'totem') return withElement('Druid');
+                if (weaponType === 'flute') return withElement('Bard');
+                if (isInstrumentWeapon) return withElement('Bard');
+                return withElement('Circle Keeper');
             }
+            if (isHeavyArmor) return withElement('War Priest');
+            if (categories.buff >= 2) return withElement('Warden');
+            return withElement('Mender');
         }
 
         if (categories.buff >= 2 && totalDamage < 1) {
