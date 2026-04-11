@@ -1614,11 +1614,11 @@ function mapInjectModal() {
           <div id="mapModalTags" style="font-size:10px;color:#7a6030;font-style:italic;"></div>
         </div>
       </div>
-      <div id="mapModalTabBar" style="display:none;flex-shrink:0;border-bottom:1px solid #1e1a0a;display:flex;">
+      <div id="mapModalTabBar" style="display:none;flex-shrink:0;border-bottom:1px solid #1e1a0a;">
         <button id="mapTabOverview" onclick="mapSwitchTab('overview')" style="${TAB_BTN}color:#c8a84b;border-bottom-color:#c8a84b;">Overview</button>
         <button id="mapTabLore"     onclick="mapSwitchTab('lore')"     style="${TAB_BTN}color:#4a3820;">Lore</button>
       </div>
-      <div style="overflow-y:auto;-webkit-overflow-scrolling:touch;flex:0 1 auto;min-height:0;">
+      <div style="overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;min-height:0;">
         <div id="mapModalOverview" style="padding:11px 16px 10px;"></div>
         <div id="mapModalLore"     style="padding:11px 16px 10px;display:none;"></div>
       </div>
