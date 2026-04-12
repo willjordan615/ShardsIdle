@@ -410,7 +410,20 @@ async function displayCombatLog(combatData) {
         logDisplay.innerHTML    = '';
         resultDisplay.innerHTML = '';
         _clearModifierVignettes();
-        _getActiveModifiers().filter(m => m.vignette?.persistent).forEach(_applyModifierVignette);
+        console.warn('[VIGNETTE] init — gameData.modifiers:', window.gameData?.modifiers, '| selectedChallenge.modifiers:', window.currentState?.selectedChallenge?.modifiers);
+        const _applyPersistentVignettes = () => {
+            const mods = window.gameData?.modifiers;
+            if (!mods || mods.length === 0) {
+                console.warn('[VIGNETTE] gameData.modifiers not ready at init — deferring 100ms');
+                setTimeout(() => {
+                    console.warn('[VIGNETTE] deferred retry — gameData.modifiers:', window.gameData?.modifiers);
+                    _getActiveModifiers().filter(m => m.vignette?.persistent).forEach(_applyModifierVignette);
+                }, 100);
+                return;
+            }
+            _getActiveModifiers().filter(m => m.vignette?.persistent).forEach(_applyModifierVignette);
+        };
+        _applyPersistentVignettes();
 
         // Modifier tag line — shows explicitly-assigned field modifiers in the stage header area.
         // Uses only the challenge's own modifiers array, not the auto-injected sudden_death default.
