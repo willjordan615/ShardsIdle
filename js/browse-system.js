@@ -101,7 +101,6 @@ function createBrowseCard(char) {
     card.className = 'card browse-card';
 
     const stats = char.combatStats || {};
-    const milestones = stats.milestones || {};
     const totalKills = Object.values(stats.enemyKills || {}).reduce((a, b) => a + b, 0);
     const totalChallenges = Object.keys(stats.challengeCompletions || {}).length;
 
@@ -131,14 +130,6 @@ function createBrowseCard(char) {
     const activeSkillNames = [..._nonIntrinsic1.slice(0, 2), ..._intrinsic1.slice(0, 1)]
         .map(s => window.gameData?.skills?.find(sk => sk.id === s.skillID)?.name)
         .filter(Boolean);
-
-    // Milestone badges with tooltips
-    const badges = [];
-    if (milestones.firstBlood)        badges.push({ icon: '🩸', label: 'First Blood — Won their first combat' });
-    if (milestones.hundredKills)      badges.push({ icon: '💀', label: '100 Kills — Defeated 100 enemies' });
-    if (milestones.masterHealer)      badges.push({ icon: '✨', label: 'Master Healer — 10,000 healing done' });
-    if (milestones.undefeated)        badges.push({ icon: '🏆', label: 'Undefeated — 10+ wins, no losses' });
-    if (milestones.centuryOfCombats)  badges.push({ icon: '⚔️', label: 'Century — 100 combats fought' });
 
     const statCell = (label, value, colorClass = '') =>
         `<div class="browse-stat-cell">
@@ -175,11 +166,6 @@ function createBrowseCard(char) {
         <div style="font-size:0.75rem;color:#888;margin-bottom:0.5rem;">
             Signature: <span style="color:#d4af37;">${topSkillName}</span>
             ${topKillEntry ? ` · Most hunted: <span style="color:#ff8c8c;">${topKillEntry[0].replace(/_/g,' ')} ×${topKillEntry[1]}</span>` : ''}
-        </div>` : ''}
-
-        ${badges.length ? `
-        <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:0.6rem;">
-            ${badges.map(b => `<span title="${b.label}" style="font-size:1rem;cursor:default;" aria-label="${b.label}">${b.icon}</span>`).join('')}
         </div>` : ''}
 
         ${char.isOwn
@@ -530,15 +516,6 @@ async function loadPublicCompanions(page) {
                 .map(s => window.gameData?.skills?.find(sk => sk.id === s.skillID)?.name)
                 .filter(Boolean);
 
-            const milestones = stats.milestones || {};
-            const badges = [
-                milestones.firstBlood       && { icon: '🩸', title: 'First Blood' },
-                milestones.hundredKills     && { icon: '💀', title: '100 Kills' },
-                milestones.masterHealer     && { icon: '✨', title: 'Master Healer' },
-                milestones.undefeated       && { icon: '🏆', title: 'Undefeated' },
-                milestones.centuryOfCombats && { icon: '⚔️', title: 'Century' },
-            ].filter(Boolean);
-
             const totalKills = Object.values(stats.enemyKills || {}).reduce((a, b) => a + b, 0);
             const totalChallenges = Object.keys(stats.challengeCompletions || {}).length;
             const topSkillId = Object.entries(stats.skillUsage || {}).sort((a,b) => b[1]-a[1])[0]?.[0];
@@ -585,8 +562,6 @@ async function loadPublicCompanions(page) {
                     ${topSkillName ? `Sig: <span style="color:#d4af37;">${topSkillName}</span>` : ''}
                     ${topKillEntry ? ` · <span class="color-red-soft">${topKillEntry[0].replace(/_/g,' ')} ×${topKillEntry[1]}</span>` : ''}
                 </div>` : ''}
-
-                ${badges.length ? `<div style="margin-bottom:0.3rem;font-size:0.95rem;letter-spacing:2px;">${badges.map(b => `<span title="${b.title}" style="cursor:default;">${b.icon}</span>`).join('')}</div>` : ''}
 
                 <div style="color:#8b7355;font-size:0.68rem;margin-bottom:0.4rem;">${char.importCount || 0} imports</div>
                 <button class="secondary btn-full" ${disabled ? 'disabled' : ''}>${disabledLabel || 'Add to Party'}</button>
