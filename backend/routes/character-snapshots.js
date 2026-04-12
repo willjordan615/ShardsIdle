@@ -232,7 +232,10 @@ router.get('/import/:shareCode', optionalAuth, async (req, res) => {
                 importedAt: new Date().toISOString(),
                 canReExport: false,
                 isLinkedReference: true,
-                aiProfile: originalCharacter?.aiProfile || snapshot.ai_profile || 'balanced'
+                aiProfile:   originalCharacter?.aiProfile || snapshot.ai_profile || 'balanced',
+                avatarId:    originalCharacter?.avatarId    || snapshot.avatar_id    || null,
+                avatarColor: originalCharacter?.avatarColor || snapshot.avatar_color || null,
+                avatarFrame: originalCharacter?.avatarFrame || snapshot.avatar_frame || null
             },
             originalStats: {
                 wins: JSON.parse(snapshot.combat_stats).wins,

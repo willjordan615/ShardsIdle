@@ -157,6 +157,9 @@ router.post('/start', requireAuth, async (req, res) => {
                             keyring:          originalChar.keyring          || {},
                             aiProfile:        originalChar.aiProfile        || 'balanced',
                             level:            originalChar.level,
+                            avatarId:         originalChar.avatarId         || null,
+                            avatarColor:      originalChar.avatarColor      || null,
+                            avatarFrame:      originalChar.avatarFrame      || null,
                         };
                     }
                 }
