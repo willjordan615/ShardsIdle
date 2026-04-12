@@ -905,7 +905,16 @@ class CombatEngine {
             });
           }
           if (statusResults.healed > 0) {
-            combatant.currentHP = Math.min(combatant.maxHP, combatant.currentHP + statusResults.healed);
+            let statusHeal = statusResults.healed;
+            const sdModStatus = combatant.activeDungeonModifiers?.find(m => m.type === 'sudden_death');
+            if (sdModStatus && (combatant.suddenDeathTurn || 0) > 0) {
+              const hs = sdModStatus.healSuppression || {};
+              const effectiveness = Math.max(0.0,
+                (hs.initialEffectiveness ?? 0.20) - Math.floor((combatant.suddenDeathTurn || 0) / (hs.interval ?? 10)) * (hs.dropPerInterval ?? 0.08)
+              );
+              statusHeal = Math.floor(statusHeal * effectiveness);
+            }
+            combatant.currentHP = Math.min(combatant.maxHP, combatant.currentHP + statusHeal);
           }
 
           // Leech DoT: credit heals to the source combatant
@@ -914,7 +923,16 @@ class CombatEngine {
             statusResults.sourceHeals.forEach(({ sourceId, amount }) => {
               const source = allCombatants.find(c => c.id === sourceId && !c.defeated);
               if (source) {
-                source.currentHP = Math.min(source.maxHP, source.currentHP + amount);
+                let leechAmount = amount;
+                const sdModLeech = source.activeDungeonModifiers?.find(m => m.type === 'sudden_death');
+                if (sdModLeech && (source.suddenDeathTurn || 0) > 0) {
+                  const hs = sdModLeech.healSuppression || {};
+                  const effectiveness = Math.max(0.0,
+                    (hs.initialEffectiveness ?? 0.20) - Math.floor((source.suddenDeathTurn || 0) / (hs.interval ?? 10)) * (hs.dropPerInterval ?? 0.08)
+                  );
+                  leechAmount = Math.floor(leechAmount * effectiveness);
+                }
+                source.currentHP = Math.min(source.maxHP, source.currentHP + leechAmount);
                 //console.log(`[LIFEDRAIN] ${source.name} leeches ${amount} HP from ${combatant.name}`);
               }
             });
@@ -964,10 +982,12 @@ class CombatEngine {
               c.suddenDeathTurn = (c.suddenDeathTurn || 0) + 1;
             });
             console.warn(`[SUDDEN DEATH] Turn ${stageTurnCount}: dealing ${(pct*100).toFixed(0)}% max HP to all combatants`);
+            const sdTargets = [];
             allCombatants.forEach(c => {
               const dmg = Math.max(1, Math.floor(c.maxHP * pct));
               c.currentHP = Math.max(0, c.currentHP - dmg);
               if (c.currentHP <= 0) c.defeated = true;
+              sdTargets.push({ targetId: c.id, hpAfter: c.currentHP });
             });
             stageTurns.push({
               turnNumber: globalTurnCount + 0.5,
@@ -979,7 +999,8 @@ class CombatEngine {
               result: {
                 message: `The battle has gone on too long. All combatants take ${(pct*100).toFixed(0)}% of their maximum HP in damage.`,
                 success: false,
-                delay: 800
+                delay: 800,
+                targets: sdTargets
               }
             });
           }
@@ -2943,7 +2964,15 @@ _applyLootTagFlavour(item, tagDef) {
                 if (!statusDef?.effects?.healAttackerOnHit) return;
                 const fraction = statusDef.effects.healAttackerOnHit;
                 const harmonyScale = 1 + ((actor.stats?.harmony || 0) / 300);
-                const healAmount = Math.max(1, Math.floor(hitDamage * fraction * harmonyScale));
+                let healAmount = Math.max(1, Math.floor(hitDamage * fraction * harmonyScale));
+                const sdModOnHit = actor.activeDungeonModifiers?.find(m => m.type === 'sudden_death');
+                if (sdModOnHit && (actor.suddenDeathTurn || 0) > 0) {
+                    const hs = sdModOnHit.healSuppression || {};
+                    const effectiveness = Math.max(0.0,
+                        (hs.initialEffectiveness ?? 0.20) - Math.floor((actor.suddenDeathTurn || 0) / (hs.interval ?? 10)) * (hs.dropPerInterval ?? 0.08)
+                    );
+                    healAmount = Math.floor(healAmount * effectiveness);
+                }
                 actor.currentHP = Math.min(actor.maxHP, actor.currentHP + healAmount);
                 //console.log(`[LIFEDRAIN] ${actor.name} healed ${healAmount} via ${statusDef.name} on ${target.name}`);
             });
