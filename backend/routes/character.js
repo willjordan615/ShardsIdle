@@ -30,6 +30,9 @@ function ownsCharacter(character, userId) {
  */
 router.get('/', requireAuth, async (req, res) => {
     try {
+        // Reliable "player opened the game" signal — fires on every session load
+        db.touchCharacterLastLogin(req.userId).catch(() => {});
+
         const page  = Math.max(1, parseInt(req.query.page)  || 1);
         const limit = Math.min(20, Math.max(1, parseInt(req.query.limit) || 6));
         const offset = (page - 1) * limit;
