@@ -656,6 +656,9 @@ async function loadAdminCharacters() {
         const res = await fetch(BACKEND_URL + '/api/admin/db/characters');
         const rows = await res.json();
         if (!rows.length) { el.innerHTML = '<p style="color:#888;padding:12px;">No characters found.</p>'; return; }
+        const fmtTs = v => (v && v !== 'Never')
+            ? v.slice(0, 16).replace('T', ' ')
+            : '<span style="color:#555">Never</span>';
         el.innerHTML = `
             <table style="width:100%;border-collapse:collapse;font-size:.85em;">
                 <thead><tr style="color:#aaa;border-bottom:1px solid #333;">
@@ -663,6 +666,8 @@ async function loadAdminCharacters() {
                     <th style="text-align:left;padding:6px;">Race</th>
                     <th style="text-align:center;padding:6px;">Lvl</th>
                     <th style="text-align:center;padding:6px;">XP</th>
+                    <th style="text-align:center;padding:6px;">Last Login</th>
+                    <th style="text-align:center;padding:6px;">Last Seen</th>
                     <th style="padding:6px;"></th>
                 </tr></thead>
                 <tbody>${rows.map(r => `
@@ -671,6 +676,8 @@ async function loadAdminCharacters() {
                         <td style="padding:6px;color:#aaa;">${r.race}</td>
                         <td style="padding:6px;text-align:center;">${r.level}</td>
                         <td style="padding:6px;text-align:center;">${(r.experience||0).toLocaleString()}</td>
+                        <td style="padding:6px;text-align:center;color:#888;font-size:.8em;">${fmtTs(r.last_login)}</td>
+                        <td style="padding:6px;text-align:center;color:#888;font-size:.8em;">${fmtTs(r.last_seen)}</td>
                         <td style="padding:6px;text-align:right;">
                             <button onclick="adminViewCharacter('${r.id}')" style="margin-right:4px;padding:2px 8px;background:#1a2a3a;border:1px solid #345;color:#8af;cursor:pointer;border-radius:3px;">View</button>
                             <button onclick="adminReassignCharacter('${r.id}','${r.name}')" style="margin-right:4px;padding:2px 8px;background:#1a2a1a;border:1px solid #353;color:#8f8;cursor:pointer;border-radius:3px;">Reassign</button>
@@ -923,6 +930,9 @@ async function loadAdminSnapshots() {
         const res = await fetch(BACKEND_URL + '/api/admin/db/snapshots');
         const rows = await res.json();
         if (!rows.length) { el.innerHTML = '<p style="color:#888;padding:12px;">No snapshots found.</p>'; return; }
+        const fmtTs = v => (v && v !== 'Never')
+            ? v.slice(0, 16).replace('T', ' ')
+            : '<span style="color:#555">Never</span>';
         el.innerHTML = `
             <table style="width:100%;border-collapse:collapse;font-size:.85em;">
                 <thead><tr style="color:#aaa;border-bottom:1px solid #333;">
@@ -931,6 +941,7 @@ async function loadAdminSnapshots() {
                     <th style="text-align:center;padding:6px;">Lvl</th>
                     <th style="text-align:center;padding:6px;">Public</th>
                     <th style="text-align:center;padding:6px;">Imports</th>
+                    <th style="text-align:center;padding:6px;">Last Imported</th>
                     <th style="padding:6px;"></th>
                 </tr></thead>
                 <tbody>${rows.map(r => `
@@ -940,6 +951,7 @@ async function loadAdminSnapshots() {
                         <td style="padding:6px;text-align:center;">${r.level}</td>
                         <td style="padding:6px;text-align:center;">${r.is_public ? '✓' : '—'}</td>
                         <td style="padding:6px;text-align:center;">${r.import_count||0}</td>
+                        <td style="padding:6px;text-align:center;color:#888;font-size:.8em;">${fmtTs(r.last_imported_at)}</td>
                         <td style="padding:6px;text-align:right;">
                             <button onclick="adminDeleteSnapshot('${r.snapshot_id}','${r.character_name}')" style="padding:2px 8px;background:#2a1a1a;border:1px solid #533;color:#f88;cursor:pointer;border-radius:3px;">Delete</button>
                         </td>

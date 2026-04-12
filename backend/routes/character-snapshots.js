@@ -198,11 +198,11 @@ router.get('/import/:shareCode', optionalAuth, async (req, res) => {
             );
         });
 
-        // Increment import count on ORIGINAL snapshot
+        // Increment import count and stamp last_imported_at on the original snapshot
         await new Promise((resolve, reject) => {
             rawDb.run(
-                `UPDATE character_snapshots SET import_count = import_count + 1 WHERE share_code = ?`,
-                [shareCode],
+                `UPDATE character_snapshots SET import_count = import_count + 1, last_imported_at = ? WHERE share_code = ?`,
+                [new Date().toISOString(), shareCode],
                 (err) => {
                     if (err) reject(err);
                     else resolve();

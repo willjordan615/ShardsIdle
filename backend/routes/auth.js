@@ -213,6 +213,9 @@ router.post('/login', loginRateLimiter, async (req, res) => {
         const token = generateToken();
         await db.createSession(token, user.user_id);
 
+        // Stamp last_login on all characters owned by this user — fire-and-forget
+        db.touchCharacterLastLogin(user.user_id).catch(() => {});
+
         res.json({ token, userId: user.user_id, username: user.username, isGuest: false });
     } catch (err) {
         console.error('[AUTH] /login error:', err);

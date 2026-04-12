@@ -109,6 +109,8 @@ function createTables() {
                     lastActiveAt DATETIME,
                     createdAt INTEGER NOT NULL,
                     lastModified INTEGER NOT NULL,
+                    last_seen INTEGER DEFAULT NULL,
+                    last_login INTEGER DEFAULT NULL,
                     lastSuccessfulChallengeId TEXT DEFAULT NULL
                 )
             `, (err) => { if (err) reject(err); });
@@ -275,6 +277,31 @@ async function initializeCharacterSnapshotsTable() {
             });
         });
     }
+
+    // Migration: add activity timestamp columns to characters
+    for (const [col, def] of [
+        ['last_seen',  'INTEGER DEFAULT NULL'],
+        ['last_login', 'INTEGER DEFAULT NULL'],
+    ]) {
+        await new Promise((resolve) => {
+            db.run(`ALTER TABLE characters ADD COLUMN ${col} ${def}`, (err) => {
+                if (err && !err.message.includes('duplicate column')) {
+                    console.warn(`[DATABASE] Migration note (${col}):`, err.message);
+                }
+                resolve();
+            });
+        });
+    }
+
+    // Migration: add last_imported_at to character_snapshots
+    await new Promise((resolve) => {
+        db.run(`ALTER TABLE character_snapshots ADD COLUMN last_imported_at DATETIME DEFAULT NULL`, (err) => {
+            if (err && !err.message.includes('duplicate column')) {
+                console.warn('[DATABASE] Migration note (last_imported_at):', err.message);
+            }
+            resolve();
+        });
+    });
 }
 
 // ── Idle session helpers ──────────────────────────────────────────────────────
@@ -370,8 +397,8 @@ function saveCharacter(character) {
                 ownerUserId, isPublic, shareCode, buildName, buildDescription,
                 importCount, lastSharedAt,
                 avatarId, avatarColor, avatarFrame, title, lastActiveAt,
-                createdAt, lastModified, lastSuccessfulChallengeId, aiProfile, roleTag
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                createdAt, lastModified, last_seen, lastSuccessfulChallengeId, aiProfile, roleTag
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(id) DO UPDATE SET
                 name = ?, race = ?, level = ?, experience = ?,
                 conviction = ?, endurance = ?, ambition = ?, harmony = ?,
@@ -381,7 +408,7 @@ function saveCharacter(character) {
                 ownerUserId = ?, isPublic = ?, shareCode = ?, buildName = ?, buildDescription = ?,
                 importCount = ?, lastSharedAt = ?,
                 avatarId = ?, avatarColor = ?, avatarFrame = ?, title = ?, lastActiveAt = ?,
-                lastModified = ?, lastSuccessfulChallengeId = ?, aiProfile = ?, roleTag = ?`,
+                lastModified = ?, last_seen = ?, lastSuccessfulChallengeId = ?, aiProfile = ?, roleTag = ?`,
             [
                 character.id, character.name, character.race, character.level, character.experience,
                 character.stats?.conviction || 0, character.stats?.endurance || 0,
@@ -404,7 +431,7 @@ function saveCharacter(character) {
                 character.avatarId || null, character.avatarColor || null,
                 character.avatarFrame || null, character.title || null,
                 character.lastActiveAt || Date.now(),
-                character.createdAt || Date.now(), Date.now(),
+                character.createdAt || Date.now(), Date.now(), Date.now(),
                 character.lastSuccessfulChallengeId || null,
                 character.aiProfile || 'balanced',
                 character.roleTag || null,
@@ -430,7 +457,7 @@ function saveCharacter(character) {
                 character.avatarId || null, character.avatarColor || null,
                 character.avatarFrame || null, character.title || null,
                 character.lastActiveAt || Date.now(),
-                Date.now(), character.lastSuccessfulChallengeId || null,
+                Date.now(), Date.now(), character.lastSuccessfulChallengeId || null,
                 character.aiProfile || 'balanced',
                 character.roleTag || null,
             ],
@@ -489,6 +516,8 @@ function getCharacter(characterId) {
                     aiProfile: row.aiProfile || 'balanced',
                     roleTag: row.roleTag || null,
                     shareEnabled: row.isPublic === 1,
+                    last_login: row.last_login || null,
+                    last_seen:  row.last_seen  || null,
                 });
             } else {
                 resolve(null);
@@ -544,6 +573,8 @@ function getAllCharacters() {
                     aiProfile: row.aiProfile || 'balanced',
                     roleTag: row.roleTag || null,
                     shareEnabled: row.isPublic === 1,
+                    last_login: row.last_login || null,
+                    last_seen:  row.last_seen  || null,
                 })) : [];
                 resolve(characters);
             }
@@ -780,6 +811,18 @@ function scheduleSessionPruning() {
     }, 6 * 60 * 60 * 1000);
 }
 
+// Stamp last_login on all characters owned by a user — called on successful login.
+// Fire-and-forget from auth.js; errors are swallowed so they never block login.
+function touchCharacterLastLogin(userId) {
+    return new Promise((resolve) => {
+        db.run(
+            `UPDATE characters SET last_login = ? WHERE ownerUserId = ?`,
+            [Date.now(), userId],
+            () => resolve()
+        );
+    });
+}
+
 // ── Combat log pruning ────────────────────────────────────────────────────────
 // Two-tier cleanup to prevent unbounded growth in an idle game context:
 //   1. Strip full turn data from logs older than 24h (keep metadata + segment summaries)
@@ -913,4 +956,5 @@ module.exports = {
     setIdleSession,
     getIdleSession,
     clearIdleSession,
+    touchCharacterLastLogin,
 };

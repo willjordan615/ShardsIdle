@@ -192,10 +192,22 @@ function getDB() {
 // GET /api/admin/db/characters — list all characters
 router.get('/db/characters', (req, res) => {
     const db = getDB();
-    db.all(`SELECT id, name, race, level, experience FROM characters ORDER BY level DESC`, [], (err, rows) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json(rows || []);
-    });
+    db.all(
+        `SELECT id, name, race, level, experience, ownerUserId, createdAt, lastModified, last_login, last_seen
+         FROM characters ORDER BY level DESC`,
+        [],
+        (err, rows) => {
+            if (err) return res.status(500).json({ error: err.message });
+            const fmt = (ts) => ts ? new Date(ts).toISOString() : 'Never';
+            res.json((rows || []).map(r => ({
+                ...r,
+                lastModified: fmt(r.lastModified),
+                createdAt:    fmt(r.createdAt),
+                last_login:   fmt(r.last_login),
+                last_seen:    fmt(r.last_seen),
+            })));
+        }
+    );
 });
 
 // GET /api/admin/db/characters/:id — get full character data
@@ -276,11 +288,19 @@ router.delete('/db/characters/:id', (req, res) => {
 // GET /api/admin/db/snapshots — list all snapshots
 router.get('/db/snapshots', (req, res) => {
     const db = getDB();
-    db.all(`SELECT snapshot_id, character_name, share_code, level, race, is_public, import_count, created_at
-            FROM character_snapshots ORDER BY created_at DESC`, [], (err, rows) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json(rows || []);
-    });
+    db.all(
+        `SELECT snapshot_id, character_name, share_code, level, race, is_public, import_count,
+                created_at, last_imported_at
+         FROM character_snapshots ORDER BY created_at DESC`,
+        [],
+        (err, rows) => {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json((rows || []).map(r => ({
+                ...r,
+                last_imported_at: r.last_imported_at || 'Never',
+            })));
+        }
+    );
 });
 
 // DELETE /api/admin/db/snapshots/:id — delete a snapshot
