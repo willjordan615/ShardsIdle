@@ -1240,6 +1240,8 @@
             "name": "Something in the Trees",
             "spawnChance": 0.4,
             "checkType": "skill",
+            "checkStat": "harmony",
+            "difficultyThreshold": 100,
             "requiredSkillTag": "nature",
             "successEffect": {
               "type": "narrative_only",
@@ -1622,6 +1624,8 @@
             "name": "The Bell Inscription",
             "spawnChance": 1,
             "checkType": "skill",
+            "checkStat": "harmony",
+            "difficultyThreshold": 100,
             "requiredSkillID": "holy_light",
             "successEffect": {
               "type": "narrative_only",
@@ -1851,6 +1855,8 @@
             "name": "The Approach",
             "spawnChance": 0.65,
             "checkType": "skill",
+            "checkStat": "conviction",
+            "difficultyThreshold": 100,
             "requiredSkillID": "sense",
             "successEffect": {
               "type": "remove_enemy",
@@ -1968,6 +1974,8 @@
             "name": "The Vault Door",
             "spawnChance": 1,
             "checkType": "skill",
+            "checkStat": "conviction",
+            "difficultyThreshold": 100,
             "requiredSkillID": "sense",
             "successEffect": {
               "type": "narrative_only",
@@ -2271,6 +2279,8 @@
             "name": "Burn the Edges",
             "spawnChance": 0.65,
             "checkType": "skill",
+            "checkStat": "conviction",
+            "difficultyThreshold": 100,
             "successEffect": {
               "type": "remove_enemy",
               "enemyTypeID": "orchard_sproutling",
@@ -2359,6 +2369,8 @@
             "name": "The Well's Edge",
             "spawnChance": 1,
             "checkType": "skill",
+            "checkStat": "harmony",
+            "difficultyThreshold": 100,
             "requiredSkillID": "nature_touch",
             "successEffect": {
               "type": "narrative_only",
@@ -2612,6 +2624,8 @@
             "name": "Reading the Checkpoint",
             "spawnChance": 0.6,
             "checkType": "skill",
+            "checkStat": "conviction",
+            "difficultyThreshold": 100,
             "requiredSkillID": "sense",
             "successEffect": {
               "type": "remove_enemy",
@@ -3025,6 +3039,8 @@
             "name": "Reading the Flame",
             "spawnChance": 0.6,
             "checkType": "skill",
+            "checkStat": "conviction",
+            "difficultyThreshold": 100,
             "successEffect": {
               "type": "remove_enemy",
               "enemyTypeID": "ashen_ember",
@@ -3093,6 +3109,8 @@
             "name": "The Hearth",
             "spawnChance": 1,
             "checkType": "skill",
+            "checkStat": "ambition",
+            "difficultyThreshold": 100,
             "requiredSkillID": "sleet",
             "successEffect": {
               "type": "narrative_only",
@@ -3456,6 +3474,8 @@
             "name": "A Burning Brand",
             "spawnChance": 0.55,
             "checkType": "skill",
+            "checkStat": "conviction",
+            "difficultyThreshold": 100,
             "successEffect": {
               "type": "remove_enemy",
               "enemyTypeID": "kennel_runt",
@@ -3524,6 +3544,8 @@
             "name": "Reading the Pack",
             "spawnChance": 1,
             "checkType": "skill",
+            "checkStat": "ambition",
+            "difficultyThreshold": 100,
             "requiredSkillID": "stalk",
             "successEffect": {
               "type": "narrative_only",
@@ -3879,6 +3901,8 @@
             "name": "The Ward's Edge",
             "spawnChance": 0.65,
             "checkType": "skill",
+            "checkStat": "harmony",
+            "difficultyThreshold": 100,
             "requiredSkillTag": "nature",
             "successEffect": {
               "type": "narrative_only",
@@ -3950,6 +3974,8 @@
             "name": "The Breach Frequency",
             "spawnChance": 1,
             "checkType": "skill",
+            "checkStat": "harmony",
+            "difficultyThreshold": 100,
             "requiredSkillTag": "nature",
             "successEffect": {
               "type": "narrative_only",
@@ -4788,6 +4814,8 @@
             "name": "Reading the Runes",
             "spawnChance": 0.65,
             "checkType": "skill",
+            "checkStat": "harmony",
+            "difficultyThreshold": 100,
             "requiredSkillTag": "nature",
             "successEffect": {
               "type": "narrative_only",
@@ -4854,6 +4882,8 @@
             "name": "Elara's Presence",
             "spawnChance": 1,
             "checkType": "skill",
+            "checkStat": "harmony",
+            "difficultyThreshold": 100,
             "requiredSkillTag": "holy",
             "successEffect": {
               "type": "narrative_only",
@@ -5182,6 +5212,8 @@
             "name": "Reading the Runes",
             "spawnChance": 0.6,
             "checkType": "skill",
+            "checkStat": "conviction",
+            "difficultyThreshold": 100,
             "requiredSkillTag": "physical",
             "successEffect": {
               "type": "narrative_only",
@@ -5594,6 +5626,8 @@
             "name": "Against the Cold",
             "spawnChance": 0.6,
             "checkType": "skill",
+            "checkStat": "conviction",
+            "difficultyThreshold": 100,
             "requiredSkillTag": "fire",
             "successEffect": {
               "type": "remove_enemy",
@@ -5716,6 +5750,8 @@
             "name": "Thrain's Recordings",
             "spawnChance": 1,
             "checkType": "skill",
+            "checkStat": "harmony",
+            "difficultyThreshold": 100,
             "requiredSkillTag": "cold",
             "successEffect": {
               "type": "narrative_only",
@@ -6068,6 +6104,8 @@
             "name": "Reading the Light",
             "spawnChance": 0.6,
             "checkType": "skill",
+            "checkStat": "harmony",
+            "difficultyThreshold": 100,
             "requiredSkillTag": "cold",
             "successEffect": {
               "type": "narrative_only",
@@ -6134,6 +6172,8 @@
             "name": "The Pulse in the Light",
             "spawnChance": 1,
             "checkType": "skill",
+            "checkStat": "harmony",
+            "difficultyThreshold": 100,
             "requiredSkillTag": "holy",
             "successEffect": {
               "type": "narrative_only",
@@ -6476,6 +6516,8 @@
             "name": "The Ink's Shadow",
             "spawnChance": 0.6,
             "checkType": "skill",
+            "checkStat": "conviction",
+            "difficultyThreshold": 100,
             "requiredSkillTag": "shadow",
             "successEffect": {
               "type": "narrative_only",
@@ -6495,6 +6537,8 @@
             "name": "The Older Hand",
             "spawnChance": 0.55,
             "checkType": "skill",
+            "checkStat": "harmony",
+            "difficultyThreshold": 100,
             "requiredSkillTag": "nature",
             "successEffect": {
               "type": "narrative_only",
@@ -6561,6 +6605,8 @@
             "name": "The Sealed Section",
             "spawnChance": 1,
             "checkType": "skill",
+            "checkStat": "conviction",
+            "difficultyThreshold": 100,
             "requiredSkillTag": "shadow",
             "successEffect": {
               "type": "narrative_only",
@@ -6922,6 +6968,8 @@
             "name": "Reading the Fracture",
             "spawnChance": 0.6,
             "checkType": "skill",
+            "checkStat": "harmony",
+            "difficultyThreshold": 100,
             "requiredSkillTag": "nature",
             "successEffect": {
               "type": "narrative_only",
@@ -7009,6 +7057,8 @@
             "name": "The Ward's Heart",
             "spawnChance": 1,
             "checkType": "skill",
+            "checkStat": "harmony",
+            "difficultyThreshold": 100,
             "requiredSkillTag": "nature",
             "successEffect": {
               "type": "narrative_only",
@@ -7343,6 +7393,8 @@
             "name": "Find the Sealkeepers",
             "spawnChance": 0.65,
             "checkType": "skill",
+            "checkStat": "harmony",
+            "difficultyThreshold": 100,
             "requiredSkillTag": "nature",
             "successEffect": {
               "type": "narrative_only",
@@ -7414,6 +7466,8 @@
             "name": "The Corrupted Ley Line",
             "spawnChance": 1,
             "checkType": "skill",
+            "checkStat": "harmony",
+            "difficultyThreshold": 100,
             "requiredSkillTag": "nature",
             "successEffect": {
               "type": "narrative_only",
@@ -7806,6 +7860,8 @@
             "name": "What the Silence Says",
             "spawnChance": 0.65,
             "checkType": "skill",
+            "checkStat": "harmony",
+            "difficultyThreshold": 100,
             "requiredSkillTag": "holy",
             "successEffect": {
               "type": "narrative_only",
@@ -7877,6 +7933,8 @@
             "name": "Read the Vote",
             "spawnChance": 1,
             "checkType": "skill",
+            "checkStat": "conviction",
+            "difficultyThreshold": 100,
             "requiredSkillTag": "shadow",
             "successEffect": {
               "type": "narrative_only",

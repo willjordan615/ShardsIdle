@@ -720,7 +720,8 @@ async function displayCombatLog(combatData) {
                             } else {
                                 actionHint = `<div style="font-size:0.75rem;color:#5a4a30;margin-top:4px;">No <em>${tag}</em> skills in your repertoire yet.</div>`;
                             }
-                        } else if (!success) {
+                        } else if (!success && action.type === 'pre_combat_fallback') {
+                            // Skill not equipped at all — prompt player to equip it
                             actionHint = `<div style="font-size:0.75rem;color:#6a8a6a;margin-top:4px;">Equip ${skillLabel} to pass this check.</div>`;
                         }
 
