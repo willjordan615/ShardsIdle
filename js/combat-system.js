@@ -109,7 +109,7 @@ async function renderChallenges() {
             <div style="margin-top:0.75rem; border-top:1px solid rgba(139,115,85,0.2); padding-top:0.5rem;">
                 <button onclick="event.stopPropagation(); toggleLore('${loreId}')"
                     style="background:none; border:none; color:#8b7355; font-size:0.72rem; letter-spacing:0.06em; text-transform:uppercase; cursor:pointer; padding:0;">
-                    📖 Lore ${unlockedLore.length > 0 ? `(${unlockedLore.length}/${loreEntries.length})` : ''}
+                    <img src="/assets/icons/open-book.svg" class="gi-icon"> Lore ${unlockedLore.length > 0 ? `(${unlockedLore.length}/${loreEntries.length})` : ''}
                 </button>
                 <div id="${loreId}" style="display:none; margin-top:0.5rem;">
                     ${unlockedLore.map(e => `
@@ -118,7 +118,7 @@ async function renderChallenges() {
                         </div>`).join('')}
                     ${lockedCount > 0 ? `
                         <div style="color:#444; font-size:0.72rem; margin-top:0.25rem;">
-                            ${Array(lockedCount).fill('🔒').join(' ')} ${lockedCount} entr${lockedCount === 1 ? 'y' : 'ies'} undiscovered
+                            ${Array(lockedCount).fill('<img src="/assets/icons/key.svg" class="gi-icon">').join(' ')} ${lockedCount} entr${lockedCount === 1 ? 'y' : 'ies'} undiscovered
                         </div>` : ''}
                 </div>
             </div>` : ''}

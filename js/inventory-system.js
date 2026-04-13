@@ -501,7 +501,7 @@ function _renderGearModal(character, activeSlot, sortKey) {
             const nameColor = _rollQualityColor(inv) || _rarityColor(inv.rarity);
             const twoHanded = def?.two_handed ? `<span class="inv-two-handed-tag">Two-Handed</span>` : '';
             const isProtected = inv.locked || inv.favorited;
-            const lockLabel   = inv.favorited ? '★ Fav' : inv.locked ? '🔒 Locked' : 'Unlocked';
+            const lockLabel   = inv.favorited ? '★ Fav' : inv.locked ? '<img src="/assets/icons/key.svg" class="gi-icon"> Locked' : 'Unlocked';
             const lockClass   = inv.favorited ? 'inv-btn--fav' : inv.locked ? 'inv-btn--locked' : 'inv-btn--unlocked';
             rows += `
                 <div class="inv-item" data-inv-idx="${idx}">

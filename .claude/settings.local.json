@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd /tmp)",
+      "Bash(unzip -o game-icons-white.zip -d game-icons-white/)",
+      "Read(//tmp/**)",
+      "Bash(cp /tmp/game-icons-white/icons/delapouite/cloak-dagger.svg \"C:/Users/wtsna/Desktop/ShardsIdle/assets/icons/cloak-and-dagger.svg\")",
+      "Bash(find /tmp/game-icons-white -name \"cloak-dagger.svg\" -exec cp {} \"C:/Users/wtsna/Desktop/ShardsIdle/assets/icons/cloak-and-dagger.svg\" \\\\;)"
+    ]
+  }
+}

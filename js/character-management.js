@@ -1253,7 +1253,7 @@ async function renderCharacterSkills(character) {
                     : [];
                 const hintHTML = comboHints.length > 0
                     ? `<div style="margin-top:0.5rem; font-size:0.78em; color:#c8a84b; border-top:1px solid rgba(200,168,75,0.25); padding-top:0.4rem;">
-                           ⚗ May combine with: ${comboHints.join(', ')}
+                           <img src="/assets/icons/cauldron.svg" class="gi-icon"> May combine with: ${comboHints.join(', ')}
                        </div>`
                     : '';
 
@@ -1285,7 +1285,7 @@ async function renderCharacterSkills(character) {
 
                 // Swap Button
                 const btn = document.createElement('button');
-                btn.textContent = '🔄 Change Skill';
+                btn.innerHTML = '<img src="/assets/icons/cycle.svg" class="gi-icon"> Change Skill';
                 btn.className = 'btn-swap secondary';
                 btn.onclick = () => openSkillSwapModal(character, slotIndex);
                 card.appendChild(btn);
@@ -1297,7 +1297,7 @@ async function renderCharacterSkills(character) {
                     <div class="card-description">This skill no longer exists. Please select a replacement.</div>
                 `;
                 const btn = document.createElement('button');
-                btn.textContent = '⚡ Equip Skill';
+                btn.innerHTML = '<img src="/assets/icons/electric.svg" class="gi-icon"> Equip Skill';
                 btn.className = 'btn-swap secondary';
                 btn.onclick = () => openSkillSwapModal(character, slotIndex);
                 card.appendChild(btn);
@@ -1308,7 +1308,7 @@ async function renderCharacterSkills(character) {
                 <div class="card-title" style="color:#666;">Empty Slot ${slotIndex + 1}</div>
                 <div class="card-description">No skill equipped</div>
                 <button id="swap-btn-${slotIndex}" class="btn-swap secondary">
-                    ⚡ Equip Skill
+                    <img src="/assets/icons/electric.svg" class="gi-icon"> Equip Skill
                 </button>
             `;
             const btn = card.querySelector(`#swap-btn-${slotIndex}`);
@@ -1346,7 +1346,7 @@ async function renderCharacterSkills(character) {
                 .map(pid => window.gameData?.skills?.find(s => s.id === pid)?.name || pid)
                 .filter(Boolean);
             const comboLine = parents.length === 2
-                ? `<div style="color:#c8a84b; font-size:0.7em; margin-top:4px;">⚗ Discovered via: ${parents.join(' + ')}</div>`
+                ? `<div style="color:#c8a84b; font-size:0.7em; margin-top:4px;"><img src="/assets/icons/cauldron.svg" class="gi-icon"> Discovered via: ${parents.join(' + ')}</div>`
                 : '';
 
             const row = document.createElement('div');

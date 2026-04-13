@@ -1246,7 +1246,7 @@ function renderTurn(turn, logDisplay, hpMaxes, hpCurrent) {
         } else {
             // Subsequent procs while still at level 0 — same for everyone, no fanfare
             turnEl.innerHTML = `
-                <div class="turn-header" style="color:#8a7520;">⚡ <strong>${skillName}</strong> (Lv.0 — gaining XP)</div>
+                <div class="turn-header" style="color:#8a7520;"><img src="/assets/icons/electric.svg" class="gi-icon"> <strong>${skillName}</strong> (Lv.0 — gaining XP)</div>
                 <div class="turn-message">${turn.result?.message || skillName + ' fires!'}</div>
             `;
         }

@@ -4191,3 +4191,12 @@ body:has(#combatlog.active) #headerTopBar {
     max-height: 260px;
     overflow-y: auto;
 }
+
+/* ── Game icon SVGs used in place of emoji ──────────────────────────── */
+.gi-icon {
+    width: 1em;
+    height: 1em;
+    vertical-align: -0.1em;
+    opacity: 0.85;
+    flex-shrink: 0;
+}

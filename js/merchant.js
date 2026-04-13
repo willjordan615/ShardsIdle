@@ -9,7 +9,7 @@ const MERCHANTS = [
     id: 'herbalist',
     name: 'The Herbalist',
     greeting: 'She sets up beside a wagon of dried roots and clay jars, and waves you over without looking up.',
-    icon: '🌿',
+    icon: '<img src="/assets/icons/herbs-bundle.svg" class="gi-icon">',
     itemPool: [
       'health_potion_minor', 'health_potion', 'health_potion_major',
       'mana_potion_minor', 'mana_potion', 'mana_potion_major',
@@ -25,7 +25,7 @@ const MERCHANTS = [
     id: 'alchemist',
     name: 'The Alchemist',
     greeting: "His cart smells like sulfur and something you can't name. He doesn't apologize for it.",
-    icon: '⚗️',
+    icon: '<img src="/assets/icons/cauldron.svg" class="gi-icon">',
     itemPool: [
       'consumable_bomb_fire', 'consumable_bomb_ice', 'consumable_bomb_flash',
       'smoke_bomb', 'antidote',
@@ -39,7 +39,7 @@ const MERCHANTS = [
     id: 'scribe',
     name: 'The Wandering Scribe',
     greeting: 'She carries more knowledge than she will ever use herself. Some of it she is willing to part with.',
-    icon: '📜',
+    icon: '<img src="/assets/icons/scroll-unfurled.svg" class="gi-icon">',
     itemPool: [
       'consumable_scroll_fireball', 'consumable_scroll_lightning',
       'consumable_scroll_teleport',
@@ -53,7 +53,7 @@ const MERCHANTS = [
     id: 'fence',
     name: 'The Fence',
     greeting: "Doesn't ask where you've been. Doesn't tell you where she got it. Fair trade.",
-    icon: '🗝️',
+    icon: '<img src="/assets/icons/key.svg" class="gi-icon">',
     itemPool: [
       'consumable_tool_lockpick', 'consumable_tool_rope',
       'throwing_knife', 'escape_rope',

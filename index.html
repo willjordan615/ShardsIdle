@@ -191,7 +191,7 @@
                     <div style="display:flex; align-items:center; gap:10px;">
                         <span id="detailGold" style="color:#d4af37; font-size:0.85rem;">💰 0g</span>
                         <span id="detailDust" style="color:#8888ff; font-size:0.85rem;">✨ 0 dust</span>
-                        <button onclick="openCombatHistoryModal()" class="secondary btn-compact">📜 Combat History</button>
+                        <button onclick="openCombatHistoryModal()" class="secondary btn-compact"><img src="/assets/icons/scroll-unfurled.svg" class="gi-icon"> Combat History</button>
                     </div>
                 </div>
                 <p id="detailRace" style="color: #8b7355; margin-bottom: 0; position:relative; z-index:1;">Race</p>
@@ -341,7 +341,7 @@
         <div id="combatHistoryModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:2000; justify-content:center; align-items:center;">
             <div style="background:linear-gradient(135deg,var(--window-base),var(--window-deep)); border:2px solid var(--gold-border); border-radius:8px; padding:20px; width:90%; max-width:640px; max-height:82vh; display:flex; flex-direction:column;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-shrink:0;">
-                    <h3 style="color:#ffd700; margin:0;">📜 Combat History</h3>
+                    <h3 style="color:#ffd700; margin:0;"><img src="/assets/icons/scroll-unfurled.svg" class="gi-icon"> Combat History</h3>
                     <button onclick="document.getElementById('combatHistoryModal').style.display='none'" class="danger btn-compact">✕ Close</button>
                 </div>
                 <div id="combatHistoryDisplay" style="overflow-y:auto; font-size:0.85rem; flex:1;">
@@ -409,8 +409,8 @@
                         <h3>Available Companions</h3>
                         <!-- ADDED: Tab Navigation -->
                         <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; border-bottom: 1px solid #8b7355; padding-bottom: 0.5rem;">
-                            <button onclick="showCompanionTab('bots')" id="tab-bots" style="background: rgba(45, 80, 22, 0.5);">🤖 Bot Companions</button>
-                            <button onclick="showCompanionTab('public')" id="tab-public" class="secondary">🌐 Public Characters</button>
+                            <button onclick="showCompanionTab('bots')" id="tab-bots" style="background: rgba(45, 80, 22, 0.5);"><img src="/assets/icons/processor.svg" class="gi-icon"> Bot Companions</button>
+                            <button onclick="showCompanionTab('public')" id="tab-public" class="secondary"><img src="/assets/icons/wireframe-globe.svg" class="gi-icon"> Public Characters</button>
                         </div>
                         
                         <!-- Bot Companions -->
@@ -534,7 +534,7 @@
             </div>
 
             <!-- Mobile loot tab button -->
-            <button id="sessionLootTab" onclick="openSessionLootDrawer()" style="display:none;">🎒</button>
+            <button id="sessionLootTab" onclick="openSessionLootDrawer()" style="display:none;"><img src="/assets/icons/knapsack.svg" class="gi-icon"></button>
         </div>
 
         <!-- ========================================== -->
@@ -634,12 +634,12 @@
                     <button onclick="closeAdminPanel()" class="admin-close-btn">Close</button>
                 </div>
                 <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
-                    <button id="adminTabItems"      onclick="switchAdminTab('items')"      class="admin-btn-create" style="flex:1;">📦 Items</button>
-                    <button id="adminTab_skills"    onclick="switchAdminTab('skills')"     class="admin-btn-create" style="flex:1; background:#2a3a2a;">🔗 Skills</button>
-                    <button id="adminTab_enemies"   onclick="switchAdminTab('enemies')"    class="admin-btn-create" style="flex:1; background:#2a3a2a;">👹 Enemies</button>
-                    <button id="adminTab_characters" onclick="switchAdminTab('characters')" class="admin-btn-create" style="flex:1; background:#2a3a2a;">👤 Characters</button>
+                    <button id="adminTabItems"      onclick="switchAdminTab('items')"      class="admin-btn-create" style="flex:1;"><img src="/assets/icons/chest-armor.svg" class="gi-icon"> Items</button>
+                    <button id="adminTab_skills"    onclick="switchAdminTab('skills')"     class="admin-btn-create" style="flex:1; background:#2a3a2a;"><img src="/assets/icons/resonance.svg" class="gi-icon"> Skills</button>
+                    <button id="adminTab_enemies"   onclick="switchAdminTab('enemies')"    class="admin-btn-create" style="flex:1; background:#2a3a2a;"><img src="/assets/icons/battered-axe.svg" class="gi-icon"> Enemies</button>
+                    <button id="adminTab_characters" onclick="switchAdminTab('characters')" class="admin-btn-create" style="flex:1; background:#2a3a2a;"><img src="/assets/icons/cloak-and-dagger.svg" class="gi-icon"> Characters</button>
                     <button id="adminTab_snapshots" onclick="switchAdminTab('snapshots')"  class="admin-btn-create" style="flex:1; background:#2a3a2a;">📤 Snapshots</button>
-                    <button id="adminTab_db"        onclick="switchAdminTab('db')"         class="admin-btn-create" style="flex:1; background:#2a3a2a;">🗄 DB</button>
+                    <button id="adminTab_db"        onclick="switchAdminTab('db')"         class="admin-btn-create" style="flex:1; background:#2a3a2a;"><img src="/assets/icons/magnifying-glass.svg" class="gi-icon"> DB</button>
                     <button id="adminTab_tuning"    onclick="switchAdminTab('tuning')"     class="admin-btn-create" style="flex:1; background:#2a3a2a;">⚙ Tuning</button>
                 </div>
                 <div id="adminTabContent_items">
@@ -655,7 +655,7 @@
                         <button id="skillSubTab_edit" onclick="switchSkillSubTab('edit')"
                             style="padding:4px 12px;background:#1a3a2a;border:1px solid #3a6a4a;color:#8fa;cursor:pointer;border-radius:4px;font-size:.82em;">✏️ Edit Skills</button>
                         <button id="skillSubTab_tree" onclick="switchSkillSubTab('tree')"
-                            style="padding:4px 12px;background:#2a3a2a;border:1px solid #333;color:#888;cursor:pointer;border-radius:4px;font-size:.82em;">🔗 Combo Tree</button>
+                            style="padding:4px 12px;background:#2a3a2a;border:1px solid #333;color:#888;cursor:pointer;border-radius:4px;font-size:.82em;"><img src="/assets/icons/cycle.svg" class="gi-icon"> Combo Tree</button>
                     </div>
                     <div id="skillSubContent_edit" style="padding:8px;">
                         <div style="display:flex;gap:6px;margin-bottom:6px;align-items:center;">
@@ -754,7 +754,7 @@
 
             <!-- Tab Bar -->
             <div class="settings-tabs">
-                <button class="settings-tab settings-tab-active" data-tab="appearance">🎨 Appearance</button>
+                <button class="settings-tab settings-tab-active" data-tab="appearance"><img src="/assets/icons/palette.svg" class="gi-icon"> Appearance</button>
                 <button class="settings-tab" data-tab="gameplay">⚔ Gameplay</button>
                 <button class="settings-tab" data-tab="sound">🔊 Sound</button>
                 <button class="settings-tab" data-tab="accessibility">♿ Accessibility</button>
@@ -1722,7 +1722,7 @@ function mapOpenModal(c) {
       }
       if (lockedLoreCount > 0) {
         loreHtml += `<div style="color:#3a3020;font-size:0.7rem;letter-spacing:0.05em;margin-top:6px;">
-          ${'🔒 '.repeat(lockedLoreCount).trim()} &nbsp;${lockedLoreCount} entr${lockedLoreCount === 1 ? 'y' : 'ies'} undiscovered
+          ${'<img src="/assets/icons/key.svg" class="gi-icon"> '.repeat(lockedLoreCount).trim()} &nbsp;${lockedLoreCount} entr${lockedLoreCount === 1 ? 'y' : 'ies'} undiscovered
         </div>`;
       }
       loreEl.innerHTML = loreHtml;
