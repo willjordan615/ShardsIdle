@@ -1347,16 +1347,55 @@ function renderTurn(turn, logDisplay, hpMaxes, hpCurrent) {
 // Status icon data — populated from gameData on first use
 // The emoji field in statuses.json now holds an icon filename (no extension).
 const _STATUS_TINT = {
-    bleed:              'status-tint-red',
-    siphon_ward:        'status-tint-red',
-    life_leech:         'status-tint-red',
-    cursed_blood:       'status-tint-red',
-    bloodlust_buff:     'status-tint-red',
-    taunt:              'status-tint-red',
-    berserker_stance_buff: 'status-tint-red',
-    poison_weak:        'status-tint-green',
-    poison_strong:      'status-tint-purple',
-    poison_deadly:      'status-tint-dark',
+    // Bleed family — keep existing red tints
+    bleed:                 'status-tint-red',
+    siphon_ward:           'status-tint-red',
+    life_leech:            'status-tint-red',
+    cursed_blood:          'status-tint-red',
+    bloodlust_buff:        'status-tint-red',
+    deep_wound:            'status-tint-red',
+
+    // Orange
+    burn:                  'status-tint-orange',
+    mana_burn:             'status-tint-orange',
+    strength:              'status-tint-orange',
+    conviction_surge:      'status-tint-orange',
+
+    // Purple (poison family)
+    poison:                'status-tint-purple',
+    poison_weak:           'status-tint-purple',
+    poison_strong:         'status-tint-purple',
+    poison_deadly:         'status-tint-purple',
+    poison_weapon:         'status-tint-purple',
+
+    // Ice blue
+    freeze:                'status-tint-ice',
+    chilled:               'status-tint-ice',
+
+    // Yellow
+    electrified:           'status-tint-yellow',
+    haste:                 'status-tint-yellow',
+    speed_boost:           'status-tint-yellow',
+
+    // Magenta
+    arcane_burn:           'status-tint-magenta',
+    spell_amplification:   'status-tint-magenta',
+
+    // Dark grey / muted
+    shadowed:              'status-tint-shadow',
+    stealth:               'status-tint-shadow',
+
+    // Soft gold
+    harmony:               'status-tint-gold',
+    harmony_bond:          'status-tint-gold',
+
+    // Sickly green
+    cursed:                'status-tint-sickly',
+
+    // Dark red
+    conviction_drain:      'status-tint-darkred',
+    endurance_crack:       'status-tint-darkred',
+    ambition_edge:         'status-tint-darkred',
 };
 
 let _statusData = null;
