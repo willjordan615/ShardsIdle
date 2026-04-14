@@ -551,7 +551,7 @@ async function startCombat(forcedChallengeId) {
 
 /**
  * Navigate to character detail screen without stopping the idle loop.
- * Called from the "👤 View Character" button on the combat log screen.
+ * Called from the "View Character" button on the combat log screen.
  */
 function viewCharacterDuringCombat() {
     const charId = currentState.detailCharacterId;
@@ -580,7 +580,7 @@ function updateChallengeStatusBanner() {
             banner.style.display = 'flex';
             banner.innerHTML = `
                 <div style="display:flex; align-items:center; gap:8px; flex:1; flex-wrap:wrap;">
-                    <span style="color:#ffd700;">⏳ Finishing current challenge...</span>
+                    <span style="color:#ffd700;"><img src="/assets/icons/duration.svg" class="gi-icon" alt=""> Finishing current challenge...</span>
                     <span style="color:#aaa; font-size:0.82em;">Will stop after this run.</span>
                 </div>
                 <div style="display:flex; gap:8px; margin-left:auto;">
@@ -591,7 +591,7 @@ function updateChallengeStatusBanner() {
         } else {
             banner.style.display = 'flex';
             banner.innerHTML = `
-                <span style="color:#4cd964;">⚔️ Active:</span>
+                <span style="color:#4cd964;">Active:</span>
                 <span style="color:#ffd700; margin-left:6px;">${challengeName}</span>
                 <div style="margin-left:auto; display:flex; gap:8px;">
                     <button onclick="showScreen('combatlog')" class="secondary" style="font-size:0.85rem; padding:6px 14px;">▶ Watch</button>

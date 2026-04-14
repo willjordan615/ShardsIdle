@@ -95,7 +95,7 @@
         // Unlocks section
         const unlocksHTML = payload.newUnlocks?.length ? `
             <div class="rm-section rm-unlocks" style="--rm-delay:0.1s">
-                <div class="rm-section-label rm-section-label--unlock">✨ Skill Unlocked</div>
+                <div class="rm-section-label rm-section-label--unlock"><img src="/assets/icons/powder.svg" class="gi-icon" alt=""> Skill Unlocked</div>
                 ${payload.newUnlocks.map(u => `
                     <div class="rm-unlock-entry">
                         <div class="rm-unlock-name">${u.skillDef?.name || u.skillID}</div>
@@ -108,7 +108,7 @@
         const lootCount = payload.loot?.length || 0;
         const lootHTML  = lootCount ? `
             <div class="rm-section rm-loot-section" style="--rm-delay:0.18s">
-                <div class="rm-section-label">⚔ Loot</div>
+                <div class="rm-section-label">Loot</div>
                 <div class="rm-loot-list">
                     ${payload.loot.map((item, i) => {
                         const color      = rarityColor(item.rarity);
@@ -162,7 +162,7 @@
                         const afterPct  = (data.after / threshold) * 100;
                         return `<div class="rm-skill-row" data-from="${beforePct}" data-to="${afterPct}" data-leveled="${!!data.leveledUp}" data-disc="${isDisc}">
                             <div class="rm-skill-header">
-                                <span class="rm-skill-name ${isDisc ? 'rm-skill-name--disc' : ''}">${isDisc ? '🔮 ' : ''}${data.name}${!isDisc ? ` <span class="rm-skill-level">Lv.${data.level}</span>` : ''}</span>
+                                <span class="rm-skill-name ${isDisc ? 'rm-skill-name--disc' : ''}">${data.name}${!isDisc ? ` <span class="rm-skill-level">Lv.${data.level}</span>` : ''}</span>
                                 <span class="rm-skill-xp">+${data.xpAwarded.toFixed(0)} XP${data.leveledUp ? ` <span class="rm-levelup">${isDisc ? 'UNLOCKED!' : 'LEVEL UP!'}</span>` : ''}</span>
                             </div>
                             <div class="rm-bar-track"><div class="rm-bar ${isDisc ? 'rm-bar--disc' : 'rm-bar--skill'}" style="width:${beforePct}%"></div></div>
@@ -175,7 +175,7 @@
         const autoEquips   = payload.autoEquips || [];
         const autoEquipHTML = autoEquips.length ? `
             <div class="rm-section rm-autoequip-section" style="--rm-delay:${(0.30 + lootCount * 0.1).toFixed(2)}s">
-                <div class="rm-section-label">⚔ Auto-Equipped</div>
+                <div class="rm-section-label">Auto-Equipped</div>
                 <div class="rm-autoequip-list">
                     ${autoEquips.map(e => e.oldName
                         ? `<div class="rm-autoequip-row">

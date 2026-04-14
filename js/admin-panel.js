@@ -112,7 +112,7 @@
         <div style="overflow-y:auto;max-height:65vh;padding:8px;">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
                 <button onclick="adminBackToList()" style="padding:4px 10px;background:#1a2a1a;border:1px solid #3a5a3a;color:#8fa;cursor:pointer;border-radius:4px;">← Back</button>
-                <span style="color:#d4af37;font-size:1em;font-weight:bold;">${isNew ? '➕ New Item' : '✏️ ' + esc(item.name)}</span>
+                <span style="color:#d4af37;font-size:1em;font-weight:bold;">${isNew ? '➕ New Item' : esc(item.name)}</span>
             </div>
 
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
@@ -169,8 +169,8 @@
             </div>
 
             <div style="display:flex;gap:8px;">
-                <button class="admin-btn-save" onclick="adminSaveItem(${isNew})">${isNew ? '✅ Create' : '💾 Save'}</button>
-                ${!isNew ? `<button class="admin-btn-cancel" style="background:#8b2222;" onclick="adminDeleteItem('${editingItemId}')">🗑️ Delete</button>` : ''}
+                <button class="admin-btn-save" onclick="adminSaveItem(${isNew})">${isNew ? '✅ Create' : 'Save'}</button>
+                ${!isNew ? `<button class="admin-btn-cancel" style="background:#8b2222;" onclick="adminDeleteItem('${editingItemId}')">Delete</button>` : ''}
                 <button class="admin-btn-cancel" onclick="adminBackToList()">Cancel</button>
             </div>
         </div>`;
@@ -448,7 +448,7 @@ window.openAdminEnemy = function(idx) {
         <div style="overflow-y:auto;max-height:65vh;padding:8px;">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
                 <button onclick="loadAdminEnemies()" style="padding:4px 10px;background:#1a2a1a;border:1px solid #3a5a3a;color:#8fa;cursor:pointer;border-radius:4px;">← Back</button>
-                <span style="color:#d4af37;font-weight:bold;">${isNew ? '➕ New Enemy' : '✏️ ' + (e.name||'')}</span>
+                <span style="color:#d4af37;font-weight:bold;">${isNew ? '➕ New Enemy' : (e.name||'')}</span>
             </div>
 
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
@@ -490,8 +490,8 @@ window.openAdminEnemy = function(idx) {
             </div>
 
             <div style="display:flex;gap:8px;">
-                <button class="admin-btn-save" onclick="adminSaveEnemy(${isNew})">${isNew ? '✅ Create' : '💾 Save'}</button>
-                ${!isNew ? `<button class="admin-btn-cancel" style="background:#8b2222;" onclick="adminDeleteEnemy()">🗑️ Delete</button>` : ''}
+                <button class="admin-btn-save" onclick="adminSaveEnemy(${isNew})">${isNew ? '✅ Create' : 'Save'}</button>
+                ${!isNew ? `<button class="admin-btn-cancel" style="background:#8b2222;" onclick="adminDeleteEnemy()">Delete</button>` : ''}
                 <button class="admin-btn-cancel" onclick="loadAdminEnemies()">Cancel</button>
             </div>
         </div>`;
@@ -820,7 +820,7 @@ window.adminViewCharacter = async function(id) {
                 <div style="display:flex;gap:8px;">
                     <button onclick="adminSaveCharacter('${char.id}', ${skills.length})"
                         style="padding:6px 18px;background:#1a3a1a;border:1px solid #3a6a3a;color:#8f8;cursor:pointer;border-radius:4px;font-size:.9em;">
-                        💾 Save Changes
+                        Save Changes
                     </button>
                     <button onclick="loadAdminCharacters()"
                         style="padding:6px 14px;background:#222;border:1px solid #444;color:#aaa;cursor:pointer;border-radius:4px;font-size:.9em;">
@@ -828,7 +828,7 @@ window.adminViewCharacter = async function(id) {
                     </button>
                     <button onclick="adminDeleteCharacter('${char.id}','${char.name}')"
                         style="margin-left:auto;padding:6px 14px;background:#2a1a1a;border:1px solid #533;color:#f88;cursor:pointer;border-radius:4px;font-size:.9em;">
-                        🗑️ Delete Character
+                        Delete Character
                     </button>
                 </div>
             </div>`;
@@ -1072,7 +1072,7 @@ window.adminFilterSkills = function(q) {
         .forEach(({ s, i }) => {
             if (catF && s.category !== catF) return;
             if (search && !s.name.toLowerCase().includes(search) && !s.id.toLowerCase().includes(search)) return;
-            const tag = s.isStarterSkill ? '⭐ ' : (s.parentSkills?.length === 2) ? '🔮 ' : '';
+            const tag = '';
             const opt = document.createElement('option');
             opt.value = i;
             opt.textContent = `${tag}${s.name} (${s.id})`;
@@ -1114,7 +1114,7 @@ window.openAdminSkill = function(idx) {
 
     el.innerHTML = `
         <div style="border-top:1px solid #1a2a3a;padding-top:10px;">
-            <div style="color:#d4af37;font-weight:bold;margin-bottom:8px;">${isNew ? '➕ New Skill' : '✏️ ' + (s.name || '')}</div>
+            <div style="color:#d4af37;font-weight:bold;margin-bottom:8px;">${isNew ? '➕ New Skill' : (s.name || '')}</div>
 
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px;">
                 <div class="admin-field"><label>ID ${isNew ? '<span style="color:#555;font-size:.75em">(auto from name, editable)</span>' : ''}</label>
@@ -1194,8 +1194,8 @@ window.openAdminSkill = function(idx) {
             <div id="sk_effectsList" style="margin-bottom:8px;"></div>
 
             <div style="display:flex;gap:6px;">
-                <button class="admin-btn-save" onclick="adminSaveSkill(${isNew})">${isNew ? '✅ Create' : '💾 Save'}</button>
-                ${!isNew ? `<button class="admin-btn-cancel" style="background:#8b2222;" onclick="adminDeleteSkill()">🗑️ Delete</button>` : ''}
+                <button class="admin-btn-save" onclick="adminSaveSkill(${isNew})">${isNew ? '✅ Create' : 'Save'}</button>
+                ${!isNew ? `<button class="admin-btn-cancel" style="background:#8b2222;" onclick="adminDeleteSkill()">Delete</button>` : ''}
                 <button class="admin-btn-cancel" onclick="document.getElementById('adminSkillEditor').style.display='none'">Cancel</button>
             </div>
         </div>`;

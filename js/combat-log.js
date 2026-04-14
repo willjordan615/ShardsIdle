@@ -583,7 +583,7 @@ async function displayCombatLog(combatData) {
         // Don't pre-populate enemies from participants.enemies — that reflects the
         // final stage's pool, not stage 1. Each stage reveals its own enemies when
         // its intro finishes. Show a placeholder until then.
-        enemyStatus.innerHTML = '<div class="enemy-panel-placeholder">⚔️ Awaiting encounter...</div>';
+        enemyStatus.innerHTML = '<div class="enemy-panel-placeholder">Awaiting encounter...</div>';
 
         // --- PLAYBACK ---
         const hasSegments  = combatData.segments && Array.isArray(combatData.segments) && combatData.segments.length > 0;
@@ -793,7 +793,7 @@ async function displayCombatLog(combatData) {
 
                 // 6. Stage summary — update banner to show outcome, then log it
                 const outcomeColor = segment.status === 'victory' ? '#4cd964' : '#f44336';
-                const outcomeIcon  = segment.status === 'victory' ? '⚔️ Stage Clear' : '💀 Defeated';
+                const outcomeIcon  = segment.status === 'victory' ? 'Stage Clear' : 'Defeated';
                 if (stageBannerPre) {
                     const summaryEl = document.createElement('div');
                     summaryEl.style.cssText = `color:${outcomeColor}; margin-top:6px; font-style:normal; font-weight:bold; font-size:0.85rem;`;
@@ -1239,7 +1239,7 @@ function renderTurn(turn, logDisplay, hpMaxes, hpCurrent) {
             } else {
                 turnEl.classList.add('discovery-turn--ally');
                 turnEl.innerHTML = `
-                    <div class="turn-header" style="color:#a08828;">✨ ${turn.actorName} — <strong>${skillName}</strong> discovered</div>
+                    <div class="turn-header" style="color:#a08828;"><img src="/assets/icons/powder.svg" class="gi-icon" alt=""> ${turn.actorName} — <strong>${skillName}</strong> discovered</div>
                     <div class="turn-message">${turn.result?.message || skillName + ' fires!'}</div>
                 `;
             }
@@ -1538,7 +1538,7 @@ try {
         // Log current discovery XP so we can confirm accumulation across combats
         const discoveries = character.skills.filter(s => s.discovered && (s.skillLevel || 0) < 1);
         if (discoveries.length > 0) {
-            discoveries.forEach(s => console.log(`[XP] 📖 ${s.skillID} entering combat rewards at XP: ${(s.skillXP||0).toFixed(0)} / 120`));
+            discoveries.forEach(s => console.log(`[XP] ${s.skillID} entering combat rewards at XP: ${(s.skillXP||0).toFixed(0)} / 120`));
         }
 
         const oldLevel = character.level || 1;
@@ -1572,7 +1572,7 @@ try {
             if (isMyTurn && turn.isFirstDiscovery && turn.action?.skillID) {
                 const exists = character.skills.some(s => s.skillID === turn.action.skillID);
                 if (!exists) {
-                    console.log(`[REWARDS] ⚡ FORCE INJECTING discovery: ${turn.action.skillID}`);
+                    console.log(`[REWARDS] FORCE INJECTING discovery: ${turn.action.skillID}`);
                     character.skills.push({
                         skillID: turn.action.skillID,
                         skillLevel: 0,
@@ -1749,9 +1749,9 @@ try {
                         newUnlocks.push({ skillID, skillDef });
                     } else {
                     }
-                    console.log(`[XP] 🎉 ${skillID} reached Level ${skillRef.skillLevel}!`);
+                    console.log(`[XP] ${skillID} reached Level ${skillRef.skillLevel}!`);
                 } else if (skillRef.skillLevel < 1) {
-                    console.log(`[XP] ✨ ${skillID} discovery XP: ${skillRef.skillXP.toFixed(0)} / ${threshold} (+${xpToAward})`);
+                    console.log(`[XP] ${skillID} discovery XP: ${skillRef.skillXP.toFixed(0)} / ${threshold} (+${xpToAward})`);
                 }
             }
         });

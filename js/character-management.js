@@ -834,8 +834,8 @@ async function renderRoster(page) {
         }
 
         const profileLabels = {
-            balanced:'⚖️ Balanced', aggressive:'⚔️ Aggressive', cautious:'🛡️ Cautious',
-            support:'💚 Support', disruptor:'🌀 Disruptor', opportunist:'🗡️ Opportunist'
+            balanced:'<img src="/assets/icons/scales.svg" class="gi-icon" alt=""> Balanced', aggressive:'<img src="/assets/icons/battered-axe.svg" class="gi-icon" alt=""> Aggressive', cautious:'<img src="/assets/icons/shield-echoes.svg" class="gi-icon" alt=""> Cautious',
+            support:'<img src="/assets/icons/healing-shield.svg" class="gi-icon" alt=""> Support', disruptor:'<img src="/assets/icons/star-swirl.svg" class="gi-icon" alt=""> Disruptor', opportunist:'<img src="/assets/icons/crosshair-arrow.svg" class="gi-icon" alt=""> Opportunist'
         };
 
         characters.forEach(character => {
@@ -854,7 +854,7 @@ async function renderRoster(page) {
                 })
                 .filter(Boolean);
 
-            const profileLabel = profileLabels[character.aiProfile] || '⚖️ Balanced';
+            const profileLabel = profileLabels[character.aiProfile] || '<img src="/assets/icons/scales.svg" class="gi-icon" alt=""> Balanced';
 
             const card = document.createElement('div');
             card.className = 'card roster-card';
@@ -1016,8 +1016,8 @@ async function showCharacterDetail(characterId, opts = {}) {
         // Currency display
         const goldEl = document.getElementById('detailGold');
         const dustEl = document.getElementById('detailDust');
-        if (goldEl) goldEl.textContent = `💰 ${(character.gold || 0).toFixed(0)}g`;
-        if (dustEl) dustEl.textContent = `✨ ${(character.arcaneDust || 0).toFixed(2)} dust`;
+        if (goldEl) goldEl.innerHTML = `<img src="/assets/icons/two-coins.svg" class="gi-icon" alt=""> ${(character.gold || 0).toFixed(0)}g`;
+        if (dustEl) dustEl.innerHTML = `<img src="/assets/icons/powder.svg" class="gi-icon" alt=""> ${(character.arcaneDust || 0).toFixed(2)} dust`;
 
 
         const detailLevelEl = document.getElementById('detailLevel');
@@ -1065,26 +1065,26 @@ async function showCharacterDetail(characterId, opts = {}) {
         // Populate Combat Style section
         const profile = character.aiProfile || 'balanced';
         const profileLabels = {
-            balanced:    '⚖️ Balanced',
-            aggressive:  '⚔️ Aggressive',
-            cautious:    '🛡️ Cautious',
-            support:     '💚 Support',
-            disruptor:   '🌀 Disruptor',
-            opportunist: '🗡️ Opportunist'
+            balanced:    '<img src="/assets/icons/scales.svg" class="gi-icon" alt=""> Balanced',
+            aggressive:  '<img src="/assets/icons/battered-axe.svg" class="gi-icon" alt=""> Aggressive',
+            cautious:    '<img src="/assets/icons/shield-echoes.svg" class="gi-icon" alt=""> Cautious',
+            support:     '<img src="/assets/icons/healing-shield.svg" class="gi-icon" alt=""> Support',
+            disruptor:   '<img src="/assets/icons/star-swirl.svg" class="gi-icon" alt=""> Disruptor',
+            opportunist: '<img src="/assets/icons/crosshair-arrow.svg" class="gi-icon" alt=""> Opportunist'
         };
         const badge = document.getElementById('aiProfileBadge');
-        if (badge) badge.textContent = profileLabels[profile] || profile;
+        if (badge) badge.innerHTML = profileLabels[profile] || profile;
         const select = document.getElementById('aiProfileDetailSelect');
         if (select) select.value = profile;
 
         // Role tag
         const roleTag = character.roleTag || '';
         const ROLE_LABELS = {
-            Defender: '🛡 Defender', Bruiser: '⚔️ Bruiser', Mage: '🔮 Mage',
-            Healer: '💊 Healer', Support: '💚 Support', Utility: '🔧 Utility', Assassin: '🗡️ Assassin'
+            Defender: '<img src="/assets/icons/chest-armor.svg" class="gi-icon" alt=""> Defender', Bruiser: '<img src="/assets/icons/mailed-fist.svg" class="gi-icon" alt=""> Bruiser', Mage: '<img src="/assets/icons/earth-crack.svg" class="gi-icon" alt=""> Mage',
+            Healer: '<img src="/assets/icons/caduceus.svg" class="gi-icon" alt=""> Healer', Support: '<img src="/assets/icons/resonance.svg" class="gi-icon" alt=""> Support', Utility: '<img src="/assets/icons/uncertainty.svg" class="gi-icon" alt=""> Utility', Assassin: '<img src="/assets/icons/cloak-and-dagger.svg" class="gi-icon" alt=""> Assassin'
         };
         const roleTagBadge = document.getElementById('roleTagBadge');
-        if (roleTagBadge) roleTagBadge.textContent = ROLE_LABELS[roleTag] || 'None';
+        if (roleTagBadge) roleTagBadge.innerHTML = ROLE_LABELS[roleTag] || 'None';
         const roleTagSelect = document.getElementById('roleTagSelect');
         if (roleTagSelect) roleTagSelect.value = roleTag;
         const msg = document.getElementById('aiProfileSaveMsg');
@@ -1385,7 +1385,7 @@ async function renderCharacterSkills(character) {
             card.style.cssText = 'background:rgba(138,100,255,0.08); border:1px solid rgba(138,100,255,0.3); border-radius:6px; padding:8px 10px;';
             card.innerHTML = `
                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span style="color:#aa88ff; font-weight:bold; font-size:0.9em;">⭐ ${skillDef.name}</span>
+                    <span style="color:#aa88ff; font-weight:bold; font-size:0.9em;">${skillDef.name}</span>
                     <span style="color:#666; font-size:0.72em;">Innate · ${raceDef.name}</span>
                 </div>
                 <div style="color:#888; font-size:0.78em; margin-top:3px;">${skillDef.description || ''}</div>
@@ -1644,14 +1644,14 @@ async function saveAiProfile() {
         if (character) character.aiProfile = aiProfile;
 
         const profileLabels = {
-            balanced:    '⚖️ Balanced',
-            aggressive:  '⚔️ Aggressive',
-            cautious:    '🛡️ Cautious',
-            support:     '💚 Support',
-            disruptor:   '🌀 Disruptor',
-            opportunist: '🗡️ Opportunist'
+            balanced:    '<img src="/assets/icons/scales.svg" class="gi-icon" alt=""> Balanced',
+            aggressive:  '<img src="/assets/icons/battered-axe.svg" class="gi-icon" alt=""> Aggressive',
+            cautious:    '<img src="/assets/icons/shield-echoes.svg" class="gi-icon" alt=""> Cautious',
+            support:     '<img src="/assets/icons/healing-shield.svg" class="gi-icon" alt=""> Support',
+            disruptor:   '<img src="/assets/icons/star-swirl.svg" class="gi-icon" alt=""> Disruptor',
+            opportunist: '<img src="/assets/icons/crosshair-arrow.svg" class="gi-icon" alt=""> Opportunist'
         };
-        if (badge) badge.textContent = profileLabels[aiProfile] || aiProfile;
+        if (badge) badge.innerHTML = profileLabels[aiProfile] || aiProfile;
         if (msg) {
             msg.textContent = 'Combat style saved.';
             setTimeout(() => { if (msg) msg.textContent = ''; }, 2000);
@@ -1671,8 +1671,8 @@ async function saveRoleTag() {
 
     const roleTag = select.value;
     const ROLE_LABELS = {
-        Defender: '🛡 Defender', Bruiser: '⚔️ Bruiser', Mage: '🔮 Mage',
-        Healer: '💊 Healer', Support: '💚 Support', Utility: '🔧 Utility', Assassin: '🗡️ Assassin'
+        Defender: '<img src="/assets/icons/chest-armor.svg" class="gi-icon" alt=""> Defender', Bruiser: '<img src="/assets/icons/mailed-fist.svg" class="gi-icon" alt=""> Bruiser', Mage: '<img src="/assets/icons/earth-crack.svg" class="gi-icon" alt=""> Mage',
+        Healer: '<img src="/assets/icons/caduceus.svg" class="gi-icon" alt=""> Healer', Support: '<img src="/assets/icons/resonance.svg" class="gi-icon" alt=""> Support', Utility: '<img src="/assets/icons/uncertainty.svg" class="gi-icon" alt=""> Utility', Assassin: '<img src="/assets/icons/cloak-and-dagger.svg" class="gi-icon" alt=""> Assassin'
     };
 
     try {
@@ -1681,7 +1681,7 @@ async function saveRoleTag() {
         character.roleTag = roleTag;
         await saveCharacterToServer(character);
 
-        if (badge) badge.textContent = ROLE_LABELS[roleTag] || 'None';
+        if (badge) badge.innerHTML = ROLE_LABELS[roleTag] || 'None';
         if (msg) {
             msg.textContent = 'Role saved.';
             setTimeout(() => { if (msg) msg.textContent = ''; }, 2000);
@@ -1803,7 +1803,7 @@ function renderExportButton(character) {
 
     if (character.isImportedReference) {
         btn.disabled = true;
-        btn.textContent = '📤 Sharing: N/A';
+        btn.textContent = 'Sharing: N/A';
         btn.title = 'Imported characters cannot be shared';
         btn.style.opacity = '0.4';
         btn.style.cursor = 'not-allowed';
@@ -1815,12 +1815,12 @@ function renderExportButton(character) {
         btn.style.cursor = 'pointer';
         const isSharing = !!(character.shareEnabled || character.isPublic);
         if (isSharing) {
-            btn.textContent       = '📤 Sharing: On';
+            btn.textContent       = 'Sharing: On';
             btn.style.color       = '#4cd964';
             btn.style.borderColor = '#4cd964';
             btn.title = 'Sharing enabled — click to turn off';
         } else {
-            btn.textContent       = '📤 Sharing: Off';
+            btn.textContent       = 'Sharing: Off';
             btn.style.color       = '';
             btn.style.borderColor = '';
             btn.title = 'Click to share this character publicly';
@@ -1979,7 +1979,7 @@ function renderImportBadge(character) {
         badgeContainer.style.display = 'block';
         badgeContainer.innerHTML = `
             <div style="padding: 0.75rem; background: rgba(74, 158, 255, 0.1); border: 1px solid #4a9eff; border-radius: 4px; margin-bottom: 1rem;">
-                <div style="color: #4a9eff; font-weight: bold; margin-bottom: 0.5rem;">📥 Imported Character</div>
+                <div style="color: #4a9eff; font-weight: bold; margin-bottom: 0.5rem;"><img src="/assets/icons/cloud-upload.svg" class="gi-icon" alt=""> Imported Character</div>
                 <div style="color: #aaa; font-size: 0.85rem;">
                     <div>Original Owner: ${character.originalOwnerUserId || 'Anonymous'}</div>
                     <div>Share Code: ${character.originalShareCode}</div>
@@ -2009,7 +2009,7 @@ function _renderTooltipHint() {
 
     el.style.display = 'flex';
     el.innerHTML = `
-        <span>💡 Long press skills or gear for details</span>
+        <span><img src="/assets/icons/magnifying-glass.svg" class="gi-icon" alt=""> Long press skills or gear for details</span>
         <button class="btn-dismiss-hint" onclick="
             localStorage.setItem('tooltipHintDismissed','true');
             document.getElementById('tooltipHint').style.display='none';

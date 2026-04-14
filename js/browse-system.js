@@ -114,14 +114,19 @@ function createBrowseCard(char) {
     const topKillEntry = Object.entries(stats.enemyKills || {}).sort((a, b) => b[1] - a[1])[0];
 
     const ROLE_LABELS = {
-        Defender: '🛡 Defender', Bruiser: '⚔️ Bruiser', Mage: '🔮 Mage',
-        Healer: '💊 Healer', Support: '💚 Support', Utility: '🔧 Utility', Assassin: '🗡️ Assassin'
+        Defender: '<img src="/assets/icons/chest-armor.svg" class="gi-icon" alt=""> Defender', Bruiser: '<img src="/assets/icons/mailed-fist.svg" class="gi-icon" alt=""> Bruiser', Mage: '<img src="/assets/icons/earth-crack.svg" class="gi-icon" alt=""> Mage',
+        Healer: '<img src="/assets/icons/caduceus.svg" class="gi-icon" alt=""> Healer', Support: '<img src="/assets/icons/resonance.svg" class="gi-icon" alt=""> Support', Utility: '<img src="/assets/icons/uncertainty.svg" class="gi-icon" alt=""> Utility', Assassin: '<img src="/assets/icons/cloak-and-dagger.svg" class="gi-icon" alt=""> Assassin'
     };
     const profileLabels = {
-        balanced:'⚖️', aggressive:'⚔️', cautious:'🛡️', support:'💚', disruptor:'🌀', opportunist:'🗡️'
+        balanced:'<img src="/assets/icons/scales.svg" class="gi-icon" alt="">',
+        aggressive:'<img src="/assets/icons/battered-axe.svg" class="gi-icon" alt="">',
+        cautious:'<img src="/assets/icons/shield-echoes.svg" class="gi-icon" alt="">',
+        support:'<img src="/assets/icons/healing-shield.svg" class="gi-icon" alt="">',
+        disruptor:'<img src="/assets/icons/star-swirl.svg" class="gi-icon" alt="">',
+        opportunist:'<img src="/assets/icons/crosshair-arrow.svg" class="gi-icon" alt="">'
     };
     const roleLabel = char.roleTag ? ROLE_LABELS[char.roleTag] : null;
-    const profileEmoji = profileLabels[char.aiProfile] || '⚖️';
+    const profileEmoji = profileLabels[char.aiProfile] || '<img src="/assets/icons/scales.svg" class="gi-icon" alt="">';
     const characterClass = (typeof getCharacterClass === 'function' && char.skills)
         ? getCharacterClass(char, window.gameData?.skills || [])
         : null;
@@ -345,7 +350,7 @@ window.toggleCharacterSharing = async function() {
 
         if (btn) {
             btn.disabled = false;
-            btn.textContent   = enabling ? '📤 Sharing: On' : '📤 Sharing: Off';
+            btn.textContent   = enabling ? 'Sharing: On' : 'Sharing: Off';
             btn.style.color       = enabling ? '#4cd964' : '';
             btn.style.borderColor = enabling ? '#4cd964' : '';
         }
@@ -470,8 +475,8 @@ async function loadPublicCompanions(page) {
 
         const authUserId = window.authState?.userId;
         const ROLE_LABELS = {
-            Defender:'🛡 Defender', Bruiser:'⚔️ Bruiser', Mage:'🔮 Mage',
-            Healer:'💊 Healer', Support:'💚 Support', Utility:'🔧 Utility', Assassin:'🗡️ Assassin'
+            Defender:'<img src="/assets/icons/chest-armor.svg" class="gi-icon" alt=""> Defender', Bruiser:'<img src="/assets/icons/mailed-fist.svg" class="gi-icon" alt=""> Bruiser', Mage:'<img src="/assets/icons/earth-crack.svg" class="gi-icon" alt=""> Mage',
+            Healer:'<img src="/assets/icons/caduceus.svg" class="gi-icon" alt=""> Healer', Support:'<img src="/assets/icons/resonance.svg" class="gi-icon" alt=""> Support', Utility:'<img src="/assets/icons/uncertainty.svg" class="gi-icon" alt=""> Utility', Assassin:'<img src="/assets/icons/cloak-and-dagger.svg" class="gi-icon" alt=""> Assassin'
         };
 
         container.innerHTML = '';

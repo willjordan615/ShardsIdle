@@ -146,12 +146,12 @@
                         <h3>Combat Style</h3>
                         <div class="form-group">
                             <select id="aiProfileSelect" style="width:100%;" onchange="updateCombatStyleDesc()">
-                                <option value="balanced">⚖️ Balanced</option>
-                                <option value="aggressive">⚔️ Aggressive</option>
-                                <option value="cautious">🛡️ Cautious</option>
-                                <option value="support">💚 Support</option>
-                                <option value="disruptor">🌀 Disruptor</option>
-                                <option value="opportunist">🗡️ Opportunist</option>
+                                <option value="balanced">Balanced</option>
+                                <option value="aggressive">Aggressive</option>
+                                <option value="cautious">Cautious</option>
+                                <option value="support">Support</option>
+                                <option value="disruptor">Disruptor</option>
+                                <option value="opportunist">Opportunist</option>
                             </select>
                         </div>
                         <p id="combatStyleDesc" style="color:#8b7355; font-size:0.85rem; margin-top:0.5rem; line-height:1.5; min-height:2.5rem;"></p>
@@ -177,7 +177,7 @@
         <div id="detail" class="screen">
             <!-- Challenge status banner: shown when idle loop is active -->
             <div id="challengeStatusBanner" style="display:none; background:rgba(76,217,100,0.08); border:1px solid rgba(76,217,100,0.3); border-radius:6px; padding:10px 14px; margin-bottom:12px; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
-                <span>⚔️ Active challenge</span>
+                <span>Active challenge</span>
                 <button id="returnFromChallengeBtn" onclick="requestLoopExit()" class="secondary btn-compact" style="display:none;">⏹ Return from Challenge</button>
             </div>
             <div class="nav-buttons">
@@ -189,8 +189,8 @@
                 <div style="display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:0.25rem; position:relative; z-index:1;">
                     <h2 id="detailName" style="margin:0;">Character Name</h2>
                     <div style="display:flex; align-items:center; gap:10px;">
-                        <span id="detailGold" style="color:#d4af37; font-size:0.85rem;">💰 0g</span>
-                        <span id="detailDust" style="color:#8888ff; font-size:0.85rem;">✨ 0 dust</span>
+                        <span id="detailGold" style="color:#d4af37; font-size:0.85rem;"><img src="/assets/icons/two-coins.svg" class="gi-icon" alt=""> 0g</span>
+                        <span id="detailDust" style="color:#8888ff; font-size:0.85rem;"><img src="/assets/icons/powder.svg" class="gi-icon" alt=""> 0 dust</span>
                         <button onclick="openCombatHistoryModal()" class="secondary btn-compact"><img src="/assets/icons/scroll-unfurled.svg" class="gi-icon"> Combat History</button>
                     </div>
                 </div>
@@ -284,18 +284,18 @@
                         <div class="loadout-slot loadout-slot--filled" style="cursor:pointer; position:relative; gap:12px;">
                             <span class="loadout-slot__label" style="min-width:90px; flex-shrink:0;">
                                 Combat Style
-                                <span title="Controls how your character behaves in combat. Affects which skills are prioritised, when consumables are used, and how aggressively resources are spent.&#10;&#10;⚖️ Balanced — Moderate on all fronts. Finishes low-HP enemies, conserves resources between stages.&#10;⚔️ Aggressive — Maximises damage. Almost never buffs or heals. Spends resources freely. Targets lowest-HP enemy.&#10;🛡️ Cautious — Prefers utility, defense, and healing. Buffs early, targets the biggest threat. Tight resource conservation across stages.&#10;💚 Support — Heals and buffs heavily. Rescues low-HP allies first. Rarely attacks.&#10;🌀 Disruptor — Strongly prefers control and debuff skills. Targets the most dangerous enemy.&#10;🗡️ Opportunist — Sets up combos and procs. Hits much harder when the target is already debuffed. Targets the most vulnerable enemy.&#10;&#10;All profiles: buffs are used early in a fight and nearly forbidden by turn 10. Consumables are only used when the fight is genuinely difficult." style="color:#8b7355; font-size:0.75rem; cursor:help; margin-left:4px; position:relative; z-index:2;">ⓘ</span>
+                                <span title="Controls how your character behaves in combat. Affects which skills are prioritised, when consumables are used, and how aggressively resources are spent.&#10;&#10;Balanced — Moderate on all fronts. Finishes low-HP enemies, conserves resources between stages.&#10;Aggressive — Maximises damage. Almost never buffs or heals. Spends resources freely. Targets lowest-HP enemy.&#10;Cautious — Prefers utility, defense, and healing. Buffs early, targets the biggest threat. Tight resource conservation across stages.&#10;Support — Heals and buffs heavily. Rescues low-HP allies first. Rarely attacks.&#10;Disruptor — Strongly prefers control and debuff skills. Targets the most dangerous enemy.&#10;Opportunist — Sets up combos and procs. Hits much harder when the target is already debuffed. Targets the most vulnerable enemy.&#10;&#10;All profiles: buffs are used early in a fight and nearly forbidden by turn 10. Consumables are only used when the fight is genuinely difficult." style="color:#8b7355; font-size:0.75rem; cursor:help; margin-left:4px; position:relative; z-index:2;">ⓘ</span>
                             </span>
                             <span class="loadout-slot__item" id="aiProfileBadge"></span>
                             <select id="aiProfileDetailSelect"
                                     onchange="saveAiProfile()"
                                     style="position:absolute; inset:0; width:100%; height:100%; opacity:0; cursor:pointer; z-index:1; font-size:16px;">
-                                <option value="balanced">⚖️ Balanced — Adapts to the situation</option>
-                                <option value="aggressive">⚔️ Aggressive — Always pushes for the kill</option>
-                                <option value="cautious">🛡️ Cautious — Prioritises survival and defense</option>
-                                <option value="support">💚 Support — Heals and buffs allies first</option>
-                                <option value="disruptor">🌀 Disruptor — Focuses on debuffs and control</option>
-                                <option value="opportunist">🗡️ Opportunist — Exploits weaknesses and procs</option>
+                                <option value="balanced">Balanced — Adapts to the situation</option>
+                                <option value="aggressive">Aggressive — Always pushes for the kill</option>
+                                <option value="cautious">Cautious — Prioritises survival and defense</option>
+                                <option value="support">Support — Heals and buffs allies first</option>
+                                <option value="disruptor">Disruptor — Focuses on debuffs and control</option>
+                                <option value="opportunist">Opportunist — Exploits weaknesses and procs</option>
                             </select>
                         </div>
                         <p id="aiProfileSaveMsg" style="color:#4cd964; font-size:0.75rem; min-height:1em; text-align:right; margin:2px 4px 0;"></p>
@@ -310,13 +310,13 @@
                                     onchange="saveRoleTag()"
                                     style="position:absolute; inset:0; width:100%; height:100%; opacity:0; cursor:pointer; z-index:1; font-size:16px;">
                                 <option value="">— Untagged</option>
-                                <option value="Defender">🛡 Defender</option>
-                                <option value="Bruiser">⚔️ Bruiser</option>
-                                <option value="Mage">🔮 Mage</option>
-                                <option value="Healer">💊 Healer</option>
-                                <option value="Support">💚 Support</option>
-                                <option value="Utility">🔧 Utility</option>
-                                <option value="Assassin">🗡️ Assassin</option>
+                                <option value="Defender">Defender</option>
+                                <option value="Bruiser">Bruiser</option>
+                                <option value="Mage">Mage</option>
+                                <option value="Healer">Healer</option>
+                                <option value="Support">Support</option>
+                                <option value="Utility">Utility</option>
+                                <option value="Assassin">Assassin</option>
                             </select>
                         </div>
                         <p id="roleTagSaveMsg" style="color:#4cd964; font-size:0.75rem; min-height:1em; text-align:right; margin:2px 4px 0;"></p>
@@ -329,8 +329,8 @@
 
             <!-- Character footer — always full width, outside column layout -->
             <div class="detail-footer">
-                <button onclick="deleteCharacter(currentState.detailCharacterId)" class="danger">🗑 Delete Character</button>
-                <button id="exportCharacterBtn" onclick="toggleCharacterSharing()" class="secondary">📤 Sharing: Off</button>
+                <button onclick="deleteCharacter(currentState.detailCharacterId)" class="danger">Delete Character</button>
+                <button id="exportCharacterBtn" onclick="toggleCharacterSharing()" class="secondary">Sharing: Off</button>
             </div>
             <!-- Mobile tooltip hint -->
             <div id="tooltipHint" style="display:none;"></div>
@@ -572,13 +572,13 @@
                 <div class="grid-3" style="margin-top:0.5rem;">
                     <select id="browseRoleFilter" onchange="loadBrowseCharacters(1)">
                         <option value="">Any Role</option>
-                        <option value="Defender">🛡 Defender</option>
-                        <option value="Bruiser">⚔️ Bruiser</option>
-                        <option value="Mage">🔮 Mage</option>
-                        <option value="Healer">💊 Healer</option>
-                        <option value="Support">💚 Support</option>
-                        <option value="Utility">🔧 Utility</option>
-                        <option value="Assassin">🗡️ Assassin</option>
+                        <option value="Defender">Defender</option>
+                        <option value="Bruiser">Bruiser</option>
+                        <option value="Mage">Mage</option>
+                        <option value="Healer">Healer</option>
+                        <option value="Support">Support</option>
+                        <option value="Utility">Utility</option>
+                        <option value="Assassin">Assassin</option>
                     </select>
                     <select id="browseRaceFilter" onchange="loadBrowseCharacters(1)">
                         <option value="">Any Race</option>
@@ -638,7 +638,7 @@
                     <button id="adminTab_skills"    onclick="switchAdminTab('skills')"     class="admin-btn-create" style="flex:1; background:#2a3a2a;"><img src="/assets/icons/resonance.svg" class="gi-icon"> Skills</button>
                     <button id="adminTab_enemies"   onclick="switchAdminTab('enemies')"    class="admin-btn-create" style="flex:1; background:#2a3a2a;"><img src="/assets/icons/battered-axe.svg" class="gi-icon"> Enemies</button>
                     <button id="adminTab_characters" onclick="switchAdminTab('characters')" class="admin-btn-create" style="flex:1; background:#2a3a2a;"><img src="/assets/icons/cloak-and-dagger.svg" class="gi-icon"> Characters</button>
-                    <button id="adminTab_snapshots" onclick="switchAdminTab('snapshots')"  class="admin-btn-create" style="flex:1; background:#2a3a2a;">📤 Snapshots</button>
+                    <button id="adminTab_snapshots" onclick="switchAdminTab('snapshots')"  class="admin-btn-create" style="flex:1; background:#2a3a2a;">Snapshots</button>
                     <button id="adminTab_db"        onclick="switchAdminTab('db')"         class="admin-btn-create" style="flex:1; background:#2a3a2a;"><img src="/assets/icons/magnifying-glass.svg" class="gi-icon"> DB</button>
                     <button id="adminTab_tuning"    onclick="switchAdminTab('tuning')"     class="admin-btn-create" style="flex:1; background:#2a3a2a;">⚙ Tuning</button>
                 </div>
@@ -653,7 +653,7 @@
                     <!-- Sub-tabs -->
                     <div style="display:flex;gap:6px;padding:8px 8px 0;">
                         <button id="skillSubTab_edit" onclick="switchSkillSubTab('edit')"
-                            style="padding:4px 12px;background:#1a3a2a;border:1px solid #3a6a4a;color:#8fa;cursor:pointer;border-radius:4px;font-size:.82em;">✏️ Edit Skills</button>
+                            style="padding:4px 12px;background:#1a3a2a;border:1px solid #3a6a4a;color:#8fa;cursor:pointer;border-radius:4px;font-size:.82em;">Edit Skills</button>
                         <button id="skillSubTab_tree" onclick="switchSkillSubTab('tree')"
                             style="padding:4px 12px;background:#2a3a2a;border:1px solid #333;color:#888;cursor:pointer;border-radius:4px;font-size:.82em;"><img src="/assets/icons/cycle.svg" class="gi-icon"> Combo Tree</button>
                     </div>
@@ -755,7 +755,7 @@
             <!-- Tab Bar -->
             <div class="settings-tabs">
                 <button class="settings-tab settings-tab-active" data-tab="appearance"><img src="/assets/icons/palette.svg" class="gi-icon"> Appearance</button>
-                <button class="settings-tab" data-tab="gameplay">⚔ Gameplay</button>
+                <button class="settings-tab" data-tab="gameplay">Gameplay</button>
                 <button class="settings-tab" data-tab="sound">🔊 Sound</button>
                 <button class="settings-tab" data-tab="accessibility">♿ Accessibility</button>
             </div>
