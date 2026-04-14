@@ -1331,7 +1331,7 @@ async function renderCharacterSkills(character) {
 
         const heading = document.createElement('div');
         heading.style.cssText = 'color:#d4af37; font-size:0.8em; letter-spacing:1px; margin-bottom:6px; text-transform:uppercase;';
-        heading.textContent = '\u{1F52E} Discovered (Unlocking...)';
+        heading.innerHTML = '<img src="/assets/icons/spectacles.svg" class="gi-icon" alt=""> Discovered (Unlocking...)';
         section.appendChild(heading);
 
         const UNLOCK_THRESHOLD = 120;
