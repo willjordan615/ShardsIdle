@@ -1,0 +1,43 @@
+I'll analyze the repository for dead functions. Let me search through the codebase to identify functions that are defined but never called.Now let me search for JavaScript function definitions across the frontend and backend:Now let me get more comprehensive coverage by examining key files for unused functions:Now I'll search more carefully through the codebase to identify dead/unused functions:Let me check more frontend files for potential dead code:Based on my review of the Shards Idle codebase, I've identified several dead/unused functions that are defined but never called. Here's the comprehensive analysis:
+
+Dead Functions Found
+Backend (Node.js/Express)
+database.js:
+
+getImportReference(importId) (line 637) — Defined but never called. The code uses getImportByCharacterId() instead.
+getCharacterImports(characterId) (line 655) — Defined but never called anywhere in the codebase.
+routes/auth.js:
+
+sanitizeDisplayText() (line 21) — Defined but never used. Character names use sanitizeUsername() instead.
+routes/character.js:
+
+sanitizeText() (line 8) — Defined but never called within this file. It's redundant with similar functions in other routes.
+routes/character-snapshots.js:
+
+sanitizeText() (line 15) — Duplicate/unused sanitization function (appears in multiple route files).
+Frontend (Vanilla JS)
+js/inventory-system.js:
+
+equipItem(character, itemId, idx) (line 862) — Wrapper that just calls equipItemNew(). All callers use equipItemNew() directly.
+unequipItem(character, slot) (line 863) — Wrapper that just calls unequipItemNew(). All callers use the New version directly.
+js/game-data.js:
+
+getAuthToken() (line 78) — Defined but never called; window.authState.token is accessed directly instead.
+hasWeaponProc(procId) (line 615, nested helper) — Defined inside getCharacterClass() but never invoked within that function.
+js/combat-log.js & js/combat-rewards.js:
+
+Multiple internal helper functions (_snap, _statusSnapshot in combatEngine.js lines 2869, 3014) appear to be duplicated snapshot builders — only one should exist.
+Recommendations
+Remove the wrapper functions in inventory-system.js (equipItem, unequipItem) — just call the New versions directly.
+
+Consolidate sanitization — merge sanitizeText() and sanitizeDisplayText() into a single utility in one place, then import it where needed.
+
+Delete unused DB functions:
+
+getImportReference() (use getImportByCharacterId() exclusively)
+getCharacterImports() (appears unused; verify it's not called dynamically)
+Remove getAuthToken() — use window.authState.token directly or create a clear pattern.
+
+Audit combatEngine.js — the duplicate snapshot functions (_snap and _statusSnapshot) should be consolidated into one.
+
+Would you like me to create a GitHub issue documenting these findings, or would you prefer a PR that cleans up these dead functions?
