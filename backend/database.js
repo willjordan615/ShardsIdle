@@ -105,6 +105,10 @@ function createTables() {
                     avatarId TEXT,
                     avatarColor TEXT,
                     avatarFrame TEXT,
+                    customAvatarUrl TEXT DEFAULT NULL,
+                    customAvatarX REAL DEFAULT 0,
+                    customAvatarY REAL DEFAULT 0,
+                    customAvatarScale REAL DEFAULT 1,
                     title TEXT,
                     lastActiveAt DATETIME,
                     createdAt INTEGER NOT NULL,
@@ -302,6 +306,23 @@ async function initializeCharacterSnapshotsTable() {
             resolve();
         });
     });
+
+    // Migration: add custom avatar fields
+    for (const [col, def] of [
+        ['customAvatarUrl',   'TEXT DEFAULT NULL'],
+        ['customAvatarX',     'REAL DEFAULT 0'],
+        ['customAvatarY',     'REAL DEFAULT 0'],
+        ['customAvatarScale', 'REAL DEFAULT 1'],
+    ]) {
+        await new Promise((resolve) => {
+            db.run(`ALTER TABLE characters ADD COLUMN ${col} ${def}`, (err) => {
+                if (err && !err.message.includes('duplicate column')) {
+                    console.warn(`[DATABASE] Migration note (${col}):`, err.message);
+                }
+                resolve();
+            });
+        });
+    }
 }
 
 // ── Idle session helpers ──────────────────────────────────────────────────────
@@ -396,9 +417,11 @@ function saveCharacter(character) {
                 unlockedCombos, combatStats, partyStats,
                 ownerUserId, isPublic, shareCode, buildName, buildDescription,
                 importCount, lastSharedAt,
-                avatarId, avatarColor, avatarFrame, title, lastActiveAt,
+                avatarId, avatarColor, avatarFrame,
+                customAvatarUrl, customAvatarX, customAvatarY, customAvatarScale,
+                title, lastActiveAt,
                 createdAt, lastModified, last_seen, lastSuccessfulChallengeId, aiProfile, roleTag
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(id) DO UPDATE SET
                 name = ?, race = ?, level = ?, experience = ?,
                 conviction = ?, endurance = ?, ambition = ?, harmony = ?,
@@ -407,7 +430,9 @@ function saveCharacter(character) {
                 unlockedCombos = ?, combatStats = ?, partyStats = ?,
                 ownerUserId = ?, isPublic = ?, shareCode = ?, buildName = ?, buildDescription = ?,
                 importCount = ?, lastSharedAt = ?,
-                avatarId = ?, avatarColor = ?, avatarFrame = ?, title = ?, lastActiveAt = ?,
+                avatarId = ?, avatarColor = ?, avatarFrame = ?,
+                customAvatarUrl = ?, customAvatarX = ?, customAvatarY = ?, customAvatarScale = ?,
+                title = ?, lastActiveAt = ?,
                 lastModified = ?, last_seen = ?, lastSuccessfulChallengeId = ?, aiProfile = ?, roleTag = ?`,
             [
                 character.id, character.name, character.race, character.level, character.experience,
@@ -429,7 +454,12 @@ function saveCharacter(character) {
                 character.buildName || null, character.buildDescription || null,
                 character.importCount || 0, character.lastSharedAt || null,
                 character.avatarId || null, character.avatarColor || null,
-                character.avatarFrame || null, character.title || null,
+                character.avatarFrame || null,
+                character.customAvatarUrl || null,
+                character.customAvatarX ?? 0,
+                character.customAvatarY ?? 0,
+                character.customAvatarScale ?? 1,
+                character.title || null,
                 character.lastActiveAt || Date.now(),
                 character.createdAt || Date.now(), Date.now(), Date.now(),
                 character.lastSuccessfulChallengeId || null,
@@ -455,7 +485,12 @@ function saveCharacter(character) {
                 character.buildName || null, character.buildDescription || null,
                 character.importCount || 0, character.lastSharedAt || null,
                 character.avatarId || null, character.avatarColor || null,
-                character.avatarFrame || null, character.title || null,
+                character.avatarFrame || null,
+                character.customAvatarUrl || null,
+                character.customAvatarX ?? 0,
+                character.customAvatarY ?? 0,
+                character.customAvatarScale ?? 1,
+                character.title || null,
                 character.lastActiveAt || Date.now(),
                 Date.now(), Date.now(), character.lastSuccessfulChallengeId || null,
                 character.aiProfile || 'balanced',
@@ -518,6 +553,10 @@ function getCharacter(characterId) {
                     shareEnabled: row.isPublic === 1,
                     last_login: row.last_login || null,
                     last_seen:  row.last_seen  || null,
+                    customAvatarUrl: row.customAvatarUrl || null,
+                    customAvatarX: row.customAvatarX ?? 0,
+                    customAvatarY: row.customAvatarY ?? 0,
+                    customAvatarScale: row.customAvatarScale ?? 1,
                 });
             } else {
                 resolve(null);
@@ -575,6 +614,10 @@ function getAllCharacters() {
                     shareEnabled: row.isPublic === 1,
                     last_login: row.last_login || null,
                     last_seen:  row.last_seen  || null,
+                    customAvatarUrl: row.customAvatarUrl || null,
+                    customAvatarX: row.customAvatarX ?? 0,
+                    customAvatarY: row.customAvatarY ?? 0,
+                    customAvatarScale: row.customAvatarScale ?? 1,
                 })) : [];
                 resolve(characters);
             }

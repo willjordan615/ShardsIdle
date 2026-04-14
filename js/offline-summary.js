@@ -64,8 +64,8 @@ function _renderOfflineSummary(summary, primaryChar) {
     const avatarColor  = primaryChar?.avatarColor || '#8a7a5a';
 
     // Avatar HTML — full portrait treatment
-    const avatarHtml = (window.AVATARS && avatarId)
-        ? window.AVATARS.renderCardBg(avatarId, avatarColor)
+    const avatarHtml = window.AVATARS
+        ? window.AVATARS.renderCardBgForCharacter(primaryChar)
         : '';
 
     // Time away

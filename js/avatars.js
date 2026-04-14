@@ -130,6 +130,30 @@ const IMAGES = {
         return `<div class="avatar-card-bg">${svg.replace('<svg ', `<svg style="color:${tint}" `)}</div>`;
     }
 
-    window.AVATARS = { defaultForRace, defaultColor, renderPicker, renderCardBg };
+    /**
+     * renderCardBgForCharacter(character) → HTML string
+     * Uses customAvatarUrl if set, with stored transform values.
+     * Falls back to renderCardBg(avatarId, color) if no custom URL.
+     *
+     * Transform model:
+     *   customAvatarX/Y: translate percentage offsets (default 0)
+     *   customAvatarScale: scale multiplier (default 1)
+     */
+    function renderCardBgForCharacter(character) {
+        if (character && character.customAvatarUrl) {
+            const x     = character.customAvatarX     ?? 0;
+            const y     = character.customAvatarY     ?? 0;
+            const scale = character.customAvatarScale ?? 1;
+            const transform = `scale(${scale}) translate(${x}%, ${y}%)`;
+            return `<div class="avatar-card-bg avatar-card-bg--custom">` +
+                `<img src="${character.customAvatarUrl}" alt="" draggable="false" ` +
+                `style="position:absolute;width:100%;height:100%;object-fit:cover;` +
+                `transform:${transform};transform-origin:center center;">` +
+                `</div>`;
+        }
+        return renderCardBg(character?.avatarId, character?.avatarColor);
+    }
+
+    window.AVATARS = { defaultForRace, defaultColor, renderPicker, renderCardBg, renderCardBgForCharacter };
 
 })();

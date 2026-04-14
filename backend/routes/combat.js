@@ -160,6 +160,10 @@ router.post('/start', requireAuth, async (req, res) => {
                             avatarId:         originalChar.avatarId         || null,
                             avatarColor:      originalChar.avatarColor      || null,
                             avatarFrame:      originalChar.avatarFrame      || null,
+                            customAvatarUrl:  originalChar.customAvatarUrl  || null,
+                            customAvatarX:    originalChar.customAvatarX    ?? 0,
+                            customAvatarY:    originalChar.customAvatarY    ?? 0,
+                            customAvatarScale: originalChar.customAvatarScale ?? 1,
                         };
                     }
                 }
@@ -651,6 +655,12 @@ router.post('/idle/collect', requireAuth, async (req, res) => {
                 consumableStash:  char.consumableStash || {},
                 keyring:          char.keyring || {},
                 aiProfile:        char.aiProfile || 'balanced',
+                avatarId:         char.avatarId || null,
+                avatarColor:      char.avatarColor || null,
+                customAvatarUrl:  char.customAvatarUrl || null,
+                customAvatarX:    char.customAvatarX ?? 0,
+                customAvatarY:    char.customAvatarY ?? 0,
+                customAvatarScale: char.customAvatarScale ?? 1,
             };
         }));
 

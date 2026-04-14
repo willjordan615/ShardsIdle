@@ -195,6 +195,28 @@
                     </div>
                 </div>
                 <p id="detailRace" style="color: #8b7355; margin-bottom: 0; position:relative; z-index:1;">Race</p>
+                <button id="customAvatarToggleBtn" onclick="toggleCustomAvatarEditor()" class="btn-minor" style="position:absolute; bottom:8px; right:10px; z-index:2; font-size:0.72rem; padding:2px 8px; opacity:0.7;">Portrait</button>
+            </div>
+
+            <!-- Custom avatar URL editor — collapsed by default -->
+            <div id="customAvatarEditor" style="display:none; background:rgba(0,0,0,0.4); border-bottom:1px solid rgba(212,175,55,0.2); padding:10px 16px 12px;">
+                <div style="display:flex; align-items:flex-start; gap:12px; flex-wrap:wrap;">
+                    <div style="flex:1; min-width:200px;">
+                        <label style="display:block; font-size:0.75rem; color:#8b7355; margin-bottom:4px;">Custom Portrait URL <span style="color:#555; font-size:0.7rem;">(https://... image)</span></label>
+                        <div style="display:flex; gap:6px; align-items:center;">
+                            <input id="customAvatarUrlInput" type="text" placeholder="https://example.com/portrait.jpg"
+                                style="flex:1; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.15); border-radius:4px; color:#e8e0d0; padding:5px 8px; font-size:0.82rem; min-width:0;"
+                                oninput="previewCustomAvatar()">
+                            <button onclick="saveCustomAvatar()" class="secondary btn-compact" style="font-size:0.78rem; white-space:nowrap;">Save</button>
+                            <button onclick="clearCustomAvatar()" class="btn-minor" style="font-size:0.78rem; white-space:nowrap;">Clear</button>
+                        </div>
+                        <p id="customAvatarMsg" style="color:#4cd964; font-size:0.72rem; min-height:1em; margin:3px 0 0;"></p>
+                    </div>
+                    <div id="customAvatarPreview" style="width:72px; height:96px; border:1px solid rgba(255,255,255,0.15); border-radius:4px; overflow:hidden; background:#1a1a2e; flex-shrink:0; position:relative; cursor:move; user-select:none;">
+                        <div id="customAvatarPreviewInner" style="position:absolute;inset:0;overflow:hidden;"></div>
+                    </div>
+                </div>
+                <p style="color:#555; font-size:0.7rem; margin:6px 0 0;">Host your image externally (Imgur, Discord CDN, etc.). Drag to reposition · scroll to zoom.</p>
             </div>
 
             <div class="detail-layout">

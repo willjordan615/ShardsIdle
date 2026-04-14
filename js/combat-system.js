@@ -421,7 +421,11 @@ async function startCombat(forcedChallengeId) {
             aiProfile: member.aiProfile || 'balanced',
             race: member.race || null,
             avatarId: member.avatarId || null,
-            avatarColor: member.avatarColor || null
+            avatarColor: member.avatarColor || null,
+            customAvatarUrl: member.customAvatarUrl || null,
+            customAvatarX: member.customAvatarX ?? 0,
+            customAvatarY: member.customAvatarY ?? 0,
+            customAvatarScale: member.customAvatarScale ?? 1
         }));
 
         // Inject story companions whose gates are met for this challenge

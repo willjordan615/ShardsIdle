@@ -861,7 +861,7 @@ async function renderRoster(page) {
             card.style.cssText = 'position:relative; overflow:hidden;';
             card.onclick = async () => await showCharacterDetail(character.id);
 
-            const avatarBg = window.AVATARS?.renderCardBg(character.avatarId, character.avatarColor) ?? '';
+            const avatarBg = window.AVATARS?.renderCardBgForCharacter(character) ?? '';
             card.innerHTML = `
                 ${avatarBg}
                 <div class="roster-card__header">
@@ -984,6 +984,7 @@ async function showCharacterDetail(characterId, opts = {}) {
         await ensureIntrinsicSkill(character);
 
         currentState.detailCharacterId = characterId;
+        window._currentDetailCharacter = character;
         const race = getRace(character.race);
         const xpToNextLevel = getXPToNextLevel(character.level);
         const xpPercent = getProgressPercent(character.experience, xpToNextLevel);
@@ -995,20 +996,22 @@ async function showCharacterDetail(characterId, opts = {}) {
         if (detailHeader) {
             const existingBg = detailHeader.querySelector('.avatar-card-bg');
             if (existingBg) existingBg.remove();
-            const avatarBg = window.AVATARS?.renderCardBg(character.avatarId, character.avatarColor) ?? '';
+            const avatarBg = window.AVATARS?.renderCardBgForCharacter(character) ?? '';
             if (avatarBg) {
                 detailHeader.insertAdjacentHTML('afterbegin', avatarBg);
-                const bgEl = detailHeader.querySelector('.avatar-card-bg');
-                const img  = bgEl?.querySelector('img');
-                if (bgEl && img) {
-                    img.style.width     = '100%';
-                    img.style.height    = 'auto';
-                    img.style.objectFit = 'unset';
-                    img.style.objectPosition = 'unset';
-                    img.style.position  = 'absolute';
-                    img.style.left      = '0';
-                    img.style.right     = '0';
-                    img.style.animation = 'detail-portrait-pan 14s ease-in-out infinite alternate';
+                if (!character.customAvatarUrl) {
+                    const bgEl = detailHeader.querySelector('.avatar-card-bg');
+                    const img  = bgEl?.querySelector('img');
+                    if (bgEl && img) {
+                        img.style.width     = '100%';
+                        img.style.height    = 'auto';
+                        img.style.objectFit = 'unset';
+                        img.style.objectPosition = 'unset';
+                        img.style.position  = 'absolute';
+                        img.style.left      = '0';
+                        img.style.right     = '0';
+                        img.style.animation = 'detail-portrait-pan 14s ease-in-out infinite alternate';
+                    }
                 }
             }
         }
@@ -1091,6 +1094,8 @@ async function showCharacterDetail(characterId, opts = {}) {
         if (msg) msg.textContent = '';
 
         if (!silent) {
+            const _cae = document.getElementById('customAvatarEditor');
+            if (_cae) _cae.style.display = 'none';
             showScreen('detail');
             if (typeof updateChallengeStatusBanner === 'function') updateChallengeStatusBanner();
             if (localStorage.getItem('si_guide_pending') && !localStorage.getItem('si_guide_dismissed')) {
@@ -1690,6 +1695,174 @@ async function saveRoleTag() {
         if (msg) msg.textContent = 'Failed to save.';
         console.error('saveRoleTag error:', err);
     }
+}
+
+// Draft transform state for the custom avatar editor (not yet saved)
+const _customAvatarDraft = { x: 0, y: 0, scale: 1 };
+
+function _updateCustomAvatarPreviewTransform() {
+    const preview = document.getElementById('customAvatarPreviewInner');
+    const img = preview?.querySelector('img');
+    if (!img) return;
+    img.style.transform = `scale(${_customAvatarDraft.scale}) translate(${_customAvatarDraft.x}%, ${_customAvatarDraft.y}%)`;
+}
+
+function _bindCustomAvatarPreviewInteraction() {
+    const preview = document.getElementById('customAvatarPreview');
+    if (!preview || preview._caInteractionBound) return;
+    preview._caInteractionBound = true;
+
+    let dragging = false, startX = 0, startY = 0, startDX = 0, startDY = 0;
+
+    preview.addEventListener('mousedown', e => {
+        dragging = true;
+        startX = e.clientX; startY = e.clientY;
+        startDX = _customAvatarDraft.x; startDY = _customAvatarDraft.y;
+        e.preventDefault();
+    });
+    document.addEventListener('mousemove', e => {
+        if (!dragging) return;
+        const rect = preview.getBoundingClientRect();
+        const dx = (e.clientX - startX) / rect.width  * 100 / _customAvatarDraft.scale;
+        const dy = (e.clientY - startY) / rect.height * 100 / _customAvatarDraft.scale;
+        _customAvatarDraft.x = startDX + dx;
+        _customAvatarDraft.y = startDY + dy;
+        _updateCustomAvatarPreviewTransform();
+    });
+    document.addEventListener('mouseup', () => { dragging = false; });
+
+    preview.addEventListener('wheel', e => {
+        e.preventDefault();
+        const factor = e.deltaY < 0 ? 1.1 : 0.9;
+        _customAvatarDraft.scale = Math.max(0.5, Math.min(5, _customAvatarDraft.scale * factor));
+        _updateCustomAvatarPreviewTransform();
+    }, { passive: false });
+
+    // Touch drag
+    let lastTouch = null;
+    preview.addEventListener('touchstart', e => {
+        if (e.touches.length === 1) {
+            lastTouch = { x: e.touches[0].clientX, y: e.touches[0].clientY,
+                          dx: _customAvatarDraft.x, dy: _customAvatarDraft.y };
+        }
+        e.preventDefault();
+    }, { passive: false });
+    preview.addEventListener('touchmove', e => {
+        if (e.touches.length === 1 && lastTouch) {
+            const rect = preview.getBoundingClientRect();
+            _customAvatarDraft.x = lastTouch.dx + (e.touches[0].clientX - lastTouch.x) / rect.width  * 100 / _customAvatarDraft.scale;
+            _customAvatarDraft.y = lastTouch.dy + (e.touches[0].clientY - lastTouch.y) / rect.height * 100 / _customAvatarDraft.scale;
+            _updateCustomAvatarPreviewTransform();
+        }
+        e.preventDefault();
+    }, { passive: false });
+}
+
+function toggleCustomAvatarEditor() {
+    const editor = document.getElementById('customAvatarEditor');
+    if (!editor) return;
+    const isVisible = editor.style.display !== 'none';
+    editor.style.display = isVisible ? 'none' : 'block';
+    if (!isVisible) {
+        const char = window._currentDetailCharacter;
+        const input = document.getElementById('customAvatarUrlInput');
+        if (input && char) input.value = char.customAvatarUrl || '';
+        _customAvatarDraft.x     = char?.customAvatarX     ?? 0;
+        _customAvatarDraft.y     = char?.customAvatarY     ?? 0;
+        _customAvatarDraft.scale = char?.customAvatarScale ?? 1;
+        previewCustomAvatar();
+        _bindCustomAvatarPreviewInteraction();
+    }
+}
+
+function previewCustomAvatar() {
+    const input   = document.getElementById('customAvatarUrlInput');
+    const preview = document.getElementById('customAvatarPreviewInner');
+    if (!preview) return;
+    const url = input?.value?.trim() || '';
+    if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+        preview.innerHTML = `<img src="${url}" alt="" draggable="false"
+            style="position:absolute;width:100%;height:100%;object-fit:cover;transform-origin:center center;"
+            onerror="this.parentElement.innerHTML='<span style=\\'color:#666;font-size:0.65rem;padding:4px;display:block;\\'>Invalid URL</span>'">`;
+        _updateCustomAvatarPreviewTransform();
+    } else {
+        preview.innerHTML = '';
+    }
+}
+
+function _reRenderDetailHeaderAvatar(character) {
+    const detailHeader = document.getElementById('detailCharHeader');
+    if (!detailHeader) return;
+    const existingBg = detailHeader.querySelector('.avatar-card-bg');
+    if (existingBg) existingBg.remove();
+    const avatarBg = window.AVATARS?.renderCardBgForCharacter(character) ?? '';
+    if (avatarBg) {
+        detailHeader.insertAdjacentHTML('afterbegin', avatarBg);
+        if (!character.customAvatarUrl) {
+            const bgEl = detailHeader.querySelector('.avatar-card-bg');
+            const img  = bgEl?.querySelector('img');
+            if (bgEl && img) {
+                img.style.width     = '100%';
+                img.style.height    = 'auto';
+                img.style.objectFit = 'unset';
+                img.style.objectPosition = 'unset';
+                img.style.position  = 'absolute';
+                img.style.left      = '0';
+                img.style.right     = '0';
+                img.style.animation = 'detail-portrait-pan 14s ease-in-out infinite alternate';
+            }
+        }
+    }
+}
+
+async function saveCustomAvatar() {
+    const characterId = currentState.detailCharacterId;
+    const input = document.getElementById('customAvatarUrlInput');
+    const msg   = document.getElementById('customAvatarMsg');
+    if (!characterId || !input) return;
+
+    const url = input.value.trim();
+    if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
+        if (msg) msg.textContent = 'URL must start with http:// or https://';
+        return;
+    }
+
+    try {
+        const character = await getCharacter(characterId);
+        if (!character) throw new Error('Character not found');
+        character.customAvatarUrl   = url || null;
+        character.customAvatarX     = url ? _customAvatarDraft.x     : 0;
+        character.customAvatarY     = url ? _customAvatarDraft.y     : 0;
+        character.customAvatarScale = url ? _customAvatarDraft.scale : 1;
+        await saveCharacterToServer(character);
+
+        if (window._currentDetailCharacter) {
+            Object.assign(window._currentDetailCharacter, {
+                customAvatarUrl:   character.customAvatarUrl,
+                customAvatarX:     character.customAvatarX,
+                customAvatarY:     character.customAvatarY,
+                customAvatarScale: character.customAvatarScale,
+            });
+        }
+
+        _reRenderDetailHeaderAvatar(character);
+
+        if (msg) {
+            msg.textContent = url ? 'Portrait saved.' : 'Portrait cleared.';
+            setTimeout(() => { if (msg) msg.textContent = ''; }, 2500);
+        }
+    } catch (err) {
+        if (msg) msg.textContent = 'Failed to save.';
+        console.error('saveCustomAvatar error:', err);
+    }
+}
+
+async function clearCustomAvatar() {
+    const input = document.getElementById('customAvatarUrlInput');
+    if (input) input.value = '';
+    _customAvatarDraft.x = 0; _customAvatarDraft.y = 0; _customAvatarDraft.scale = 1;
+    previewCustomAvatar();
+    await saveCustomAvatar();
 }
 
 async function deleteCharacter(characterId) {

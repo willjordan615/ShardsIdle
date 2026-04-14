@@ -3785,6 +3785,29 @@ body:has(#combatlog.active) #headerTopBar {
 .detail-char-header .avatar-card-bg img {
     display: none;
 }
+/* custom portrait in detail header — show it, override the hide rule */
+.detail-char-header .avatar-card-bg--custom img {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: unset !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    animation: none !important;
+}
+/* card bg custom variant — full bleed cover, readable opacity */
+.avatar-card-bg--custom,
+.detail-char-header .avatar-card-bg--custom,
+.combatant .avatar-card-bg--custom {
+    position: absolute;
+    inset: 0;
+    width: auto;
+    overflow: hidden;
+    opacity: 0.45;
+    filter: none;
+}
 @keyframes detail-portrait-pan {
     from { transform: translateY(-20%); }
     to   { transform: translateY(-45%); }

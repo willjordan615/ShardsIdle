@@ -518,7 +518,7 @@ async function displayCombatLog(combatData) {
             const div = document.createElement('div');
             div.className = 'combatant';
             div.id = `party-${pc.characterID}`;
-            const avatarBg = window.AVATARS?.renderCardBg(pc.avatarId, pc.avatarColor) ?? '';
+            const avatarBg = window.AVATARS?.renderCardBgForCharacter(pc) ?? '';
             div.innerHTML = `
                 ${avatarBg}
                 <div class="combatant-inner">

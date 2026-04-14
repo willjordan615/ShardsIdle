@@ -1113,7 +1113,11 @@ class CombatEngine {
           consumableStash: p.consumableStash,
           keyring: p.keyring,
           avatarId: partySnapshots[idx]?.avatarId || null,
-          avatarColor: partySnapshots[idx]?.avatarColor || null
+          avatarColor: partySnapshots[idx]?.avatarColor || null,
+          customAvatarUrl: partySnapshots[idx]?.customAvatarUrl || null,
+          customAvatarX: partySnapshots[idx]?.customAvatarX ?? 0,
+          customAvatarY: partySnapshots[idx]?.customAvatarY ?? 0,
+          customAvatarScale: partySnapshots[idx]?.customAvatarScale ?? 1
         })),
         enemies: segments[segments.length-1]?.participantsSnapshot.enemies || []
       },
