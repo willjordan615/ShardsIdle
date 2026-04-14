@@ -2417,7 +2417,10 @@ _applyLootTagFlavour(item, tagDef) {
         });
     }
 
-    // Consumable belt — add the skill linked to each consumable with qty > 0
+    // Consumable belt — add the skill linked to each consumable with qty > 0.
+    // Only include skillIDs that resolve to an actual combat skill; items like
+    // escape_rope have a skillID that is handled externally (via the /escape
+    // route) and should never enter the combat skill pool.
     const consumables = character.consumables || {};
     if (typeof consumables === 'object' && !Array.isArray(consumables)) {
         Object.entries(consumables).forEach(([consumableId, qty]) => {
@@ -2425,7 +2428,7 @@ _applyLootTagFlavour(item, tagDef) {
                 const itemDef = this.gear.find(g => g.id === consumableId);
                 if (itemDef) {
                     const skillId = itemDef.skillID || itemDef.effect_skillid;
-                    if (skillId) pool.add(skillId);
+                    if (skillId && this.skills.find(s => s.id === skillId)) pool.add(skillId);
                 }
             }
         });
