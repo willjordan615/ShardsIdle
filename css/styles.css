@@ -3808,6 +3808,11 @@ body:has(#combatlog.active) #headerTopBar {
     opacity: 0.45;
     filter: none;
 }
+/* Override the desaturation and position rules that apply to all .avatar-card-bg imgs */
+.avatar-card-bg--custom img {
+    filter: none !important;
+    object-position: center center !important;
+}
 @keyframes detail-portrait-pan {
     from { transform: translateY(-20%); }
     to   { transform: translateY(-45%); }
