@@ -4200,3 +4200,10 @@ body:has(#combatlog.active) #headerTopBar {
     opacity: 0.85;
     flex-shrink: 0;
 }
+
+/* ── Status pip icon colour tints ────────────────────────────────────── */
+/* Applied to the .status-pip span; filter tints the child <img> via inheritance */
+.status-tint-red    .gi-icon { filter: invert(24%) sepia(94%) saturate(700%) hue-rotate(335deg) brightness(1.1); }
+.status-tint-green  .gi-icon { filter: invert(55%) sepia(60%) saturate(400%) hue-rotate(90deg)  brightness(1.1); }
+.status-tint-purple .gi-icon { filter: invert(30%) sepia(60%) saturate(600%) hue-rotate(260deg) brightness(1.1); }
+.status-tint-dark   .gi-icon { filter: invert(10%) sepia(30%) saturate(200%) hue-rotate(260deg) brightness(0.7); }

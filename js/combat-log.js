@@ -1344,7 +1344,21 @@ function renderTurn(turn, logDisplay, hpMaxes, hpCurrent) {
 // --- HEALTH BAR UPDATERS ---
 
 
-// Status emoji/tooltip data — populated from gameData on first use
+// Status icon data — populated from gameData on first use
+// The emoji field in statuses.json now holds an icon filename (no extension).
+const _STATUS_TINT = {
+    bleed:              'status-tint-red',
+    siphon_ward:        'status-tint-red',
+    life_leech:         'status-tint-red',
+    cursed_blood:       'status-tint-red',
+    bloodlust_buff:     'status-tint-red',
+    taunt:              'status-tint-red',
+    berserker_stance_buff: 'status-tint-red',
+    poison_weak:        'status-tint-green',
+    poison_strong:      'status-tint-purple',
+    poison_deadly:      'status-tint-dark',
+};
+
 let _statusData = null;
 function _getStatusData() {
     if (_statusData) return _statusData;
@@ -1352,9 +1366,9 @@ function _getStatusData() {
     _statusData = {};
     statuses.forEach(s => {
         _statusData[s.id] = {
-            emoji:   s.emoji   || '⚠️',
+            icon:    s.emoji || 'uncertainty',
             tooltip: s.tooltip || s.description || s.id,
-            type:    s.type    || 'debuff',
+            type:    s.type  || 'debuff',
         };
     });
     return _statusData;
@@ -1369,10 +1383,11 @@ function updateStatusEffects(combatantId, statuses) {
     }
     const data = _getStatusData();
     el.innerHTML = statuses.map(s => {
-        const info = data[s.id] || { emoji: '⚠️', tooltip: s.id, type: 'debuff' };
-        const cls  = info.type === 'buff' ? 'status-pip status-pip-buff' : 'status-pip status-pip-debuff';
-        const label = info.type === 'buff' ? info.tooltip : info.tooltip;
-        return `<span class="${cls}" data-tooltip="${label} (${s.duration}t)">${info.emoji}</span>`;
+        const info   = data[s.id] || { icon: 'uncertainty', tooltip: s.id, type: 'debuff' };
+        const pipCls = info.type === 'buff' ? 'status-pip status-pip-buff' : 'status-pip status-pip-debuff';
+        const tint   = _STATUS_TINT[s.id] ? ` ${_STATUS_TINT[s.id]}` : '';
+        const img    = `<img src="/assets/icons/${info.icon}.svg" class="gi-icon" alt="">`;
+        return `<span class="${pipCls}${tint}" data-tooltip="${info.tooltip} (${s.duration}t)">${img}</span>`;
     }).join('');
 }
 
